@@ -5,10 +5,10 @@
   --color-primary-dark: #0047CC;
   --color-accent: #AAFF00;
   --color-accent-dark: #88CC00;
-  --color-bg: #F5F7FA;
-  --color-surface: #FFFFFF;
-  --color-text: #0D0D0D;
-  --color-muted: #6B7280;
+  --color-bg: #0f0f0f;
+  --color-surface: #1a1a1a;
+  --color-text: #e0e0e0;
+  --color-muted: #8b8b8b;
   --color-error: #FF3B30;
   --color-success: #34C759;
 
@@ -22,4 +22,14 @@ html, body {
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
+  
+  /* Hide scrollbar while keeping functionality */
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+
+/* Chrome, Safari, Edge */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }

@@ -12,8 +12,16 @@ export const ACTIVITIES = [
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },
 	{ id: 'swimming', label: 'Swimming', emoji: '🏊' },
 	{ id: 'hiking', label: 'Hiking', emoji: '🥾' },
-	{ id: 'football', label: 'Football', emoji: '⚽' },
-	{ id: 'badminton', label: 'Badminton', emoji: '🏸' }
+	{ id: 'badminton', label: 'Badminton', emoji: '🏸' },
+	{ id: 'ping-pong', label: 'Ping Pong', emoji: '🏓' },
+	{ id: 'pickleball', label: 'Pickleball', emoji: '🥒' },
+	{ id: 'squash', label: 'Squash', emoji: '📦' },
+	{ id: 'racquetball', label: 'Racquetball', emoji: '🎾' },
+	{ id: 'gym', label: 'Gym Training', emoji: '💪' },
+	{ id: 'rock-climbing', label: 'Rock Climbing', emoji: '🧗' },
+	{ id: 'golf', label: 'Golf', emoji: '⛳' },
+	{ id: 'martial-arts', label: 'Martial Arts', emoji: '🥋' },
+	{ id: 'fencing', label: 'Fencing', emoji: '🤺' }
 ] as const;
 
 export type ActivityId = (typeof ACTIVITIES)[number]['id'];
