@@ -55,7 +55,8 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 export async function getDiscoverFeed(
 	currentUid: string,
 	activityFilter: string,
-	formatFilter: ActivityFormat | ''
+	formatFilter: ActivityFormat | '',
+	genderFilter: string = ''
 ): Promise<UserProfile[]> {
 	// Get users who we already swiped
 	const sentSnap = await getDocs(collection(db, 'swipes', currentUid, 'sent'));
@@ -69,6 +70,8 @@ export async function getDiscoverFeed(
 	for (const d of snap.docs) {
 		if (alreadySwiped.has(d.id)) continue;
 		const data = d.data() as Omit<UserProfile, 'uid'>;
+
+		if (genderFilter && data.gender !== genderFilter) continue;
 
 		// Filter by activity + format if set
 		if (activityFilter || formatFilter) {

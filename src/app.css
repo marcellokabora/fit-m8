@@ -1,31 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0066FF;
-  --color-primary-dark: #0047CC;
-  --color-accent: #AAFF00;
-  --color-accent-dark: #88CC00;
-  --color-bg: #0f0f0f;
-  --color-surface: #1a1a1a;
-  --color-text: #e0e0e0;
-  --color-muted: #8b8b8b;
-  --color-error: #FF3B30;
-  --color-success: #34C759;
+  --color-primary: #0066ff;
+  --color-primary-dark: #0047cc;
+  --color-secondary: #ff5a36;
+  --color-secondary-dark: #e6431f;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-text: #0d0d0d;
+  --color-muted: #6b7280;
+  --color-error: #ff3b30;
+  --color-success: #34c759;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
-  
+
   /* Hide scrollbar while keeping functionality */
-  -ms-overflow-style: none;  /* IE & Edge */
-  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Chrome, Safari, Edge */

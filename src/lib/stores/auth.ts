@@ -4,7 +4,6 @@ import {
 	onAuthStateChanged,
 	signInWithPopup,
 	GoogleAuthProvider,
-	OAuthProvider,
 	FacebookAuthProvider,
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword,
@@ -15,7 +14,8 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import type { UserProfile } from '$lib/types';
 
 function createAuthStore() {
-	const { subscribe, set } = writable<User | null>(null);
+	// undefined = auth state not yet resolved (still reading persisted session)
+	const { subscribe, set } = writable<User | null | undefined>(undefined);
 
 	if (typeof window !== 'undefined') {
 		onAuthStateChanged(auth, (user) => set(user));
@@ -24,7 +24,6 @@ function createAuthStore() {
 	return {
 		subscribe,
 		signInGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()),
-		signInApple: () => signInWithPopup(auth, new OAuthProvider('apple.com')),
 		signInFacebook: () => signInWithPopup(auth, new FacebookAuthProvider()),
 		signInEmail: (email: string, password: string) =>
 			signInWithEmailAndPassword(auth, email, password),
@@ -36,7 +35,7 @@ function createAuthStore() {
 
 export const authUser = createAuthStore();
 
-export const isLoggedIn = derived(authUser, ($user) => $user !== null);
+export const isLoggedIn = derived(authUser, ($user) => !!$user);
 
 function createUserProfileStore() {
 	const { subscribe, set, update } = writable<UserProfile | null>(null);
@@ -64,3 +63,4 @@ export const userProfile = createUserProfileStore();
 
 export const filterActivity = writable<string>('');
 export const filterFormat = writable<'1v1' | '2v2' | ''>('');
+export const filterGender = writable<'Male' | 'Female' | ''>('');

@@ -12,10 +12,19 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter({ fallback: 'index.html' })
+			adapter: adapter({ fallback: 'index.html' }),
+			inspector: true
 		}),
 		VitePWA({
 			registerType: 'autoUpdate',
+			// avoid the inline SW-registration script vite-plugin-pwa injects by default,
+			// which gets blocked by a strict `script-src` CSP; register manually instead
+			injectRegister: false,
+			devOptions: {
+				// dev server has no static index.html to precache, so keep the SW
+				// disabled in dev and only register it in production builds
+				enabled: false
+			},
 			manifest: {
 				name: 'FitMate',
 				short_name: 'FitMate',
