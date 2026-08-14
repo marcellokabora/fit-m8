@@ -16,6 +16,7 @@
   import { ACTIVITIES } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import { unreadMatches } from "$lib/stores/unread";
 
   let matches = $state<Match[]>([]);
   let otherUsers = $state<Record<string, UserProfile>>({});
@@ -115,12 +116,13 @@
         {@const activity = ACTIVITIES.find((a) => a.id === match.activity)}
         {@const otherUid = match.userIds.find((id) => id !== $authUser?.uid)}
         {@const other = otherUid ? otherUsers[otherUid] : undefined}
+        {@const unread = $unreadMatches.has(match.id)}
         <a
           href="/chat/{match.id}"
           class="flex items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm active:scale-[0.98] transition-transform"
         >
           <div
-            class="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary"
+            class="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary"
           >
             {#if other?.photoURL}
               <img
@@ -131,21 +133,42 @@
             {:else}
               <User class="size-6" />
             {/if}
+            {#if unread}
+              <span
+                class="absolute right-0 top-0 size-3.5 rounded-full border-2 border-surface bg-red-500"
+              ></span>
+            {/if}
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-bold text-text truncate">
               {other?.displayName ?? "Match"}
             </p>
-            <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
-              <ActivityIcon id={match.activity} class="size-3.5" />
-              {activity?.label ?? match.activity} · {match.format}
-            </p>
+            {#if match.lastMessage}
+              <p
+                class="mt-1 truncate text-sm {unread
+                  ? 'font-bold text-text'
+                  : 'text-muted'}"
+              >
+                {match.lastMessage}
+              </p>
+            {:else}
+              <p
+                class="mt-1 flex items-center gap-1 text-sm text-muted truncate"
+              >
+                <ActivityIcon id={match.activity} class="size-3.5" />
+                {activity?.label ?? match.activity} · {match.format}
+              </p>
+            {/if}
           </div>
           <div class="flex flex-col items-end gap-1">
-            <span
-              class="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"
-              >Chat</span
-            >
+            {#if unread}
+              <span class="size-2.5 rounded-full bg-red-500"></span>
+            {:else}
+              <span
+                class="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"
+                >Chat</span
+              >
+            {/if}
           </div>
         </a>
       {/each}

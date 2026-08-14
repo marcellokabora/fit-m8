@@ -9,6 +9,7 @@
     orderBy,
     onSnapshot,
     addDoc,
+    updateDoc,
     serverTimestamp,
     doc,
     getDoc,
@@ -43,6 +44,14 @@
     }
   }
 
+  async function markAsRead() {
+    const uid = get(authUser)?.uid;
+    if (!uid) return;
+    await updateDoc(doc(db, "matches", matchId), {
+      [`readBy.${uid}`]: serverTimestamp(),
+    });
+  }
+
   onMount(() => {
     loadOtherUser();
     const q = query(
@@ -57,6 +66,8 @@
       loading = false;
       await tick();
       messagesEndEl?.scrollIntoView({ behavior: "smooth" });
+      // chat is open, so any message that just arrived counts as read
+      markAsRead();
     });
   });
 
@@ -72,6 +83,12 @@
       senderId: uid,
       text: msg,
       timestamp: serverTimestamp(),
+    });
+    await updateDoc(doc(db, "matches", matchId), {
+      lastMessage: msg,
+      lastMessageAt: serverTimestamp(),
+      lastMessageSenderId: uid,
+      [`readBy.${uid}`]: serverTimestamp(),
     });
     sending = false;
   }

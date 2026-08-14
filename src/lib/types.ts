@@ -60,6 +60,11 @@ export interface Match {
 	format: ActivityFormat;
 	status: MatchStatus;
 	createdAt: Date;
+	lastMessage?: string;
+	lastMessageAt?: Date;
+	lastMessageSenderId?: string;
+	// per-uid timestamp of when that user last read the chat
+	readBy?: Record<string, Date>;
 }
 
 export interface Message {
