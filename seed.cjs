@@ -8,10 +8,11 @@ const envPath = path.resolve(process.cwd(), '.env');
 const env = {};
 fs.readFileSync(envPath, 'utf-8')
 	.split('\n')
-	.filter(line => line && !line.startsWith('#'))
+	.map(line => line.trim())
+	.filter(line => line && !line.startsWith('#') && line.includes('='))
 	.forEach(line => {
-		const [key, value] = line.split('=');
-		env[key.trim()] = value.trim();
+		const [key, ...rest] = line.split('=');
+		env[key.trim()] = rest.join('=').trim();
 	});
 
 const serviceAccountPath = path.resolve(process.cwd(), 'firebase-key.json');
