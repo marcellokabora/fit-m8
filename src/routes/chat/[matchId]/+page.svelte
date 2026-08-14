@@ -10,20 +10,41 @@
     onSnapshot,
     addDoc,
     serverTimestamp,
+    doc,
+    getDoc,
   } from "firebase/firestore";
-  import type { Message } from "$lib/types";
+  import type { Message, Match, UserProfile } from "$lib/types";
   import { get } from "svelte/store";
   import { ArrowLeft, LoaderCircle, Sparkles, Send } from "@lucide/svelte";
 
-  let matchId = $derived(page.params.matchId);
+  let matchId = $derived(page.params.matchId as string);
   let messages = $state<Message[]>([]);
   let text = $state("");
   let loading = $state(true);
   let sending = $state(false);
   let messagesEndEl = $state<HTMLDivElement | null>(null);
   let unsubscribe: (() => void) | null = null;
+  let otherUser = $state<UserProfile | null>(null);
+
+  async function loadOtherUser() {
+    const uid = get(authUser)?.uid;
+    if (!uid) return;
+    const matchSnap = await getDoc(doc(db, "matches", matchId));
+    if (!matchSnap.exists()) return;
+    const match = matchSnap.data() as Omit<Match, "id">;
+    const otherUid = match.userIds.find((id) => id !== uid);
+    if (!otherUid) return;
+    const userSnap = await getDoc(doc(db, "users", otherUid));
+    if (userSnap.exists()) {
+      otherUser = {
+        uid: otherUid,
+        ...(userSnap.data() as Omit<UserProfile, "uid">),
+      };
+    }
+  }
 
   onMount(() => {
+    loadOtherUser();
     const q = query(
       collection(db, "chats", matchId, "messages"),
       orderBy("timestamp", "asc"),
@@ -76,9 +97,22 @@
     >
       <ArrowLeft class="size-5 text-text" />
     </a>
+    {#if otherUser}
+      <a href="/profile/{otherUser.uid}" class="shrink-0">
+        <img
+          src={otherUser.photoURL}
+          alt={otherUser.displayName}
+          class="size-10 rounded-full object-cover"
+        />
+      </a>
+    {/if}
     <div class="flex-1">
-      <p class="font-bold text-text">Match Chat</p>
-      <p class="text-xs text-muted">{matchId}</p>
+      <p class="font-bold text-text">
+        {otherUser?.displayName ?? "Match Chat"}
+      </p>
+      <p class="text-xs text-muted">
+        {otherUser ? `${otherUser.age} · ${otherUser.city}` : matchId}
+      </p>
     </div>
   </div>
 

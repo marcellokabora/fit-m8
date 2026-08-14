@@ -1,25 +1,24 @@
 <script lang="ts">
-  import {
-    Footprints,
-    CircleDot,
-    Disc,
-    Volleyball,
-    Circle,
-    Bike,
-    WavesHorizontal,
-    Mountain,
-    Feather,
-    Table2,
-    Disc2,
-    Box,
-    Disc3,
-    Dumbbell,
-    MountainSnow,
-    Flag,
-    Swords,
-    Sword,
-    Activity,
-  } from "@lucide/svelte";
+  import Jogging from "~icons/material-symbols/directions-run";
+  import Padel from "~icons/material-symbols/padel";
+  import Tennis from "~icons/material-symbols/sports-tennis";
+  import BeachVolley from "~icons/material-symbols/sports-volleyball";
+  import Basketball from "~icons/material-symbols/sports-basketball";
+  import Cycling from "~icons/material-symbols/pedal-bike";
+  import Swimming from "~icons/material-symbols/pool";
+  import Hiking from "~icons/material-symbols/hiking";
+  import Badminton from "~icons/material-symbols/badminton";
+  import PingPong from "~icons/mdi/table-tennis";
+  import Pickleball from "~icons/material-symbols/pickleball";
+  import Squash from "~icons/mdi/squash";
+  import Racquetball from "~icons/mdi/racquetball";
+  import Gym from "~icons/material-symbols/sports-gymnastics";
+  import Calisthenics from "~icons/mdi/arm-flex";
+  import RockClimbing from "~icons/mdi/rock-climbing";
+  import Golf from "~icons/material-symbols/sports-golf";
+  import MartialArts from "~icons/material-symbols/sports-martial-arts";
+  import Fencing from "~icons/mdi/fencing";
+  import Generic from "~icons/material-symbols/sports-outline";
   import type { ActivityId } from "$lib/types";
 
   let {
@@ -27,28 +26,29 @@
     class: className = "size-5",
   }: { id: ActivityId | string; class?: string } = $props();
 
-  const ICONS: Record<string, typeof Activity> = {
-    jogging: Footprints,
-    padel: CircleDot,
-    tennis: Disc,
-    "beach-volley": Volleyball,
-    basketball: Circle,
-    cycling: Bike,
-    swimming: WavesHorizontal,
-    hiking: Mountain,
-    badminton: Feather,
-    "ping-pong": Table2,
-    pickleball: Disc2,
-    squash: Box,
-    racquetball: Disc3,
-    gym: Dumbbell,
-    "rock-climbing": MountainSnow,
-    golf: Flag,
-    "martial-arts": Swords,
-    fencing: Sword,
+  const ICONS: Record<string, typeof Jogging> = {
+    jogging: Jogging,
+    padel: Padel,
+    tennis: Tennis,
+    "beach-volley": BeachVolley,
+    basketball: Basketball,
+    cycling: Cycling,
+    swimming: Swimming,
+    hiking: Hiking,
+    badminton: Badminton,
+    "ping-pong": PingPong,
+    pickleball: Pickleball,
+    squash: Squash,
+    racquetball: Racquetball,
+    gym: Gym,
+    calisthenics: Calisthenics,
+    "rock-climbing": RockClimbing,
+    golf: Golf,
+    "martial-arts": MartialArts,
+    fencing: Fencing,
   };
 
-  let Icon = $derived(ICONS[id] ?? Activity);
+  let Icon = $derived(ICONS[id] ?? Generic);
 </script>
 
 <Icon class={className} />

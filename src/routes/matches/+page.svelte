@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
-  import { LoaderCircle, Users } from "@lucide/svelte";
+  import { onDestroy } from "svelte";
+  import { LoaderCircle, Users, User } from "@lucide/svelte";
   import { authUser } from "$lib/stores/auth";
   import { db } from "$lib/firebase/client";
   import {
@@ -9,34 +9,68 @@
     where,
     onSnapshot,
     orderBy,
+    doc,
+    getDoc,
   } from "firebase/firestore";
-  import type { Match } from "$lib/types";
+  import type { Match, UserProfile } from "$lib/types";
   import { ACTIVITIES } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import { get } from "svelte/store";
 
   let matches = $state<Match[]>([]);
+  let otherUsers = $state<Record<string, UserProfile>>({});
   let loading = $state(true);
+  let error = $state<string | null>(null);
   let unsubscribe: (() => void) | null = null;
 
-  onMount(() => {
-    const uid = get(authUser)?.uid;
-    if (!uid) return;
+  async function loadOtherUser(uid: string) {
+    if (otherUsers[uid]) return;
+    const snap = await getDoc(doc(db, "users", uid));
+    if (snap.exists()) {
+      otherUsers[uid] = { uid, ...(snap.data() as Omit<UserProfile, "uid">) };
+    }
+  }
 
+  // Re-run once auth state resolves ($authUser starts as undefined while loading)
+  $effect(() => {
+    const uid = $authUser?.uid;
+    unsubscribe?.();
+    unsubscribe = null;
+
+    if (!uid) {
+      matches = [];
+      loading = $authUser === undefined;
+      return;
+    }
+
+    loading = true;
+    error = null;
     const q = query(
       collection(db, "matches"),
       where("userIds", "array-contains", uid),
       orderBy("createdAt", "desc"),
     );
 
-    unsubscribe = onSnapshot(q, (snap) => {
-      matches = snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as Omit<Match, "id">),
-      }));
-      loading = false;
-    });
+    unsubscribe = onSnapshot(
+      q,
+      (snap) => {
+        matches = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Match, "id">),
+        }));
+        loading = false;
+        for (const match of matches) {
+          const otherUid = match.userIds.find((id) => id !== uid);
+          if (otherUid) loadOtherUser(otherUid);
+        }
+      },
+      (err) => {
+        // Without this the spinner would spin forever on a rules/index failure
+        console.error("Failed to load matches:", err);
+        error = err.message;
+        loading = false;
+      },
+    );
   });
 
   onDestroy(() => unsubscribe?.());
@@ -51,6 +85,13 @@
   {#if loading}
     <div class="flex flex-1 items-center justify-center text-muted">
       <LoaderCircle class="size-10 animate-spin" />
+    </div>
+  {:else if error}
+    <div
+      class="flex flex-1 flex-col items-center justify-center gap-2 px-8 text-center"
+    >
+      <p class="text-lg font-bold text-text">Couldn't load matches</p>
+      <p class="text-sm text-muted">{error}</p>
     </div>
   {:else if matches.length === 0}
     <div
@@ -72,20 +113,33 @@
     <div class="flex flex-col gap-3 px-5">
       {#each matches as match}
         {@const activity = ACTIVITIES.find((a) => a.id === match.activity)}
+        {@const otherUid = match.userIds.find((id) => id !== $authUser?.uid)}
+        {@const other = otherUid ? otherUsers[otherUid] : undefined}
         <a
           href="/chat/{match.id}"
           class="flex items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm active:scale-[0.98] transition-transform"
         >
           <div
-            class="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            class="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary"
           >
-            <ActivityIcon id={match.activity} class="size-6" />
+            {#if other?.photoURL}
+              <img
+                src={other.photoURL}
+                alt={other.displayName}
+                class="h-full w-full object-cover"
+              />
+            {:else}
+              <User class="size-6" />
+            {/if}
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-bold text-text truncate">
-              {activity?.label ?? match.activity}
+              {other?.displayName ?? "Match"}
             </p>
-            <p class="text-sm text-muted">{match.format} · {match.status}</p>
+            <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
+              <ActivityIcon id={match.activity} class="size-3.5" />
+              {activity?.label ?? match.activity} · {match.format}
+            </p>
           </div>
           <div class="flex flex-col items-end gap-1">
             <span

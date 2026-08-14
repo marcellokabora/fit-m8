@@ -18,6 +18,7 @@ export const ACTIVITIES = [
 	{ id: 'squash', label: 'Squash', emoji: '📦' },
 	{ id: 'racquetball', label: 'Racquetball', emoji: '🎾' },
 	{ id: 'gym', label: 'Gym Training', emoji: '💪' },
+	{ id: 'calisthenics', label: 'Calisthenics', emoji: '🤸' },
 	{ id: 'rock-climbing', label: 'Rock Climbing', emoji: '🧗' },
 	{ id: 'golf', label: 'Golf', emoji: '⛳' },
 	{ id: 'martial-arts', label: 'Martial Arts', emoji: '🥋' },

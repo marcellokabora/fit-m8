@@ -8,7 +8,7 @@
     type ActivityFormat,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import { Camera, User, Zap, Loader2 } from "@lucide/svelte";
+  import { Camera, User, Zap, Loader2, MapPin } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { storage } from "$lib/firebase/client";
   import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -22,6 +22,8 @@
   let age = $state(25);
   let gender = $state("");
   let city = $state("");
+  let locatingCity = $state(false);
+  let locationError = $state("");
 
   // Step 2 — Activities
   let selectedActivities = $state<string[]>([]);
@@ -69,6 +71,43 @@
     } finally {
       uploadingPhoto = false;
       input.value = "";
+    }
+  }
+
+  async function detectCity() {
+    locationError = "";
+    if (!("geolocation" in navigator)) {
+      locationError = "Geolocation isn't supported on this device";
+      return;
+    }
+
+    locatingCity = true;
+    try {
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 300000,
+          }),
+      );
+
+      const { latitude, longitude } = position.coords;
+      const res = await fetch(
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+      );
+      if (!res.ok) throw new Error("Couldn't resolve your city");
+      const data = await res.json();
+      const detected = data.city || data.locality || data.principalSubdivision;
+      if (!detected) throw new Error("Couldn't resolve your city");
+      city = detected;
+    } catch (err: any) {
+      locationError =
+        err.code === 1
+          ? "Location access denied"
+          : (err.message ?? "Couldn't detect your location");
+    } finally {
+      locatingCity = false;
     }
   }
 
@@ -157,13 +196,47 @@
           placeholder="Age"
           class="w-24 rounded-2xl border-2 border-gray-200 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
         />
-        <input
-          type="text"
-          bind:value={city}
-          placeholder="City"
-          class="flex-1 rounded-2xl border-2 border-gray-200 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-        />
+        {#if city}
+          <div
+            class="flex flex-1 items-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 px-4 py-4"
+          >
+            <MapPin class="size-5 shrink-0 text-primary" />
+            <span class="flex-1 truncate text-base font-semibold text-text"
+              >{city}</span
+            >
+            <button
+              type="button"
+              onclick={detectCity}
+              disabled={locatingCity}
+              class="shrink-0 text-xs font-bold uppercase tracking-wide text-primary disabled:opacity-40"
+            >
+              {#if locatingCity}
+                <Loader2 class="size-4 animate-spin" />
+              {:else}
+                Refresh
+              {/if}
+            </button>
+          </div>
+        {:else}
+          <button
+            type="button"
+            onclick={detectCity}
+            disabled={locatingCity}
+            class="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-300 bg-surface px-4 py-4 text-sm font-semibold text-primary transition-colors active:scale-95 disabled:opacity-40"
+          >
+            {#if locatingCity}
+              <Loader2 class="size-5 animate-spin" />
+              Detecting…
+            {:else}
+              <MapPin class="size-5" />
+              Use my location
+            {/if}
+          </button>
+        {/if}
       </div>
+      {#if locationError}
+        <p class="-mt-2 text-xs font-medium text-red-500">{locationError}</p>
+      {/if}
       <div class="flex gap-3">
         {#each ["Male", "Female", "Other"] as g}
           <button
@@ -258,10 +331,10 @@
     <p class="mb-6 text-sm text-muted">
       Add a photo so others can find you (optional)
     </p>
-    <div class="flex flex-col items-center gap-4">
+    <div class="flex flex-1 flex-col items-center justify-center gap-4">
       <div class="relative">
         <div
-          class="flex size-32 items-center justify-center rounded-full bg-gray-200 text-6xl"
+          class="flex size-56 items-center justify-center rounded-full bg-gray-200 text-6xl"
         >
           {#if photoURL}
             <img
@@ -270,20 +343,20 @@
               class="h-full w-full rounded-full object-cover"
             />
           {:else}
-            <User class="size-14 text-muted" />
+            <User class="size-24 text-muted" />
           {/if}
           {#if uploadingPhoto}
             <div
               class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40"
             >
-              <Loader2 class="size-8 animate-spin text-white" />
+              <Loader2 class="size-10 animate-spin text-white" />
             </div>
           {/if}
         </div>
         <label
-          class="absolute bottom-0 right-0 flex size-10 items-center justify-center rounded-full border-2 border-bg bg-primary text-white shadow-sm active:scale-95"
+          class="absolute bottom-2 right-2 flex size-12 items-center justify-center rounded-full border-2 border-bg bg-primary text-white shadow-sm active:scale-95"
         >
-          <Camera class="size-5" />
+          <Camera class="size-6" />
           <input
             type="file"
             accept="image/*"
@@ -317,7 +390,7 @@
     {#if step < TOTAL_STEPS}
       <button
         onclick={next}
-        disabled={step === 1 && !displayName}
+        disabled={step === 1 && (!displayName || !city)}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         Continue
