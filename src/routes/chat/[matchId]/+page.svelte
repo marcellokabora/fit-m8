@@ -15,8 +15,10 @@
     getDoc,
   } from "firebase/firestore";
   import type { Message, Match, UserProfile } from "$lib/types";
+  import { ACTIVITIES } from "$lib/types";
   import { get } from "svelte/store";
   import { ArrowLeft, LoaderCircle, Sparkles, Send } from "@lucide/svelte";
+  import ActivityIcon from "$lib/components/ActivityIcon.svelte";
 
   let matchId = $derived(page.params.matchId as string);
   let messages = $state<Message[]>([]);
@@ -26,14 +28,17 @@
   let messagesEndEl = $state<HTMLDivElement | null>(null);
   let unsubscribe: (() => void) | null = null;
   let otherUser = $state<UserProfile | null>(null);
+  let match = $state<Match | null>(null);
+  let activity = $derived(ACTIVITIES.find((a) => a.id === match?.activity));
 
   async function loadOtherUser() {
     const uid = get(authUser)?.uid;
     if (!uid) return;
     const matchSnap = await getDoc(doc(db, "matches", matchId));
     if (!matchSnap.exists()) return;
-    const match = matchSnap.data() as Omit<Match, "id">;
-    const otherUid = match.userIds.find((id) => id !== uid);
+    const matchData = matchSnap.data() as Omit<Match, "id">;
+    match = { id: matchSnap.id, ...matchData };
+    const otherUid = matchData.userIds.find((id) => id !== uid);
     if (!otherUid) return;
     const userSnap = await getDoc(doc(db, "users", otherUid));
     if (userSnap.exists()) {
@@ -127,9 +132,14 @@
       <p class="font-bold text-text">
         {otherUser?.displayName ?? "Match Chat"}
       </p>
-      <p class="text-xs text-muted">
-        {otherUser ? `${otherUser.age} · ${otherUser.city}` : matchId}
-      </p>
+      {#if match}
+        <p class="flex items-center gap-1 text-xs text-muted">
+          <ActivityIcon id={match.activity} class="size-3" />
+          {activity?.label ?? match.activity} · {match.format}
+        </p>
+      {:else}
+        <p class="text-xs text-muted">{matchId}</p>
+      {/if}
     </div>
   </div>
 

@@ -133,30 +133,22 @@
             {:else}
               <User class="size-6" />
             {/if}
-            {#if unread}
-              <span
-                class="absolute right-0 top-0 size-3.5 rounded-full border-2 border-surface bg-red-500"
-              ></span>
-            {/if}
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-bold text-text truncate">
               {other?.displayName ?? "Match"}
             </p>
+            <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
+              <ActivityIcon id={match.activity} class="size-3.5" />
+              {activity?.label ?? match.activity} · {match.format}
+            </p>
             {#if match.lastMessage}
               <p
-                class="mt-1 truncate text-sm {unread
+                class="mt-0.5 truncate text-sm {unread
                   ? 'font-bold text-text'
                   : 'text-muted'}"
               >
                 {match.lastMessage}
-              </p>
-            {:else}
-              <p
-                class="mt-1 flex items-center gap-1 text-sm text-muted truncate"
-              >
-                <ActivityIcon id={match.activity} class="size-3.5" />
-                {activity?.label ?? match.activity} · {match.format}
               </p>
             {/if}
           </div>

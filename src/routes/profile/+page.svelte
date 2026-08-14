@@ -11,6 +11,7 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { storage } from "$lib/firebase/client";
   import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+  import { compressImage } from "$lib/image";
   import { User, MapPin, Plus, X, Camera, Loader2 } from "@lucide/svelte";
 
   let editing = $state(false);
@@ -45,7 +46,6 @@
   // Avatar upload
   let uploadingPhoto = $state(false);
   let photoError = $state("");
-  const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
 
   async function handlePhotoChange(e: Event) {
     const input = e.currentTarget as HTMLInputElement;
@@ -58,19 +58,15 @@
       input.value = "";
       return;
     }
-    if (file.size > MAX_PHOTO_SIZE) {
-      photoError = "Image must be smaller than 5MB";
-      input.value = "";
-      return;
-    }
 
     const uid = get(authUser)?.uid;
     if (!uid) return;
 
     uploadingPhoto = true;
     try {
+      const compressed = await compressImage(file);
       const photoRef = ref(storage, `avatars/${uid}`);
-      await uploadBytes(photoRef, file);
+      await uploadBytes(photoRef, compressed);
       const photoURL = await getDownloadURL(photoRef);
       await userProfile.save(uid, { photoURL });
     } catch (err: any) {

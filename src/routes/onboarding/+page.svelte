@@ -12,6 +12,7 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { storage } from "$lib/firebase/client";
   import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+  import { compressImage } from "$lib/image";
 
   let step = $state(1);
   const TOTAL_STEPS = 4;
@@ -37,7 +38,6 @@
   let photoURL = $state("");
   let uploadingPhoto = $state(false);
   let photoError = $state("");
-  const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
   let saving = $state(false);
   let error = $state("");
 
@@ -52,19 +52,15 @@
       input.value = "";
       return;
     }
-    if (file.size > MAX_PHOTO_SIZE) {
-      photoError = "Image must be smaller than 5MB";
-      input.value = "";
-      return;
-    }
 
     const uid = get(authUser)?.uid;
     if (!uid) return;
 
     uploadingPhoto = true;
     try {
+      const compressed = await compressImage(file);
       const photoRef = ref(storage, `avatars/${uid}`);
-      await uploadBytes(photoRef, file);
+      await uploadBytes(photoRef, compressed);
       photoURL = await getDownloadURL(photoRef);
     } catch (err: any) {
       photoError = err.message ?? "Upload failed";
