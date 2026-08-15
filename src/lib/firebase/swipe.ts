@@ -7,7 +7,8 @@ import {
 	where,
 	getDocs,
 	serverTimestamp,
-	limit
+	limit,
+	writeBatch
 } from 'firebase/firestore';
 import { db } from '$lib/firebase/client';
 import type {
@@ -99,4 +100,12 @@ export async function getDiscoverFeed(
 		candidates.push({ uid: d.id, ...data });
 	}
 	return candidates;
+}
+
+// Deletes every recorded swipe so previously liked/passed profiles reappear in the discover feed.
+export async function resetSwipes(uid: string) {
+	const sentSnap = await getDocs(collection(db, 'swipes', uid, 'sent'));
+	const batch = writeBatch(db);
+	sentSnap.docs.forEach((d) => batch.delete(d.ref));
+	await batch.commit();
 }

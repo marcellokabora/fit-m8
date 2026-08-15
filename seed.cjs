@@ -339,26 +339,10 @@ function prepareProfile(profile, profileIndex) {
 	return { ...profile, activities };
 }
 
-// Give each profile 3 photos by borrowing 2 extra shots from other profiles
-// of the same gender (seed data has only one curated photo per person).
+// Give each profile 3 photos by repeating their single curated shot.
 function attachPhotos(profiles) {
-	const indexesByGender = new Map();
-	profiles.forEach((profile, index) => {
-		const list = indexesByGender.get(profile.gender) ?? [];
-		list.push(index);
-		indexesByGender.set(profile.gender, list);
-	});
-
-	return profiles.map((profile, index) => {
-		const pool = indexesByGender.get(profile.gender).filter(i => i !== index);
-		const secondIndex = pool[index % pool.length];
-		const thirdIndex = pool[(index + Math.floor(pool.length / 2)) % pool.length];
-		const photos = [
-			profile.photoURL,
-			profiles[secondIndex].photoURL,
-			profiles[thirdIndex].photoURL
-		].filter(Boolean);
-
+	return profiles.map(profile => {
+		const photos = [profile.photoURL, profile.photoURL, profile.photoURL];
 		return { ...profile, photos, photoURL: photos[0] };
 	});
 }
