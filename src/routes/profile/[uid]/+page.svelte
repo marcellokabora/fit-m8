@@ -2,14 +2,24 @@
   import { page } from "$app/state";
   import { db } from "$lib/firebase/client";
   import { doc, getDoc } from "firebase/firestore";
-  import { ACTIVITIES, type UserProfile } from "$lib/types";
+  import { ACTIVITIES, formatLabel, type UserProfile } from "$lib/types";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import { ArrowLeft, User, MapPin, LoaderCircle } from "@lucide/svelte";
+  import BackHeader from "$lib/components/BackHeader.svelte";
+  import PhotoGallery from "$lib/components/PhotoGallery.svelte";
+  import { MapPin, LoaderCircle } from "@lucide/svelte";
 
   let uid = $derived(page.params.uid as string);
   let profile = $state<UserProfile | null>(null);
   let loading = $state(true);
   let notFound = $state(false);
+
+  let photos = $derived(
+    profile?.photos?.length
+      ? profile.photos
+      : profile?.photoURL
+        ? [profile.photoURL]
+        : [],
+  );
 
   $effect(() => {
     loading = true;
@@ -27,15 +37,7 @@
 </script>
 
 <div class="flex min-h-screen flex-col bg-bg pb-12">
-  <div class="flex items-center gap-3 px-4 pb-3 pt-12">
-    <button
-      onclick={() => history.back()}
-      class="flex size-9 items-center justify-center rounded-full hover:bg-gray-100"
-    >
-      <ArrowLeft class="size-5 text-text" />
-    </button>
-    <h1 class="text-lg font-black text-text">Profile</h1>
-  </div>
+  <BackHeader title="Profile" />
 
   {#if loading}
     <div class="flex flex-1 items-center justify-center text-muted">
@@ -46,20 +48,9 @@
       <p>User not found</p>
     </div>
   {:else}
-    <div class="flex flex-col items-center gap-3 px-5 pb-6">
-      <div
-        class="flex size-24 items-center justify-center rounded-full bg-primary/20 text-6xl"
-      >
-        {#if profile.photoURL}
-          <img
-            src={profile.photoURL}
-            alt={profile.displayName}
-            class="h-full w-full rounded-full object-cover"
-          />
-        {:else}
-          <User class="size-12 text-primary" />
-        {/if}
-      </div>
+    <PhotoGallery {photos} alt={profile.displayName} />
+
+    <div class="flex flex-col items-center gap-3 px-5 pb-6 pt-4">
       <h2 class="text-xl font-black text-text">{profile.displayName}</h2>
       <div class="flex items-center gap-2 text-sm text-muted">
         {#if profile.age}
@@ -72,8 +63,15 @@
           </span>
         {/if}
       </div>
+      {#if profile.sexualOrientation === "gay"}
+        <span
+          class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
+        >
+          Gay
+        </span>
+      {/if}
       {#if profile.bio}
-        <p class="text-center text-sm text-muted">{profile.bio}</p>
+        <p class="text-center text-sm text-muted text-balance">{profile.bio}</p>
       {/if}
     </div>
 
@@ -97,7 +95,9 @@
               </span>
               <div class="flex-1">
                 <p class="font-bold text-text">{info?.label ?? act.id}</p>
-                <p class="text-sm text-muted">{act.format} · {act.level}</p>
+                <p class="text-sm text-muted">
+                  {formatLabel(act.format)} · {act.level}
+                </p>
               </div>
             </div>
           {/each}

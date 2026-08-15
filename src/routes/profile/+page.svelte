@@ -5,6 +5,7 @@
     ACTIVITY_FORMAT_OPTIONS,
     SEXUAL_ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
+    formatLabel,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
@@ -15,20 +16,9 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import { storage } from "$lib/firebase/client";
-  import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-  import { compressImage } from "$lib/image";
-  import {
-    User,
-    MapPin,
-    Plus,
-    X,
-    Camera,
-    Loader2,
-    Check,
-    Sun,
-    Moon,
-  } from "@lucide/svelte";
+  import PhotoGrid from "$lib/components/PhotoGrid.svelte";
+  import PhotoGallery from "$lib/components/PhotoGallery.svelte";
+  import { MapPin, Plus, X, Check, Sun, Moon } from "@lucide/svelte";
   import { activeTheme, THEMES } from "$lib/stores/theme";
 
   let editing = $state(false);
@@ -40,6 +30,11 @@
   let sexualOrientation = $state<SexualOrientation>(
     $userProfile?.sexualOrientation ?? "straight",
   );
+  let photos = $state<string[]>(
+    $userProfile?.photos ??
+      ($userProfile?.photoURL ? [$userProfile.photoURL] : []),
+  );
+  let uid = $derived($authUser?.uid ?? "");
 
   $effect(() => {
     if ($userProfile) {
@@ -47,8 +42,16 @@
       bio = $userProfile.bio ?? "";
       city = $userProfile.city ?? "";
       sexualOrientation = $userProfile.sexualOrientation ?? "straight";
+      photos =
+        $userProfile.photos ??
+        ($userProfile.photoURL ? [$userProfile.photoURL] : []);
     }
   });
+
+  function handlePhotosChange(next: string[]) {
+    if (!uid) return;
+    userProfile.save(uid, { photos: next, photoURL: next[0] ?? "" });
+  }
 
   async function save() {
     saving = true;
@@ -69,44 +72,10 @@
     await authUser.signOut();
   }
 
-  // Avatar upload
-  let uploadingPhoto = $state(false);
-  let photoError = $state("");
-
-  async function handlePhotoChange(e: Event) {
-    const input = e.currentTarget as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    photoError = "";
-    if (!file.type.startsWith("image/")) {
-      photoError = "Please choose an image file";
-      input.value = "";
-      return;
-    }
-
-    const uid = get(authUser)?.uid;
-    if (!uid) return;
-
-    uploadingPhoto = true;
-    try {
-      const compressed = await compressImage(file);
-      const photoRef = ref(storage, `avatars/${uid}`);
-      await uploadBytes(photoRef, compressed);
-      const photoURL = await getDownloadURL(photoRef);
-      await userProfile.save(uid, { photoURL });
-    } catch (err: any) {
-      photoError = err.message ?? "Upload failed";
-    } finally {
-      uploadingPhoto = false;
-      input.value = "";
-    }
-  }
-
   // Add sport
   let showAddSport = $state(false);
   let newActivityId = $state<string | null>(null);
-  let newFormat = $state<ActivityFormat>("1v1");
+  let newFormat = $state<ActivityFormat>("all");
   let newLevel = $state<SkillLevel>("Basic");
   let savingSport = $state(false);
 
@@ -119,7 +88,7 @@
   function openAddSport() {
     showAddSport = true;
     newActivityId = null;
-    newFormat = "1v1";
+    newFormat = "all";
     newLevel = "Basic";
   }
 
@@ -163,46 +132,12 @@
     </button>
   </div>
 
-  <!-- Avatar + basic info -->
-  <div class="flex flex-col items-center gap-3 px-5 pb-6">
-    <div class="relative">
-      <div
-        class="flex size-24 items-center justify-center rounded-full bg-primary/20 text-6xl"
-      >
-        {#if $userProfile?.photoURL}
-          <img
-            src={$userProfile.photoURL}
-            alt={$userProfile.displayName}
-            class="h-full w-full rounded-full object-cover"
-          />
-        {:else}
-          <User class="size-12 text-primary" />
-        {/if}
-        {#if uploadingPhoto}
-          <div
-            class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40"
-          >
-            <Loader2 class="size-6 animate-spin text-white" />
-          </div>
-        {/if}
+  <!-- Photos + basic info -->
+  {#if editing}
+    <div class="flex flex-col items-center gap-3 px-5 pb-6">
+      <div class="w-full max-w-xs">
+        <PhotoGrid {photos} {uid} onchange={handlePhotosChange} />
       </div>
-      <label
-        class="absolute bottom-0 right-0 flex size-8 items-center justify-center rounded-full border-2 border-bg bg-primary text-white shadow-sm active:scale-95"
-      >
-        <Camera class="size-4" />
-        <input
-          type="file"
-          accept="image/*"
-          onchange={handlePhotoChange}
-          disabled={uploadingPhoto}
-          class="hidden"
-        />
-      </label>
-    </div>
-    {#if photoError}
-      <p class="text-sm text-error">{photoError}</p>
-    {/if}
-    {#if editing}
       <input
         type="text"
         bind:value={displayName}
@@ -217,7 +152,10 @@
       <div class="w-full">
         <LocationPicker bind:city />
       </div>
-    {:else}
+    </div>
+  {:else}
+    <PhotoGallery {photos} alt={$userProfile?.displayName ?? "Profile photo"} />
+    <div class="flex flex-col items-center gap-3 px-5 pb-6 pt-4">
       <h2 class="text-xl font-black text-text">
         {$userProfile?.displayName ?? "—"}
       </h2>
@@ -232,8 +170,8 @@
           {$userProfile.bio}
         </p>
       {/if}
-    {/if}
-  </div>
+    </div>
+  {/if}
 
   <!-- Sexual orientation -->
   <div class="px-5 pb-8">
@@ -251,14 +189,6 @@
       >
         {saving ? "Saving…" : "Save changes"}
       </button>
-    {:else}
-      <p class="text-sm text-text">
-        {SEXUAL_ORIENTATIONS.find(
-          (orientation) =>
-            orientation.value ===
-            ($userProfile?.sexualOrientation ?? "straight"),
-        )?.label ?? "Not set"}
-      </p>
     {/if}
   </div>
 
@@ -283,7 +213,9 @@
             </span>
             <div class="flex-1">
               <p class="font-bold text-text">{info?.label ?? act.id}</p>
-              <p class="text-sm text-muted">{act.format} · {act.level}</p>
+              <p class="text-sm text-muted">
+                {formatLabel(act.format)} · {act.level}
+              </p>
             </div>
             <button
               onclick={() => removeSport(act.id)}
@@ -348,7 +280,7 @@
                     onclick={() => (newLevel = level.value as SkillLevel)}
                     class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {newLevel ===
                     level.value
-                      ? 'border-secondary-dark bg-secondary text-white'
+                      ? 'border-primary bg-primary text-white'
                       : 'border-border text-muted'}"
                   >
                     {level.label}

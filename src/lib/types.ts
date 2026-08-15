@@ -2,12 +2,16 @@ export type SwipeDirection = 'like' | 'pass';
 export type MatchStatus = 'pending' | 'confirmed' | 'declined';
 
 export const ACTIVITY_FORMAT_OPTIONS = [
+	{ value: 'all', label: 'All' },
 	{ value: '1v1', label: '1v1' },
-	{ value: '2v2', label: '2v2' },
-	{ value: 'both', label: 'Both' }
+	{ value: '2v2', label: '2v2' }
 ] as const;
 
 export type ActivityFormat = (typeof ACTIVITY_FORMAT_OPTIONS)[number]['value'];
+
+export function formatLabel(format: ActivityFormat): string {
+	return ACTIVITY_FORMAT_OPTIONS.find((f) => f.value === format)?.label ?? format;
+}
 
 export const SKILL_LEVEL_OPTIONS = [
 	{ value: 'Basic', label: 'Basic' },
@@ -18,8 +22,7 @@ export type SkillLevel = (typeof SKILL_LEVEL_OPTIONS)[number]['value'];
 
 export const SEXUAL_ORIENTATIONS = [
 	{ value: 'straight', label: 'Straight' },
-	{ value: 'gay', label: 'Gay' },
-	{ value: 'bisexual', label: 'Bisexual' }
+	{ value: 'gay', label: 'Gay' }
 ] as const;
 
 export type SexualOrientation = (typeof SEXUAL_ORIENTATIONS)[number]['value'];
@@ -58,6 +61,8 @@ export interface UserProfile {
 	uid: string;
 	displayName: string;
 	photoURL: string;
+	// up to 3 photo URLs, in display order — photos[0] is the default/main photo (mirrored in photoURL)
+	photos?: string[];
 	bio: string;
 	age: number;
 	gender: string;

@@ -65,4 +65,4 @@ export const filterActivity = writable<string>('');
 export const filterFormat = writable<'1v1' | '2v2' | ''>('');
 export const filterLevel = writable<SkillLevel | ''>('');
 export const filterGender = writable<'Male' | 'Female' | ''>('');
-export const filterSexualOrientation = writable<SexualOrientation>('straight');
+export const filterSexualOrientation = writable<SexualOrientation | ''>('');

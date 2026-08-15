@@ -4,19 +4,19 @@
   import {
     ACTIVITIES,
     ACTIVITY_FORMAT_OPTIONS,
+    SEXUAL_ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
+    type SexualOrientation,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import { Camera, User, Zap, Loader2 } from "@lucide/svelte";
+  import { Zap } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import { storage } from "$lib/firebase/client";
-  import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-  import { compressImage } from "$lib/image";
+  import PhotoGrid from "$lib/components/PhotoGrid.svelte";
 
   let step = $state(1);
   const TOTAL_STEPS = 4;
@@ -26,6 +26,7 @@
   let bio = $state("");
   let age = $state(25);
   let gender = $state("");
+  let sexualOrientation = $state<SexualOrientation>("straight");
   let city = $state("");
 
   // Step 2 — Activities
@@ -36,41 +37,11 @@
     Record<string, { format: ActivityFormat; level: SkillLevel }>
   >({});
 
-  // Step 4 — Photo (optional)
-  let photoURL = $state("");
-  let uploadingPhoto = $state(false);
-  let photoError = $state("");
+  // Step 4 — Photos (optional, up to 3)
+  let photos = $state<string[]>([]);
   let saving = $state(false);
   let error = $state("");
-
-  async function handlePhotoChange(e: Event) {
-    const input = e.currentTarget as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    photoError = "";
-    if (!file.type.startsWith("image/")) {
-      photoError = "Please choose an image file";
-      input.value = "";
-      return;
-    }
-
-    const uid = get(authUser)?.uid;
-    if (!uid) return;
-
-    uploadingPhoto = true;
-    try {
-      const compressed = await compressImage(file);
-      const photoRef = ref(storage, `avatars/${uid}`);
-      await uploadBytes(photoRef, compressed);
-      photoURL = await getDownloadURL(photoRef);
-    } catch (err: any) {
-      photoError = err.message ?? "Upload failed";
-    } finally {
-      uploadingPhoto = false;
-      input.value = "";
-    }
-  }
+  let uid = $derived($authUser?.uid ?? "");
 
   function toggleActivity(id: string) {
     if (selectedActivities.includes(id)) {
@@ -78,7 +49,7 @@
       delete activitySettings[id];
     } else {
       selectedActivities = [...selectedActivities, id];
-      activitySettings[id] = { format: "1v1", level: "Basic" };
+      activitySettings[id] = { format: "all", level: "Basic" };
     }
   }
 
@@ -107,9 +78,10 @@
         bio,
         age,
         gender,
-        sexualOrientation: "straight",
+        sexualOrientation,
         city,
-        photoURL: photoURL || user.photoURL || "",
+        photos,
+        photoURL: photos[0] || user.photoURL || "",
         activities,
       });
       goto("/discover");
@@ -172,6 +144,15 @@
             {g}
           </button>
         {/each}
+      </div>
+      <div>
+        <p class="mb-2 text-sm font-bold text-muted">Sexual orientation</p>
+        <SegmentedControl
+          options={SEXUAL_ORIENTATIONS}
+          value={sexualOrientation}
+          ariaLabel="Sexual orientation"
+          onchange={(value) => (sexualOrientation = value)}
+        />
       </div>
     </div>
   {:else if step === 2}
@@ -242,48 +223,15 @@
       {/each}
     </div>
   {:else if step === 4}
-    <h2 class="mb-1 text-2xl font-black text-text">Profile photo</h2>
+    <h2 class="mb-1 text-2xl font-black text-text">Profile photos</h2>
     <p class="mb-6 text-sm text-muted">
-      Add a photo so others can find you (optional)
+      Add up to 3 photos so others can find you (optional). The first one is
+      your main photo.
     </p>
     <div class="flex flex-1 flex-col items-center justify-center gap-4">
-      <div class="relative">
-        <div
-          class="flex size-56 items-center justify-center rounded-full bg-gray-200 text-6xl"
-        >
-          {#if photoURL}
-            <img
-              src={photoURL}
-              alt="Profile"
-              class="h-full w-full rounded-full object-cover"
-            />
-          {:else}
-            <User class="size-24 text-muted" />
-          {/if}
-          {#if uploadingPhoto}
-            <div
-              class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40"
-            >
-              <Loader2 class="size-10 animate-spin text-white" />
-            </div>
-          {/if}
-        </div>
-        <label
-          class="absolute bottom-2 right-2 flex size-12 items-center justify-center rounded-full border-2 border-bg bg-primary text-white shadow-sm active:scale-95"
-        >
-          <Camera class="size-6" />
-          <input
-            type="file"
-            accept="image/*"
-            onchange={handlePhotoChange}
-            disabled={uploadingPhoto}
-            class="hidden"
-          />
-        </label>
+      <div class="w-full max-w-xs">
+        <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
       </div>
-      {#if photoError}
-        <p class="text-sm text-error">{photoError}</p>
-      {/if}
     </div>
     {#if error}
       <p class="mt-4 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">

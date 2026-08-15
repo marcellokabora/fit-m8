@@ -15,10 +15,11 @@
     getDoc,
   } from "firebase/firestore";
   import type { Message, Match, UserProfile } from "$lib/types";
-  import { ACTIVITIES } from "$lib/types";
+  import { ACTIVITIES, formatLabel } from "$lib/types";
   import { get } from "svelte/store";
-  import { ArrowLeft, LoaderCircle, Sparkles, Send } from "@lucide/svelte";
+  import { LoaderCircle, Sparkles, Send } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import BackHeader from "$lib/components/BackHeader.svelte";
 
   let matchId = $derived(page.params.matchId as string);
   let messages = $state<Message[]>([]);
@@ -110,38 +111,32 @@
 
 <div class="flex h-screen flex-col bg-bg">
   <!-- Header -->
-  <div
-    class="flex items-center gap-3 border-b border-border bg-surface px-4 pb-3 pt-12"
-  >
-    <a
-      href="/matches"
-      class="flex size-9 items-center justify-center rounded-full hover:bg-gray-100"
-    >
-      <ArrowLeft class="size-5 text-text" />
-    </a>
-    {#if otherUser}
-      <a href="/profile/{otherUser.uid}" class="shrink-0">
-        <img
-          src={otherUser.photoURL}
-          alt={otherUser.displayName}
-          class="size-10 rounded-full object-cover"
-        />
-      </a>
-    {/if}
-    <div class="flex-1">
-      <p class="font-bold text-text">
-        {otherUser?.displayName ?? "Match Chat"}
-      </p>
-      {#if match}
-        <p class="flex items-center gap-1 text-xs text-muted">
-          <ActivityIcon id={match.activity} class="size-3" />
-          {activity?.label ?? match.activity} · {match.format}
-        </p>
-      {:else}
-        <p class="text-xs text-muted">{matchId}</p>
+  <BackHeader href="/matches" class="border-b border-border bg-surface">
+    {#snippet children()}
+      {#if otherUser}
+        <a href="/profile/{otherUser.uid}" class="shrink-0">
+          <img
+            src={otherUser.photoURL}
+            alt={otherUser.displayName}
+            class="size-10 rounded-full object-cover"
+          />
+        </a>
       {/if}
-    </div>
-  </div>
+      <div class="flex-1">
+        <p class="font-bold text-text">
+          {otherUser?.displayName ?? "Match Chat"}
+        </p>
+        {#if match}
+          <p class="flex items-center gap-1 text-xs text-muted">
+            <ActivityIcon id={match.activity} class="size-3" />
+            {activity?.label ?? match.activity} · {formatLabel(match.format)}
+          </p>
+        {:else}
+          <p class="text-xs text-muted">{matchId}</p>
+        {/if}
+      </div>
+    {/snippet}
+  </BackHeader>
 
   <!-- Messages -->
   <div class="flex-1 overflow-y-auto px-4 py-4">

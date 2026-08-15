@@ -40,6 +40,7 @@ const db = getFirestore();
 const fakeProfiles = [
 	{
 		displayName: 'Sarah',
+		photoURL: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 26,
 		city: 'Barcelona',
 		gender: 'Female',
@@ -310,7 +311,7 @@ function prepareProfile(profile, profileIndex) {
 		existingIds.add(id);
 		activities.push({
 			id,
-			format: offset % 3 === 2 ? 'both' : offset % 2 === 0 ? '1v1' : '2v2',
+			format: offset % 3 === 2 ? 'all' : offset % 2 === 0 ? '1v1' : '2v2',
 			level: (profileIndex + offset) % 2 === 0 ? 'Basic' : 'Expert'
 		});
 	}
@@ -318,10 +319,37 @@ function prepareProfile(profile, profileIndex) {
 	return { ...profile, activities };
 }
 
+// Give each profile 3 photos by borrowing 2 extra shots from other profiles
+// of the same gender (seed data has only one curated photo per person).
+function attachPhotos(profiles) {
+	const indexesByGender = new Map();
+	profiles.forEach((profile, index) => {
+		const list = indexesByGender.get(profile.gender) ?? [];
+		list.push(index);
+		indexesByGender.set(profile.gender, list);
+	});
+
+	return profiles.map((profile, index) => {
+		const pool = indexesByGender.get(profile.gender).filter(i => i !== index);
+		const secondIndex = pool[index % pool.length];
+		const thirdIndex = pool[(index + Math.floor(pool.length / 2)) % pool.length];
+		const photos = [
+			profile.photoURL,
+			profiles[secondIndex].photoURL,
+			profiles[thirdIndex].photoURL
+		].filter(Boolean);
+
+		return { ...profile, photos, photoURL: photos[0] };
+	});
+}
+
+
 async function seedDatabase() {
 	console.log('🌱 Seeding fake profiles...\n');
 
-	for (const [profileIndex, sourceProfile] of fakeProfiles.entries()) {
+	const profilesWithPhotos = attachPhotos(fakeProfiles);
+
+	for (const [profileIndex, sourceProfile] of profilesWithPhotos.entries()) {
 		try {
 			const profile = prepareProfile(sourceProfile, profileIndex);
 			// Create a fake user ID (e.g., user_sarah_001)

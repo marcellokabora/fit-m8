@@ -90,7 +90,7 @@ export async function getDiscoverFeed(
 			const match = data.activities?.some(
 				(a) =>
 					(!activityFilter || a.id === activityFilter) &&
-					(!formatFilter || a.format === formatFilter || a.format === 'both') &&
+					(!formatFilter || a.format === formatFilter || a.format === 'all') &&
 					(!levelFilter || a.level === levelFilter)
 			);
 			if (!match) continue;
