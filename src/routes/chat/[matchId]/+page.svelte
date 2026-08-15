@@ -111,7 +111,7 @@
 <div class="flex h-screen flex-col bg-bg">
   <!-- Header -->
   <div
-    class="flex items-center gap-3 border-b border-gray-200 bg-surface px-4 pb-3 pt-12"
+    class="flex items-center gap-3 border-b border-border bg-surface px-4 pb-3 pt-12"
   >
     <a
       href="/matches"
@@ -179,14 +179,14 @@
   </div>
 
   <!-- Input -->
-  <div class="border-t border-gray-200 bg-surface px-4 py-3 pb-safe">
+  <div class="border-t border-border bg-surface px-4 py-3 pb-safe">
     <div class="flex items-end gap-3">
       <textarea
         bind:value={text}
         onkeydown={handleKeydown}
         placeholder="Type a message…"
         rows={1}
-        class="flex-1 resize-none rounded-2xl border-2 border-gray-200 bg-bg px-4 py-3 text-sm text-text outline-none focus:border-primary"
+        class="flex-1 resize-none rounded-2xl border-2 border-border bg-bg px-4 py-3 text-sm text-text outline-none focus:border-primary"
       ></textarea>
       <button
         onclick={send}

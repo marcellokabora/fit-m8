@@ -10,7 +10,7 @@ import {
 	limit
 } from 'firebase/firestore';
 import { db } from '$lib/firebase/client';
-import type { ActivityFormat, UserProfile } from '$lib/types';
+import type { ActivityFormat, SexualOrientation, UserProfile } from '$lib/types';
 
 export async function recordSwipe(
 	fromUid: string,
@@ -56,7 +56,8 @@ export async function getDiscoverFeed(
 	currentUid: string,
 	activityFilter: string,
 	formatFilter: ActivityFormat | '',
-	genderFilter: string = ''
+	genderFilter: string = '',
+	sexualOrientationFilter: SexualOrientation | '' = ''
 ): Promise<UserProfile[]> {
 	// Get users who we already swiped
 	const sentSnap = await getDocs(collection(db, 'swipes', currentUid, 'sent'));
@@ -72,6 +73,11 @@ export async function getDiscoverFeed(
 		const data = d.data() as Omit<UserProfile, 'uid'>;
 
 		if (genderFilter && data.gender !== genderFilter) continue;
+		if (
+			sexualOrientationFilter &&
+			(data.sexualOrientation ?? 'straight') !== sexualOrientationFilter
+		)
+			continue;
 
 		// Filter by activity + format if set
 		if (activityFilter || formatFilter) {

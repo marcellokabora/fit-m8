@@ -12,7 +12,7 @@
 </script>
 
 <nav
-  class="fixed bottom-0 inset-x-0 z-40 border-t border-gray-200 bg-surface pb-safe"
+  class="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface pb-safe"
 >
   <div class="flex">
     {#each tabs as tab}

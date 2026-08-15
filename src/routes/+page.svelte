@@ -21,12 +21,12 @@
 </script>
 
 <div
-  class="flex min-h-screen flex-col items-center justify-between bg-primary px-6 pb-12 pt-20"
+  class="flex min-h-screen flex-col items-center justify-between bg-bg px-6 pb-12 pt-20"
 >
   <!-- Logo / Hero -->
-  <div class="flex flex-col items-center gap-4 text-white">
+  <div class="flex flex-col items-center gap-4 text-text">
     <div
-      class="flex size-24 items-center justify-center overflow-hidden rounded-3xl bg-secondary shadow-xl"
+      class="flex size-24 items-center justify-center overflow-hidden rounded-3xl bg-primary shadow-xl"
     >
       <img
         src="/logo.jpg"
@@ -35,7 +35,7 @@
       />
     </div>
     <h1 class="text-5xl font-black tracking-tight">FitMate</h1>
-    <p class="text-center text-lg font-medium opacity-80">
+    <p class="text-center text-lg font-medium text-muted">
       Find your perfect sports partner.<br />Swipe. Match. Play.
     </p>
   </div>
@@ -44,7 +44,7 @@
   <div class="flex flex-wrap justify-center gap-3">
     {#each HERO_ACTIVITIES as activity}
       <span
-        class="flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
+        class="flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary"
       >
         <ActivityIcon id={activity.id} class="size-4" />
         {activity.label}
@@ -56,13 +56,13 @@
   <div class="flex w-full flex-col gap-3">
     <a
       href="/auth"
-      class="block w-full rounded-2xl bg-secondary py-4 text-center text-lg font-bold text-white shadow-lg active:scale-95"
+      class="block w-full rounded-2xl bg-primary py-4 text-center text-lg font-bold text-white shadow-lg active:scale-95"
     >
       Get Started
     </a>
     <a
       href="/auth?mode=login"
-      class="block w-full rounded-2xl border-2 border-white/30 py-4 text-center text-lg font-semibold text-white active:scale-95"
+      class="block w-full rounded-2xl border-2 border-border bg-surface py-4 text-center text-lg font-semibold text-text active:scale-95"
     >
       I already have an account
     </a>

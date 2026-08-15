@@ -3,6 +3,14 @@ export type SkillLevel = 'beginner' | 'intermediate' | 'advanced';
 export type SwipeDirection = 'like' | 'pass';
 export type MatchStatus = 'pending' | 'confirmed' | 'declined';
 
+export const SEXUAL_ORIENTATIONS = [
+	{ value: 'straight', label: 'Straight' },
+	{ value: 'gay', label: 'Gay' },
+	{ value: 'bisexual', label: 'Bisexual' }
+] as const;
+
+export type SexualOrientation = (typeof SEXUAL_ORIENTATIONS)[number]['value'];
+
 export const ACTIVITIES = [
 	{ id: 'jogging', label: 'Jogging', emoji: '🏃' },
 	{ id: 'padel', label: 'Padel', emoji: '🎾' },
@@ -40,6 +48,7 @@ export interface UserProfile {
 	bio: string;
 	age: number;
 	gender: string;
+	sexualOrientation?: SexualOrientation | null;
 	city: string;
 	activities: UserActivity[];
 	createdAt: Date;

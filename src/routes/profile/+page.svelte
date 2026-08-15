@@ -2,17 +2,32 @@
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
     ACTIVITIES,
+    SEXUAL_ORIENTATIONS,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
+    type SexualOrientation,
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import LocationPicker from "$lib/components/LocationPicker.svelte";
+  import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import { storage } from "$lib/firebase/client";
   import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
   import { compressImage } from "$lib/image";
-  import { User, MapPin, Plus, X, Camera, Loader2 } from "@lucide/svelte";
+  import {
+    User,
+    MapPin,
+    Plus,
+    X,
+    Camera,
+    Loader2,
+    Check,
+    Sun,
+    Moon,
+  } from "@lucide/svelte";
+  import { activeTheme, THEMES } from "$lib/stores/theme";
 
   let editing = $state(false);
   let saving = $state(false);
@@ -20,12 +35,16 @@
   let displayName = $state($userProfile?.displayName ?? "");
   let bio = $state($userProfile?.bio ?? "");
   let city = $state($userProfile?.city ?? "");
+  let sexualOrientation = $state<SexualOrientation>(
+    $userProfile?.sexualOrientation ?? "straight",
+  );
 
   $effect(() => {
     if ($userProfile) {
       displayName = $userProfile.displayName;
       bio = $userProfile.bio ?? "";
       city = $userProfile.city ?? "";
+      sexualOrientation = $userProfile.sexualOrientation ?? "straight";
     }
   });
 
@@ -33,7 +52,12 @@
     saving = true;
     const uid = get(authUser)?.uid;
     if (uid) {
-      await userProfile.save(uid, { displayName, bio, city });
+      await userProfile.save(uid, {
+        displayName,
+        bio,
+        city,
+        sexualOrientation,
+      });
     }
     saving = false;
     editing = false;
@@ -127,7 +151,7 @@
 
 <div class="flex min-h-screen flex-col bg-bg pb-24">
   <!-- Header -->
-  <div class="flex items-center justify-between px-5 pb-4 pt-12">
+  <div class="flex items-center justify-between px-5 pb-3 pt-5">
     <h1 class="text-2xl font-black text-text">Profile</h1>
     <button
       onclick={() => (editing = !editing)}
@@ -180,27 +204,17 @@
       <input
         type="text"
         bind:value={displayName}
-        class="rounded-2xl border-2 border-gray-200 bg-surface px-4 py-3 text-base font-bold text-center text-text w-full outline-none focus:border-primary"
+        class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base font-bold text-center text-text w-full outline-none focus:border-primary"
       />
       <textarea
         bind:value={bio}
         rows={2}
         placeholder="Your bio…"
-        class="w-full rounded-2xl border-2 border-gray-200 bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
+        class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
       ></textarea>
-      <input
-        type="text"
-        bind:value={city}
-        placeholder="City"
-        class="w-full rounded-2xl border-2 border-gray-200 bg-surface px-4 py-3 text-base text-text outline-none focus:border-primary"
-      />
-      <button
-        onclick={save}
-        disabled={saving}
-        class="w-full rounded-2xl bg-primary py-4 font-bold text-white active:scale-95 disabled:opacity-50"
-      >
-        {saving ? "Saving…" : "Save changes"}
-      </button>
+      <div class="w-full">
+        <LocationPicker bind:city />
+      </div>
     {:else}
       <h2 class="text-xl font-black text-text">
         {$userProfile?.displayName ?? "—"}
@@ -212,8 +226,37 @@
         </p>
       {/if}
       {#if $userProfile?.bio}
-        <p class="text-center text-sm text-muted">{$userProfile.bio}</p>
+        <p class="text-center text-sm text-muted text-balance">
+          {$userProfile.bio}
+        </p>
       {/if}
+    {/if}
+  </div>
+
+  <!-- Sexual orientation -->
+  <div class="px-5 pb-8">
+    {#if editing}
+      <SegmentedControl
+        options={SEXUAL_ORIENTATIONS}
+        value={sexualOrientation}
+        ariaLabel="Sexual orientation"
+        onchange={(value) => (sexualOrientation = value)}
+      />
+      <button
+        onclick={save}
+        disabled={saving}
+        class="mt-4 w-full rounded-2xl bg-primary py-4 font-bold text-white active:scale-95 disabled:opacity-50"
+      >
+        {saving ? "Saving…" : "Save changes"}
+      </button>
+    {:else}
+      <p class="text-sm text-text">
+        {SEXUAL_ORIENTATIONS.find(
+          (orientation) =>
+            orientation.value ===
+            ($userProfile?.sexualOrientation ?? "straight"),
+        )?.label ?? "Not set"}
+      </p>
     {/if}
   </div>
 
@@ -267,7 +310,7 @@
                 class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 {newActivityId ===
                 activity.id
                   ? 'border-primary bg-primary/10'
-                  : 'border-gray-200 bg-bg'}"
+                  : 'border-border bg-bg'}"
               >
                 <ActivityIcon id={activity.id} class="size-6 text-primary" />
                 <span class="text-xs font-semibold text-text"
@@ -291,7 +334,7 @@
                     class="flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors {newFormat ===
                     fmt
                       ? 'border-primary bg-primary text-white'
-                      : 'border-gray-200 text-text'}"
+                      : 'border-border text-text'}"
                   >
                     {fmt}
                   </button>
@@ -309,7 +352,7 @@
                     class="flex-1 rounded-xl border-2 py-2 text-xs font-bold capitalize transition-colors {newLevel ===
                     lvl
                       ? 'border-secondary-dark bg-secondary text-white'
-                      : 'border-gray-200 text-muted'}"
+                      : 'border-border text-muted'}"
                   >
                     {lvl}
                   </button>
@@ -322,7 +365,7 @@
         <div class="mt-4 flex gap-3">
           <button
             onclick={() => (showAddSport = false)}
-            class="flex-1 rounded-2xl border-2 border-gray-200 py-3 text-sm font-semibold text-text active:scale-95"
+            class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
           >
             Cancel
           </button>
@@ -344,6 +387,63 @@
         Add sport
       </button>
     {/if}
+  </div>
+
+  <!-- Theme -->
+  <div class="px-5 pt-8">
+    <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+      Appearance
+    </h3>
+    <div class="mb-4 flex rounded-xl border-2 border-border bg-bg p-0.5">
+      <button
+        onclick={() => activeTheme.selectMode("light")}
+        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
+        'light'
+          ? 'bg-primary text-white'
+          : 'text-muted'}"
+      >
+        <Sun class="size-4" />
+        Light
+      </button>
+      <button
+        onclick={() => activeTheme.selectMode("dark")}
+        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
+        'dark'
+          ? 'bg-primary text-white'
+          : 'text-muted'}"
+      >
+        <Moon class="size-4" />
+        Dark
+      </button>
+    </div>
+
+    <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+      App Theme
+    </h3>
+    <div class="grid grid-cols-3 gap-3">
+      {#each THEMES as theme}
+        <button
+          onclick={() => activeTheme.selectTheme(theme.id)}
+          class="flex flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all active:scale-95 {$activeTheme.themeId ===
+          theme.id
+            ? 'border-primary bg-primary/10'
+            : 'border-border bg-surface'}"
+        >
+          <span
+            class="relative flex size-10 items-center justify-center rounded-full shadow-sm"
+            style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.secondary} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
+            'dark'
+              ? theme.dark.bg
+              : theme.light.bg}"
+          >
+            {#if $activeTheme.themeId === theme.id}
+              <Check class="size-5 text-white drop-shadow" />
+            {/if}
+          </span>
+          <span class="text-xs font-semibold text-text">{theme.label}</span>
+        </button>
+      {/each}
+    </div>
   </div>
 
   <!-- Logout -->

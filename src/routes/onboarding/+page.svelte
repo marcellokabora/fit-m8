@@ -8,8 +8,9 @@
     type ActivityFormat,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import { Camera, User, Zap, Loader2, MapPin } from "@lucide/svelte";
+  import { Camera, User, Zap, Loader2 } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import LocationPicker from "$lib/components/LocationPicker.svelte";
   import { storage } from "$lib/firebase/client";
   import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
   import { compressImage } from "$lib/image";
@@ -23,8 +24,6 @@
   let age = $state(25);
   let gender = $state("");
   let city = $state("");
-  let locatingCity = $state(false);
-  let locationError = $state("");
 
   // Step 2 — Activities
   let selectedActivities = $state<string[]>([]);
@@ -70,43 +69,6 @@
     }
   }
 
-  async function detectCity() {
-    locationError = "";
-    if (!("geolocation" in navigator)) {
-      locationError = "Geolocation isn't supported on this device";
-      return;
-    }
-
-    locatingCity = true;
-    try {
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: false,
-            timeout: 10000,
-            maximumAge: 300000,
-          }),
-      );
-
-      const { latitude, longitude } = position.coords;
-      const res = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
-      );
-      if (!res.ok) throw new Error("Couldn't resolve your city");
-      const data = await res.json();
-      const detected = data.city || data.locality || data.principalSubdivision;
-      if (!detected) throw new Error("Couldn't resolve your city");
-      city = detected;
-    } catch (err: any) {
-      locationError =
-        err.code === 1
-          ? "Location access denied"
-          : (err.message ?? "Couldn't detect your location");
-    } finally {
-      locatingCity = false;
-    }
-  }
-
   function toggleActivity(id: string) {
     if (selectedActivities.includes(id)) {
       selectedActivities = selectedActivities.filter((a) => a !== id);
@@ -142,6 +104,7 @@
         bio,
         age,
         gender,
+        sexualOrientation: "straight",
         city,
         photoURL: photoURL || user.photoURL || "",
         activities,
@@ -175,13 +138,13 @@
         type="text"
         bind:value={displayName}
         placeholder="Your name"
-        class="rounded-2xl border-2 border-gray-200 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+        class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
       />
       <textarea
         bind:value={bio}
         placeholder="Short bio (optional)"
         rows={3}
-        class="rounded-2xl border-2 border-gray-200 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+        class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
       ></textarea>
       <div class="flex gap-3">
         <input
@@ -190,49 +153,10 @@
           min={16}
           max={80}
           placeholder="Age"
-          class="w-24 rounded-2xl border-2 border-gray-200 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+          class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
         />
-        {#if city}
-          <div
-            class="flex flex-1 items-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 px-4 py-4"
-          >
-            <MapPin class="size-5 shrink-0 text-primary" />
-            <span class="flex-1 truncate text-base font-semibold text-text"
-              >{city}</span
-            >
-            <button
-              type="button"
-              onclick={detectCity}
-              disabled={locatingCity}
-              class="shrink-0 text-xs font-bold uppercase tracking-wide text-primary disabled:opacity-40"
-            >
-              {#if locatingCity}
-                <Loader2 class="size-4 animate-spin" />
-              {:else}
-                Refresh
-              {/if}
-            </button>
-          </div>
-        {:else}
-          <button
-            type="button"
-            onclick={detectCity}
-            disabled={locatingCity}
-            class="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-300 bg-surface px-4 py-4 text-sm font-semibold text-primary transition-colors active:scale-95 disabled:opacity-40"
-          >
-            {#if locatingCity}
-              <Loader2 class="size-5 animate-spin" />
-              Detecting…
-            {:else}
-              <MapPin class="size-5" />
-              Use my location
-            {/if}
-          </button>
-        {/if}
+        <LocationPicker bind:city />
       </div>
-      {#if locationError}
-        <p class="-mt-2 text-xs font-medium text-red-500">{locationError}</p>
-      {/if}
       <div class="flex gap-3">
         {#each ["Male", "Female", "Other"] as g}
           <button
@@ -240,7 +164,7 @@
             class="flex-1 rounded-2xl border-2 py-3 text-sm font-semibold transition-colors {gender ===
             g
               ? 'border-primary bg-primary text-white'
-              : 'border-gray-200 bg-surface text-text'}"
+              : 'border-border bg-surface text-text'}"
           >
             {g}
           </button>
@@ -258,7 +182,7 @@
             activity.id,
           )
             ? 'border-primary bg-primary/10'
-            : 'border-gray-200 bg-surface'}"
+            : 'border-border bg-surface'}"
         >
           <ActivityIcon id={activity.id} class="size-7 text-primary" />
           <span class="text-sm font-semibold text-text">{activity.label}</span>
@@ -272,7 +196,7 @@
       {#each selectedActivities as id}
         {@const activity = ACTIVITIES.find((a) => a.id === id)}
         {@const settings = activitySettings[id]}
-        <div class="rounded-2xl border-2 border-gray-200 bg-surface p-4">
+        <div class="rounded-2xl border-2 border-border bg-surface p-4">
           <p class="mb-3 flex items-center gap-2 font-bold text-text">
             <ActivityIcon {id} class="size-4 text-primary" />
             {activity?.label}
@@ -291,7 +215,7 @@
                   class="flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors {settings.format ===
                   fmt
                     ? 'border-primary bg-primary text-white'
-                    : 'border-gray-200 text-text'}"
+                    : 'border-border text-text'}"
                 >
                   {fmt}
                 </button>
@@ -312,7 +236,7 @@
                   class="flex-1 rounded-xl border-2 py-2 text-xs font-bold capitalize transition-colors {settings.level ===
                   lvl
                     ? 'border-secondary-dark bg-secondary text-white'
-                    : 'border-gray-200 text-muted'}"
+                    : 'border-border text-muted'}"
                 >
                   {lvl}
                 </button>
@@ -378,7 +302,7 @@
     {#if step > 1}
       <button
         onclick={back}
-        class="flex-1 rounded-2xl border-2 border-gray-200 py-4 text-base font-semibold text-text active:scale-95"
+        class="flex-1 rounded-2xl border-2 border-border py-4 text-base font-semibold text-text active:scale-95"
       >
         Back
       </button>

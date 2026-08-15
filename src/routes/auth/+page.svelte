@@ -71,7 +71,7 @@
     <button
       onclick={() => handleSocial("google")}
       disabled={loading}
-      class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-gray-200 bg-surface py-4 text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-50"
+      class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-border bg-surface py-4 text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-50"
     >
       <svg class="size-5" viewBox="0 0 24 24">
         <path
@@ -109,9 +109,9 @@
   </div>
 
   <div class="my-6 flex items-center gap-3">
-    <hr class="flex-1 border-gray-200" />
+    <hr class="flex-1 border-border" />
     <span class="text-sm text-muted">or</span>
-    <hr class="flex-1 border-gray-200" />
+    <hr class="flex-1 border-border" />
   </div>
 
   <!-- Email form -->
@@ -121,7 +121,7 @@
       bind:value={email}
       placeholder="Email address"
       required
-      class="w-full rounded-2xl border-2 border-gray-200 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+      class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
     />
     <input
       type="password"
@@ -129,7 +129,7 @@
       placeholder="Password"
       required
       minlength={6}
-      class="w-full rounded-2xl border-2 border-gray-200 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+      class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
     />
     {#if error}
       <p class="rounded-xl bg-error/10 px-4 py-3 text-sm text-error">{error}</p>

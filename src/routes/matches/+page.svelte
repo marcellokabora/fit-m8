@@ -78,7 +78,8 @@
 </script>
 
 <div class="flex min-h-screen flex-col bg-bg pb-24">
-  <div class="px-5 pb-4 pt-12">
+  <!-- Header -->
+  <div class="px-5 pb-3 pt-5">
     <h1 class="text-2xl font-black text-text">Matches</h1>
     <p class="text-sm text-muted">People you matched with</p>
   </div>

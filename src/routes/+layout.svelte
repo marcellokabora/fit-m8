@@ -3,6 +3,7 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { authUser, userProfile } from "$lib/stores/auth";
+  import { activeTheme } from "$lib/stores/theme";
   import { onMount } from "svelte";
   import { registerSW } from "virtual:pwa-register";
 
@@ -11,6 +12,8 @@
   const PUBLIC_ROUTES = ["/auth", "/"];
 
   onMount(() => {
+    activeTheme.init();
+
     if (import.meta.env.PROD) {
       registerSW({ immediate: true });
     }

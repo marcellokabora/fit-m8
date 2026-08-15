@@ -9,6 +9,7 @@
   --color-surface: #ffffff;
   --color-text: #0d0d0d;
   --color-muted: #6b7280;
+  --color-border: #e5e7eb;
   --color-error: #ff3b30;
   --color-success: #34c759;
 
@@ -23,6 +24,9 @@ body {
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   /* Hide scrollbar while keeping functionality */
   -ms-overflow-style: none; /* IE & Edge */

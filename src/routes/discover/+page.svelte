@@ -14,18 +14,44 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import {
     authUser,
+    userProfile,
     filterActivity,
     filterFormat,
     filterGender,
+    filterSexualOrientation,
   } from "$lib/stores/auth";
   import { getDiscoverFeed, recordSwipe } from "$lib/firebase/swipe";
-  import { ACTIVITIES, type UserProfile } from "$lib/types";
+  import {
+    ACTIVITIES,
+    SEXUAL_ORIENTATIONS,
+    type UserProfile,
+  } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
+  import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+
+  const FORMAT_FILTER_OPTIONS = [
+    { value: "", label: "All" },
+    { value: "1v1", label: "1v1" },
+    { value: "2v2", label: "2v2" },
+  ] as const;
+
+  const GENDER_FILTER_OPTIONS = [
+    { value: "", label: "All" },
+    { value: "Male", label: "Male" },
+    { value: "Female", label: "Female" },
+  ] as const;
 
   let users = $state<UserProfile[]>([]);
   let loading = $state(true);
   let matchBanner = $state(false);
+  let profileActivities = $derived(
+    ACTIVITIES.filter((activity) =>
+      $userProfile?.activities?.some(
+        (profileActivity) => profileActivity.id === activity.id,
+      ),
+    ),
+  );
 
   // Swipe state
   let cardEl = $state<HTMLDivElement | null>(null);
@@ -48,6 +74,7 @@
       get(filterActivity),
       get(filterFormat),
       get(filterGender),
+      get(filterSexualOrientation),
     );
     loading = false;
   }
@@ -55,9 +82,20 @@
   // Reload when auth resolves or filters change
   $effect(() => {
     $authUser;
+    $userProfile;
     $filterActivity;
     $filterFormat;
     $filterGender;
+    $filterSexualOrientation;
+
+    if (
+      $filterActivity &&
+      !profileActivities.some((activity) => activity.id === $filterActivity)
+    ) {
+      filterActivity.set("");
+      return;
+    }
+
     loadFeed();
   });
 
@@ -166,34 +204,35 @@
 
         <!-- Format -->
         <p class="mb-2 text-sm font-bold text-muted">Players</p>
-        <div class="mb-5 flex rounded-xl border-2 border-gray-200 bg-bg p-0.5">
-          {#each ["", "1v1", "2v2"] as fmt}
-            <button
-              onclick={() => filterFormat.set(fmt as any)}
-              class="flex-1 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors {$filterFormat ===
-              fmt
-                ? 'bg-primary text-white'
-                : 'text-muted'}"
-            >
-              {fmt === "" ? "All" : fmt}
-            </button>
-          {/each}
+        <div class="mb-5">
+          <SegmentedControl
+            options={FORMAT_FILTER_OPTIONS}
+            value={$filterFormat}
+            ariaLabel="Players"
+            onchange={(value) => filterFormat.set(value)}
+          />
         </div>
 
         <!-- Gender -->
         <p class="mb-2 text-sm font-bold text-muted">Gender</p>
-        <div class="mb-5 flex rounded-xl border-2 border-gray-200 bg-bg p-0.5">
-          {#each ["", "Male", "Female"] as g}
-            <button
-              onclick={() => filterGender.set(g as any)}
-              class="flex-1 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors {$filterGender ===
-              g
-                ? 'bg-primary text-white'
-                : 'text-muted'}"
-            >
-              {g === "" ? "All" : g}
-            </button>
-          {/each}
+        <div class="mb-5">
+          <SegmentedControl
+            options={GENDER_FILTER_OPTIONS}
+            value={$filterGender}
+            ariaLabel="Gender"
+            onchange={(value) => filterGender.set(value)}
+          />
+        </div>
+
+        <!-- Sexual orientation -->
+        <p class="mb-2 text-sm font-bold text-muted">Sexual orientation</p>
+        <div class="mb-5">
+          <SegmentedControl
+            options={SEXUAL_ORIENTATIONS}
+            value={$filterSexualOrientation}
+            ariaLabel="Sexual orientation"
+            onchange={(value) => filterSexualOrientation.set(value)}
+          />
         </div>
 
         <!-- Sport -->
@@ -208,7 +247,7 @@
           >
             All sports
           </button>
-          {#each ACTIVITIES as act}
+          {#each profileActivities as act}
             <button
               onclick={() => pickActivity(act.id)}
               class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {$filterActivity ===
@@ -418,7 +457,7 @@
         <div class="flex gap-3 w-full">
           <button
             onclick={() => (matchBanner = false)}
-            class="flex-1 rounded-2xl border-2 border-gray-200 py-3 font-semibold text-text"
+            class="flex-1 rounded-2xl border-2 border-border py-3 font-semibold text-text"
           >
             Keep swiping
           </button>

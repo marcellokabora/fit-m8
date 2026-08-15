@@ -11,7 +11,7 @@ import {
 	type User
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import type { UserProfile } from '$lib/types';
+import type { SexualOrientation, UserProfile } from '$lib/types';
 
 function createAuthStore() {
 	// undefined = auth state not yet resolved (still reading persisted session)
@@ -64,3 +64,4 @@ export const userProfile = createUserProfileStore();
 export const filterActivity = writable<string>('');
 export const filterFormat = writable<'1v1' | '2v2' | ''>('');
 export const filterGender = writable<'Male' | 'Female' | ''>('');
+export const filterSexualOrientation = writable<SexualOrientation>('straight');
