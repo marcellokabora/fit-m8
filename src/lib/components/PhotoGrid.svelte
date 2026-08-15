@@ -74,10 +74,10 @@
   }
 </script>
 
-<div class="flex flex-col gap-2">
-  <div class="grid grid-cols-3 gap-3">
+<div class="flex w-full flex-col gap-2">
+  <div class="grid w-full grid-cols-3 gap-3">
     {#each Array(MAX_PHOTOS) as _, index}
-      <div class="relative aspect-3/4">
+      <div class="relative aspect-3/4 w-full">
         {#if photos[index]}
           <img
             src={photos[index]}

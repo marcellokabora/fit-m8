@@ -11,13 +11,14 @@
   import PingPong from "~icons/mdi/table-tennis";
   import Pickleball from "~icons/material-symbols/pickleball";
   import Squash from "~icons/mdi/squash";
-  import Racquetball from "~icons/mdi/racquetball";
+  import Frescobol from "~icons/mdi/racquetball";
   import Gym from "~icons/material-symbols/sports-gymnastics";
   import Calisthenics from "~icons/mdi/arm-flex";
   import RockClimbing from "~icons/mdi/rock-climbing";
   import Golf from "~icons/material-symbols/sports-golf";
   import MartialArts from "~icons/material-symbols/sports-martial-arts";
   import Fencing from "~icons/mdi/fencing";
+  import Paddleboard from "~icons/material-symbols/kayaking";
   import Generic from "~icons/material-symbols/sports-outline";
   import type { ActivityId } from "$lib/types";
 
@@ -39,13 +40,14 @@
     "ping-pong": PingPong,
     pickleball: Pickleball,
     squash: Squash,
-    racquetball: Racquetball,
+    frescobol: Frescobol,
     gym: Gym,
     calisthenics: Calisthenics,
     "rock-climbing": RockClimbing,
     golf: Golf,
     "martial-arts": MartialArts,
     fencing: Fencing,
+    paddleboard: Paddleboard,
   };
 
   let Icon = $derived(ICONS[id] ?? Generic);

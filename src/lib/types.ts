@@ -20,12 +20,19 @@ export const SKILL_LEVEL_OPTIONS = [
 
 export type SkillLevel = (typeof SKILL_LEVEL_OPTIONS)[number]['value'];
 
-export const SEXUAL_ORIENTATIONS = [
+export const ORIENTATIONS = [
 	{ value: 'straight', label: 'Straight' },
 	{ value: 'gay', label: 'Gay' }
 ] as const;
 
-export type SexualOrientation = (typeof SEXUAL_ORIENTATIONS)[number]['value'];
+export type SexualOrientation = (typeof ORIENTATIONS)[number]['value'];
+
+export const GENDER_OPTIONS = [
+	{ value: 'Male', label: 'Male' },
+	{ value: 'Female', label: 'Female' }
+] as const;
+
+export type Gender = (typeof GENDER_OPTIONS)[number]['value'];
 
 export const ACTIVITIES = [
 	{ id: 'jogging', label: 'Jogging', emoji: '🏃' },
@@ -40,13 +47,13 @@ export const ACTIVITIES = [
 	{ id: 'ping-pong', label: 'Ping Pong', emoji: '🏓' },
 	{ id: 'pickleball', label: 'Pickleball', emoji: '🥒' },
 	{ id: 'squash', label: 'Squash', emoji: '📦' },
-	{ id: 'racquetball', label: 'Racquetball', emoji: '🎾' },
+	{ id: 'frescobol', label: 'Frescobol', emoji: '🏖️' },
 	{ id: 'gym', label: 'Gym Training', emoji: '💪' },
 	{ id: 'calisthenics', label: 'Calisthenics', emoji: '🤸' },
 	{ id: 'rock-climbing', label: 'Rock Climbing', emoji: '🧗' },
 	{ id: 'golf', label: 'Golf', emoji: '⛳' },
 	{ id: 'martial-arts', label: 'Martial Arts', emoji: '🥋' },
-	{ id: 'fencing', label: 'Fencing', emoji: '🤺' }
+	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶' }
 ] as const;
 
 export type ActivityId = (typeof ACTIVITIES)[number]['id'];
@@ -65,8 +72,8 @@ export interface UserProfile {
 	photos?: string[];
 	bio: string;
 	age: number;
-	gender: string;
-	sexualOrientation?: SexualOrientation | null;
+	gender: Gender | '';
+	orientation?: SexualOrientation | null;
 	city: string;
 	activities: UserActivity[];
 	createdAt: Date;

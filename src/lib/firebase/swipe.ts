@@ -12,6 +12,7 @@ import {
 import { db } from '$lib/firebase/client';
 import type {
 	ActivityFormat,
+	Gender,
 	SexualOrientation,
 	SkillLevel,
 	UserProfile
@@ -62,7 +63,7 @@ export async function getDiscoverFeed(
 	activityFilter: string,
 	formatFilter: ActivityFormat | '',
 	levelFilter: SkillLevel | '',
-	genderFilter: string = '',
+	genderFilter: Gender | '' = '',
 	sexualOrientationFilter: SexualOrientation | '' = ''
 ): Promise<UserProfile[]> {
 	// Get users who we already swiped
@@ -81,7 +82,7 @@ export async function getDiscoverFeed(
 		if (genderFilter && data.gender !== genderFilter) continue;
 		if (
 			sexualOrientationFilter &&
-			(data.sexualOrientation ?? 'straight') !== sexualOrientationFilter
+			(data.orientation ?? 'straight') !== sexualOrientationFilter
 		)
 			continue;
 

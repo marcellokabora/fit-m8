@@ -25,7 +25,8 @@
   import { getDiscoverFeed, recordSwipe } from "$lib/firebase/swipe";
   import {
     ACTIVITIES,
-    SEXUAL_ORIENTATIONS,
+    GENDER_OPTIONS,
+    ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
     formatLabel,
     type UserProfile,
@@ -42,8 +43,7 @@
 
   const GENDER_FILTER_OPTIONS = [
     { value: "", label: "All" },
-    { value: "Male", label: "Male" },
-    { value: "Female", label: "Female" },
+    ...GENDER_OPTIONS,
   ] as const;
 
   const LEVEL_FILTER_OPTIONS = [
@@ -53,7 +53,7 @@
 
   const SEX_FILTER_OPTIONS = [
     { value: "", label: "All" },
-    ...SEXUAL_ORIENTATIONS,
+    ...ORIENTATIONS,
   ] as const;
 
   let users = $state<UserProfile[]>([]);
@@ -288,12 +288,12 @@
         </div>
 
         <!-- Sex -->
-        <p class="mb-2 text-sm font-bold text-muted">Sex</p>
+        <p class="mb-2 text-sm font-bold text-muted">Orientation</p>
         <div class="mb-5">
           <SegmentedControl
             options={SEX_FILTER_OPTIONS}
             value={$filterSexualOrientation}
-            ariaLabel="Sex"
+            ariaLabel="Orientation"
             onchange={(value) => filterSexualOrientation.set(value)}
           />
         </div>

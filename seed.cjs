@@ -44,10 +44,11 @@ const fakeProfiles = [
 		age: 26,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'straight',
 		bio: 'Love tennis and outdoor activities! 🎾',
 		activities: [
 			{ id: 'tennis', format: '1v1', level: 'Basic' },
-			{ id: 'jogging', format: '1v1', level: 'Basic' }
+			{ id: 'jogging', format: '1v1', level: 'Expert' }
 		]
 	},
 	{
@@ -56,6 +57,7 @@ const fakeProfiles = [
 		age: 24,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'gay',
 		bio: 'Padel enthusiast! Looking for a partner 🎾',
 		activities: [
 			{ id: 'padel', format: '1v1', level: 'Expert' },
@@ -68,9 +70,10 @@ const fakeProfiles = [
 		age: 28,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'straight',
 		bio: 'Pickleball addict! Casual vibes 🥒',
 		activities: [
-			{ id: 'pickleball', format: '1v1', level: 'Basic' },
+			{ id: 'pickleball', format: '1v1', level: 'Expert' },
 			{ id: 'cycling', format: '1v1', level: 'Basic' }
 		]
 	},
@@ -80,10 +83,11 @@ const fakeProfiles = [
 		age: 25,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'straight',
 		bio: 'Badminton player. Let\'s match! 🏸',
 		activities: [
 			{ id: 'badminton', format: '1v1', level: 'Basic' },
-			{ id: 'gym', format: '1v1', level: 'Basic' }
+			{ id: 'gym', format: '1v1', level: 'Expert' }
 		]
 	},
 	{
@@ -92,6 +96,7 @@ const fakeProfiles = [
 		age: 27,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'gay',
 		bio: 'Rock climbing partner needed 🧗',
 		activities: [
 			{ id: 'rock-climbing', format: '1v1', level: 'Expert' },
@@ -104,9 +109,10 @@ const fakeProfiles = [
 		age: 23,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'straight',
 		bio: 'Ping pong is life! 🏓',
 		activities: [
-			{ id: 'ping-pong', format: '1v1', level: 'Basic' },
+			{ id: 'ping-pong', format: '1v1', level: 'Expert' },
 			{ id: 'swimming', format: '1v1', level: 'Basic' }
 		]
 	},
@@ -116,6 +122,7 @@ const fakeProfiles = [
 		age: 26,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'straight',
 		bio: 'Squash player looking for regular matches 📦',
 		activities: [
 			{ id: 'squash', format: '1v1', level: 'Expert' },
@@ -128,6 +135,7 @@ const fakeProfiles = [
 		age: 24,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'gay',
 		bio: 'Martial arts enthusiast! Come train with me 🥋',
 		activities: [
 			{ id: 'martial-arts', format: '1v1', level: 'Basic' },
@@ -140,10 +148,11 @@ const fakeProfiles = [
 		age: 29,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'straight',
 		bio: 'Golf lover! Weekend matches? ⛳',
 		activities: [
 			{ id: 'golf', format: '1v1', level: 'Basic' },
-			{ id: 'cycling', format: '1v1', level: 'Basic' }
+			{ id: 'cycling', format: '1v1', level: 'Expert' }
 		]
 	},
 	{
@@ -152,6 +161,7 @@ const fakeProfiles = [
 		age: 25,
 		city: 'Barcelona',
 		gender: 'Female',
+		orientation: 'straight',
 		bio: 'Swimming and fencing! Competitive spirit 🏊',
 		activities: [
 			{ id: 'swimming', format: '1v1', level: 'Expert' },
@@ -164,6 +174,7 @@ const fakeProfiles = [
 		age: 27,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'straight',
 		bio: 'Early runs and weekend tennis are my thing! 🎾',
 		activities: [
 			{ id: 'jogging', format: '1v1', level: 'Basic' },
@@ -176,6 +187,7 @@ const fakeProfiles = [
 		age: 29,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'gay',
 		bio: 'Looking for regular padel games after work 🎾',
 		activities: [
 			{ id: 'padel', format: '2v2', level: 'Basic' },
@@ -188,6 +200,7 @@ const fakeProfiles = [
 		age: 25,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'straight',
 		bio: 'Basketball and good competition 🏀',
 		activities: [
 			{ id: 'basketball', format: '2v2', level: 'Expert' },
@@ -200,6 +213,7 @@ const fakeProfiles = [
 		age: 24,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'straight',
 		bio: 'Cycling around the coast whenever I can 🚴',
 		activities: [
 			{ id: 'cycling', format: '1v1', level: 'Expert' },
@@ -212,6 +226,7 @@ const fakeProfiles = [
 		age: 31,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'gay',
 		bio: 'Weekend hikes and climbing sessions 🧗',
 		activities: [
 			{ id: 'hiking', format: '1v1', level: 'Basic' },
@@ -224,6 +239,7 @@ const fakeProfiles = [
 		age: 26,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'straight',
 		bio: 'Badminton player searching for a new rival 🏸',
 		activities: [
 			{ id: 'badminton', format: '1v1', level: 'Basic' },
@@ -236,9 +252,10 @@ const fakeProfiles = [
 		age: 23,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'straight',
 		bio: 'Always ready for a pickleball match 🥒',
 		activities: [
-			{ id: 'pickleball', format: '2v2', level: 'Basic' },
+			{ id: 'pickleball', format: '2v2', level: 'Expert' },
 			{ id: 'squash', format: '1v1', level: 'Basic' }
 		]
 	},
@@ -248,6 +265,7 @@ const fakeProfiles = [
 		age: 28,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'straight',
 		bio: 'Golf on Sundays, gym during the week ⛳',
 		activities: [
 			{ id: 'golf', format: '1v1', level: 'Basic' },
@@ -260,6 +278,7 @@ const fakeProfiles = [
 		age: 30,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'gay',
 		bio: 'Training martial arts and looking for partners 🥋',
 		activities: [
 			{ id: 'martial-arts', format: '1v1', level: 'Expert' },
@@ -272,6 +291,7 @@ const fakeProfiles = [
 		age: 26,
 		city: 'Barcelona',
 		gender: 'Male',
+		orientation: 'straight',
 		bio: 'Beach volleyball and swimming all summer 🏐',
 		activities: [
 			{ id: 'beach-volley', format: '2v2', level: 'Basic' },

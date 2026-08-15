@@ -4,12 +4,14 @@
   import {
     ACTIVITIES,
     ACTIVITY_FORMAT_OPTIONS,
-    SEXUAL_ORIENTATIONS,
+    GENDER_OPTIONS,
+    ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
     type SexualOrientation,
+    type Gender,
   } from "$lib/types";
   import { get } from "svelte/store";
   import { Zap } from "@lucide/svelte";
@@ -24,8 +26,8 @@
   // Step 1 — Basic info
   let displayName = $state("");
   let bio = $state("");
-  let age = $state(25);
-  let gender = $state("");
+  let age = $state<number>(25);
+  let gender = $state<Gender>("Male");
   let sexualOrientation = $state<SexualOrientation>("straight");
   let city = $state("");
 
@@ -78,7 +80,7 @@
         bio,
         age,
         gender,
-        sexualOrientation,
+        orientation: sexualOrientation,
         city,
         photos,
         photoURL: photos[0] || user.photoURL || "",
@@ -132,25 +134,17 @@
         />
         <LocationPicker bind:city />
       </div>
-      <div class="flex gap-3">
-        {#each ["Male", "Female", "Other"] as g}
-          <button
-            onclick={() => (gender = g)}
-            class="flex-1 rounded-2xl border-2 py-3 text-sm font-semibold transition-colors {gender ===
-            g
-              ? 'border-primary bg-primary text-white'
-              : 'border-border bg-surface text-text'}"
-          >
-            {g}
-          </button>
-        {/each}
-      </div>
+      <SegmentedControl
+        options={GENDER_OPTIONS}
+        value={gender}
+        ariaLabel="Gender"
+        onchange={(value) => (gender = value)}
+      />
       <div>
-        <p class="mb-2 text-sm font-bold text-muted">Sexual orientation</p>
         <SegmentedControl
-          options={SEXUAL_ORIENTATIONS}
+          options={ORIENTATIONS}
           value={sexualOrientation}
-          ariaLabel="Sexual orientation"
+          ariaLabel="Orientation"
           onchange={(value) => (sexualOrientation = value)}
         />
       </div>
@@ -229,7 +223,7 @@
       your main photo.
     </p>
     <div class="flex flex-1 flex-col items-center justify-center gap-4">
-      <div class="w-full max-w-xs">
+      <div class="w-full">
         <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
       </div>
     </div>

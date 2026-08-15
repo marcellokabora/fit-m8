@@ -3,13 +3,15 @@
   import {
     ACTIVITIES,
     ACTIVITY_FORMAT_OPTIONS,
-    SEXUAL_ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
+    ORIENTATIONS,
+    GENDER_OPTIONS,
     formatLabel,
     type UserActivity,
-    type SkillLevel,
-    type ActivityFormat,
     type SexualOrientation,
+    type Gender,
+    type ActivityFormat,
+    type SkillLevel,
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
@@ -28,12 +30,14 @@
   let bio = $state($userProfile?.bio ?? "");
   let city = $state($userProfile?.city ?? "");
   let sexualOrientation = $state<SexualOrientation>(
-    $userProfile?.sexualOrientation ?? "straight",
+    $userProfile?.orientation ?? "straight",
   );
+  let gender = $state<Gender | "">($userProfile?.gender ?? "");
   let photos = $state<string[]>(
     $userProfile?.photos ??
       ($userProfile?.photoURL ? [$userProfile.photoURL] : []),
   );
+  let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let uid = $derived($authUser?.uid ?? "");
 
   $effect(() => {
@@ -41,10 +45,12 @@
       displayName = $userProfile.displayName;
       bio = $userProfile.bio ?? "";
       city = $userProfile.city ?? "";
-      sexualOrientation = $userProfile.sexualOrientation ?? "straight";
+      sexualOrientation = $userProfile.orientation ?? "straight";
+      gender = $userProfile.gender ?? "";
       photos =
         $userProfile.photos ??
         ($userProfile.photoURL ? [$userProfile.photoURL] : []);
+      activities = $userProfile.activities ?? [];
     }
   });
 
@@ -61,7 +67,9 @@
         displayName,
         bio,
         city,
-        sexualOrientation,
+        gender,
+        orientation: sexualOrientation,
+        activities,
       });
     }
     saving = false;
@@ -72,17 +80,15 @@
     await authUser.signOut();
   }
 
-  // Add sport
+  // Add sport — pick a sport, then its format/level, before adding to the
+  // local list; it's persisted to Firestore when "Save changes" is pressed.
   let showAddSport = $state(false);
   let newActivityId = $state<string | null>(null);
   let newFormat = $state<ActivityFormat>("all");
   let newLevel = $state<SkillLevel>("Basic");
-  let savingSport = $state(false);
 
   let availableActivities = $derived(
-    ACTIVITIES.filter(
-      (a) => !$userProfile?.activities?.some((act) => act.id === a.id),
-    ),
+    ACTIVITIES.filter((a) => !activities.some((act) => act.id === a.id)),
   );
 
   function openAddSport() {
@@ -92,31 +98,17 @@
     newLevel = "Basic";
   }
 
-  async function addSport() {
+  function confirmAddSport() {
     if (!newActivityId) return;
-    savingSport = true;
-    const uid = get(authUser)?.uid;
-    const newActivity: UserActivity = {
-      id: newActivityId,
-      format: newFormat,
-      level: newLevel,
-    };
-    const activities = [...($userProfile?.activities ?? []), newActivity];
-    if (uid) {
-      await userProfile.save(uid, { activities });
-    }
-    savingSport = false;
+    activities = [
+      ...activities,
+      { id: newActivityId, format: newFormat, level: newLevel },
+    ];
     showAddSport = false;
   }
 
-  async function removeSport(id: string) {
-    const uid = get(authUser)?.uid;
-    const activities = ($userProfile?.activities ?? []).filter(
-      (act) => act.id !== id,
-    );
-    if (uid) {
-      await userProfile.save(uid, { activities });
-    }
+  function removeSport(id: string) {
+    activities = activities.filter((act) => act.id !== id);
   }
 </script>
 
@@ -135,7 +127,7 @@
   <!-- Photos + basic info -->
   {#if editing}
     <div class="flex flex-col items-center gap-3 px-5 pb-6">
-      <div class="w-full max-w-xs">
+      <div class="w-full">
         <PhotoGrid {photos} {uid} onchange={handlePhotosChange} />
       </div>
       <input
@@ -173,13 +165,27 @@
     </div>
   {/if}
 
-  <!-- Sexual orientation -->
+  <!-- Gender + Orientation -->
   <div class="px-5 pb-8">
     {#if editing}
+      <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+        Gender
+      </h3>
       <SegmentedControl
-        options={SEXUAL_ORIENTATIONS}
+        options={GENDER_OPTIONS}
+        value={gender}
+        ariaLabel="Gender"
+        onchange={(value) => (gender = value)}
+      />
+      <h3
+        class="mb-2 mt-4 text-sm font-bold uppercase tracking-wide text-muted"
+      >
+        Orientation
+      </h3>
+      <SegmentedControl
+        options={ORIENTATIONS}
         value={sexualOrientation}
-        ariaLabel="Sexual orientation"
+        ariaLabel="Orientation"
         onchange={(value) => (sexualOrientation = value)}
       />
       <button
@@ -197,7 +203,127 @@
     <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
       My Sports
     </h3>
-    {#if ($userProfile?.activities?.length ?? 0) === 0}
+    {#if editing}
+      {#if activities.length === 0}
+        <p class="mb-3 text-sm text-muted">No activities set</p>
+      {:else}
+        <div class="mb-3 flex flex-col gap-3">
+          {#each activities as act}
+            {@const info = ACTIVITIES.find((a) => a.id === act.id)}
+            <div
+              class="flex items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm"
+            >
+              <span
+                class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+              >
+                <ActivityIcon id={act.id} class="size-5" />
+              </span>
+              <div class="flex-1">
+                <p class="font-bold text-text">{info?.label ?? act.id}</p>
+                <p class="text-sm text-muted">
+                  {formatLabel(act.format)} · {act.level}
+                </p>
+              </div>
+              <button
+                onclick={() => removeSport(act.id)}
+                aria-label="Remove {info?.label ?? act.id}"
+                class="flex size-8 items-center justify-center rounded-full text-muted active:scale-95"
+              >
+                <X class="size-4" />
+              </button>
+            </div>
+          {/each}
+        </div>
+      {/if}
+
+      {#if showAddSport}
+        <div
+          class="rounded-2xl border-2 border-dashed border-primary/40 bg-surface p-4"
+        >
+          <p class="mb-3 text-sm font-bold text-text">Add a sport</p>
+          {#if availableActivities.length === 0}
+            <p class="text-sm text-muted">You've added every sport already!</p>
+          {:else}
+            <div class="grid grid-cols-2 gap-2">
+              {#each availableActivities as activity}
+                <button
+                  onclick={() => (newActivityId = activity.id)}
+                  class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 {newActivityId ===
+                  activity.id
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border bg-bg'}"
+                >
+                  <ActivityIcon id={activity.id} class="size-6 text-primary" />
+                  <span class="text-xs font-semibold text-text"
+                    >{activity.label}</span
+                  >
+                </button>
+              {/each}
+            </div>
+
+            {#if newActivityId}
+              <div class="mt-4">
+                <p
+                  class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
+                >
+                  Format
+                </p>
+                <div class="mb-3">
+                  <SegmentedControl
+                    options={ACTIVITY_FORMAT_OPTIONS}
+                    value={newFormat}
+                    ariaLabel="Format"
+                    onchange={(value) => (newFormat = value)}
+                  />
+                </div>
+                <p
+                  class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
+                >
+                  Level
+                </p>
+                <div class="flex gap-2">
+                  {#each SKILL_LEVEL_OPTIONS as level}
+                    <button
+                      onclick={() => (newLevel = level.value as SkillLevel)}
+                      class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {newLevel ===
+                      level.value
+                        ? 'border-primary bg-primary text-white'
+                        : 'border-border text-muted'}"
+                    >
+                      {level.label}
+                    </button>
+                  {/each}
+                </div>
+              </div>
+            {/if}
+          {/if}
+
+          <div class="mt-4 flex gap-3">
+            <button
+              onclick={() => (showAddSport = false)}
+              class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
+            >
+              Cancel
+            </button>
+            <button
+              onclick={confirmAddSport}
+              disabled={!newActivityId}
+              class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+            >
+              Add sport
+            </button>
+          </div>
+        </div>
+      {:else}
+        <button
+          onclick={openAddSport}
+          class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
+        >
+          <Plus class="size-4" />
+          Add sport
+        </button>
+      {/if}
+    {:else if ($userProfile?.activities?.length ?? 0) === 0}
       <p class="text-sm text-muted">No activities set</p>
     {:else}
       <div class="flex flex-col gap-3">
@@ -217,163 +343,70 @@
                 {formatLabel(act.format)} · {act.level}
               </p>
             </div>
-            <button
-              onclick={() => removeSport(act.id)}
-              aria-label="Remove {info?.label ?? act.id}"
-              class="flex size-8 items-center justify-center rounded-full text-muted active:scale-95"
-            >
-              <X class="size-4" />
-            </button>
           </div>
         {/each}
       </div>
     {/if}
-
-    {#if showAddSport}
-      <div
-        class="mt-3 rounded-2xl border-2 border-dashed border-primary/40 bg-surface p-4"
-      >
-        <p class="mb-3 text-sm font-bold text-text">Add a sport</p>
-        {#if availableActivities.length === 0}
-          <p class="text-sm text-muted">You've added every sport already!</p>
-        {:else}
-          <div class="grid grid-cols-2 gap-2">
-            {#each availableActivities as activity}
-              <button
-                onclick={() => (newActivityId = activity.id)}
-                class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 {newActivityId ===
-                activity.id
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border bg-bg'}"
-              >
-                <ActivityIcon id={activity.id} class="size-6 text-primary" />
-                <span class="text-xs font-semibold text-text"
-                  >{activity.label}</span
-                >
-              </button>
-            {/each}
-          </div>
-
-          {#if newActivityId}
-            <div class="mt-4">
-              <p
-                class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-              >
-                Format
-              </p>
-              <div class="mb-3">
-                <SegmentedControl
-                  options={ACTIVITY_FORMAT_OPTIONS}
-                  value={newFormat}
-                  ariaLabel="Format"
-                  onchange={(value) => (newFormat = value)}
-                />
-              </div>
-              <p
-                class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-              >
-                Level
-              </p>
-              <div class="flex gap-2">
-                {#each SKILL_LEVEL_OPTIONS as level}
-                  <button
-                    onclick={() => (newLevel = level.value as SkillLevel)}
-                    class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {newLevel ===
-                    level.value
-                      ? 'border-primary bg-primary text-white'
-                      : 'border-border text-muted'}"
-                  >
-                    {level.label}
-                  </button>
-                {/each}
-              </div>
-            </div>
-          {/if}
-        {/if}
-
-        <div class="mt-4 flex gap-3">
-          <button
-            onclick={() => (showAddSport = false)}
-            class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
-          >
-            Cancel
-          </button>
-          <button
-            onclick={addSport}
-            disabled={!newActivityId || savingSport}
-            class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
-          >
-            {savingSport ? "Adding…" : "Add sport"}
-          </button>
-        </div>
-      </div>
-    {:else}
-      <button
-        onclick={openAddSport}
-        class="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
-      >
-        <Plus class="size-4" />
-        Add sport
-      </button>
-    {/if}
   </div>
 
   <!-- Theme -->
-  <div class="px-5 pt-8">
-    <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      Appearance
-    </h3>
-    <div class="mb-4 flex rounded-xl border-2 border-border bg-bg p-0.5">
-      <button
-        onclick={() => activeTheme.selectMode("light")}
-        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
-        'light'
-          ? 'bg-primary text-white'
-          : 'text-muted'}"
-      >
-        <Sun class="size-4" />
-        Light
-      </button>
-      <button
-        onclick={() => activeTheme.selectMode("dark")}
-        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
-        'dark'
-          ? 'bg-primary text-white'
-          : 'text-muted'}"
-      >
-        <Moon class="size-4" />
-        Dark
-      </button>
-    </div>
-
-    <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      App Theme
-    </h3>
-    <div class="grid grid-cols-3 gap-3">
-      {#each THEMES as theme}
+  {#if editing}
+    <div class="px-5 pt-8">
+      <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+        Appearance
+      </h3>
+      <div class="mb-4 flex rounded-xl border-2 border-border bg-bg p-0.5">
         <button
-          onclick={() => activeTheme.selectTheme(theme.id)}
-          class="flex flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all active:scale-95 {$activeTheme.themeId ===
-          theme.id
-            ? 'border-primary bg-primary/10'
-            : 'border-border bg-surface'}"
+          onclick={() => activeTheme.selectMode("light")}
+          class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
+          'light'
+            ? 'bg-primary text-white'
+            : 'text-muted'}"
         >
-          <span
-            class="relative flex size-10 items-center justify-center rounded-full shadow-sm"
-            style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.secondary} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
-            'dark'
-              ? theme.dark.bg
-              : theme.light.bg}"
-          >
-            {#if $activeTheme.themeId === theme.id}
-              <Check class="size-5 text-white drop-shadow" />
-            {/if}
-          </span>
-          <span class="text-xs font-semibold text-text">{theme.label}</span>
+          <Sun class="size-4" />
+          Light
         </button>
-      {/each}
+        <button
+          onclick={() => activeTheme.selectMode("dark")}
+          class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
+          'dark'
+            ? 'bg-primary text-white'
+            : 'text-muted'}"
+        >
+          <Moon class="size-4" />
+          Dark
+        </button>
+      </div>
+
+      <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+        App Theme
+      </h3>
+      <div class="grid grid-cols-3 gap-3">
+        {#each THEMES as theme}
+          <button
+            onclick={() => activeTheme.selectTheme(theme.id)}
+            class="flex flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all active:scale-95 {$activeTheme.themeId ===
+            theme.id
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-surface'}"
+          >
+            <span
+              class="relative flex size-10 items-center justify-center rounded-full shadow-sm"
+              style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.secondary} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
+              'dark'
+                ? theme.dark.bg
+                : theme.light.bg}"
+            >
+              {#if $activeTheme.themeId === theme.id}
+                <Check class="size-5 text-white drop-shadow" />
+              {/if}
+            </span>
+            <span class="text-xs font-semibold text-text">{theme.label}</span>
+          </button>
+        {/each}
+      </div>
     </div>
-  </div>
+  {/if}
 
   <!-- Logout -->
   <div class="mt-auto px-5 pt-8">

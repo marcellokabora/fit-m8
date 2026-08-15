@@ -63,7 +63,7 @@
           </span>
         {/if}
       </div>
-      {#if profile.sexualOrientation === "gay"}
+      {#if profile.orientation === "gay"}
         <span
           class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
         >
