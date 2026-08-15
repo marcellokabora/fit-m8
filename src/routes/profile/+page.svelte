@@ -2,7 +2,9 @@
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
     ACTIVITIES,
+    ACTIVITY_FORMAT_OPTIONS,
     SEXUAL_ORIENTATIONS,
+    SKILL_LEVEL_OPTIONS,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
@@ -105,7 +107,7 @@
   let showAddSport = $state(false);
   let newActivityId = $state<string | null>(null);
   let newFormat = $state<ActivityFormat>("1v1");
-  let newLevel = $state<SkillLevel>("beginner");
+  let newLevel = $state<SkillLevel>("Basic");
   let savingSport = $state(false);
 
   let availableActivities = $derived(
@@ -118,7 +120,7 @@
     showAddSport = true;
     newActivityId = null;
     newFormat = "1v1";
-    newLevel = "beginner";
+    newLevel = "Basic";
   }
 
   async function addSport() {
@@ -327,18 +329,13 @@
               >
                 Format
               </p>
-              <div class="mb-3 flex gap-2">
-                {#each ["1v1", "2v2"] as fmt}
-                  <button
-                    onclick={() => (newFormat = fmt as ActivityFormat)}
-                    class="flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors {newFormat ===
-                    fmt
-                      ? 'border-primary bg-primary text-white'
-                      : 'border-border text-text'}"
-                  >
-                    {fmt}
-                  </button>
-                {/each}
+              <div class="mb-3">
+                <SegmentedControl
+                  options={ACTIVITY_FORMAT_OPTIONS}
+                  value={newFormat}
+                  ariaLabel="Format"
+                  onchange={(value) => (newFormat = value)}
+                />
               </div>
               <p
                 class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
@@ -346,15 +343,15 @@
                 Level
               </p>
               <div class="flex gap-2">
-                {#each ["beginner", "intermediate", "advanced"] as lvl}
+                {#each SKILL_LEVEL_OPTIONS as level}
                   <button
-                    onclick={() => (newLevel = lvl as SkillLevel)}
-                    class="flex-1 rounded-xl border-2 py-2 text-xs font-bold capitalize transition-colors {newLevel ===
-                    lvl
+                    onclick={() => (newLevel = level.value as SkillLevel)}
+                    class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {newLevel ===
+                    level.value
                       ? 'border-secondary-dark bg-secondary text-white'
                       : 'border-border text-muted'}"
                   >
-                    {lvl}
+                    {level.label}
                   </button>
                 {/each}
               </div>

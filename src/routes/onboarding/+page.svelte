@@ -3,6 +3,8 @@
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
     ACTIVITIES,
+    ACTIVITY_FORMAT_OPTIONS,
+    SKILL_LEVEL_OPTIONS,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
@@ -11,6 +13,7 @@
   import { Camera, User, Zap, Loader2 } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
+  import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import { storage } from "$lib/firebase/client";
   import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
   import { compressImage } from "$lib/image";
@@ -75,7 +78,7 @@
       delete activitySettings[id];
     } else {
       selectedActivities = [...selectedActivities, id];
-      activitySettings[id] = { format: "1v1", level: "beginner" };
+      activitySettings[id] = { format: "1v1", level: "Basic" };
     }
   }
 
@@ -207,20 +210,12 @@
             >
               Format
             </p>
-            <div class="flex gap-2">
-              {#each ["1v1", "2v2"] as fmt}
-                <button
-                  onclick={() =>
-                    (activitySettings[id].format = fmt as ActivityFormat)}
-                  class="flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors {settings.format ===
-                  fmt
-                    ? 'border-primary bg-primary text-white'
-                    : 'border-border text-text'}"
-                >
-                  {fmt}
-                </button>
-              {/each}
-            </div>
+            <SegmentedControl
+              options={ACTIVITY_FORMAT_OPTIONS}
+              value={settings.format}
+              ariaLabel="Format for {activity?.label ?? id}"
+              onchange={(value) => (activitySettings[id].format = value)}
+            />
           </div>
           <div>
             <p
@@ -229,16 +224,16 @@
               Level
             </p>
             <div class="flex gap-2">
-              {#each ["beginner", "intermediate", "advanced"] as lvl}
+              {#each SKILL_LEVEL_OPTIONS as level}
                 <button
                   onclick={() =>
-                    (activitySettings[id].level = lvl as SkillLevel)}
-                  class="flex-1 rounded-xl border-2 py-2 text-xs font-bold capitalize transition-colors {settings.level ===
-                  lvl
+                    (activitySettings[id].level = level.value as SkillLevel)}
+                  class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {settings.level ===
+                  level.value
                     ? 'border-secondary-dark bg-secondary text-white'
                     : 'border-border text-muted'}"
                 >
-                  {lvl}
+                  {level.label}
                 </button>
               {/each}
             </div>

@@ -17,6 +17,7 @@
     userProfile,
     filterActivity,
     filterFormat,
+    filterLevel,
     filterGender,
     filterSexualOrientation,
   } from "$lib/stores/auth";
@@ -24,6 +25,7 @@
   import {
     ACTIVITIES,
     SEXUAL_ORIENTATIONS,
+    SKILL_LEVEL_OPTIONS,
     type UserProfile,
   } from "$lib/types";
   import { get } from "svelte/store";
@@ -40,6 +42,11 @@
     { value: "", label: "All" },
     { value: "Male", label: "Male" },
     { value: "Female", label: "Female" },
+  ] as const;
+
+  const LEVEL_FILTER_OPTIONS = [
+    { value: "", label: "All" },
+    ...SKILL_LEVEL_OPTIONS,
   ] as const;
 
   let users = $state<UserProfile[]>([]);
@@ -73,6 +80,7 @@
       uid,
       get(filterActivity),
       get(filterFormat),
+      get(filterLevel),
       get(filterGender),
       get(filterSexualOrientation),
     );
@@ -85,6 +93,7 @@
     $userProfile;
     $filterActivity;
     $filterFormat;
+    $filterLevel;
     $filterGender;
     $filterSexualOrientation;
 
@@ -167,12 +176,6 @@
       >
         <SlidersHorizontal class="size-5 text-text" />
       </button>
-      <a
-        href="/profile"
-        class="flex size-9 items-center justify-center rounded-full bg-surface shadow-sm"
-      >
-        <User class="size-5 text-text" />
-      </a>
     </div>
   </div>
 
@@ -213,6 +216,17 @@
           />
         </div>
 
+        <!-- Level -->
+        <p class="mb-2 text-sm font-bold text-muted">Level</p>
+        <div class="mb-5">
+          <SegmentedControl
+            options={LEVEL_FILTER_OPTIONS}
+            value={$filterLevel}
+            ariaLabel="Level"
+            onchange={(value) => filterLevel.set(value)}
+          />
+        </div>
+
         <!-- Gender -->
         <p class="mb-2 text-sm font-bold text-muted">Gender</p>
         <div class="mb-5">
@@ -225,7 +239,7 @@
         </div>
 
         <!-- Sexual orientation -->
-        <p class="mb-2 text-sm font-bold text-muted">Sexual orientation</p>
+        <p class="mb-2 text-sm font-bold text-muted">Orientation</p>
         <div class="mb-5">
           <SegmentedControl
             options={SEXUAL_ORIENTATIONS}
@@ -265,7 +279,9 @@
   {/if}
 
   <!-- Card stack -->
-  <div class="relative flex flex-1 flex-col items-center justify-center px-5">
+  <div
+    class="relative flex min-h-0 flex-1 flex-col items-center justify-center px-5"
+  >
     {#if loading}
       <div class="flex flex-col items-center gap-3 text-muted">
         <LoaderCircle class="size-10 animate-spin" />
@@ -287,7 +303,7 @@
       </div>
     {:else}
       <!-- Card stack wrapper: keeps all layers anchored to the same box -->
-      <div class="relative w-full max-h-[520px] aspect-[3/4]">
+      <div class="relative min-h-0 w-full max-w-md flex-1">
         <!-- Background cards (stacked look) -->
         {#if users[2]}
           <div
@@ -426,7 +442,7 @@
       </div>
 
       <!-- Action buttons -->
-      <div class="mt-6 flex gap-6">
+      <div class="mt-4 flex shrink-0 gap-6">
         <button
           onclick={() => swipe("pass")}
           class="flex size-16 items-center justify-center rounded-full bg-surface text-3xl shadow-lg active:scale-90 transition-transform"

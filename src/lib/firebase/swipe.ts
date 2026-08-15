@@ -10,7 +10,12 @@ import {
 	limit
 } from 'firebase/firestore';
 import { db } from '$lib/firebase/client';
-import type { ActivityFormat, SexualOrientation, UserProfile } from '$lib/types';
+import type {
+	ActivityFormat,
+	SexualOrientation,
+	SkillLevel,
+	UserProfile
+} from '$lib/types';
 
 export async function recordSwipe(
 	fromUid: string,
@@ -56,6 +61,7 @@ export async function getDiscoverFeed(
 	currentUid: string,
 	activityFilter: string,
 	formatFilter: ActivityFormat | '',
+	levelFilter: SkillLevel | '',
 	genderFilter: string = '',
 	sexualOrientationFilter: SexualOrientation | '' = ''
 ): Promise<UserProfile[]> {
@@ -79,12 +85,13 @@ export async function getDiscoverFeed(
 		)
 			continue;
 
-		// Filter by activity + format if set
-		if (activityFilter || formatFilter) {
+		// Activity filters must match the same activity entry.
+		if (activityFilter || formatFilter || levelFilter) {
 			const match = data.activities?.some(
 				(a) =>
 					(!activityFilter || a.id === activityFilter) &&
-					(!formatFilter || a.format === formatFilter)
+					(!formatFilter || a.format === formatFilter || a.format === 'both') &&
+					(!levelFilter || a.level === levelFilter)
 			);
 			if (!match) continue;
 		}

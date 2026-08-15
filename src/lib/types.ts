@@ -1,7 +1,20 @@
-export type ActivityFormat = '1v1' | '2v2';
-export type SkillLevel = 'beginner' | 'intermediate' | 'advanced';
 export type SwipeDirection = 'like' | 'pass';
 export type MatchStatus = 'pending' | 'confirmed' | 'declined';
+
+export const ACTIVITY_FORMAT_OPTIONS = [
+	{ value: '1v1', label: '1v1' },
+	{ value: '2v2', label: '2v2' },
+	{ value: 'both', label: 'Both' }
+] as const;
+
+export type ActivityFormat = (typeof ACTIVITY_FORMAT_OPTIONS)[number]['value'];
+
+export const SKILL_LEVEL_OPTIONS = [
+	{ value: 'Basic', label: 'Basic' },
+	{ value: 'Expert', label: 'Expert' }
+] as const;
+
+export type SkillLevel = (typeof SKILL_LEVEL_OPTIONS)[number]['value'];
 
 export const SEXUAL_ORIENTATIONS = [
 	{ value: 'straight', label: 'Straight' },
