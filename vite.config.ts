@@ -28,11 +28,11 @@ export default defineConfig({
 				enabled: false
 			},
 			manifest: {
-				name: 'FitMate',
-				short_name: 'FitMate',
+				name: 'Fit-M8',
+				short_name: 'Fit-M8',
 				description: 'Match people for sports activities',
-				theme_color: '#0066FF',
-				background_color: '#F5F7FA',
+				theme_color: '#0b0f17',
+				background_color: '#0b0f17',
 				display: 'standalone',
 				orientation: 'portrait',
 				start_url: '/',

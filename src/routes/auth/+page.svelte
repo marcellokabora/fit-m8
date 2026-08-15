@@ -52,12 +52,12 @@
     >
       <img
         src="/logo.jpg"
-        alt="FitMate logo"
+        alt="Fit-M8 logo"
         class="h-full w-full object-cover"
       />
     </a>
     <h1 class="text-2xl font-black text-text">
-      {mode === "login" ? "Welcome back" : "Join FitMate"}
+      {mode === "login" ? "Welcome back" : "Join Fit-M8"}
     </h1>
     <p class="text-sm text-muted">
       {mode === "login"

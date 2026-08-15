@@ -91,7 +91,7 @@ export interface ThemeState {
 
 const THEME_KEY = 'fitmate-theme';
 const MODE_KEY = 'fitmate-theme-mode';
-const DEFAULT_STATE: ThemeState = { themeId: THEMES[0].id, mode: 'light' };
+const DEFAULT_STATE: ThemeState = { themeId: THEMES[0].id, mode: 'dark' };
 
 function applyState(state: ThemeState) {
     if (typeof document === 'undefined') return;
@@ -108,6 +108,10 @@ function applyState(state: ThemeState) {
     root.setProperty('--color-muted', modeColors.muted);
     root.setProperty('--color-border', modeColors.border);
     document.documentElement.dataset.themeMode = state.mode;
+
+    // keep the mobile browser/status bar in sync with the app background
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) themeColorMeta.setAttribute('content', modeColors.bg);
 }
 
 function createThemeStore() {
@@ -119,7 +123,7 @@ function createThemeStore() {
             if (typeof window === 'undefined') return;
             const themeId = window.localStorage.getItem(THEME_KEY) ?? DEFAULT_STATE.themeId;
             const savedMode = window.localStorage.getItem(MODE_KEY);
-            const mode: ThemeMode = savedMode === 'dark' ? 'dark' : 'light';
+            const mode: ThemeMode = savedMode === 'light' ? 'light' : 'dark';
             const state: ThemeState = {
                 themeId: THEMES.some((t) => t.id === themeId) ? themeId : DEFAULT_STATE.themeId,
                 mode

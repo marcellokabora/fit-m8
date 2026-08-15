@@ -34,7 +34,7 @@
 </script>
 
 <svelte:head>
-  <title>FitMate</title>
+  <title>Fit-M8</title>
   <meta
     name="description"
     content="Match people for sports activities near you"

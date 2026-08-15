@@ -143,7 +143,7 @@
               <ActivityIcon id={match.activity} class="size-3.5" />
               {activity?.label ?? match.activity} · {formatLabel(match.format)}
             </p>
-            {#if match.lastMessage}
+            <!-- {#if match.lastMessage}
               <p
                 class="mt-0.5 truncate text-sm {unread
                   ? 'font-bold text-text'
@@ -151,7 +151,7 @@
               >
                 {match.lastMessage}
               </p>
-            {/if}
+            {/if} -->
           </div>
           <div class="flex flex-col items-end gap-1">
             {#if unread}

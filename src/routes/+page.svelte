@@ -30,11 +30,11 @@
     >
       <img
         src="/logo.jpg"
-        alt="FitMate logo"
+        alt="Fit-M8 logo"
         class="h-full w-full object-cover"
       />
     </div>
-    <h1 class="text-5xl font-black tracking-tight">FitMate</h1>
+    <h1 class="text-5xl font-black tracking-tight">Fit-M8</h1>
     <p class="text-center text-lg font-medium text-muted">
       Find your perfect sports partner.<br />Swipe. Match. Play.
     </p>

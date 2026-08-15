@@ -162,10 +162,10 @@ const fakeProfiles = [
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
-		bio: 'Swimming and fencing! Competitive spirit 🏊',
+		bio: 'Swimming and frescobol! Competitive spirit 🏊',
 		activities: [
 			{ id: 'swimming', format: '1v1', level: 'Expert' },
-			{ id: 'fencing', format: '1v1', level: 'Basic' }
+			{ id: 'frescobol', format: '1v1', level: 'Basic' }
 		]
 	},
 	{
@@ -282,7 +282,7 @@ const fakeProfiles = [
 		bio: 'Training martial arts and looking for partners 🥋',
 		activities: [
 			{ id: 'martial-arts', format: '1v1', level: 'Expert' },
-			{ id: 'fencing', format: '1v1', level: 'Basic' }
+			{ id: 'frescobol', format: '1v1', level: 'Basic' }
 		]
 	},
 	{
@@ -318,7 +318,7 @@ const activityPool = [
 	'rock-climbing',
 	'golf',
 	'martial-arts',
-	'fencing'
+	'frescobol'
 ];
 
 function prepareProfile(profile, profileIndex) {

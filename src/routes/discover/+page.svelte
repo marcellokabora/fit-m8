@@ -29,6 +29,7 @@
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
     formatLabel,
+    type DiscoverFilters,
     type UserProfile,
   } from "$lib/types";
   import { get } from "svelte/store";
@@ -88,10 +89,53 @@
   });
 
   let filtersOpen = $state(false);
+  // uid for which we've already synced filter stores from Firestore, so we don't redo it on every profile update
+  let filtersSyncedFor = $state<string | null>(null);
 
   function pickActivity(id: string) {
     filterActivity.set(id);
   }
+
+  function applyFilters(filters: DiscoverFilters) {
+    filterActivity.set(filters.activity);
+    filterFormat.set(filters.format);
+    filterLevel.set(filters.level);
+    filterGender.set(filters.gender);
+    filterSexualOrientation.set(filters.orientation);
+  }
+
+  async function saveFilters() {
+    const uid = get(authUser)?.uid;
+    if (!uid) return;
+    await userProfile.save(uid, {
+      discoverFilters: {
+        activity: get(filterActivity),
+        format: get(filterFormat),
+        level: get(filterLevel),
+        gender: get(filterGender),
+        orientation: get(filterSexualOrientation),
+      },
+    });
+  }
+
+  function closeFilters() {
+    filtersOpen = false;
+    saveFilters();
+  }
+
+  // Sync filter stores from the saved profile once per user; if none saved yet, open the modal for first-time setup
+  $effect(() => {
+    const uid = $authUser?.uid;
+    const profile = $userProfile;
+    if (!uid || !profile || filtersSyncedFor === uid) return;
+    filtersSyncedFor = uid;
+
+    if (profile.discoverFilters) {
+      applyFilters(profile.discoverFilters);
+    } else {
+      filtersOpen = true;
+    }
+  });
 
   async function loadFeed() {
     const uid = get(authUser)?.uid;
@@ -235,7 +279,7 @@
     <div
       transition:fade={{ duration: 200 }}
       class="fixed inset-0 z-50 flex justify-end bg-black/40"
-      onclick={() => (filtersOpen = false)}
+      onclick={closeFilters}
     >
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -247,7 +291,7 @@
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-lg font-black text-text">Filters</h2>
           <button
-            onclick={() => (filtersOpen = false)}
+            onclick={closeFilters}
             class="flex size-8 items-center justify-center rounded-full bg-bg text-muted"
           >
             <X class="size-4" />
@@ -255,12 +299,12 @@
         </div>
 
         <!-- Format -->
-        <p class="mb-2 text-sm font-bold text-muted">Players</p>
+        <p class="mb-2 text-sm font-bold text-muted">Format</p>
         <div class="mb-5">
           <SegmentedControl
             options={FORMAT_FILTER_OPTIONS}
             value={$filterFormat}
-            ariaLabel="Players"
+            ariaLabel="Format"
             onchange={(value) => filterFormat.set(value)}
           />
         </div>

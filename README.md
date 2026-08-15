@@ -1,8 +1,8 @@
-# FitMate 🏃⚡
+# Fit-M8 🏃⚡
 
 **Match people for sports activities — Tinder-style.**
 
-FitMate is a mobile-first Progressive Web App built with SvelteKit, TailwindCSS, and Firebase. Find your perfect 1v1 or 2v2 partner for jogging, padel, tennis, beach volleyball, and more.
+Fit-M8 is a mobile-first Progressive Web App built with SvelteKit, TailwindCSS, and Firebase. Find your perfect 1v1 or 2v2 partner for jogging, padel, tennis, beach volleyball, and more.
 
 ## Tech Stack
 

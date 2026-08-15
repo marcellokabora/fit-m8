@@ -17,7 +17,6 @@
   import RockClimbing from "~icons/mdi/rock-climbing";
   import Golf from "~icons/material-symbols/sports-golf";
   import MartialArts from "~icons/material-symbols/sports-martial-arts";
-  import Fencing from "~icons/mdi/fencing";
   import Paddleboard from "~icons/material-symbols/kayaking";
   import Generic from "~icons/material-symbols/sports-outline";
   import type { ActivityId } from "$lib/types";
@@ -46,7 +45,6 @@
     "rock-climbing": RockClimbing,
     golf: Golf,
     "martial-arts": MartialArts,
-    fencing: Fencing,
     paddleboard: Paddleboard,
   };
 

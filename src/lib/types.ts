@@ -64,6 +64,14 @@ export interface UserActivity {
 	level: SkillLevel;
 }
 
+export interface DiscoverFilters {
+	activity: string;
+	format: '1v1' | '2v2' | '';
+	level: SkillLevel | '';
+	gender: Gender | '';
+	orientation: SexualOrientation | '';
+}
+
 export interface UserProfile {
 	uid: string;
 	displayName: string;
@@ -76,6 +84,8 @@ export interface UserProfile {
 	orientation?: SexualOrientation | null;
 	city: string;
 	activities: UserActivity[];
+	// undefined until the user has confirmed filters at least once from the Discover screen
+	discoverFilters?: DiscoverFilters;
 	createdAt: Date;
 	updatedAt: Date;
 }
