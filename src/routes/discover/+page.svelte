@@ -6,7 +6,6 @@
     SlidersHorizontal,
     User,
     X,
-    LoaderCircle,
     Moon,
     MapPin,
     Check,
@@ -14,6 +13,7 @@
     PartyPopper,
   } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import Loading from "$lib/components/Loading.svelte";
   import {
     authUser,
     userProfile,
@@ -563,10 +563,7 @@
     class="relative flex min-h-0 flex-1 flex-col items-center justify-center px-5"
   >
     {#if loading}
-      <div class="flex flex-col items-center gap-3 text-muted">
-        <LoaderCircle class="size-10 animate-spin" />
-        <p class="text-sm">Loading players…</p>
-      </div>
+      <Loading />
     {:else if users.length === 0}
       <div class="flex flex-col items-center gap-4 text-center">
         <Moon class="size-16 text-muted" />

@@ -5,7 +5,7 @@
   import { fade } from "svelte/transition";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Logo from "$lib/components/Logo.svelte";
-  import Splash from "$lib/components/Splash.svelte";
+  import Loading from "$lib/components/Loading.svelte";
 
   // true once auth state resolves to "no user" and the rest of the page can reveal
   let ready = $state(false);
@@ -51,7 +51,7 @@
   class="flex min-h-dvh flex-col items-center justify-between bg-bg px-6 pb-12 pt-20"
 >
   {#if !ready}
-    <Splash />
+    <Loading />
   {/if}
 
   <!-- Logo / Hero -->
