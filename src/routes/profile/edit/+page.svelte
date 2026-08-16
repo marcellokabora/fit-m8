@@ -20,7 +20,7 @@
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
-  import { Plus, X, RotateCcw } from "@lucide/svelte";
+  import { Plus, X, RotateCcw, ChevronDown, Trash2 } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
 
@@ -254,16 +254,20 @@
                   {formatLabel(act.format)} · {act.level}
                 </p>
               </div>
-              <button
-                onclick={(e) => {
-                  e.stopPropagation();
-                  removeSport(act.id);
-                }}
-                aria-label="Remove {info?.label ?? act.id}"
-                class="flex size-8 items-center justify-center rounded-full text-muted active:scale-95"
-              >
-                <X class="size-4" />
-              </button>
+              {#if expanded}
+                <button
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    removeSport(act.id);
+                  }}
+                  aria-label="Remove {info?.label ?? act.id}"
+                  class="flex size-8 items-center justify-center rounded-full bg-error/10 text-error active:scale-95"
+                >
+                  <Trash2 class="size-4" />
+                </button>
+              {:else}
+                <ChevronDown class="size-5 text-muted" />
+              {/if}
             </div>
             {#if expanded}
               <div class="px-4 pb-4" transition:slide={{ duration: 200 }}>

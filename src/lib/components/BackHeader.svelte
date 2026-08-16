@@ -15,7 +15,9 @@
   } = $props();
 </script>
 
-<div class="flex items-center gap-3 px-4 pb-3 pt-5 {className}">
+<div
+  class="sticky top-0 z-10 flex items-center gap-3 px-4 pb-3 pt-5 {className}"
+>
   {#if href}
     <a
       {href}

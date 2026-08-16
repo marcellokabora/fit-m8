@@ -25,7 +25,9 @@
 
 <div class="flex min-h-dvh flex-col bg-bg pb-24">
   <!-- Header -->
-  <div class="flex items-center justify-between px-5 pb-3 pt-5">
+  <div
+    class="sticky top-0 z-10 flex items-center justify-between bg-bg px-5 pb-3 pt-5"
+  >
     <h1 class="text-2xl font-black text-text">Profile</h1>
     <a
       href="/profile/edit"

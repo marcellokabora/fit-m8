@@ -37,7 +37,7 @@
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
-  <BackHeader title="Profile" />
+  <BackHeader title="Profile" class="bg-bg" />
 
   {#if loading}
     <div class="flex flex-1 items-center justify-center text-muted">

@@ -652,14 +652,16 @@
           >
             <!-- Photo progress segments (Tinder-style tap navigation) -->
             {#if currentPhotos.length > 1}
-              <div class="absolute inset-x-12 top-6 z-10 flex gap-1">
+              <div
+                class="absolute left-1/2 top-6 z-10 flex w-1/3 -translate-x-1/2 gap-1"
+              >
                 {#each currentPhotos as _, i}
                   <div
                     class="h-1 flex-1 overflow-hidden rounded-full bg-white/40"
                   >
                     <div
                       class="h-full rounded-full bg-white"
-                      style="width: {i <= photoIndex ? '100%' : '0%'}"
+                      style="width: {i === photoIndex ? '100%' : '0%'}"
                     ></div>
                   </div>
                 {/each}
