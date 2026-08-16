@@ -8,11 +8,16 @@
   );
   let email = $state("");
   let password = $state("");
+  let confirmPassword = $state("");
   let error = $state("");
   let loading = $state(false);
 
   async function handleEmail() {
     error = "";
+    if (mode === "register" && password !== confirmPassword) {
+      error = "Passwords do not match";
+      return;
+    }
     loading = true;
     try {
       if (mode === "login") {
@@ -28,12 +33,12 @@
     }
   }
 
-  async function handleSocial(provider: "google" | "facebook") {
+  // Facebook login disabled for now
+  async function handleSocial(provider: "google") {
     error = "";
     loading = true;
     try {
       if (provider === "google") await authUser.signInGoogle();
-      else await authUser.signInFacebook();
       goto("/discover");
     } catch (e: any) {
       error = e.message ?? "Something went wrong";
@@ -94,6 +99,7 @@
       Continue with Google
     </button>
 
+    <!-- Facebook login disabled for now
     <button
       onclick={() => handleSocial("facebook")}
       disabled={loading}
@@ -106,6 +112,7 @@
       </svg>
       Continue with Facebook
     </button>
+    -->
   </div>
 
   <div class="my-6 flex items-center gap-3">
@@ -131,6 +138,16 @@
       minlength={6}
       class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
     />
+    {#if mode === "register"}
+      <input
+        type="password"
+        bind:value={confirmPassword}
+        placeholder="Confirm password"
+        required
+        minlength={6}
+        class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+      />
+    {/if}
     {#if error}
       <p class="rounded-xl bg-error/10 px-4 py-3 text-sm text-error">{error}</p>
     {/if}

@@ -1,13 +1,38 @@
 <script lang="ts">
-  import { MapPin, Loader2 } from "@lucide/svelte";
+  import { MapPin, Loader2, Pencil } from "@lucide/svelte";
 
   let { city = $bindable("") }: { city?: string } = $props();
 
   let locating = $state(false);
   let error = $state("");
+  let manualEntry = $state(false);
+  let manualCity = $state("");
+
+  // Primary provider, no API key required.
+  async function reverseGeocodeBigDataCloud(lat: number, lon: number) {
+    const res = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+    );
+    if (!res.ok) throw new Error("bigdatacloud lookup failed");
+    const data = await res.json();
+    return data.city || data.locality || data.principalSubdivision || "";
+  }
+
+  // Fallback provider used if the primary API is down or unreachable.
+  async function reverseGeocodeNominatim(lat: number, lon: number) {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=jsonv2`,
+      { headers: { Accept: "application/json" } },
+    );
+    if (!res.ok) throw new Error("nominatim lookup failed");
+    const data = await res.json();
+    const addr = data.address ?? {};
+    return addr.city || addr.town || addr.village || addr.county || "";
+  }
 
   async function detect() {
     error = "";
+    manualEntry = false;
     if (!("geolocation" in navigator)) {
       error = "Geolocation isn't supported on this device";
       return;
@@ -25,27 +50,61 @@
       );
 
       const { latitude, longitude } = position.coords;
-      const res = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
-      );
-      if (!res.ok) throw new Error("Couldn't resolve your city");
-      const data = await res.json();
-      const detected = data.city || data.locality || data.principalSubdivision;
+      let detected = "";
+      try {
+        detected = await reverseGeocodeBigDataCloud(latitude, longitude);
+      } catch {
+        detected = await reverseGeocodeNominatim(latitude, longitude);
+      }
       if (!detected) throw new Error("Couldn't resolve your city");
       city = detected;
     } catch (err: any) {
       error =
         err.code === 1
           ? "Location access denied"
-          : (err.message ?? "Couldn't detect your location");
+          : "Couldn't detect your location";
+      manualEntry = true;
+      manualCity = city;
     } finally {
       locating = false;
     }
   }
+
+  function startManualEntry() {
+    error = "";
+    manualCity = city;
+    manualEntry = true;
+  }
+
+  function saveManualCity() {
+    const trimmed = manualCity.trim();
+    if (!trimmed) return;
+    city = trimmed;
+    manualEntry = false;
+  }
 </script>
 
 <div class="flex flex-1 flex-col gap-2">
-  {#if city}
+  {#if manualEntry}
+    <div class="flex items-center gap-2">
+      <input
+        type="text"
+        bind:value={manualCity}
+        placeholder="Enter your city"
+        maxlength="80"
+        onkeydown={(e) => e.key === "Enter" && saveManualCity()}
+        class="flex-1 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base font-semibold text-text placeholder:text-text/40 focus:border-primary focus:outline-none"
+      />
+      <button
+        type="button"
+        onclick={saveManualCity}
+        disabled={!manualCity.trim()}
+        class="shrink-0 rounded-2xl bg-primary px-4 py-4 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+      >
+        Save
+      </button>
+    </div>
+  {:else if city}
     <div
       class="flex items-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 px-4 py-4"
     >
@@ -53,6 +112,14 @@
       <span class="flex-1 truncate text-base font-semibold text-text"
         >{city}</span
       >
+      <button
+        type="button"
+        onclick={startManualEntry}
+        class="shrink-0 text-primary"
+        aria-label="Edit city"
+      >
+        <Pencil class="size-4" />
+      </button>
       <button
         type="button"
         onclick={detect}
