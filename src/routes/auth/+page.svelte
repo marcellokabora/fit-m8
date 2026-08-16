@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { authUser } from "$lib/stores/auth";
+  import Logo from "$lib/components/Logo.svelte";
 
   let mode = $derived(
     page.url.searchParams.get("mode") === "login" ? "login" : "register",
@@ -53,13 +54,9 @@
   <div class="mb-8 flex flex-col items-center gap-2">
     <a
       href="/"
-      class="mb-2 flex size-14 items-center justify-center overflow-hidden rounded-2xl bg-primary"
+      class="mb-2 flex size-14 items-center justify-center rounded-2xl bg-primary p-3 text-white"
     >
-      <img
-        src="/logo.jpg"
-        alt="Fit-M8 logo"
-        class="h-full w-full object-cover"
-      />
+      <Logo class="h-full w-full" />
     </a>
     <h1 class="text-2xl font-black text-text">
       {mode === "login" ? "Welcome back" : "Join Fit-M8"}

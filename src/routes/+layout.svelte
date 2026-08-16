@@ -21,8 +21,9 @@
     return authUser.subscribe(async (user) => {
       if (user === undefined) return; // still resolving persisted session
       const path = page.url.pathname;
-      if (!user && !PUBLIC_ROUTES.includes(path)) {
-        goto("/auth");
+      if (!user) {
+        userProfile.set(null);
+        if (!PUBLIC_ROUTES.includes(path)) goto("/auth");
       } else if (user) {
         const hasProfile = await userProfile.load(user.uid);
         if (!hasProfile && path !== "/onboarding") {
