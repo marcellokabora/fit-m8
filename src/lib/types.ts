@@ -70,7 +70,14 @@ export interface DiscoverFilters {
 	level: SkillLevel | '';
 	gender: Gender | '';
 	orientation: SexualOrientation | '';
+	minAge: number | null;
+	maxAge: number | null;
+	// max distance from the current user, in km; null/undefined = no distance filter
+	maxDistanceKm: number | null;
 }
+
+// Default distance filter applied until the user picks their own value or explicitly clears it to "Any"
+export const DEFAULT_DISTANCE_KM = 10;
 
 export interface UserProfile {
 	uid: string;
@@ -83,6 +90,9 @@ export interface UserProfile {
 	gender: Gender | '';
 	orientation?: SexualOrientation | null;
 	city: string;
+	// coordinates from the last successful geolocation lookup, used for distance filtering — undefined if the city was entered manually
+	lat?: number;
+	lng?: number;
 	activities: UserActivity[];
 	// undefined until the user has confirmed filters at least once from the Discover screen
 	discoverFilters?: DiscoverFilters;

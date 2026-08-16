@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { fly, fade, scale } from "svelte/transition";
   import {
@@ -21,6 +22,9 @@
     filterLevel,
     filterGender,
     filterSexualOrientation,
+    filterMinAge,
+    filterMaxAge,
+    filterMaxDistanceKm,
   } from "$lib/stores/auth";
   import { getDiscoverFeed, recordSwipe } from "$lib/firebase/swipe";
   import {
@@ -28,6 +32,7 @@
     GENDER_OPTIONS,
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
+    DEFAULT_DISTANCE_KM,
     formatLabel,
     type DiscoverFilters,
     type UserProfile,
@@ -57,6 +62,9 @@
     ...ORIENTATIONS,
   ] as const;
 
+  const AGE_MIN = 18;
+  const AGE_MAX = 60;
+
   let users = $state<UserProfile[]>([]);
   let loading = $state(true);
   let matchBanner = $state(false);
@@ -67,6 +75,71 @@
       ),
     ),
   );
+  let hasCoords = $derived(
+    $userProfile?.lat !== undefined && $userProfile?.lng !== undefined,
+  );
+
+  // Draft slider values track drag position live; the underlying filter
+  // stores (which trigger the Firestore query) only get updated on release.
+  let ageMinDraft = $state(AGE_MIN);
+  let ageMaxDraft = $state(AGE_MAX);
+  let distanceDraft = $state<number | null>(DEFAULT_DISTANCE_KM);
+
+  $effect(() => {
+    ageMinDraft = $filterMinAge ?? AGE_MIN;
+  });
+  $effect(() => {
+    ageMaxDraft = $filterMaxAge ?? AGE_MAX;
+  });
+  $effect(() => {
+    distanceDraft = $filterMaxDistanceKm;
+  });
+
+  function updateAgeMinDraft(value: number) {
+    ageMinDraft = Math.min(value, ageMaxDraft);
+  }
+
+  function updateAgeMaxDraft(value: number) {
+    ageMaxDraft = Math.max(value, ageMinDraft);
+  }
+
+  function commitAgeMin() {
+    filterMinAge.set(ageMinDraft === AGE_MIN ? null : ageMinDraft);
+  }
+
+  function commitAgeMax() {
+    filterMaxAge.set(ageMaxDraft === AGE_MAX ? null : ageMaxDraft);
+  }
+
+  function commitDistance() {
+    filterMaxDistanceKm.set(distanceDraft);
+  }
+
+  // Backfill coordinates for profiles saved before distance filtering existed —
+  // only runs if the browser already granted geolocation, so it never prompts.
+  onMount(() => {
+    if (typeof navigator === "undefined") return;
+    if (!("geolocation" in navigator) || !("permissions" in navigator)) return;
+    navigator.permissions
+      .query({ name: "geolocation" as PermissionName })
+      .then((status) => {
+        if (status.state !== "granted") return;
+        const uid = get(authUser)?.uid;
+        const profile = get(userProfile);
+        if (!uid || !profile || profile.lat !== undefined) return;
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            userProfile.save(uid, {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+          },
+          () => {},
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+        );
+      })
+      .catch(() => {});
+  });
 
   // Swipe state
   let cardEl = $state<HTMLDivElement | null>(null);
@@ -103,6 +176,15 @@
     filterLevel.set(filters.level);
     filterGender.set(filters.gender);
     filterSexualOrientation.set(filters.orientation);
+    filterMinAge.set(filters.minAge ?? null);
+    filterMaxAge.set(filters.maxAge ?? null);
+    // undefined means the profile predates this filter, so fall back to the default;
+    // an explicit null means the user picked "Any" and should stay that way
+    filterMaxDistanceKm.set(
+      filters.maxDistanceKm === undefined
+        ? DEFAULT_DISTANCE_KM
+        : filters.maxDistanceKm,
+    );
   }
 
   async function saveFilters() {
@@ -115,6 +197,9 @@
         level: get(filterLevel),
         gender: get(filterGender),
         orientation: get(filterSexualOrientation),
+        minAge: get(filterMinAge),
+        maxAge: get(filterMaxAge),
+        maxDistanceKm: get(filterMaxDistanceKm),
       },
     });
   }
@@ -142,6 +227,7 @@
     const uid = get(authUser)?.uid;
     if (!uid) return;
     loading = true;
+    const profile = get(userProfile);
     users = await getDiscoverFeed(
       uid,
       get(filterActivity),
@@ -149,6 +235,10 @@
       get(filterLevel),
       get(filterGender),
       get(filterSexualOrientation),
+      get(filterMinAge),
+      get(filterMaxAge),
+      get(filterMaxDistanceKm),
+      { lat: profile?.lat, lng: profile?.lng },
     );
     loading = false;
   }
@@ -162,6 +252,9 @@
     $filterLevel;
     $filterGender;
     $filterSexualOrientation;
+    $filterMinAge;
+    $filterMaxAge;
+    $filterMaxDistanceKm;
 
     if (
       $filterActivity &&
@@ -350,6 +443,90 @@
             ariaLabel="Orientation"
             onchange={(value) => filterSexualOrientation.set(value)}
           />
+        </div>
+
+        <!-- Age -->
+        <div class="mb-2 flex items-center justify-between">
+          <p class="text-sm font-bold text-muted">Age range</p>
+          <span class="text-xs font-semibold text-muted"
+            >{ageMinDraft} - {ageMaxDraft}</span
+          >
+        </div>
+        <div class="relative mb-5 h-6">
+          <div
+            class="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-border"
+          ></div>
+          <div
+            class="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary"
+            style="left: {((ageMinDraft - AGE_MIN) / (AGE_MAX - AGE_MIN)) *
+              100}%; right: {100 -
+              ((ageMaxDraft - AGE_MIN) / (AGE_MAX - AGE_MIN)) * 100}%;"
+          ></div>
+          <input
+            type="range"
+            min={AGE_MIN}
+            max={AGE_MAX}
+            value={ageMinDraft}
+            oninput={(e) =>
+              updateAgeMinDraft(
+                Number((e.currentTarget as HTMLInputElement).value),
+              )}
+            onchange={commitAgeMin}
+            class="range-thumb absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary"
+          />
+          <input
+            type="range"
+            min={AGE_MIN}
+            max={AGE_MAX}
+            value={ageMaxDraft}
+            oninput={(e) =>
+              updateAgeMaxDraft(
+                Number((e.currentTarget as HTMLInputElement).value),
+              )}
+            onchange={commitAgeMax}
+            class="range-thumb absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary"
+          />
+        </div>
+
+        <!-- Distance -->
+        <div class="mb-2 flex items-center justify-between">
+          <p class="text-sm font-bold text-muted">Distance</p>
+          <span class="text-xs font-semibold text-muted">
+            {distanceDraft ? `Within ${distanceDraft} km` : "Any"}
+          </span>
+        </div>
+        <div class="mb-5">
+          <input
+            type="range"
+            min="1"
+            max="30"
+            step="1"
+            disabled={!hasCoords}
+            value={distanceDraft ?? 200}
+            oninput={(e) => {
+              distanceDraft = Number(
+                (e.currentTarget as HTMLInputElement).value,
+              );
+            }}
+            onchange={commitDistance}
+            class="w-full accent-primary disabled:opacity-40"
+          />
+          {#if distanceDraft !== null}
+            <button
+              onclick={() => {
+                distanceDraft = null;
+                commitDistance();
+              }}
+              class="mt-1 text-xs font-semibold text-primary"
+            >
+              Clear
+            </button>
+          {/if}
+          {#if !hasCoords}
+            <p class="mt-1 text-xs text-muted">
+              Enable location detection in your profile to filter by distance.
+            </p>
+          {/if}
         </div>
 
         <!-- Sport -->
@@ -619,3 +796,17 @@
 
   <BottomNav active="discover" />
 </div>
+
+<style>
+  /* Two overlapping range inputs form one dual-thumb slider; only the thumbs
+     should capture pointer events so clicks pass through to the top-most track. */
+  .range-thumb {
+    pointer-events: none;
+  }
+  .range-thumb::-webkit-slider-thumb {
+    pointer-events: auto;
+  }
+  .range-thumb::-moz-range-thumb {
+    pointer-events: auto;
+  }
+</style>

@@ -1,7 +1,15 @@
 <script lang="ts">
   import { MapPin, Loader2, Pencil } from "@lucide/svelte";
 
-  let { city = $bindable("") }: { city?: string } = $props();
+  let {
+    city = $bindable(""),
+    lat = $bindable<number | undefined>(undefined),
+    lng = $bindable<number | undefined>(undefined),
+  }: {
+    city?: string;
+    lat?: number;
+    lng?: number;
+  } = $props();
 
   let locating = $state(false);
   let error = $state("");
@@ -58,6 +66,8 @@
       }
       if (!detected) throw new Error("Couldn't resolve your city");
       city = detected;
+      lat = latitude;
+      lng = longitude;
     } catch (err: any) {
       error =
         err.code === 1
@@ -80,6 +90,9 @@
     const trimmed = manualCity.trim();
     if (!trimmed) return;
     city = trimmed;
+    // manual entry has no known coordinates, so distance filtering can't use this profile
+    lat = undefined;
+    lng = undefined;
     manualEntry = false;
   }
 </script>

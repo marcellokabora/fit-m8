@@ -19,9 +19,10 @@
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
+  import AppearancePicker from "$lib/components/AppearancePicker.svelte";
 
   let step = $state(1);
-  const TOTAL_STEPS = 4;
+  const TOTAL_STEPS = 5;
 
   // Step 1 — Basic info
   let displayName = $state("");
@@ -139,6 +140,7 @@
         value={gender}
         ariaLabel="Gender"
         onchange={(value) => (gender = value)}
+        size="lg"
       />
       <div>
         <SegmentedControl
@@ -146,6 +148,7 @@
           value={sexualOrientation}
           ariaLabel="Orientation"
           onchange={(value) => (sexualOrientation = value)}
+          size="lg"
         />
       </div>
     </div>
@@ -227,6 +230,10 @@
         <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
       </div>
     </div>
+  {:else if step === 5}
+    <h2 class="mb-1 text-2xl font-black text-text">Make it yours</h2>
+    <p class="mb-6 text-sm text-muted">Pick a look for the app</p>
+    <AppearancePicker />
     {#if error}
       <p class="mt-4 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
         {error}

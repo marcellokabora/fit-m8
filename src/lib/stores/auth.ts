@@ -10,8 +10,8 @@ import {
 	signOut,
 	type User
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import type { Gender, SexualOrientation, SkillLevel, UserProfile } from '$lib/types';
+import { doc, getDoc, setDoc, deleteField, serverTimestamp } from 'firebase/firestore';
+import { DEFAULT_DISTANCE_KM, type Gender, type SexualOrientation, type SkillLevel, type UserProfile } from '$lib/types';
 
 function createAuthStore() {
 	// undefined = auth state not yet resolved (still reading persisted session)
@@ -53,7 +53,16 @@ function createUserProfileStore() {
 			return false;
 		},
 		save: async (uid: string, data: Partial<UserProfile>) => {
-			await setDoc(doc(db, 'users', uid), { ...data, updatedAt: serverTimestamp() }, { merge: true });
+			// Firestore rejects explicit `undefined` values, so translate them to field deletions
+			const firestoreData: Record<string, unknown> = {};
+			for (const [key, value] of Object.entries(data)) {
+				firestoreData[key] = value === undefined ? deleteField() : value;
+			}
+			await setDoc(
+				doc(db, 'users', uid),
+				{ ...firestoreData, updatedAt: serverTimestamp() },
+				{ merge: true }
+			);
 			update((p) => ({ ...(p ?? ({ uid } as UserProfile)), ...data }));
 		}
 	};
@@ -66,3 +75,6 @@ export const filterFormat = writable<'1v1' | '2v2' | ''>('');
 export const filterLevel = writable<SkillLevel | ''>('');
 export const filterGender = writable<Gender | ''>('');
 export const filterSexualOrientation = writable<SexualOrientation | ''>('');
+export const filterMinAge = writable<number | null>(null);
+export const filterMaxAge = writable<number | null>(null);
+export const filterMaxDistanceKm = writable<number | null>(DEFAULT_DISTANCE_KM);

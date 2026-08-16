@@ -41,7 +41,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Sarah',
 		photoURL: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 26,
+		age: 19,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
@@ -54,7 +54,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Emma',
 		photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 24,
+		age: 33,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'gay',
@@ -67,7 +67,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Lisa',
 		photoURL: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 28,
+		age: 45,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
@@ -80,7 +80,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Maria',
 		photoURL: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 25,
+		age: 21,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
@@ -93,7 +93,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Julia',
 		photoURL: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 27,
+		age: 38,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'gay',
@@ -106,7 +106,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Anna',
 		photoURL: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 23,
+		age: 50,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
@@ -119,7 +119,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Sophie',
 		photoURL: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 26,
+		age: 18,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
@@ -132,7 +132,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Lucia',
 		photoURL: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 24,
+		age: 29,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'gay',
@@ -145,7 +145,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Vera',
 		photoURL: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 29,
+		age: 41,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
@@ -158,7 +158,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Rosa',
 		photoURL: 'https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 25,
+		age: 20,
 		city: 'Barcelona',
 		gender: 'Female',
 		orientation: 'straight',
@@ -171,7 +171,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Alex',
 		photoURL: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 27,
+		age: 36,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'straight',
@@ -184,7 +184,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Daniel',
 		photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 29,
+		age: 47,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'gay',
@@ -197,7 +197,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Mateo',
 		photoURL: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 25,
+		age: 22,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'straight',
@@ -210,7 +210,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Leo',
 		photoURL: 'https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 24,
+		age: 31,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'straight',
@@ -223,7 +223,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Hugo',
 		photoURL: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 31,
+		age: 43,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'gay',
@@ -236,7 +236,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Adrian',
 		photoURL: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 26,
+		age: 25,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'straight',
@@ -249,7 +249,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Nico',
 		photoURL: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 23,
+		age: 49,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'straight',
@@ -262,7 +262,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Marc',
 		photoURL: 'https://images.unsplash.com/photo-1557862921-37829c790f19?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 28,
+		age: 34,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'straight',
@@ -275,7 +275,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Eric',
 		photoURL: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 30,
+		age: 40,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'gay',
@@ -288,7 +288,7 @@ const fakeProfiles = [
 	{
 		displayName: 'Pablo',
 		photoURL: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=900&h=1200&q=85',
-		age: 26,
+		age: 28,
 		city: 'Barcelona',
 		gender: 'Male',
 		orientation: 'straight',
@@ -320,6 +320,19 @@ const activityPool = [
 	'martial-arts',
 	'frescobol'
 ];
+
+const BARCELONA_CENTER = { lat: 41.3851, lng: 2.1734 };
+
+// Places a point `distanceKm` from Barcelona at a bearing derived from `index`, so
+// fake profiles are spread out in different directions instead of stacking on one line.
+function locationAtDistance(index, distanceKm) {
+	const bearingRad = (((index * 53) % 360) * Math.PI) / 180;
+	const latRad = (BARCELONA_CENTER.lat * Math.PI) / 180;
+	return {
+		lat: BARCELONA_CENTER.lat + (distanceKm / 111) * Math.cos(bearingRad),
+		lng: BARCELONA_CENTER.lng + (distanceKm / (111 * Math.cos(latRad))) * Math.sin(bearingRad)
+	};
+}
 
 function prepareProfile(profile, profileIndex) {
 	const activities = [...profile.activities];
@@ -356,18 +369,23 @@ async function seedDatabase() {
 	for (const [profileIndex, sourceProfile] of profilesWithPhotos.entries()) {
 		try {
 			const profile = prepareProfile(sourceProfile, profileIndex);
+			// Spread test profiles from 5km up to ~105km away so the distance filter has something to bite on
+			const distanceKm = (profileIndex + 1) * 5;
+			const { lat, lng } = locationAtDistance(profileIndex, distanceKm);
 			// Create a fake user ID (e.g., user_sarah_001)
 			const userId = `fake_${profile.displayName.toLowerCase()}_${Math.random().toString(36).substr(2, 9)}`;
 
 			const userData = {
 				...profile,
+				lat,
+				lng,
 				uid: userId,
 				createdAt: FieldValue.serverTimestamp(),
 				updatedAt: FieldValue.serverTimestamp()
 			};
 
 			await db.collection('users').doc(userId).set(userData);
-			console.log(`✅ Created: ${profile.displayName} (${profile.age}y) - ${profile.activities.map(a => a.id).join(', ')}`);
+			console.log(`✅ Created: ${profile.displayName} (${profile.age}y, ~${distanceKm}km away) - ${profile.activities.map(a => a.id).join(', ')}`);
 		} catch (error) {
 			console.error(`❌ Error creating ${profile.displayName}:`, error.message);
 		}

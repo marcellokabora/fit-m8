@@ -59,13 +59,28 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 	);
 }
 
+// Great-circle distance between two coordinates, in km
+function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+	const R = 6371;
+	const dLat = ((lat2 - lat1) * Math.PI) / 180;
+	const dLng = ((lng2 - lng1) * Math.PI) / 180;
+	const a =
+		Math.sin(dLat / 2) ** 2 +
+		Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+	return 2 * R * Math.asin(Math.sqrt(a));
+}
+
 export async function getDiscoverFeed(
 	currentUid: string,
 	activityFilter: string,
 	formatFilter: ActivityFormat | '',
 	levelFilter: SkillLevel | '',
 	genderFilter: Gender | '' = '',
-	sexualOrientationFilter: SexualOrientation | '' = ''
+	sexualOrientationFilter: SexualOrientation | '' = '',
+	minAge: number | null = null,
+	maxAge: number | null = null,
+	maxDistanceKm: number | null = null,
+	currentCoords: { lat?: number; lng?: number } = {}
 ): Promise<UserProfile[]> {
 	// Get users who we already swiped
 	const sentSnap = await getDocs(collection(db, 'swipes', currentUid, 'sent'));
@@ -74,6 +89,8 @@ export async function getDiscoverFeed(
 
 	let q = query(collection(db, 'users'), limit(20));
 	const snap = await getDocs(q);
+
+	const hasOrigin = currentCoords.lat !== undefined && currentCoords.lng !== undefined;
 
 	const candidates: UserProfile[] = [];
 	for (const d of snap.docs) {
@@ -86,6 +103,15 @@ export async function getDiscoverFeed(
 			(data.orientation ?? 'straight') !== sexualOrientationFilter
 		)
 			continue;
+		if (minAge !== null && data.age < minAge) continue;
+		if (maxAge !== null && data.age > maxAge) continue;
+
+		// Distance filter only applies when we know both locations; candidates without
+		// coordinates can't be verified as out of range, so they're kept rather than dropped.
+		if (maxDistanceKm !== null && hasOrigin && data.lat !== undefined && data.lng !== undefined) {
+			const km = distanceKm(currentCoords.lat!, currentCoords.lng!, data.lat, data.lng);
+			if (km > maxDistanceKm) continue;
+		}
 
 		// Activity filters must match the same activity entry.
 		if (activityFilter || formatFilter || levelFilter) {
