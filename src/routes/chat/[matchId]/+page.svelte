@@ -109,7 +109,7 @@
   let currentUid = $derived($authUser?.uid);
 </script>
 
-<div class="flex h-screen flex-col bg-bg">
+<div class="flex h-dvh flex-col bg-bg">
   <!-- Header -->
   <BackHeader href="/matches" class="border-b border-border bg-surface">
     {#snippet children()}

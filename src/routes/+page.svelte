@@ -5,12 +5,10 @@
   import { fade } from "svelte/transition";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Logo from "$lib/components/Logo.svelte";
+  import Splash from "$lib/components/Splash.svelte";
 
   // true once auth state resolves to "no user" and the rest of the page can reveal
   let ready = $state(false);
-
-  const MIN_SPLASH_MS = 200; // keep the splash visible briefly so it doesn't just flash
-  const mountedAt = Date.now();
 
   onMount(() => {
     return authUser.subscribe(async (user) => {
@@ -18,10 +16,6 @@
       if (user) {
         goto("/discover");
         return;
-      }
-      const elapsed = Date.now() - mountedAt;
-      if (elapsed < MIN_SPLASH_MS) {
-        await new Promise((r) => setTimeout(r, MIN_SPLASH_MS - elapsed));
       }
       ready = true;
     });
@@ -54,8 +48,12 @@
 </script>
 
 <div
-  class="flex min-h-screen flex-col items-center justify-between bg-bg px-6 pb-12 pt-20"
+  class="flex min-h-dvh flex-col items-center justify-between bg-bg px-6 pb-12 pt-20"
 >
+  {#if !ready}
+    <Splash />
+  {/if}
+
   <!-- Logo / Hero -->
   <div class="flex flex-col items-center gap-4 text-text">
     <div
@@ -70,18 +68,6 @@
       </p>
     {/if}
   </div>
-
-  {#if !ready}
-    <!-- Centered loading spinner while auth state resolves -->
-    <div
-      transition:fade={{ duration: 200 }}
-      class="fixed inset-0 flex items-center justify-center"
-    >
-      <div
-        class="size-10 animate-spin rounded-full border-4 border-primary/30 border-t-primary"
-      ></div>
-    </div>
-  {/if}
 
   {#if ready}
     <!-- Activity bubbles -->

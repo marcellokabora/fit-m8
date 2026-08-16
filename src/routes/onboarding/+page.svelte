@@ -96,7 +96,7 @@
   }
 </script>
 
-<div class="flex min-h-screen flex-col bg-bg px-6 pb-10 pt-10">
+<div class="flex min-h-dvh flex-col bg-bg px-6 pb-10 pt-10">
   <!-- Progress -->
   <div class="mb-8 flex items-center gap-2">
     {#each Array(TOTAL_STEPS) as _, i}

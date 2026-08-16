@@ -46,6 +46,6 @@
   {/if}
 </svelte:head>
 
-<div class="min-h-screen bg-bg font-sans">
+<div class="min-h-dvh bg-bg font-sans">
   {@render children()}
 </div>

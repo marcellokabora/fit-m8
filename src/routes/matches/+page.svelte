@@ -77,7 +77,7 @@
   onDestroy(() => unsubscribe?.());
 </script>
 
-<div class="flex min-h-screen flex-col bg-bg pb-24">
+<div class="flex min-h-dvh flex-col bg-bg pb-24">
   <!-- Header -->
   <div class="px-5 pb-3 pt-5">
     <h1 class="text-2xl font-black text-text">Matches</h1>

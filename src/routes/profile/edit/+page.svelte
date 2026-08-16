@@ -149,7 +149,7 @@
   }
 </script>
 
-<div class="flex min-h-screen flex-col bg-bg">
+<div class="flex min-h-dvh flex-col bg-bg">
   <!-- Header -->
   <div
     class="sticky top-0 z-10 flex items-center justify-between bg-bg px-5 pb-3 pt-5"

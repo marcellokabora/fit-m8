@@ -36,7 +36,7 @@
   });
 </script>
 
-<div class="flex min-h-screen flex-col bg-bg pb-12">
+<div class="flex min-h-dvh flex-col bg-bg pb-12">
   <BackHeader title="Profile" />
 
   {#if loading}

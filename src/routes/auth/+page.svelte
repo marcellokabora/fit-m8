@@ -49,7 +49,7 @@
   }
 </script>
 
-<div class="flex min-h-screen flex-col bg-bg px-6 pb-10 pt-16">
+<div class="flex min-h-dvh flex-col bg-bg px-6 pb-10 pt-16">
   <!-- Header -->
   <div class="mb-8 flex flex-col items-center gap-2">
     <a
