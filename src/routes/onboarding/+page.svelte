@@ -57,6 +57,8 @@
   let gender = $state<Gender>("male");
   let sexualOrientation = $state<SexualOrientation>("hetero");
   let city = $state("");
+  let lat = $state<number | undefined>(undefined);
+  let lng = $state<number | undefined>(undefined);
 
   // Step 2 — Activities
   let selectedActivities = $state<string[]>([]);
@@ -109,6 +111,8 @@
         gender,
         orientation: sexualOrientation,
         city,
+        lat,
+        lng,
         photos,
         photoURL: photos[0] || user.photoURL || "",
         activities,
@@ -161,7 +165,7 @@
           placeholder={t.t("onboarding.age")}
           class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
         />
-        <LocationPicker bind:city />
+        <LocationPicker bind:city bind:lat bind:lng />
       </div>
       <SegmentedControl
         options={genderOptions}
