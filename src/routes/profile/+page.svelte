@@ -286,9 +286,6 @@
 
   <!-- Logout -->
   <div class="mt-auto px-5 pt-8">
-    <div class="pb-6">
-      <LanguagePicker />
-    </div>
     <button
       onclick={logout}
       class="mt-5 w-full rounded-2xl border-2 border-error/30 py-4 text-base font-semibold text-error active:scale-95"

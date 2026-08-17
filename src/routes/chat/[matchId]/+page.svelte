@@ -117,27 +117,40 @@
   <BackHeader href="/matches" class="border-b border-border bg-surface">
     {#snippet children()}
       {#if otherUser}
-        <a href="/profile/{otherUser.uid}" class="shrink-0">
+        <a
+          href="/profile/{otherUser.uid}"
+          class="flex flex-1 items-center gap-3"
+        >
           <img
             src={otherUser.photoURL}
             alt={otherUser.displayName}
-            class="size-10 rounded-full object-cover"
+            class="size-10 shrink-0 rounded-full object-cover"
           />
+          <div class="flex-1">
+            <p class="font-bold text-text">{otherUser.displayName}</p>
+            {#if match}
+              <p class="flex items-center gap-1 text-xs text-muted">
+                <ActivityIcon id={match.activity} class="size-3" />
+                {t.activity(match.activity)} · {t.format(match.format)}
+              </p>
+            {:else}
+              <p class="text-xs text-muted">{matchId}</p>
+            {/if}
+          </div>
         </a>
+      {:else}
+        <div class="flex-1">
+          <p class="font-bold text-text">{t.t("chat.fallbackTitle")}</p>
+          {#if match}
+            <p class="flex items-center gap-1 text-xs text-muted">
+              <ActivityIcon id={match.activity} class="size-3" />
+              {t.activity(match.activity)} · {t.format(match.format)}
+            </p>
+          {:else}
+            <p class="text-xs text-muted">{matchId}</p>
+          {/if}
+        </div>
       {/if}
-      <div class="flex-1">
-        <p class="font-bold text-text">
-          {otherUser?.displayName ?? t.t("chat.fallbackTitle")}
-        </p>
-        {#if match}
-          <p class="flex items-center gap-1 text-xs text-muted">
-            <ActivityIcon id={match.activity} class="size-3" />
-            {t.activity(match.activity)} · {t.format(match.format)}
-          </p>
-        {:else}
-          <p class="text-xs text-muted">{matchId}</p>
-        {/if}
-      </div>
     {/snippet}
   </BackHeader>
 

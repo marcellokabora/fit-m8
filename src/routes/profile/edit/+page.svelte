@@ -14,7 +14,11 @@
   import { X, RotateCcw } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
-  import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import {
+    activeLanguage,
+    createTranslator,
+    LANGUAGES,
+  } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
   let genderOptions = $derived(
@@ -27,6 +31,12 @@
     ORIENTATIONS.map((option) => ({
       ...option,
       label: t.orientation(option.value),
+    })),
+  );
+  let languageOptions = $derived(
+    LANGUAGES.map((option) => ({
+      value: option.code,
+      label: t.t(`language.${option.code}` as any),
     })),
   );
   let saving = $state(false);
@@ -163,6 +173,20 @@
       value={sexualOrientation}
       ariaLabel={t.t("common.orientation")}
       onchange={(value) => (sexualOrientation = value)}
+      size="lg"
+    />
+  </div>
+
+  <!-- Language -->
+  <div class="px-5 pb-8">
+    <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+      {t.t("common.language")}
+    </h3>
+    <SegmentedControl
+      options={languageOptions}
+      value={$activeLanguage}
+      ariaLabel={t.t("common.language")}
+      onchange={(value) => activeLanguage.selectLanguage(value)}
       size="lg"
     />
   </div>

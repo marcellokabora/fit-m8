@@ -179,7 +179,8 @@ const MESSAGES = {
         'gender.female': 'Female',
         'orientation.hetero': 'Hetero',
         'orientation.gay': 'Gay',
-        'profile.addSports': 'Add {count} sports'
+        'profile.addSports': 'Add {count} sports',
+        'common.language': 'Language'
     },
     es: {
         'meta.description': 'Conecta con personas para hacer deporte cerca de ti', 'language.en': 'Inglés', 'language.es': 'Español', 'language.pt': 'Portugués',
@@ -205,7 +206,8 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'intro.friends.title': 'Haz nuevos amigos',
         'intro.friends.body': '¿No buscas una cita? Desactiva los filtros y encuentra compañeros de entrenamiento para compartir una sesión.',
         'intro.experts.title': 'Aprende de expertos',
-        'intro.experts.body': 'Filtra por nivel Experto para encontrar jugadores y entrenadores con experiencia que te ayuden a mejorar tu juego.'
+        'intro.experts.body': 'Filtra por nivel Experto para encontrar jugadores y entrenadores con experiencia que te ayuden a mejorar tu juego.',
+        'common.language': 'Idioma'
     },
     pt: {
         'profile.distanceAway': 'A {count} km',
@@ -216,7 +218,8 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'intro.friends.title': 'Faz novos amigos',
         'intro.friends.body': 'Não procuras encontros? Desativa os filtros e encontra parceiros de treino para partilharem uma sessão.',
         'intro.experts.title': 'Aprende com especialistas',
-        'intro.experts.body': 'Filtra pelo nível Especialista para encontrares jogadores e treinadores experientes que te podem ajudar a melhorar o teu jogo.'
+        'intro.experts.body': 'Filtra pelo nível Especialista para encontrares jogadores e treinadores experientes que te podem ajudar a melhorar o teu jogo.',
+        'common.language': 'Idioma'
     }
 };
 
