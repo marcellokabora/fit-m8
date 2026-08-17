@@ -123,6 +123,7 @@ const MESSAGES = {
         'profile.bio': 'Your bio...',
         'profile.signOut': 'Sign out',
         'profile.notFound': 'User not found',
+        'profile.distanceAway': '{count} km away',
         'profile.addSport': 'Add a sport',
         'profile.allSports': "You've added every sport already!",
         'profile.addSportButton': 'Add sport',
@@ -196,6 +197,7 @@ export type TranslationParams = Record<string, string | number>;
 const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string>>> = {
     en: {},
     es: {
+        'profile.distanceAway': 'A {count} km',
         'intro.skip': 'Omitir',
         'intro.next': 'Siguiente',
         'intro.dating.title': 'Encuentra una cita',
@@ -206,6 +208,7 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'intro.experts.body': 'Filtra por nivel Experto para encontrar jugadores y entrenadores con experiencia que te ayuden a mejorar tu juego.'
     },
     pt: {
+        'profile.distanceAway': 'A {count} km',
         'intro.skip': 'Saltar',
         'intro.next': 'Seguinte',
         'intro.dating.title': 'Encontra um par',

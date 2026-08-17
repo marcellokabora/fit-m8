@@ -6,6 +6,8 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
+  import { userProfile } from "$lib/stores/auth";
+  import { distanceKm } from "$lib/location";
   import { MapPin, LoaderCircle } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -15,6 +17,20 @@
   let profile = $state<UserProfile | null>(null);
   let loading = $state(true);
   let notFound = $state(false);
+  let distanceAway = $derived.by(() => {
+    if (
+      !$userProfile ||
+      $userProfile.lat === undefined ||
+      $userProfile.lng === undefined ||
+      !profile ||
+      profile.lat === undefined ||
+      profile.lng === undefined
+    )
+      return null;
+    return Math.round(
+      distanceKm($userProfile.lat, $userProfile.lng, profile.lat, profile.lng),
+    );
+  });
 
   let photos = $derived(
     profile?.photos?.length
@@ -64,6 +80,9 @@
             <MapPin class="size-3.5" />
             {profile.city}
           </span>
+        {/if}
+        {#if distanceAway !== null}
+          <span>{t.t("profile.distanceAway", { count: distanceAway })}</span>
         {/if}
       </div>
       {#if profile.orientation === "gay"}

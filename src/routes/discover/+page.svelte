@@ -7,13 +7,13 @@
     User,
     X,
     Moon,
-    MapPin,
     Check,
     Zap,
     PartyPopper,
   } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Loading from "$lib/components/Loading.svelte";
+  import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
   import {
     authUser,
     userProfile,
@@ -665,16 +665,7 @@
                 <User class="size-24 text-primary/40" />
               {/if}
             </div>
-            <div class="shrink-0 p-5">
-              <div class="flex items-baseline gap-2">
-                <h3 class="text-xl font-black text-text">
-                  {users[1].displayName}
-                </h3>
-                {#if users[1].age}
-                  <span class="text-sm text-muted">{users[1].age}</span>
-                {/if}
-              </div>
-            </div>
+            <ProfileCardInfo user={users[1]} {t} />
           </div>
         {/if}
 
@@ -753,38 +744,7 @@
             </div>
 
             <!-- Info -->
-            <div class="shrink-0 p-5">
-              <div class="flex items-baseline gap-2">
-                <h3 class="text-xl font-black text-text">
-                  {users[0].displayName}
-                </h3>
-                {#if users[0].age}
-                  <span class="text-sm text-muted">{users[0].age}</span>
-                {/if}
-                {#if users[0].city}
-                  <span class="flex items-center gap-0.5 text-sm text-muted">
-                    <MapPin class="size-3.5" />
-                    {users[0].city}
-                  </span>
-                {/if}
-              </div>
-              {#if users[0].bio}
-                <p class="mt-1 text-sm text-muted text-balance">
-                  {users[0].bio}
-                </p>
-              {/if}
-              <div class="mt-3 flex flex-wrap gap-2">
-                {#each (users[0].activities ?? []).slice(0, 4) as act}
-                  {@const info = ACTIVITIES.find((a) => a.id === act.id)}
-                  <span
-                    class="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
-                  >
-                    <ActivityIcon id={act.id} class="size-3.5" />
-                    {t.activity(act.id)}
-                  </span>
-                {/each}
-              </div>
-            </div>
+            <ProfileCardInfo user={users[0]} {t} />
           </div>
         {/key}
       </div>
