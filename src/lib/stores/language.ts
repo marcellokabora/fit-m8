@@ -196,10 +196,24 @@ export type TranslationParams = Record<string, string | number>;
 const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string>>> = {
     en: {},
     es: {
-        'common.cancel': 'Cancelar', 'common.clear': 'Limpiar', 'common.keepSwiping': 'Seguir deslizando', 'common.continue': 'Continuar', 'common.letsGo': '¡Vamos!', 'common.like': 'Me gusta', 'common.pass': 'Pasar', 'common.information': 'Información', 'common.removeSport': 'Eliminar', 'home.email': 'Registrarse o iniciar sesión con email', 'discover.locationHint': 'Activa la detección de ubicación en tu perfil para filtrar por distancia.', 'discover.allSports': 'Todos los deportes', 'discover.refresh': 'Actualizar', 'discover.tryFilters': 'Prueba a cambiar tus filtros o vuelve más tarde', 'matches.viewMatches': 'Ver coincidencias', 'profile.discovery': 'Descubrimiento', 'profile.resetConfirm': '¿Restablecer todos los desplazamientos? Todos los perfiles a los que diste me gusta o pasaste volverán a aparecer. Esta acción no se puede deshacer.', 'appearance.classic': 'Clásico', 'appearance.ocean': 'Océano', 'appearance.sunset': 'Atardecer', 'appearance.forest': 'Bosque', 'appearance.berry': 'Frutos rojos', 'appearance.slate': 'Pizarra', 'profile.addSports': 'Añadir {count} deportes'
+        'intro.skip': 'Omitir',
+        'intro.next': 'Siguiente',
+        'intro.dating.title': 'Encuentra una cita',
+        'intro.dating.body': 'Configura tus filtros de género y orientación para conocer a personas con las que conectes mientras practicas los deportes que te gustan.',
+        'intro.friends.title': 'Haz nuevos amigos',
+        'intro.friends.body': '¿No buscas una cita? Desactiva los filtros y encuentra compañeros de entrenamiento para compartir una sesión.',
+        'intro.experts.title': 'Aprende de expertos',
+        'intro.experts.body': 'Filtra por nivel Experto para encontrar jugadores y entrenadores con experiencia que te ayuden a mejorar tu juego.'
     },
     pt: {
-        'common.cancel': 'Cancelar', 'common.clear': 'Limpar', 'common.keepSwiping': 'Continuar a deslizar', 'common.continue': 'Continuar', 'common.letsGo': 'Vamos!', 'common.like': 'Gosto', 'common.pass': 'Passar', 'common.information': 'Informação', 'common.removeSport': 'Remover', 'home.email': 'Registar ou iniciar sessão com email', 'discover.locationHint': 'Ativa a deteção de localização no teu perfil para filtrar por distância.', 'discover.allSports': 'Todos os desportos', 'discover.refresh': 'Atualizar', 'discover.tryFilters': 'Tenta alterar os teus filtros ou volta mais tarde', 'matches.viewMatches': 'Ver combinações', 'profile.discovery': 'Descoberta', 'profile.resetConfirm': 'Repor todos os deslizes? Todas as pessoas de quem gostaste ou que passaste voltarão a aparecer. Esta ação não pode ser anulada.', 'appearance.classic': 'Clássico', 'appearance.ocean': 'Oceano', 'appearance.sunset': 'Pôr do sol', 'appearance.forest': 'Floresta', 'appearance.berry': 'Frutos vermelhos', 'appearance.slate': 'Ardósia', 'profile.addSports': 'Adicionar {count} desportos'
+        'intro.skip': 'Saltar',
+        'intro.next': 'Seguinte',
+        'intro.dating.title': 'Encontra um par',
+        'intro.dating.body': 'Define os teus filtros de género e orientação para conheceres pessoas com quem te identifiques enquanto praticas os teus desportos favoritos.',
+        'intro.friends.title': 'Faz novos amigos',
+        'intro.friends.body': 'Não procuras encontros? Desativa os filtros e encontra parceiros de treino para partilharem uma sessão.',
+        'intro.experts.title': 'Aprende com especialistas',
+        'intro.experts.body': 'Filtra pelo nível Especialista para encontrares jogadores e treinadores experientes que te podem ajudar a melhorar o teu jogo.'
     }
 };
 
@@ -214,7 +228,7 @@ export interface Translator {
 
 export function createTranslator(language: LanguageCode): Translator {
     const messages: Partial<Record<TranslationKey, string>> = {
-        ...(MESSAGES[language] as Partial<Record<TranslationKey, string>>),
+        ...MESSAGES[language],
         ...EXTRA_MESSAGES[language]
     };
     const t = (key: TranslationKey, params: TranslationParams = {}) => {
