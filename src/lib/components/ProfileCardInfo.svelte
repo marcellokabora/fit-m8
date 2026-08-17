@@ -3,12 +3,28 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import type { UserProfile } from "$lib/types";
   import type { Translator } from "$lib/stores/language";
+  import { userProfile } from "$lib/stores/auth";
+  import { distanceKm } from "$lib/location";
 
   let { user, t }: { user: UserProfile; t: Translator } = $props();
+
+  let distanceAway = $derived.by(() => {
+    if (
+      !$userProfile ||
+      $userProfile.lat === undefined ||
+      $userProfile.lng === undefined ||
+      user.lat === undefined ||
+      user.lng === undefined
+    )
+      return null;
+    return Math.round(
+      distanceKm($userProfile.lat, $userProfile.lng, user.lat, user.lng),
+    );
+  });
 </script>
 
 <div class="shrink-0 p-5">
-  <div class="flex items-baseline gap-2">
+  <div class="flex items-center gap-2">
     <h3 class="text-xl font-black text-text">
       {user.displayName}
     </h3>
@@ -19,6 +35,11 @@
       <span class="flex items-center gap-0.5 text-sm text-muted">
         <MapPin class="size-3.5" />
         {user.city}
+      </span>
+    {/if}
+    {#if distanceAway !== null}
+      <span class="text-sm text-muted">
+        {t.t("profile.distanceAway", { count: distanceAway })}
       </span>
     {/if}
   </div>

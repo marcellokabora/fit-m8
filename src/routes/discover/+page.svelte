@@ -538,22 +538,33 @@
               : t.t("common.any")}
           </span>
         </div>
-        <div class="mb-5">
+        <div class="relative mb-1 h-6">
+          <div
+            class="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-border"
+          ></div>
+          <div
+            class="absolute inset-y-0 left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary"
+            style="width: {((Math.min(distanceDraft ?? 30, 30) - 1) /
+              (30 - 1)) *
+              100}%;"
+          ></div>
           <input
             type="range"
             min="1"
             max="30"
             step="1"
             disabled={!hasCoords}
-            value={distanceDraft ?? 200}
+            value={distanceDraft ?? 30}
             oninput={(e) => {
               distanceDraft = Number(
                 (e.currentTarget as HTMLInputElement).value,
               );
             }}
             onchange={commitDistance}
-            class="w-full accent-primary disabled:opacity-40"
+            class="absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary disabled:opacity-40"
           />
+        </div>
+        <div class="mb-5">
           {#if distanceDraft !== null}
             <button
               onclick={() => {

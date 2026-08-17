@@ -42,6 +42,9 @@ const MESSAGES = {
         'common.level': 'Level',
         'common.gender': 'Gender',
         'common.orientation': 'Orientation',
+        'common.name': 'Name',
+        'common.biography': 'Biography',
+        'common.location': 'Location',
         'common.sports': 'Sports',
         'common.mySports': 'My Sports',
         'common.noActivities': 'No activities set',
@@ -130,7 +133,6 @@ const MESSAGES = {
         'profile.resetSwipes': 'Reset swipes',
         'profile.resettingSwipes': 'Resetting...',
         'profile.discovery': 'Discovery',
-        'profile.resetConfirm': "Reset all swipes? Everyone you've liked or passed will reappear in Discover. This can't be undone.",
         'appearance.title': 'Appearance',
         'appearance.light': 'Light',
         'appearance.dark': 'Dark',
@@ -207,7 +209,10 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'intro.friends.body': '¿No buscas una cita? Desactiva los filtros y encuentra compañeros de entrenamiento para compartir una sesión.',
         'intro.experts.title': 'Aprende de expertos',
         'intro.experts.body': 'Filtra por nivel Experto para encontrar jugadores y entrenadores con experiencia que te ayuden a mejorar tu juego.',
-        'common.language': 'Idioma'
+        'common.language': 'Idioma',
+        'common.name': 'Nombre',
+        'common.biography': 'Biografía',
+        'common.location': 'Ubicación'
     },
     pt: {
         'profile.distanceAway': 'A {count} km',
@@ -219,7 +224,10 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'intro.friends.body': 'Não procuras encontros? Desativa os filtros e encontra parceiros de treino para partilharem uma sessão.',
         'intro.experts.title': 'Aprende com especialistas',
         'intro.experts.body': 'Filtra pelo nível Especialista para encontrares jogadores e treinadores experientes que te podem ajudar a melhorar o teu jogo.',
-        'common.language': 'Idioma'
+        'common.language': 'Idioma',
+        'common.name': 'Nome',
+        'common.biography': 'Biografia',
+        'common.location': 'Localização'
     }
 };
 

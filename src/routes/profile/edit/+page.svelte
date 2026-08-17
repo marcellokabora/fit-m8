@@ -134,7 +134,7 @@
     </div>
     <div class="w-full">
       <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
-        {t.t("common.information")}
+        {t.t("common.name")}
       </h3>
       <input
         type="text"
@@ -142,13 +142,21 @@
         class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base font-bold text-text w-full outline-none focus:border-primary"
       />
     </div>
-    <textarea
-      bind:value={bio}
-      rows={2}
-      placeholder={t.t("profile.bio")}
-      class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
-    ></textarea>
     <div class="w-full">
+      <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+        {t.t("common.biography")}
+      </h3>
+      <textarea
+        bind:value={bio}
+        rows={2}
+        placeholder={t.t("profile.bio")}
+        class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
+      ></textarea>
+    </div>
+    <div class="w-full">
+      <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+        {t.t("common.location")}
+      </h3>
       <LocationPicker bind:city bind:lat bind:lng />
     </div>
   </div>
@@ -205,9 +213,6 @@
       <div
         class="rounded-2xl border-2 border-dashed border-error/40 bg-surface p-4"
       >
-        <p class="mb-3 text-sm font-bold text-text">
-          {t.t("profile.resetConfirm")}
-        </p>
         <div class="flex gap-3">
           <button
             onclick={() => (confirmResetSwipes = false)}
