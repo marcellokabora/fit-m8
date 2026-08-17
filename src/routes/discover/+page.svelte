@@ -33,16 +33,24 @@
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
     DEFAULT_DISTANCE_KM,
-    formatLabel,
     type DiscoverFilters,
     type UserProfile,
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
+  import IntroSlides from "$lib/components/IntroSlides.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
+
+  const INTRO_SEEN_KEY = "fitmate-intro-seen";
+  let showIntro = $state(false);
+
+  function dismissIntro() {
+    showIntro = false;
+    localStorage.setItem(INTRO_SEEN_KEY, "1");
+  }
 
   const FORMAT_FILTER_OPTIONS = [
     { value: "", label: "" },
@@ -147,6 +155,7 @@
   // only runs if the browser already granted geolocation, so it never prompts.
   onMount(() => {
     if (typeof navigator === "undefined") return;
+    if (!localStorage.getItem(INTRO_SEEN_KEY)) showIntro = true;
     if (!("geolocation" in navigator) || !("permissions" in navigator)) return;
     navigator.permissions
       .query({ name: "geolocation" as PermissionName })
@@ -835,6 +844,10 @@
 
   <BottomNav active="discover" />
 </div>
+
+{#if showIntro}
+  <IntroSlides onclose={dismissIntro} />
+{/if}
 
 <style>
   /* Two overlapping range inputs form one dual-thumb slider; only the thumbs

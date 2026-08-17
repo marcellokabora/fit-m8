@@ -2,7 +2,7 @@
   import { page } from "$app/state";
   import { db } from "$lib/firebase/client";
   import { doc, getDoc } from "firebase/firestore";
-  import { ACTIVITIES, formatLabel, type UserProfile } from "$lib/types";
+  import { ACTIVITIES, type UserProfile } from "$lib/types";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";

@@ -13,7 +13,7 @@
     getDoc,
   } from "firebase/firestore";
   import type { Match, UserProfile } from "$lib/types";
-  import { ACTIVITIES, formatLabel } from "$lib/types";
+  import { ACTIVITIES } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { unreadMatches } from "$lib/stores/unread";

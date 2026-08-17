@@ -15,7 +15,7 @@
     getDoc,
   } from "firebase/firestore";
   import type { Message, Match, UserProfile } from "$lib/types";
-  import { ACTIVITIES, formatLabel } from "$lib/types";
+  import { ACTIVITIES } from "$lib/types";
   import { get } from "svelte/store";
   import { LoaderCircle, Sparkles, Send } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";

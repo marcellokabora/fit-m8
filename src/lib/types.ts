@@ -9,10 +9,6 @@ export const ACTIVITY_FORMAT_OPTIONS = [
 
 export type ActivityFormat = (typeof ACTIVITY_FORMAT_OPTIONS)[number]['value'];
 
-export function formatLabel(format: ActivityFormat): string {
-	return ACTIVITY_FORMAT_OPTIONS.find((f) => f.value === format)?.label ?? format;
-}
-
 export const SKILL_LEVEL_OPTIONS = [
 	{ value: 'Basic', label: 'Basic' },
 	{ value: 'Expert', label: 'Expert' }

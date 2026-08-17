@@ -2,24 +2,16 @@
   import { goto } from "$app/navigation";
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
-    ACTIVITIES,
-    ACTIVITY_FORMAT_OPTIONS,
-    SKILL_LEVEL_OPTIONS,
     ORIENTATIONS,
     GENDER_OPTIONS,
-    type UserActivity,
     type SexualOrientation,
     type Gender,
-    type ActivityFormat,
-    type SkillLevel,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import { slide } from "svelte/transition";
-  import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
-  import { Plus, X, RotateCcw, ChevronDown, Trash2 } from "@lucide/svelte";
+  import { X, RotateCcw } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
@@ -37,19 +29,6 @@
       label: t.orientation(option.value),
     })),
   );
-  let formatOptions = $derived(
-    ACTIVITY_FORMAT_OPTIONS.map((option) => ({
-      ...option,
-      label: t.format(option.value),
-    })),
-  );
-  let skillOptions = $derived(
-    SKILL_LEVEL_OPTIONS.map((option) => ({
-      ...option,
-      label: t.skill(option.value),
-    })),
-  );
-
   let saving = $state(false);
   let confirmResetSwipes = $state(false);
   let resettingSwipes = $state(false);
@@ -67,7 +46,6 @@
     $userProfile?.photos ??
       ($userProfile?.photoURL ? [$userProfile.photoURL] : []),
   );
-  let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let uid = $derived($authUser?.uid ?? "");
 
   $effect(() => {
@@ -82,7 +60,6 @@
       photos =
         $userProfile.photos ??
         ($userProfile.photoURL ? [$userProfile.photoURL] : []);
-      activities = $userProfile.activities ?? [];
     }
   });
 
@@ -103,67 +80,10 @@
         lng,
         gender,
         orientation: sexualOrientation,
-        activities,
       });
     }
     saving = false;
     goto("/profile");
-  }
-
-  // Add sport — multi-select any number of sports, add them all at once with
-  // default format/level, then fine-tune each one inline in the sports list.
-  let showAddSport = $state(false);
-  let selectedNewIds = $state<string[]>([]);
-  let expandedActivityId = $state<string | null>(null);
-
-  let availableActivities = $derived(
-    ACTIVITIES.filter((a) => !activities.some((act) => act.id === a.id)),
-  );
-
-  function openAddSport() {
-    showAddSport = true;
-    selectedNewIds = [];
-  }
-
-  function toggleNewSelection(id: string) {
-    selectedNewIds = selectedNewIds.includes(id)
-      ? selectedNewIds.filter((x) => x !== id)
-      : [...selectedNewIds, id];
-  }
-
-  function confirmAddSport() {
-    if (selectedNewIds.length === 0) return;
-    activities = [
-      ...activities,
-      ...selectedNewIds.map((id) => ({
-        id,
-        format: "1v1" as ActivityFormat,
-        level: "Basic" as SkillLevel,
-      })),
-    ];
-    showAddSport = false;
-    selectedNewIds = [];
-  }
-
-  function toggleExpandActivity(id: string) {
-    expandedActivityId = expandedActivityId === id ? null : id;
-  }
-
-  function updateActivityFormat(id: string, format: ActivityFormat) {
-    activities = activities.map((act) =>
-      act.id === id ? { ...act, format } : act,
-    );
-  }
-
-  function updateActivityLevel(id: string, level: SkillLevel) {
-    activities = activities.map((act) =>
-      act.id === id ? { ...act, level } : act,
-    );
-  }
-
-  function removeSport(id: string) {
-    activities = activities.filter((act) => act.id !== id);
-    if (expandedActivityId === id) expandedActivityId = null;
   }
 
   async function handleResetSwipes() {
@@ -209,7 +129,7 @@
       <input
         type="text"
         bind:value={displayName}
-        class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base font-bold text-center text-text w-full outline-none focus:border-primary"
+        class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base font-bold text-text w-full outline-none focus:border-primary"
       />
     </div>
     <textarea
@@ -245,145 +165,6 @@
       onchange={(value) => (sexualOrientation = value)}
       size="lg"
     />
-  </div>
-
-  <!-- Activities -->
-  <div class="px-5">
-    <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      {t.t("common.mySports")}
-    </h3>
-    {#if activities.length === 0}
-      <p class="mb-3 text-sm text-muted">{t.t("common.noActivities")}</p>
-    {:else}
-      <div class="mb-3 flex flex-col gap-3">
-        {#each activities as act}
-          {@const info = ACTIVITIES.find((a) => a.id === act.id)}
-          {@const expanded = expandedActivityId === act.id}
-          <div class="rounded-2xl bg-surface shadow-sm">
-            <div
-              role="button"
-              tabindex="0"
-              onclick={() => toggleExpandActivity(act.id)}
-              onkeydown={(e) =>
-                (e.key === "Enter" || e.key === " ") &&
-                toggleExpandActivity(act.id)}
-              class="flex items-center gap-4 p-4"
-            >
-              <span
-                class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
-              >
-                <ActivityIcon id={act.id} class="size-5" />
-              </span>
-              <div class="flex-1">
-                <p class="font-bold text-text">{t.activity(act.id)}</p>
-                <p class="text-sm text-muted">
-                  {t.format(act.format)} · {t.skill(act.level)}
-                </p>
-              </div>
-              {#if expanded}
-                <button
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    removeSport(act.id);
-                  }}
-                  aria-label={`${t.t("common.removeSport")} ${t.activity(act.id)}`}
-                  class="flex size-8 items-center justify-center rounded-full bg-error/10 text-error active:scale-95"
-                >
-                  <Trash2 class="size-4" />
-                </button>
-              {:else}
-                <ChevronDown class="size-5 text-muted" />
-              {/if}
-            </div>
-            {#if expanded}
-              <div class="px-4 pb-4" transition:slide={{ duration: 200 }}>
-                <p
-                  class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-                >
-                  {t.t("common.format")}
-                </p>
-                <div class="mb-3">
-                  <SegmentedControl
-                    options={formatOptions}
-                    value={act.format}
-                    ariaLabel={t.t("common.format")}
-                    onchange={(value) => updateActivityFormat(act.id, value)}
-                  />
-                </div>
-                <p
-                  class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-                >
-                  {t.t("common.level")}
-                </p>
-                <SegmentedControl
-                  options={skillOptions}
-                  value={act.level}
-                  ariaLabel={t.t("common.level")}
-                  onchange={(value) => updateActivityLevel(act.id, value)}
-                />
-              </div>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {/if}
-
-    {#if showAddSport}
-      <div
-        class="rounded-2xl border-2 border-dashed border-primary/40 bg-surface p-4"
-      >
-        <p class="mb-3 text-sm font-bold text-text">
-          {t.t("profile.addSport")}
-        </p>
-        {#if availableActivities.length === 0}
-          <p class="text-sm text-muted">{t.t("profile.allSports")}</p>
-        {:else}
-          <div class="grid grid-cols-2 gap-2">
-            {#each availableActivities as activity}
-              <button
-                onclick={() => toggleNewSelection(activity.id)}
-                class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 {selectedNewIds.includes(
-                  activity.id,
-                )
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border bg-bg'}"
-              >
-                <ActivityIcon id={activity.id} class="size-6 text-primary" />
-                <span class="text-xs font-semibold text-text"
-                  >{t.activity(activity.id)}</span
-                >
-              </button>
-            {/each}
-          </div>
-        {/if}
-
-        <div class="mt-4 flex gap-3">
-          <button
-            onclick={() => (showAddSport = false)}
-            class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
-          >
-            {t.t("common.cancel")}
-          </button>
-          <button
-            onclick={confirmAddSport}
-            disabled={selectedNewIds.length === 0}
-            class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
-          >
-            {selectedNewIds.length > 1
-              ? t.t("profile.addSports", { count: selectedNewIds.length })
-              : t.t("profile.addSportButton")}
-          </button>
-        </div>
-      </div>
-    {:else}
-      <button
-        onclick={openAddSport}
-        class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
-      >
-        <Plus class="size-4" />
-        {t.t("profile.addSportButton")}
-      </button>
-    {/if}
   </div>
 
   <!-- Theme -->
