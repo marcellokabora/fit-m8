@@ -606,7 +606,7 @@
     class="relative flex min-h-0 flex-1 flex-col items-center justify-center px-5"
   >
     {#if loading}
-      <Loading />
+      <Loading fullscreen={false} />
     {:else if users.length === 0}
       <div class="flex flex-col items-center gap-4 text-center">
         <Moon class="size-16 text-muted" />

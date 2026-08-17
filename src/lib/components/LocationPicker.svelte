@@ -19,6 +19,10 @@
   let manualEntry = $state(false);
   let manualCity = $state("");
 
+  // Default coordinates used when the user enters a city manually (no geolocation available).
+  const BARCELONA_LAT = 41.3874;
+  const BARCELONA_LNG = 2.1686;
+
   // Primary provider, no API key required.
   async function reverseGeocodeBigDataCloud(lat: number, lon: number) {
     const res = await fetch(
@@ -74,8 +78,10 @@
     } catch (err: any) {
       error =
         err.code === 1 ? t.t("location.denied") : t.t("location.detectFailed");
-      manualEntry = true;
-      manualCity = city;
+      // geolocation unavailable/denied, fall back to Barcelona instead of prompting manual entry
+      city = "Barcelona";
+      lat = BARCELONA_LAT;
+      lng = BARCELONA_LNG;
     } finally {
       locating = false;
     }
@@ -91,9 +97,9 @@
     const trimmed = manualCity.trim();
     if (!trimmed) return;
     city = trimmed;
-    // manual entry has no known coordinates, so distance filtering can't use this profile
-    lat = undefined;
-    lng = undefined;
+    // manual entry has no real coordinates, default to Barcelona so distance filtering still works
+    lat = BARCELONA_LAT;
+    lng = BARCELONA_LNG;
     manualEntry = false;
   }
 </script>
