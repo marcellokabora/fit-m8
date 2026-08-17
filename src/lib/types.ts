@@ -10,22 +10,22 @@ export const ACTIVITY_FORMAT_OPTIONS = [
 export type ActivityFormat = (typeof ACTIVITY_FORMAT_OPTIONS)[number]['value'];
 
 export const SKILL_LEVEL_OPTIONS = [
-	{ value: 'Basic', label: 'Basic' },
-	{ value: 'Expert', label: 'Expert' }
+	{ value: 'basic', label: 'Basic' },
+	{ value: 'expert', label: 'Expert' }
 ] as const;
 
 export type SkillLevel = (typeof SKILL_LEVEL_OPTIONS)[number]['value'];
 
 export const ORIENTATIONS = [
-	{ value: 'straight', label: 'Hetero' },
+	{ value: 'hetero', label: 'Hetero' },
 	{ value: 'gay', label: 'Gay' }
 ] as const;
 
 export type SexualOrientation = (typeof ORIENTATIONS)[number]['value'];
 
 export const GENDER_OPTIONS = [
-	{ value: 'Male', label: 'Male' },
-	{ value: 'Female', label: 'Female' }
+	{ value: 'male', label: 'Male' },
+	{ value: 'female', label: 'Female' }
 ] as const;
 
 export type Gender = (typeof GENDER_OPTIONS)[number]['value'];

@@ -95,7 +95,7 @@
       ...selectedNewIds.map((id) => ({
         id,
         format: "1v1" as ActivityFormat,
-        level: "Basic" as SkillLevel,
+        level: "basic" as SkillLevel,
       })),
     ]);
     showAddSport = false;

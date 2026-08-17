@@ -43,12 +43,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 19,
 		city: 'Barcelona',
-		gender: 'Female',
-		orientation: 'straight',
+		gender: 'female',
+		orientation: 'hetero',
 		bio: 'Love tennis and outdoor activities! 🎾',
 		activities: [
-			{ id: 'tennis', format: '1v1', level: 'Basic' },
-			{ id: 'jogging', format: '1v1', level: 'Expert' }
+			{ id: 'tennis', format: '1v1', level: 'basic' },
+			{ id: 'jogging', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -56,12 +56,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 33,
 		city: 'Barcelona',
-		gender: 'Female',
+		gender: 'female',
 		orientation: 'gay',
 		bio: 'Padel enthusiast! Looking for a partner 🎾',
 		activities: [
-			{ id: 'padel', format: '1v1', level: 'Expert' },
-			{ id: 'gym', format: '1v1', level: 'Basic' }
+			{ id: 'padel', format: '1v1', level: 'expert' },
+			{ id: 'gym', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -69,12 +69,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 45,
 		city: 'Barcelona',
-		gender: 'Female',
-		orientation: 'straight',
+		gender: 'female',
+		orientation: 'hetero',
 		bio: 'Pickleball addict! Casual vibes 🥒',
 		activities: [
-			{ id: 'pickleball', format: '1v1', level: 'Expert' },
-			{ id: 'cycling', format: '1v1', level: 'Basic' }
+			{ id: 'pickleball', format: '1v1', level: 'expert' },
+			{ id: 'cycling', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -82,12 +82,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 21,
 		city: 'Barcelona',
-		gender: 'Female',
-		orientation: 'straight',
+		gender: 'female',
+		orientation: 'hetero',
 		bio: 'Badminton player. Let\'s match! 🏸',
 		activities: [
-			{ id: 'badminton', format: '1v1', level: 'Basic' },
-			{ id: 'gym', format: '1v1', level: 'Expert' }
+			{ id: 'badminton', format: '1v1', level: 'basic' },
+			{ id: 'gym', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -95,12 +95,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 38,
 		city: 'Barcelona',
-		gender: 'Female',
+		gender: 'female',
 		orientation: 'gay',
 		bio: 'Rock climbing partner needed 🧗',
 		activities: [
-			{ id: 'rock-climbing', format: '1v1', level: 'Expert' },
-			{ id: 'hiking', format: '1v1', level: 'Basic' }
+			{ id: 'rock-climbing', format: '1v1', level: 'expert' },
+			{ id: 'hiking', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -108,12 +108,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 50,
 		city: 'Barcelona',
-		gender: 'Female',
-		orientation: 'straight',
+		gender: 'female',
+		orientation: 'hetero',
 		bio: 'Ping pong is life! 🏓',
 		activities: [
-			{ id: 'ping-pong', format: '1v1', level: 'Expert' },
-			{ id: 'swimming', format: '1v1', level: 'Basic' }
+			{ id: 'ping-pong', format: '1v1', level: 'expert' },
+			{ id: 'swimming', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -121,12 +121,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 18,
 		city: 'Barcelona',
-		gender: 'Female',
-		orientation: 'straight',
+		gender: 'female',
+		orientation: 'hetero',
 		bio: 'Squash player looking for regular matches 📦',
 		activities: [
-			{ id: 'squash', format: '1v1', level: 'Expert' },
-			{ id: 'gym', format: '1v1', level: 'Basic' }
+			{ id: 'squash', format: '1v1', level: 'expert' },
+			{ id: 'gym', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -134,12 +134,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 29,
 		city: 'Barcelona',
-		gender: 'Female',
+		gender: 'female',
 		orientation: 'gay',
 		bio: 'Martial arts enthusiast! Come train with me 🥋',
 		activities: [
-			{ id: 'martial-arts', format: '1v1', level: 'Basic' },
-			{ id: 'gym', format: '1v1', level: 'Expert' }
+			{ id: 'martial-arts', format: '1v1', level: 'basic' },
+			{ id: 'gym', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -147,12 +147,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 41,
 		city: 'Barcelona',
-		gender: 'Female',
-		orientation: 'straight',
+		gender: 'female',
+		orientation: 'hetero',
 		bio: 'Golf lover! Weekend matches? ⛳',
 		activities: [
-			{ id: 'golf', format: '1v1', level: 'Basic' },
-			{ id: 'cycling', format: '1v1', level: 'Expert' }
+			{ id: 'golf', format: '1v1', level: 'basic' },
+			{ id: 'cycling', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -160,12 +160,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 20,
 		city: 'Barcelona',
-		gender: 'Female',
-		orientation: 'straight',
+		gender: 'female',
+		orientation: 'hetero',
 		bio: 'Swimming and frescobol! Competitive spirit 🏊',
 		activities: [
-			{ id: 'swimming', format: '1v1', level: 'Expert' },
-			{ id: 'frescobol', format: '1v1', level: 'Basic' }
+			{ id: 'swimming', format: '1v1', level: 'expert' },
+			{ id: 'frescobol', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -173,12 +173,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 36,
 		city: 'Barcelona',
-		gender: 'Male',
-		orientation: 'straight',
+		gender: 'male',
+		orientation: 'hetero',
 		bio: 'Early runs and weekend tennis are my thing! 🎾',
 		activities: [
-			{ id: 'jogging', format: '1v1', level: 'Basic' },
-			{ id: 'tennis', format: '1v1', level: 'Expert' }
+			{ id: 'jogging', format: '1v1', level: 'basic' },
+			{ id: 'tennis', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -186,12 +186,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 47,
 		city: 'Barcelona',
-		gender: 'Male',
+		gender: 'male',
 		orientation: 'gay',
 		bio: 'Looking for regular padel games after work 🎾',
 		activities: [
-			{ id: 'padel', format: '2v2', level: 'Basic' },
-			{ id: 'gym', format: '1v1', level: 'Expert' }
+			{ id: 'padel', format: '2v2', level: 'basic' },
+			{ id: 'gym', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -199,12 +199,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 22,
 		city: 'Barcelona',
-		gender: 'Male',
-		orientation: 'straight',
+		gender: 'male',
+		orientation: 'hetero',
 		bio: 'Basketball and good competition 🏀',
 		activities: [
-			{ id: 'basketball', format: '2v2', level: 'Expert' },
-			{ id: 'calisthenics', format: '1v1', level: 'Basic' }
+			{ id: 'basketball', format: '2v2', level: 'expert' },
+			{ id: 'calisthenics', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -212,12 +212,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 31,
 		city: 'Barcelona',
-		gender: 'Male',
-		orientation: 'straight',
+		gender: 'male',
+		orientation: 'hetero',
 		bio: 'Cycling around the coast whenever I can 🚴',
 		activities: [
-			{ id: 'cycling', format: '1v1', level: 'Expert' },
-			{ id: 'swimming', format: '1v1', level: 'Basic' }
+			{ id: 'cycling', format: '1v1', level: 'expert' },
+			{ id: 'swimming', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -225,12 +225,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 43,
 		city: 'Barcelona',
-		gender: 'Male',
+		gender: 'male',
 		orientation: 'gay',
 		bio: 'Weekend hikes and climbing sessions 🧗',
 		activities: [
-			{ id: 'hiking', format: '1v1', level: 'Basic' },
-			{ id: 'rock-climbing', format: '1v1', level: 'Expert' }
+			{ id: 'hiking', format: '1v1', level: 'basic' },
+			{ id: 'rock-climbing', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -238,12 +238,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 25,
 		city: 'Barcelona',
-		gender: 'Male',
-		orientation: 'straight',
+		gender: 'male',
+		orientation: 'hetero',
 		bio: 'Badminton player searching for a new rival 🏸',
 		activities: [
-			{ id: 'badminton', format: '1v1', level: 'Basic' },
-			{ id: 'ping-pong', format: '1v1', level: 'Expert' }
+			{ id: 'badminton', format: '1v1', level: 'basic' },
+			{ id: 'ping-pong', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -251,12 +251,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 49,
 		city: 'Barcelona',
-		gender: 'Male',
-		orientation: 'straight',
+		gender: 'male',
+		orientation: 'hetero',
 		bio: 'Always ready for a pickleball match 🥒',
 		activities: [
-			{ id: 'pickleball', format: '2v2', level: 'Expert' },
-			{ id: 'squash', format: '1v1', level: 'Basic' }
+			{ id: 'pickleball', format: '2v2', level: 'expert' },
+			{ id: 'squash', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -264,12 +264,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1557862921-37829c790f19?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 34,
 		city: 'Barcelona',
-		gender: 'Male',
-		orientation: 'straight',
+		gender: 'male',
+		orientation: 'hetero',
 		bio: 'Golf on Sundays, gym during the week ⛳',
 		activities: [
-			{ id: 'golf', format: '1v1', level: 'Basic' },
-			{ id: 'gym', format: '1v1', level: 'Expert' }
+			{ id: 'golf', format: '1v1', level: 'basic' },
+			{ id: 'gym', format: '1v1', level: 'expert' }
 		]
 	},
 	{
@@ -277,12 +277,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 40,
 		city: 'Barcelona',
-		gender: 'Male',
+		gender: 'male',
 		orientation: 'gay',
 		bio: 'Training martial arts and looking for partners 🥋',
 		activities: [
-			{ id: 'martial-arts', format: '1v1', level: 'Expert' },
-			{ id: 'frescobol', format: '1v1', level: 'Basic' }
+			{ id: 'martial-arts', format: '1v1', level: 'expert' },
+			{ id: 'frescobol', format: '1v1', level: 'basic' }
 		]
 	},
 	{
@@ -290,12 +290,12 @@ const fakeProfiles = [
 		photoURL: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 28,
 		city: 'Barcelona',
-		gender: 'Male',
-		orientation: 'straight',
+		gender: 'male',
+		orientation: 'hetero',
 		bio: 'Beach volleyball and swimming all summer 🏐',
 		activities: [
-			{ id: 'beach-volley', format: '2v2', level: 'Basic' },
-			{ id: 'swimming', format: '1v1', level: 'Expert' }
+			{ id: 'beach-volley', format: '2v2', level: 'basic' },
+			{ id: 'swimming', format: '1v1', level: 'expert' }
 		]
 	}
 ];
@@ -345,7 +345,7 @@ function prepareProfile(profile, profileIndex) {
 		activities.push({
 			id,
 			format: offset % 3 === 2 ? 'all' : offset % 2 === 0 ? '1v1' : '2v2',
-			level: (profileIndex + offset) % 2 === 0 ? 'Basic' : 'Expert'
+			level: (profileIndex + offset) % 2 === 0 ? 'basic' : 'expert'
 		});
 	}
 
@@ -369,11 +369,12 @@ async function seedDatabase() {
 	for (const [profileIndex, sourceProfile] of profilesWithPhotos.entries()) {
 		try {
 			const profile = prepareProfile(sourceProfile, profileIndex);
-			// Spread test profiles from 5km up to ~105km away so the distance filter has something to bite on
-			const distanceKm = (profileIndex + 1) * 5;
+			// Spread test profiles from 5km up to 50km, cycling per group of 10 so distance
+			// doesn't correlate with gender (profiles are listed females-then-males).
+			const distanceKm = ((profileIndex % 10) + 1) * 5;
 			const { lat, lng } = locationAtDistance(profileIndex, distanceKm);
-			// Create a fake user ID (e.g., user_sarah_001)
-			const userId = `fake_${profile.displayName.toLowerCase()}_${Math.random().toString(36).substr(2, 9)}`;
+			// Deterministic ID (based on name) so re-running the seed updates existing docs instead of duplicating them
+			const userId = `fake_${profile.displayName.toLowerCase()}`;
 
 			const userData = {
 				...profile,

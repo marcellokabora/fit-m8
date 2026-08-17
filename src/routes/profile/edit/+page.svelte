@@ -39,7 +39,7 @@
   let lat = $state<number | undefined>($userProfile?.lat);
   let lng = $state<number | undefined>($userProfile?.lng);
   let sexualOrientation = $state<SexualOrientation>(
-    $userProfile?.orientation ?? "straight",
+    $userProfile?.orientation ?? "hetero",
   );
   let gender = $state<Gender | "">($userProfile?.gender ?? "");
   let photos = $state<string[]>(
@@ -55,7 +55,7 @@
       city = $userProfile.city ?? "";
       lat = $userProfile.lat;
       lng = $userProfile.lng;
-      sexualOrientation = $userProfile.orientation ?? "straight";
+      sexualOrientation = $userProfile.orientation ?? "hetero";
       gender = $userProfile.gender ?? "";
       photos =
         $userProfile.photos ??

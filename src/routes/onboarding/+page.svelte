@@ -54,8 +54,8 @@
   let displayName = $state("");
   let bio = $state("");
   let age = $state<number>(25);
-  let gender = $state<Gender>("Male");
-  let sexualOrientation = $state<SexualOrientation>("straight");
+  let gender = $state<Gender>("male");
+  let sexualOrientation = $state<SexualOrientation>("hetero");
   let city = $state("");
 
   // Step 2 — Activities
@@ -78,7 +78,7 @@
       delete activitySettings[id];
     } else {
       selectedActivities = [...selectedActivities, id];
-      activitySettings[id] = { format: "all", level: "Basic" };
+      activitySettings[id] = { format: "all", level: "basic" };
     }
   }
 

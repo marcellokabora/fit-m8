@@ -100,7 +100,7 @@ export async function getDiscoverFeed(
 		if (genderFilter && data.gender !== genderFilter) continue;
 		if (
 			sexualOrientationFilter &&
-			(data.orientation ?? 'straight') !== sexualOrientationFilter
+			(data.orientation ?? 'hetero') !== sexualOrientationFilter
 		)
 			continue;
 		if (minAge !== null && data.age < minAge) continue;
