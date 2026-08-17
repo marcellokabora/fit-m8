@@ -7,7 +7,6 @@
     SKILL_LEVEL_OPTIONS,
     ORIENTATIONS,
     GENDER_OPTIONS,
-    formatLabel,
     type UserActivity,
     type SexualOrientation,
     type Gender,
@@ -23,6 +22,33 @@
   import { Plus, X, RotateCcw, ChevronDown, Trash2 } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
+  let genderOptions = $derived(
+    GENDER_OPTIONS.map((option) => ({
+      ...option,
+      label: t.gender(option.value),
+    })),
+  );
+  let orientationOptions = $derived(
+    ORIENTATIONS.map((option) => ({
+      ...option,
+      label: t.orientation(option.value),
+    })),
+  );
+  let formatOptions = $derived(
+    ACTIVITY_FORMAT_OPTIONS.map((option) => ({
+      ...option,
+      label: t.format(option.value),
+    })),
+  );
+  let skillOptions = $derived(
+    SKILL_LEVEL_OPTIONS.map((option) => ({
+      ...option,
+      label: t.skill(option.value),
+    })),
+  );
 
   let saving = $state(false);
   let confirmResetSwipes = $state(false);
@@ -156,18 +182,18 @@
   >
     <a
       href="/profile"
-      aria-label="Close"
+      aria-label={t.t("common.close")}
       class="flex size-9 items-center justify-center rounded-full text-text active:scale-95"
     >
       <X class="size-5" />
     </a>
-    <h1 class="text-lg font-black text-text">Edit profile</h1>
+    <h1 class="text-lg font-black text-text">{t.t("profile.editTitle")}</h1>
     <button
       onclick={save}
       disabled={saving}
       class="rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95 disabled:opacity-50"
     >
-      {saving ? "Saving…" : "Save"}
+      {saving ? t.t("common.saving") : t.t("common.save")}
     </button>
   </div>
 
@@ -178,7 +204,7 @@
     </div>
     <div class="w-full">
       <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
-        Information
+        {t.t("common.information")}
       </h3>
       <input
         type="text"
@@ -189,7 +215,7 @@
     <textarea
       bind:value={bio}
       rows={2}
-      placeholder="Your bio…"
+      placeholder={t.t("profile.bio")}
       class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
     ></textarea>
     <div class="w-full">
@@ -203,19 +229,19 @@
       Gender
     </h3>
     <SegmentedControl
-      options={GENDER_OPTIONS}
+      options={genderOptions}
       value={gender}
-      ariaLabel="Gender"
+      ariaLabel={t.t("common.gender")}
       onchange={(value) => (gender = value)}
       size="lg"
     />
     <h3 class="mb-2 mt-4 text-sm font-bold uppercase tracking-wide text-muted">
-      Orientation
+      {t.t("common.orientation")}
     </h3>
     <SegmentedControl
-      options={ORIENTATIONS}
+      options={orientationOptions}
       value={sexualOrientation}
-      ariaLabel="Orientation"
+      ariaLabel={t.t("common.orientation")}
       onchange={(value) => (sexualOrientation = value)}
       size="lg"
     />
@@ -224,10 +250,10 @@
   <!-- Activities -->
   <div class="px-5">
     <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      My Sports
+      {t.t("common.mySports")}
     </h3>
     {#if activities.length === 0}
-      <p class="mb-3 text-sm text-muted">No activities set</p>
+      <p class="mb-3 text-sm text-muted">{t.t("common.noActivities")}</p>
     {:else}
       <div class="mb-3 flex flex-col gap-3">
         {#each activities as act}
@@ -249,9 +275,9 @@
                 <ActivityIcon id={act.id} class="size-5" />
               </span>
               <div class="flex-1">
-                <p class="font-bold text-text">{info?.label ?? act.id}</p>
+                <p class="font-bold text-text">{t.activity(act.id)}</p>
                 <p class="text-sm text-muted">
-                  {formatLabel(act.format)} · {act.level}
+                  {t.format(act.format)} · {t.skill(act.level)}
                 </p>
               </div>
               {#if expanded}
@@ -260,7 +286,7 @@
                     e.stopPropagation();
                     removeSport(act.id);
                   }}
-                  aria-label="Remove {info?.label ?? act.id}"
+                  aria-label={`${t.t("common.removeSport")} ${t.activity(act.id)}`}
                   class="flex size-8 items-center justify-center rounded-full bg-error/10 text-error active:scale-95"
                 >
                   <Trash2 class="size-4" />
@@ -274,25 +300,25 @@
                 <p
                   class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
                 >
-                  Format
+                  {t.t("common.format")}
                 </p>
                 <div class="mb-3">
                   <SegmentedControl
-                    options={ACTIVITY_FORMAT_OPTIONS}
+                    options={formatOptions}
                     value={act.format}
-                    ariaLabel="Format"
+                    ariaLabel={t.t("common.format")}
                     onchange={(value) => updateActivityFormat(act.id, value)}
                   />
                 </div>
                 <p
                   class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
                 >
-                  Level
+                  {t.t("common.level")}
                 </p>
                 <SegmentedControl
-                  options={SKILL_LEVEL_OPTIONS}
+                  options={skillOptions}
                   value={act.level}
-                  ariaLabel="Level"
+                  ariaLabel={t.t("common.level")}
                   onchange={(value) => updateActivityLevel(act.id, value)}
                 />
               </div>
@@ -306,9 +332,11 @@
       <div
         class="rounded-2xl border-2 border-dashed border-primary/40 bg-surface p-4"
       >
-        <p class="mb-3 text-sm font-bold text-text">Add a sport</p>
+        <p class="mb-3 text-sm font-bold text-text">
+          {t.t("profile.addSport")}
+        </p>
         {#if availableActivities.length === 0}
-          <p class="text-sm text-muted">You've added every sport already!</p>
+          <p class="text-sm text-muted">{t.t("profile.allSports")}</p>
         {:else}
           <div class="grid grid-cols-2 gap-2">
             {#each availableActivities as activity}
@@ -322,7 +350,7 @@
               >
                 <ActivityIcon id={activity.id} class="size-6 text-primary" />
                 <span class="text-xs font-semibold text-text"
-                  >{activity.label}</span
+                  >{t.activity(activity.id)}</span
                 >
               </button>
             {/each}
@@ -334,7 +362,7 @@
             onclick={() => (showAddSport = false)}
             class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
           >
-            Cancel
+            {t.t("common.cancel")}
           </button>
           <button
             onclick={confirmAddSport}
@@ -342,8 +370,8 @@
             class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
           >
             {selectedNewIds.length > 1
-              ? `Add ${selectedNewIds.length} sports`
-              : "Add sport"}
+              ? t.t("profile.addSports", { count: selectedNewIds.length })
+              : t.t("profile.addSportButton")}
           </button>
         </div>
       </div>
@@ -353,7 +381,7 @@
         class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
         <Plus class="size-4" />
-        Add sport
+        {t.t("profile.addSportButton")}
       </button>
     {/if}
   </div>
@@ -366,29 +394,30 @@
   <!-- Reset swipes -->
   <div class="px-5 pb-8">
     <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      Discovery
+      {t.t("profile.discovery")}
     </h3>
     {#if confirmResetSwipes}
       <div
         class="rounded-2xl border-2 border-dashed border-error/40 bg-surface p-4"
       >
         <p class="mb-3 text-sm font-bold text-text">
-          Reset all swipes? Everyone you've liked or passed will reappear in
-          Discover. This can't be undone.
+          {t.t("profile.resetConfirm")}
         </p>
         <div class="flex gap-3">
           <button
             onclick={() => (confirmResetSwipes = false)}
             class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
           >
-            Cancel
+            {t.t("common.cancel")}
           </button>
           <button
             onclick={handleResetSwipes}
             disabled={resettingSwipes}
             class="flex-1 rounded-2xl bg-error py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
           >
-            {resettingSwipes ? "Resetting…" : "Reset swipes"}
+            {resettingSwipes
+              ? t.t("profile.resettingSwipes")
+              : t.t("profile.resetSwipes")}
           </button>
         </div>
       </div>
@@ -398,7 +427,7 @@
         class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-error/40 py-3 text-sm font-bold text-error active:scale-95"
       >
         <RotateCcw class="size-4" />
-        Reset all swipes
+        {t.t("profile.resetSwipes")}
       </button>
     {/if}
   </div>

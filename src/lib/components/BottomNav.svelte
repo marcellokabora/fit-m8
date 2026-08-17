@@ -1,13 +1,20 @@
 <script lang="ts">
   import { Zap, MessageCircle, User } from "@lucide/svelte";
   import { unreadMatchCount } from "$lib/stores/unread";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let { active }: { active: "discover" | "matches" | "profile" } = $props();
 
+  let t = $derived(createTranslator($activeLanguage));
   const tabs = [
-    { id: "discover", href: "/discover", icon: Zap, label: "Discover" },
-    { id: "matches", href: "/matches", icon: MessageCircle, label: "Matches" },
-    { id: "profile", href: "/profile", icon: User, label: "Profile" },
+    { id: "discover", href: "/discover", icon: Zap, key: "nav.discover" },
+    {
+      id: "matches",
+      href: "/matches",
+      icon: MessageCircle,
+      key: "nav.matches",
+    },
+    { id: "profile", href: "/profile", icon: User, key: "nav.profile" },
   ] as const;
 </script>
 
@@ -33,7 +40,7 @@
             </span>
           {/if}
         </span>
-        {tab.label}
+        {t.t(tab.key)}
       </a>
     {/each}
   </div>

@@ -21,7 +21,7 @@ export const SKILL_LEVEL_OPTIONS = [
 export type SkillLevel = (typeof SKILL_LEVEL_OPTIONS)[number]['value'];
 
 export const ORIENTATIONS = [
-	{ value: 'straight', label: 'Straight' },
+	{ value: 'straight', label: 'Hetero' },
 	{ value: 'gay', label: 'Gay' }
 ] as const;
 

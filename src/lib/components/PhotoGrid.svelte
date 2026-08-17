@@ -8,6 +8,9 @@
   } from "firebase/storage";
   import { compressImage } from "$lib/image";
   import { Plus, X, Loader2 } from "@lucide/svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   const MAX_PHOTOS = 3;
 
@@ -31,7 +34,7 @@
 
     error = "";
     if (!file.type.startsWith("image/")) {
-      error = "Please choose an image file";
+      error = t.t("photo.chooseImage");
       input.value = "";
       return;
     }
@@ -51,7 +54,7 @@
       photos = next;
       onchange?.(next);
     } catch (err: any) {
-      error = err.message ?? "Upload failed";
+      error = err.message ?? t.t("photo.uploadFailed");
     } finally {
       uploadingIndex = null;
       input.value = "";
@@ -81,19 +84,19 @@
         {#if photos[index]}
           <img
             src={photos[index]}
-            alt="Profile photo {index + 1}"
+            alt={t.t("common.profilePhotoNumber", { count: index + 1 })}
             class="h-full w-full rounded-2xl object-cover"
           />
           {#if index === 0}
             <span
               class="absolute bottom-1 left-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white"
             >
-              Main
+              {t.t("common.main")}
             </span>
           {/if}
           <button
             onclick={() => removePhoto(index)}
-            aria-label="Remove photo"
+            aria-label={t.t("common.removePhoto")}
             class="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-error text-white shadow-sm active:scale-95"
           >
             <X class="size-3.5" />

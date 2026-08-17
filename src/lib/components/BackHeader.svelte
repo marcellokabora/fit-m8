@@ -1,6 +1,9 @@
 <script lang="ts">
   import { ArrowLeft } from "@lucide/svelte";
   import type { Snippet } from "svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let {
     href,
@@ -22,6 +25,7 @@
     <a
       {href}
       class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
+      aria-label={t.t("common.back")}
     >
       <ArrowLeft class="size-5 text-text" />
     </a>
@@ -29,6 +33,7 @@
     <button
       onclick={() => history.back()}
       class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
+      aria-label={t.t("common.back")}
     >
       <ArrowLeft class="size-5 text-text" />
     </button>

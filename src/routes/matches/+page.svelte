@@ -17,6 +17,9 @@
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { unreadMatches } from "$lib/stores/unread";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let matches = $state<Match[]>([]);
   let otherUsers = $state<Record<string, UserProfile>>({});
@@ -80,8 +83,8 @@
 <div class="flex min-h-dvh flex-col bg-bg pb-24">
   <!-- Header -->
   <div class="sticky top-0 z-10 bg-bg px-5 pb-3 pt-5">
-    <h1 class="text-2xl font-black text-text">Matches</h1>
-    <p class="text-sm text-muted">People you matched with</p>
+    <h1 class="text-2xl font-black text-text">{t.t("nav.matches")}</h1>
+    <p class="text-sm text-muted">{t.t("matches.subtitle")}</p>
   </div>
 
   {#if loading}
@@ -92,7 +95,7 @@
     <div
       class="flex flex-1 flex-col items-center justify-center gap-2 px-8 text-center"
     >
-      <p class="text-lg font-bold text-text">Couldn't load matches</p>
+      <p class="text-lg font-bold text-text">{t.t("matches.loadError")}</p>
       <p class="text-sm text-muted">{error}</p>
     </div>
   {:else if matches.length === 0}
@@ -100,15 +103,15 @@
       class="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center"
     >
       <Users class="size-16 text-muted" />
-      <p class="text-lg font-bold text-text">No matches yet</p>
+      <p class="text-lg font-bold text-text">{t.t("matches.emptyTitle")}</p>
       <p class="text-sm text-muted">
-        Keep swiping to find your sports partner!
+        {t.t("matches.emptyHint")}
       </p>
       <a
         href="/discover"
         class="rounded-2xl bg-primary px-6 py-3 font-bold text-white active:scale-95"
       >
-        Go to Discover
+        {t.t("matches.goDiscover")}
       </a>
     </div>
   {:else}
@@ -137,11 +140,11 @@
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-bold text-text truncate">
-              {other?.displayName ?? "Match"}
+              {other?.displayName ?? t.t("matches.fallback")}
             </p>
             <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
               <ActivityIcon id={match.activity} class="size-3.5" />
-              {activity?.label ?? match.activity} · {formatLabel(match.format)}
+              {t.activity(match.activity)} · {t.format(match.format)}
             </p>
             <!-- {#if match.lastMessage}
               <p
@@ -159,7 +162,7 @@
             {:else}
               <span
                 class="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"
-                >Chat</span
+                >{t.t("common.chat")}</span
               >
             {/if}
           </div>

@@ -20,6 +20,9 @@
   import { LoaderCircle, Sparkles, Send } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let matchId = $derived(page.params.matchId as string);
   let messages = $state<Message[]>([]);
@@ -124,12 +127,12 @@
       {/if}
       <div class="flex-1">
         <p class="font-bold text-text">
-          {otherUser?.displayName ?? "Match Chat"}
+          {otherUser?.displayName ?? t.t("chat.fallbackTitle")}
         </p>
         {#if match}
           <p class="flex items-center gap-1 text-xs text-muted">
             <ActivityIcon id={match.activity} class="size-3" />
-            {activity?.label ?? match.activity} · {formatLabel(match.format)}
+            {t.activity(match.activity)} · {t.format(match.format)}
           </p>
         {:else}
           <p class="text-xs text-muted">{matchId}</p>
@@ -149,8 +152,8 @@
         class="flex h-full flex-col items-center justify-center gap-3 text-center"
       >
         <Sparkles class="size-12 text-primary" />
-        <p class="font-bold text-text">Say hi to your match!</p>
-        <p class="text-sm text-muted">Plan your activity session together</p>
+        <p class="font-bold text-text">{t.t("chat.emptyTitle")}</p>
+        <p class="text-sm text-muted">{t.t("chat.emptyHint")}</p>
       </div>
     {:else}
       {#each messages as msg}
@@ -179,7 +182,7 @@
       <textarea
         bind:value={text}
         onkeydown={handleKeydown}
-        placeholder="Type a message…"
+        placeholder={t.t("chat.placeholder")}
         rows={1}
         class="flex-1 resize-none rounded-2xl border-2 border-border bg-bg px-4 py-3 text-sm text-text outline-none focus:border-primary"
       ></textarea>

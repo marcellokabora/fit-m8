@@ -7,6 +7,9 @@
   import BackHeader from "$lib/components/BackHeader.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import { MapPin, LoaderCircle } from "@lucide/svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let uid = $derived(page.params.uid as string);
   let profile = $state<UserProfile | null>(null);
@@ -37,7 +40,7 @@
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
-  <BackHeader title="Profile" class="bg-bg" />
+  <BackHeader title={t.t("nav.profile")} class="bg-bg" />
 
   {#if loading}
     <div class="flex flex-1 items-center justify-center text-muted">
@@ -45,7 +48,7 @@
     </div>
   {:else if notFound || !profile}
     <div class="flex flex-1 items-center justify-center text-muted">
-      <p>User not found</p>
+      <p>{t.t("profile.notFound")}</p>
     </div>
   {:else}
     <PhotoGallery {photos} alt={profile.displayName} />
@@ -67,7 +70,7 @@
         <span
           class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
         >
-          Gay
+          {t.orientation("gay")}
         </span>
       {/if}
       {#if profile.bio}
@@ -77,10 +80,10 @@
 
     <div class="px-5">
       <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-        Sports
+        {t.t("common.sports")}
       </h3>
       {#if (profile.activities?.length ?? 0) === 0}
-        <p class="text-sm text-muted">No activities set</p>
+        <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
       {:else}
         <div class="flex flex-col gap-3">
           {#each profile.activities as act}
@@ -94,9 +97,9 @@
                 <ActivityIcon id={act.id} class="size-5" />
               </span>
               <div class="flex-1">
-                <p class="font-bold text-text">{info?.label ?? act.id}</p>
+                <p class="font-bold text-text">{t.activity(act.id)}</p>
                 <p class="text-sm text-muted">
-                  {formatLabel(act.format)} · {act.level}
+                  {t.format(act.format)} · {t.skill(act.level)}
                 </p>
               </div>
             </div>

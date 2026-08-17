@@ -3,6 +3,9 @@
   import { page } from "$app/state";
   import { authUser } from "$lib/stores/auth";
   import Logo from "$lib/components/Logo.svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let mode = $derived(
     page.url.searchParams.get("mode") === "login" ? "login" : "register",
@@ -16,7 +19,7 @@
   async function handleEmail() {
     error = "";
     if (mode === "register" && password !== confirmPassword) {
-      error = "Passwords do not match";
+      error = t.t("auth.passwordMismatch");
       return;
     }
     loading = true;
@@ -28,7 +31,7 @@
       }
       goto("/discover");
     } catch (e: any) {
-      error = e.message ?? "Something went wrong";
+      error = e.message ?? t.t("errors.generic");
     } finally {
       loading = false;
     }
@@ -42,7 +45,7 @@
       if (provider === "google") await authUser.signInGoogle();
       goto("/discover");
     } catch (e: any) {
-      error = e.message ?? "Something went wrong";
+      error = e.message ?? t.t("errors.generic");
     } finally {
       loading = false;
     }
@@ -59,12 +62,12 @@
       <Logo class="h-full w-full" />
     </a>
     <h1 class="text-2xl font-black text-text">
-      {mode === "login" ? "Welcome back" : "Join Fit-M8"}
+      {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
     </h1>
     <p class="text-sm text-muted">
       {mode === "login"
-        ? "Sign in to find your next match"
-        : "Create your sports profile"}
+        ? t.t("auth.loginSubtitle")
+        : t.t("auth.registerSubtitle")}
     </p>
   </div>
 
@@ -93,7 +96,7 @@
           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
         />
       </svg>
-      Continue with Google
+      {t.t("home.google")}
     </button>
 
     <!-- Facebook login disabled for now
@@ -114,7 +117,7 @@
 
   <div class="my-6 flex items-center gap-3">
     <hr class="flex-1 border-border" />
-    <span class="text-sm text-muted">or</span>
+    <span class="text-sm text-muted">{t.t("auth.or")}</span>
     <hr class="flex-1 border-border" />
   </div>
 
@@ -123,14 +126,14 @@
     <input
       type="email"
       bind:value={email}
-      placeholder="Email address"
+      placeholder={t.t("auth.email")}
       required
       class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
     />
     <input
       type="password"
       bind:value={password}
-      placeholder="Password"
+      placeholder={t.t("auth.password")}
       required
       minlength={6}
       class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
@@ -139,7 +142,7 @@
       <input
         type="password"
         bind:value={confirmPassword}
-        placeholder="Confirm password"
+        placeholder={t.t("auth.confirmPassword")}
         required
         minlength={6}
         class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
@@ -153,17 +156,21 @@
       disabled={loading}
       class="w-full rounded-2xl bg-primary py-4 text-lg font-bold text-white shadow-md active:scale-95 disabled:opacity-50"
     >
-      {loading ? "Loading…" : mode === "login" ? "Sign in" : "Create account"}
+      {loading
+        ? t.t("auth.loading")
+        : mode === "login"
+          ? t.t("auth.signIn")
+          : t.t("auth.createAccount")}
     </button>
   </form>
 
   <p class="mt-6 text-center text-sm text-muted">
-    {mode === "login" ? "Don't have an account?" : "Already have an account?"}
+    {mode === "login" ? t.t("auth.noAccount") : t.t("auth.haveAccount")}
     <a
       href="/auth?mode={mode === 'login' ? 'register' : 'login'}"
       class="font-semibold text-primary"
     >
-      {mode === "login" ? "Sign up" : "Sign in"}
+      {mode === "login" ? t.t("auth.signUp") : t.t("auth.signIn")}
     </a>
   </p>
 </div>

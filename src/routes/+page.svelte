@@ -6,6 +6,10 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Logo from "$lib/components/Logo.svelte";
   import Loading from "$lib/components/Loading.svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import LanguagePicker from "$lib/components/LanguagePicker.svelte";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   // true once auth state resolves to "no user" and the rest of the page can reveal
   let ready = $state(false);
@@ -31,19 +35,19 @@
       await authUser.signInGoogle();
       goto("/discover");
     } catch (e: any) {
-      error = e.message ?? "Something went wrong";
+      error = e.message ?? t.t("errors.generic");
     } finally {
       loading = false;
     }
   }
 
   const HERO_ACTIVITIES = [
-    { id: "jogging", label: "Jogging" },
-    { id: "padel", label: "Padel" },
-    { id: "beach-volley", label: "Beach Volley" },
-    { id: "tennis", label: "Tennis" },
-    { id: "basketball", label: "Basketball" },
-    { id: "cycling", label: "Cycling" },
+    { id: "jogging" },
+    { id: "padel" },
+    { id: "beach-volley" },
+    { id: "tennis" },
+    { id: "basketball" },
+    { id: "cycling" },
   ];
 </script>
 
@@ -55,7 +59,7 @@
   {/if}
 
   <!-- Logo / Hero -->
-  <div class="flex flex-col items-center gap-4 text-text">
+  <div class="mt-4 flex flex-col items-center gap-4 text-text">
     <div
       class="flex size-24 items-center justify-center rounded-3xl bg-primary p-4 text-white shadow-xl"
     >
@@ -64,10 +68,12 @@
     {#if ready}
       <h1 transition:fade class="text-5xl font-black tracking-tight">Fit-M8</h1>
       <p transition:fade class="text-center text-lg font-medium text-muted">
-        Find your perfect sports partner.<br />Swipe. Match. Play.
+        {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
       </p>
     {/if}
   </div>
+
+  <LanguagePicker />
 
   {#if ready}
     <!-- Activity bubbles -->
@@ -77,7 +83,7 @@
           class="flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary"
         >
           <ActivityIcon id={activity.id} class="size-4" />
-          {activity.label}
+          {t.activity(activity.id)}
         </span>
       {/each}
     </div>
@@ -114,13 +120,13 @@
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
           />
         </svg>
-        {loading ? "Signing in…" : "Continue with Google"}
+        {loading ? t.t("home.signingIn") : t.t("home.google")}
       </button>
       <a
         href="/auth"
         class="block w-full rounded-2xl border-2 border-border bg-surface py-4 text-center text-lg font-semibold text-text active:scale-95"
       >
-        Sign up or log in with email
+        {t.t("home.email")}
       </a>
     </div>
   {/if}

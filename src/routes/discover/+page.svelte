@@ -40,27 +40,55 @@
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   const FORMAT_FILTER_OPTIONS = [
-    { value: "", label: "All" },
+    { value: "", label: "" },
     { value: "1v1", label: "1v1" },
     { value: "2v2", label: "2v2" },
   ] as const;
 
   const GENDER_FILTER_OPTIONS = [
-    { value: "", label: "All" },
+    { value: "", label: "" },
     ...GENDER_OPTIONS,
   ] as const;
 
   const LEVEL_FILTER_OPTIONS = [
-    { value: "", label: "All" },
+    { value: "", label: "" },
     ...SKILL_LEVEL_OPTIONS,
   ] as const;
 
   const SEX_FILTER_OPTIONS = [
-    { value: "", label: "All" },
+    { value: "", label: "" },
     ...ORIENTATIONS,
   ] as const;
+
+  let formatFilterOptions = $derived(
+    FORMAT_FILTER_OPTIONS.map((option) => ({
+      ...option,
+      label: option.value ? t.format(option.value) : t.t("common.all"),
+    })),
+  );
+  let genderFilterOptions = $derived(
+    GENDER_FILTER_OPTIONS.map((option) => ({
+      ...option,
+      label: option.value ? t.gender(option.value) : t.t("common.all"),
+    })),
+  );
+  let levelFilterOptions = $derived(
+    LEVEL_FILTER_OPTIONS.map((option) => ({
+      ...option,
+      label: option.value ? t.skill(option.value) : t.t("common.all"),
+    })),
+  );
+  let sexFilterOptions = $derived(
+    SEX_FILTER_OPTIONS.map((option) => ({
+      ...option,
+      label: option.value ? t.orientation(option.value) : t.t("common.all"),
+    })),
+  );
 
   const AGE_MIN = 18;
   const AGE_MAX = 60;
@@ -363,12 +391,12 @@
 <div class="flex h-dvh flex-col overflow-hidden bg-bg pb-22">
   <!-- Header -->
   <div class="flex items-center justify-between px-5 pb-3 pt-5">
-    <h1 class="text-2xl font-black text-text">Discover</h1>
+    <h1 class="text-2xl font-black text-text">{t.t("nav.discover")}</h1>
     <div class="flex items-center gap-2">
       <button
         onclick={() => (filtersOpen = true)}
         class="flex size-9 items-center justify-center rounded-full bg-surface shadow-sm"
-        aria-label="Filters"
+        aria-label={t.t("discover.filters")}
       >
         <SlidersHorizontal class="size-5 text-text" />
       </button>
@@ -392,7 +420,9 @@
         class="flex h-full w-full max-w-xs flex-col overflow-y-auto bg-surface p-5"
       >
         <div class="mb-4 flex items-center justify-between">
-          <h2 class="text-lg font-black text-text">Filters</h2>
+          <h2 class="text-lg font-black text-text">
+            {t.t("discover.filters")}
+          </h2>
           <button
             onclick={closeFilters}
             class="flex size-8 items-center justify-center rounded-full bg-bg text-muted"
@@ -402,52 +432,54 @@
         </div>
 
         <!-- Format -->
-        <p class="mb-2 text-sm font-bold text-muted">Format</p>
+        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.format")}</p>
         <div class="mb-5">
           <SegmentedControl
-            options={FORMAT_FILTER_OPTIONS}
+            options={formatFilterOptions}
             value={$filterFormat}
-            ariaLabel="Format"
+            ariaLabel={t.t("common.format")}
             onchange={(value) => filterFormat.set(value)}
           />
         </div>
 
         <!-- Level -->
-        <p class="mb-2 text-sm font-bold text-muted">Level</p>
+        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.level")}</p>
         <div class="mb-5">
           <SegmentedControl
-            options={LEVEL_FILTER_OPTIONS}
+            options={levelFilterOptions}
             value={$filterLevel}
-            ariaLabel="Level"
+            ariaLabel={t.t("common.level")}
             onchange={(value) => filterLevel.set(value)}
           />
         </div>
 
         <!-- Gender -->
-        <p class="mb-2 text-sm font-bold text-muted">Gender</p>
+        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.gender")}</p>
         <div class="mb-5">
           <SegmentedControl
-            options={GENDER_FILTER_OPTIONS}
+            options={genderFilterOptions}
             value={$filterGender}
-            ariaLabel="Gender"
+            ariaLabel={t.t("common.gender")}
             onchange={(value) => filterGender.set(value)}
           />
         </div>
 
         <!-- Sex -->
-        <p class="mb-2 text-sm font-bold text-muted">Orientation</p>
+        <p class="mb-2 text-sm font-bold text-muted">
+          {t.t("common.orientation")}
+        </p>
         <div class="mb-5">
           <SegmentedControl
-            options={SEX_FILTER_OPTIONS}
+            options={sexFilterOptions}
             value={$filterSexualOrientation}
-            ariaLabel="Orientation"
+            ariaLabel={t.t("common.orientation")}
             onchange={(value) => filterSexualOrientation.set(value)}
           />
         </div>
 
         <!-- Age -->
         <div class="mb-2 flex items-center justify-between">
-          <p class="text-sm font-bold text-muted">Age range</p>
+          <p class="text-sm font-bold text-muted">{t.t("discover.ageRange")}</p>
           <span class="text-xs font-semibold text-muted"
             >{ageMinDraft} - {ageMaxDraft}</span
           >
@@ -490,9 +522,11 @@
 
         <!-- Distance -->
         <div class="mb-2 flex items-center justify-between">
-          <p class="text-sm font-bold text-muted">Distance</p>
+          <p class="text-sm font-bold text-muted">{t.t("discover.distance")}</p>
           <span class="text-xs font-semibold text-muted">
-            {distanceDraft ? `Within ${distanceDraft} km` : "Any"}
+            {distanceDraft
+              ? t.t("discover.withinKm", { count: distanceDraft })
+              : t.t("common.any")}
           </span>
         </div>
         <div class="mb-5">
@@ -519,18 +553,18 @@
               }}
               class="mt-1 text-xs font-semibold text-primary"
             >
-              Clear
+              {t.t("common.clear")}
             </button>
           {/if}
           {#if !hasCoords}
             <p class="mt-1 text-xs text-muted">
-              Enable location detection in your profile to filter by distance.
+              {t.t("discover.locationHint")}
             </p>
           {/if}
         </div>
 
         <!-- Sport -->
-        <p class="mb-2 text-sm font-bold text-muted">Sport</p>
+        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.sports")}</p>
         <div class="flex flex-col gap-1">
           <button
             onclick={() => pickActivity("")}
@@ -539,7 +573,7 @@
               ? 'bg-primary text-white'
               : 'text-text hover:bg-bg'}"
           >
-            All sports
+            {t.t("discover.allSports")}
           </button>
           {#each profileActivities as act}
             <button
@@ -550,7 +584,7 @@
                 : 'text-text hover:bg-bg'}"
             >
               <ActivityIcon id={act.id} class="size-4" />
-              {act.label}
+              {t.activity(act.id)}
             </button>
           {/each}
         </div>
@@ -567,15 +601,17 @@
     {:else if users.length === 0}
       <div class="flex flex-col items-center gap-4 text-center">
         <Moon class="size-16 text-muted" />
-        <p class="text-lg font-bold text-text">No more players</p>
+        <p class="text-lg font-bold text-text">
+          {t.t("discover.noMorePlayers")}
+        </p>
         <p class="text-sm text-muted">
-          Try changing your filters or check back later
+          {t.t("discover.tryFilters")}
         </p>
         <button
           onclick={loadFeed}
           class="rounded-2xl bg-primary px-6 py-3 font-bold text-white active:scale-95"
         >
-          Refresh
+          {t.t("discover.refresh")}
         </button>
       </div>
     {:else}
@@ -735,7 +771,7 @@
                     class="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
                   >
                     <ActivityIcon id={act.id} class="size-3.5" />
-                    {info?.label ?? act.id}
+                    {t.activity(act.id)}
                   </span>
                 {/each}
               </div>
@@ -749,6 +785,7 @@
         <button
           onclick={() => swipe("pass")}
           disabled={exiting}
+          aria-label={t.t("common.pass")}
           class="flex size-16 items-center justify-center rounded-full bg-surface text-3xl shadow-lg transition-transform active:scale-90 disabled:opacity-50"
         >
           <X class="size-7 text-error" />
@@ -756,6 +793,7 @@
         <button
           onclick={() => swipe("like")}
           disabled={exiting}
+          aria-label={t.t("common.like")}
           class="flex size-16 items-center justify-center rounded-full bg-primary text-3xl text-white shadow-lg transition-transform active:scale-90 disabled:opacity-50"
         >
           <Zap class="size-7" />
@@ -773,20 +811,22 @@
         class="flex flex-col items-center gap-4 rounded-3xl bg-surface p-10 shadow-2xl text-center mx-6"
       >
         <PartyPopper class="size-16 text-primary" />
-        <h2 class="text-3xl font-black text-primary">It's a Match!</h2>
-        <p class="text-muted">You can now chat and plan your session!</p>
+        <h2 class="text-3xl font-black text-primary">
+          {t.t("discover.matchTitle")}
+        </h2>
+        <p class="text-muted">{t.t("discover.matchHint")}</p>
         <div class="flex gap-3 w-full">
           <button
             onclick={() => (matchBanner = false)}
             class="flex-1 rounded-2xl border-2 border-border py-3 font-semibold text-text"
           >
-            Keep swiping
+            {t.t("common.keepSwiping")}
           </button>
           <a
             href="/matches"
             class="flex-1 rounded-2xl bg-primary py-3 text-center font-bold text-white"
           >
-            View matches
+            {t.t("matches.viewMatches")}
           </a>
         </div>
       </div>

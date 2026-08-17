@@ -1,5 +1,8 @@
 <script lang="ts">
   import { MapPin, Loader2, Pencil } from "@lucide/svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let {
     city = $bindable(""),
@@ -42,7 +45,7 @@
     error = "";
     manualEntry = false;
     if (!("geolocation" in navigator)) {
-      error = "Geolocation isn't supported on this device";
+      error = t.t("location.unsupported");
       return;
     }
 
@@ -64,15 +67,13 @@
       } catch {
         detected = await reverseGeocodeNominatim(latitude, longitude);
       }
-      if (!detected) throw new Error("Couldn't resolve your city");
+      if (!detected) throw new Error(t.t("location.resolveFailed"));
       city = detected;
       lat = latitude;
       lng = longitude;
     } catch (err: any) {
       error =
-        err.code === 1
-          ? "Location access denied"
-          : "Couldn't detect your location";
+        err.code === 1 ? t.t("location.denied") : t.t("location.detectFailed");
       manualEntry = true;
       manualCity = city;
     } finally {
@@ -103,7 +104,7 @@
       <input
         type="text"
         bind:value={manualCity}
-        placeholder="Enter your city"
+        placeholder={t.t("location.enterCity")}
         maxlength="80"
         onkeydown={(e) => e.key === "Enter" && saveManualCity()}
         class="flex-1 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base font-semibold text-text placeholder:text-text/40 focus:border-primary focus:outline-none"
@@ -114,7 +115,7 @@
         disabled={!manualCity.trim()}
         class="shrink-0 rounded-2xl bg-primary px-4 py-4 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
       >
-        Save
+        {t.t("common.save")}
       </button>
     </div>
   {:else if city}
@@ -129,7 +130,7 @@
         type="button"
         onclick={startManualEntry}
         class="shrink-0 text-primary"
-        aria-label="Edit city"
+        aria-label={t.t("location.editCity")}
       >
         <Pencil class="size-4" />
       </button>
@@ -142,7 +143,7 @@
         {#if locating}
           <Loader2 class="size-4 animate-spin" />
         {:else}
-          Refresh
+          {t.t("common.refresh")}
         {/if}
       </button>
     </div>
@@ -155,10 +156,10 @@
     >
       {#if locating}
         <Loader2 class="size-5 animate-spin" />
-        Detecting…
+        {t.t("location.detecting")}
       {:else}
         <MapPin class="size-5" />
-        Use my location
+        {t.t("location.useMyLocation")}
       {/if}
     </button>
   {/if}

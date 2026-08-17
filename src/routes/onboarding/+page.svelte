@@ -20,9 +20,35 @@
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let step = $state(1);
   const TOTAL_STEPS = 5;
+  let t = $derived(createTranslator($activeLanguage));
+  let genderOptions = $derived(
+    GENDER_OPTIONS.map((option) => ({
+      ...option,
+      label: t.gender(option.value),
+    })),
+  );
+  let orientationOptions = $derived(
+    ORIENTATIONS.map((option) => ({
+      ...option,
+      label: t.orientation(option.value),
+    })),
+  );
+  let formatOptions = $derived(
+    ACTIVITY_FORMAT_OPTIONS.map((option) => ({
+      ...option,
+      label: t.format(option.value),
+    })),
+  );
+  let skillOptions = $derived(
+    SKILL_LEVEL_OPTIONS.map((option) => ({
+      ...option,
+      label: t.skill(option.value),
+    })),
+  );
 
   // Step 1 — Basic info
   let displayName = $state("");
@@ -109,18 +135,20 @@
   </div>
 
   {#if step === 1}
-    <h2 class="mb-1 text-2xl font-black text-text">About you</h2>
-    <p class="mb-6 text-sm text-muted">Tell us who you are</p>
+    <h2 class="mb-1 text-2xl font-black text-text">
+      {t.t("onboarding.aboutYou")}
+    </h2>
+    <p class="mb-6 text-sm text-muted">{t.t("onboarding.aboutYouHint")}</p>
     <div class="flex flex-col gap-4">
       <input
         type="text"
         bind:value={displayName}
-        placeholder="Your name"
+        placeholder={t.t("onboarding.name")}
         class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
       />
       <textarea
         bind:value={bio}
-        placeholder="Short bio (optional)"
+        placeholder={t.t("onboarding.bioOptional")}
         rows={3}
         class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
       ></textarea>
@@ -130,31 +158,33 @@
           bind:value={age}
           min={16}
           max={80}
-          placeholder="Age"
+          placeholder={t.t("onboarding.age")}
           class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
         />
         <LocationPicker bind:city />
       </div>
       <SegmentedControl
-        options={GENDER_OPTIONS}
+        options={genderOptions}
         value={gender}
-        ariaLabel="Gender"
+        ariaLabel={t.t("common.gender")}
         onchange={(value) => (gender = value)}
         size="lg"
       />
       <div>
         <SegmentedControl
-          options={ORIENTATIONS}
+          options={orientationOptions}
           value={sexualOrientation}
-          ariaLabel="Orientation"
+          ariaLabel={t.t("common.orientation")}
           onchange={(value) => (sexualOrientation = value)}
           size="lg"
         />
       </div>
     </div>
   {:else if step === 2}
-    <h2 class="mb-1 text-2xl font-black text-text">Your sports</h2>
-    <p class="mb-6 text-sm text-muted">Pick the activities you enjoy</p>
+    <h2 class="mb-1 text-2xl font-black text-text">
+      {t.t("onboarding.yourSports")}
+    </h2>
+    <p class="mb-6 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
     <div class="grid grid-cols-2 gap-3">
       {#each ACTIVITIES as activity}
         <button
@@ -166,13 +196,17 @@
             : 'border-border bg-surface'}"
         >
           <ActivityIcon id={activity.id} class="size-7 text-primary" />
-          <span class="text-sm font-semibold text-text">{activity.label}</span>
+          <span class="text-sm font-semibold text-text"
+            >{t.activity(activity.id)}</span
+          >
         </button>
       {/each}
     </div>
   {:else if step === 3}
-    <h2 class="mb-1 text-2xl font-black text-text">Your settings</h2>
-    <p class="mb-6 text-sm text-muted">For each sport, pick format and level</p>
+    <h2 class="mb-1 text-2xl font-black text-text">
+      {t.t("onboarding.yourSettings")}
+    </h2>
+    <p class="mb-6 text-sm text-muted">{t.t("onboarding.settingsHint")}</p>
     <div class="flex flex-col gap-5">
       {#each selectedActivities as id}
         {@const activity = ACTIVITIES.find((a) => a.id === id)}
@@ -180,18 +214,18 @@
         <div class="rounded-2xl border-2 border-border bg-surface p-4">
           <p class="mb-3 flex items-center gap-2 font-bold text-text">
             <ActivityIcon {id} class="size-4 text-primary" />
-            {activity?.label}
+            {activity ? t.activity(activity.id) : t.activity(id)}
           </p>
           <div class="mb-3">
             <p
               class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
             >
-              Format
+              {t.t("common.format")}
             </p>
             <SegmentedControl
-              options={ACTIVITY_FORMAT_OPTIONS}
+              options={formatOptions}
               value={settings.format}
-              ariaLabel="Format for {activity?.label ?? id}"
+              ariaLabel={t.t("common.format")}
               onchange={(value) => (activitySettings[id].format = value)}
             />
           </div>
@@ -199,10 +233,10 @@
             <p
               class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
             >
-              Level
+              {t.t("common.level")}
             </p>
             <div class="flex gap-2">
-              {#each SKILL_LEVEL_OPTIONS as level}
+              {#each skillOptions as level}
                 <button
                   onclick={() =>
                     (activitySettings[id].level = level.value as SkillLevel)}
@@ -211,7 +245,7 @@
                     ? 'border-secondary-dark bg-secondary text-white'
                     : 'border-border text-muted'}"
                 >
-                  {level.label}
+                  {t.skill(level.value)}
                 </button>
               {/each}
             </div>
@@ -220,10 +254,11 @@
       {/each}
     </div>
   {:else if step === 4}
-    <h2 class="mb-1 text-2xl font-black text-text">Profile photos</h2>
+    <h2 class="mb-1 text-2xl font-black text-text">
+      {t.t("onboarding.profilePhotos")}
+    </h2>
     <p class="mb-6 text-sm text-muted">
-      Add up to 3 photos so others can find you (optional). The first one is
-      your main photo.
+      {t.t("onboarding.photosHint")}
     </p>
     <div class="flex flex-1 flex-col items-center justify-center gap-4">
       <div class="w-full">
@@ -231,8 +266,10 @@
       </div>
     </div>
   {:else if step === 5}
-    <h2 class="mb-1 text-2xl font-black text-text">Make it yours</h2>
-    <p class="mb-6 text-sm text-muted">Pick a look for the app</p>
+    <h2 class="mb-1 text-2xl font-black text-text">
+      {t.t("onboarding.makeItYours")}
+    </h2>
+    <p class="mb-6 text-sm text-muted">{t.t("onboarding.appearanceHint")}</p>
     <AppearancePicker />
     {#if error}
       <p class="mt-4 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
@@ -248,7 +285,7 @@
         onclick={back}
         class="flex-1 rounded-2xl border-2 border-border py-4 text-base font-semibold text-text active:scale-95"
       >
-        Back
+        {t.t("common.back")}
       </button>
     {/if}
     {#if step < TOTAL_STEPS}
@@ -257,7 +294,7 @@
         disabled={step === 1 && (!displayName || !city)}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
-        Continue
+        {t.t("common.continue")}
       </button>
     {:else}
       <button
@@ -265,7 +302,7 @@
         disabled={saving}
         class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-secondary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
-        {saving ? "Saving…" : "Let's go!"}
+        {saving ? t.t("common.saving") : t.t("common.letsGo")}
         {#if !saving}
           <Zap class="size-5" />
         {/if}

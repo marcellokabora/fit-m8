@@ -3,15 +3,19 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { authUser, userProfile } from "$lib/stores/auth";
+  import { activeLanguage } from "$lib/stores/language";
   import { activeTheme } from "$lib/stores/theme";
   import { onMount } from "svelte";
   import { registerSW } from "virtual:pwa-register";
+  import { createTranslator } from "$lib/stores/language";
 
   let { children } = $props();
+  let t = $derived(createTranslator($activeLanguage));
 
   const PUBLIC_ROUTES = ["/auth", "/"];
 
   onMount(() => {
+    activeLanguage.init();
     activeTheme.init();
 
     if (import.meta.env.PROD) {
@@ -36,10 +40,7 @@
 
 <svelte:head>
   <title>Fit-M8</title>
-  <meta
-    name="description"
-    content="Match people for sports activities near you"
-  />
+  <meta name="description" content={t.t("meta.description")} />
   {#if import.meta.env.PROD}
     <!-- manifest is only generated/served by vite-plugin-pwa in production builds -->
     <link rel="manifest" href="/manifest.webmanifest" />

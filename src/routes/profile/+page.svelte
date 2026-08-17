@@ -5,7 +5,11 @@
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
+  import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import { MapPin } from "@lucide/svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let photos = $derived(
     $userProfile?.photos ??
@@ -28,17 +32,20 @@
   <div
     class="sticky top-0 z-10 flex items-center justify-between bg-bg px-5 pb-3 pt-5"
   >
-    <h1 class="text-2xl font-black text-text">Profile</h1>
+    <h1 class="text-2xl font-black text-text">{t.t("nav.profile")}</h1>
     <a
       href="/profile/edit"
       class="rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95"
     >
-      Edit
+      {t.t("profile.edit")}
     </a>
   </div>
 
   <!-- Photos + basic info -->
-  <PhotoGallery {photos} alt={$userProfile?.displayName ?? "Profile photo"} />
+  <PhotoGallery
+    {photos}
+    alt={$userProfile?.displayName ?? t.t("common.profilePhoto")}
+  />
   <div class="flex flex-col items-center gap-3 px-5 pb-6 pt-4">
     <h2 class="text-xl font-black text-text">
       {$userProfile?.displayName ?? "—"}
@@ -59,10 +66,10 @@
   <!-- Activities -->
   <div class="px-5">
     <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      My Sports
+      {t.t("common.mySports")}
     </h3>
     {#if ($userProfile?.activities?.length ?? 0) === 0}
-      <p class="text-sm text-muted">No activities set</p>
+      <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
     {:else}
       <div class="flex flex-col gap-3">
         {#each $userProfile?.activities ?? [] as act}
@@ -76,9 +83,9 @@
               <ActivityIcon id={act.id} class="size-5" />
             </span>
             <div class="flex-1">
-              <p class="font-bold text-text">{info?.label ?? act.id}</p>
+              <p class="font-bold text-text">{t.activity(act.id)}</p>
               <p class="text-sm text-muted">
-                {formatLabel(act.format)} · {act.level}
+                {t.format(act.format)} · {t.skill(act.level)}
               </p>
             </div>
           </div>
@@ -89,11 +96,14 @@
 
   <!-- Logout -->
   <div class="mt-auto px-5 pt-8">
+    <div class="pb-6">
+      <LanguagePicker />
+    </div>
     <button
       onclick={logout}
-      class="w-full rounded-2xl border-2 border-error/30 py-4 text-base font-semibold text-error active:scale-95"
+      class="mt-5 w-full rounded-2xl border-2 border-error/30 py-4 text-base font-semibold text-error active:scale-95"
     >
-      Sign out
+      {t.t("profile.signOut")}
     </button>
   </div>
 

@@ -1,11 +1,14 @@
 <script lang="ts">
   import { Check, Sun, Moon } from "@lucide/svelte";
   import { activeTheme, THEMES } from "$lib/stores/theme";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 </script>
 
 <div>
   <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-    Appearance
+    {t.t("appearance.title")}
   </h3>
   <div class="mb-4 flex rounded-xl border-2 border-border bg-bg p-0.5">
     <button
@@ -16,7 +19,7 @@
         : 'text-muted'}"
     >
       <Sun class="size-4" />
-      Light
+      {t.t("appearance.light")}
     </button>
     <button
       onclick={() => activeTheme.selectMode("dark")}
@@ -26,12 +29,12 @@
         : 'text-muted'}"
     >
       <Moon class="size-4" />
-      Dark
+      {t.t("appearance.dark")}
     </button>
   </div>
 
   <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-    App Theme
+    {t.t("appearance.appTheme")}
   </h3>
   <div class="grid grid-cols-3 gap-3">
     {#each THEMES as theme}
@@ -53,7 +56,9 @@
             <Check class="size-5 text-white drop-shadow" />
           {/if}
         </span>
-        <span class="text-xs font-semibold text-text">{theme.label}</span>
+        <span class="text-xs font-semibold text-text"
+          >{t.t(`appearance.${theme.id}` as any)}</span
+        >
       </button>
     {/each}
   </div>

@@ -1,5 +1,8 @@
 <script lang="ts">
   import { User } from "@lucide/svelte";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
+
+  let t = $derived(createTranslator($activeLanguage));
 
   let { photos, alt }: { photos: string[]; alt: string } = $props();
 
@@ -44,12 +47,12 @@
   {#if photos.length > 1}
     <button
       onclick={prevPhoto}
-      aria-label="Previous photo"
+      aria-label={t.t("common.previousPhoto")}
       class="absolute inset-y-0 left-0 w-1/2"
     ></button>
     <button
       onclick={nextPhoto}
-      aria-label="Next photo"
+      aria-label={t.t("common.nextPhoto")}
       class="absolute inset-y-0 right-0 w-1/2"
     ></button>
   {/if}
