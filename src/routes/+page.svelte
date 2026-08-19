@@ -61,12 +61,14 @@
   <!-- Logo / Hero -->
   <div class="mt-4 flex flex-col items-center gap-4 text-text">
     <div
-      class="flex size-24 items-center justify-center rounded-3xl bg-primary p-4 text-white shadow-xl"
+      class="flex size-24 items-center justify-center rounded-3xl bg-primary text-white shadow-xl overflow-auto"
     >
       <Logo class="h-full w-full" />
     </div>
     {#if ready}
-      <h1 transition:fade class="text-5xl font-black tracking-tight">Fit-M8</h1>
+      <h1 transition:fade class="font-display text-5xl tracking-wide">
+        Fit-M8
+      </h1>
       <p transition:fade class="text-center text-lg font-medium text-muted">
         {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
       </p>

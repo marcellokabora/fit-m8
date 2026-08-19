@@ -4,6 +4,7 @@
   import { authUser } from "$lib/stores/auth";
   import Logo from "$lib/components/Logo.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import { Eye, EyeOff } from "@lucide/svelte";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -12,16 +13,12 @@
   );
   let email = $state("");
   let password = $state("");
-  let confirmPassword = $state("");
+  let passwordVisible = $state(false);
   let error = $state("");
   let loading = $state(false);
 
   async function handleEmail() {
     error = "";
-    if (mode === "register" && password !== confirmPassword) {
-      error = t.t("auth.passwordMismatch");
-      return;
-    }
     loading = true;
     try {
       if (mode === "login") {
@@ -57,11 +54,11 @@
   <div class="mb-8 flex flex-col items-center gap-2">
     <a
       href="/"
-      class="mb-2 flex size-14 items-center justify-center rounded-2xl bg-primary p-3 text-white"
+      class="mb-2 flex size-14 items-center justify-center rounded-2xl bg-primary text-white overflow-auto"
     >
       <Logo class="h-full w-full" />
     </a>
-    <h1 class="text-2xl font-black text-text">
+    <h1 class="font-display text-2xl tracking-wide text-text">
       {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
     </h1>
     <p class="text-sm text-muted">
@@ -130,24 +127,28 @@
       required
       class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
     />
-    <input
-      type="password"
-      bind:value={password}
-      placeholder={t.t("auth.password")}
-      required
-      minlength={6}
-      class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-    />
-    {#if mode === "register"}
+    <div class="relative">
       <input
-        type="password"
-        bind:value={confirmPassword}
-        placeholder={t.t("auth.confirmPassword")}
+        type={passwordVisible ? "text" : "password"}
+        bind:value={password}
+        placeholder={t.t("auth.password")}
         required
         minlength={6}
-        class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+        class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 pr-12 text-base text-text outline-none focus:border-primary"
       />
-    {/if}
+      <button
+        type="button"
+        onclick={() => (passwordVisible = !passwordVisible)}
+        tabindex="-1"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-muted"
+      >
+        {#if passwordVisible}
+          <EyeOff class="size-5" />
+        {:else}
+          <Eye class="size-5" />
+        {/if}
+      </button>
+    </div>
     {#if error}
       <p class="rounded-xl bg-error/10 px-4 py-3 text-sm text-error">{error}</p>
     {/if}
