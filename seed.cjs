@@ -46,6 +46,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'hetero',
 		bio: 'Love tennis and outdoor activities! 🎾',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'tennis', format: '1v1', level: 'basic' },
 			{ id: 'jogging', format: '1v1', level: 'expert' }
@@ -59,6 +61,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'gay',
 		bio: 'Padel enthusiast! Looking for a partner 🎾',
+		isSingle: true,
+		isTrainer: true,
 		activities: [
 			{ id: 'padel', format: '1v1', level: 'expert' },
 			{ id: 'gym', format: '1v1', level: 'basic' }
@@ -72,6 +76,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'hetero',
 		bio: 'Pickleball addict! Casual vibes 🥒',
+		isSingle: false,
+		isTrainer: false,
 		activities: [
 			{ id: 'pickleball', format: '1v1', level: 'expert' },
 			{ id: 'cycling', format: '1v1', level: 'basic' }
@@ -85,6 +91,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'hetero',
 		bio: 'Badminton player. Let\'s match! 🏸',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'badminton', format: '1v1', level: 'basic' },
 			{ id: 'gym', format: '1v1', level: 'expert' }
@@ -98,6 +106,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'gay',
 		bio: 'Rock climbing partner needed 🧗',
+		isSingle: false,
+		isTrainer: true,
 		activities: [
 			{ id: 'rock-climbing', format: '1v1', level: 'expert' },
 			{ id: 'hiking', format: '1v1', level: 'basic' }
@@ -111,6 +121,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'hetero',
 		bio: 'Ping pong is life! 🏓',
+		isSingle: false,
+		isTrainer: false,
 		activities: [
 			{ id: 'ping-pong', format: '1v1', level: 'expert' },
 			{ id: 'swimming', format: '1v1', level: 'basic' }
@@ -124,6 +136,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'hetero',
 		bio: 'Squash player looking for regular matches 📦',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'squash', format: '1v1', level: 'expert' },
 			{ id: 'gym', format: '1v1', level: 'basic' }
@@ -137,6 +151,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'gay',
 		bio: 'Martial arts enthusiast! Come train with me 🥋',
+		isSingle: true,
+		isTrainer: true,
 		activities: [
 			{ id: 'martial-arts', format: '1v1', level: 'basic' },
 			{ id: 'gym', format: '1v1', level: 'expert' }
@@ -150,6 +166,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'hetero',
 		bio: 'Golf lover! Weekend matches? ⛳',
+		isSingle: false,
+		isTrainer: false,
 		activities: [
 			{ id: 'golf', format: '1v1', level: 'basic' },
 			{ id: 'cycling', format: '1v1', level: 'expert' }
@@ -163,6 +181,8 @@ const fakeProfiles = [
 		gender: 'female',
 		orientation: 'hetero',
 		bio: 'Swimming and frescobol! Competitive spirit 🏊',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'swimming', format: '1v1', level: 'expert' },
 			{ id: 'frescobol', format: '1v1', level: 'basic' }
@@ -176,6 +196,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'hetero',
 		bio: 'Early runs and weekend tennis are my thing! 🎾',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'jogging', format: '1v1', level: 'basic' },
 			{ id: 'tennis', format: '1v1', level: 'expert' }
@@ -189,6 +211,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'gay',
 		bio: 'Looking for regular padel games after work 🎾',
+		isSingle: false,
+		isTrainer: true,
 		activities: [
 			{ id: 'padel', format: '2v2', level: 'basic' },
 			{ id: 'gym', format: '1v1', level: 'expert' }
@@ -202,6 +226,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'hetero',
 		bio: 'Basketball and good competition 🏀',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'basketball', format: '2v2', level: 'expert' },
 			{ id: 'calisthenics', format: '1v1', level: 'basic' }
@@ -215,6 +241,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'hetero',
 		bio: 'Cycling around the coast whenever I can 🚴',
+		isSingle: false,
+		isTrainer: false,
 		activities: [
 			{ id: 'cycling', format: '1v1', level: 'expert' },
 			{ id: 'swimming', format: '1v1', level: 'basic' }
@@ -228,6 +256,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'gay',
 		bio: 'Weekend hikes and climbing sessions 🧗',
+		isSingle: true,
+		isTrainer: true,
 		activities: [
 			{ id: 'hiking', format: '1v1', level: 'basic' },
 			{ id: 'rock-climbing', format: '1v1', level: 'expert' }
@@ -241,6 +271,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'hetero',
 		bio: 'Badminton player searching for a new rival 🏸',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'badminton', format: '1v1', level: 'basic' },
 			{ id: 'ping-pong', format: '1v1', level: 'expert' }
@@ -254,6 +286,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'hetero',
 		bio: 'Always ready for a pickleball match 🥒',
+		isSingle: false,
+		isTrainer: false,
 		activities: [
 			{ id: 'pickleball', format: '2v2', level: 'expert' },
 			{ id: 'squash', format: '1v1', level: 'basic' }
@@ -267,6 +301,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'hetero',
 		bio: 'Golf on Sundays, gym during the week ⛳',
+		isSingle: false,
+		isTrainer: true,
 		activities: [
 			{ id: 'golf', format: '1v1', level: 'basic' },
 			{ id: 'gym', format: '1v1', level: 'expert' }
@@ -280,6 +316,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'gay',
 		bio: 'Training martial arts and looking for partners 🥋',
+		isSingle: true,
+		isTrainer: true,
 		activities: [
 			{ id: 'martial-arts', format: '1v1', level: 'expert' },
 			{ id: 'frescobol', format: '1v1', level: 'basic' }
@@ -293,6 +331,8 @@ const fakeProfiles = [
 		gender: 'male',
 		orientation: 'hetero',
 		bio: 'Beach volleyball and swimming all summer 🏐',
+		isSingle: true,
+		isTrainer: false,
 		activities: [
 			{ id: 'beach-volley', format: '2v2', level: 'basic' },
 			{ id: 'swimming', format: '1v1', level: 'expert' }

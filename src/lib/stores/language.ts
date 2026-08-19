@@ -114,6 +114,8 @@ const MESSAGES = {
         'discover.tryFilters': 'Try changing your filters or check back later',
         'discover.withinKm': 'Within {count} km',
         'discover.noMorePlayers': 'No more players',
+        'discover.singleFilter': 'Only show singles',
+        'discover.trainerFilter': 'Only show trainers',
         'discover.matchTitle': "It's a Match!",
         'discover.matchHint': 'You can now chat and plan your session!',
         'discover.matchNone': 'No matches found',
@@ -143,6 +145,9 @@ const MESSAGES = {
         'profile.resetSwipes': 'Reset swipes',
         'profile.resettingSwipes': 'Resetting...',
         'profile.discovery': 'Discovery',
+        'profile.statusTitle': 'Status',
+        'profile.single': 'Single',
+        'profile.trainer': 'Trainer',
         'appearance.title': 'Appearance',
         'appearance.light': 'Light',
         'appearance.dark': 'Dark',
@@ -227,7 +232,12 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'common.language': 'Idioma',
         'common.name': 'Nombre',
         'common.biography': 'Biografía',
-        'common.location': 'Ubicación'
+        'common.location': 'Ubicación',
+        'discover.singleFilter': 'Mostrar solo solteros',
+        'discover.trainerFilter': 'Mostrar solo entrenadores',
+        'profile.statusTitle': 'Estado',
+        'profile.single': 'Soltero/a',
+        'profile.trainer': 'Entrenador/a'
     },
     pt: {
         'discover.matchNone': 'Nenhum resultado',

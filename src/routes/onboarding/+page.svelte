@@ -18,6 +18,7 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
@@ -56,6 +57,8 @@
   let age = $state<number>(25);
   let gender = $state<Gender>("male");
   let sexualOrientation = $state<SexualOrientation>("hetero");
+  let isSingle = $state(false);
+  let isTrainer = $state(false);
   let city = $state("");
   let lat = $state<number | undefined>(undefined);
   let lng = $state<number | undefined>(undefined);
@@ -110,6 +113,8 @@
         age,
         gender,
         orientation: sexualOrientation,
+        isSingle,
+        isTrainer,
         city,
         lat,
         lng,
@@ -181,6 +186,26 @@
           ariaLabel={t.t("common.orientation")}
           onchange={(value) => (sexualOrientation = value)}
           size="lg"
+        />
+      </div>
+      <div
+        class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
+      >
+        <p class="text-sm font-semibold text-text">{t.t("profile.single")}</p>
+        <Toggle
+          checked={isSingle}
+          ariaLabel={t.t("profile.single")}
+          onchange={(value) => (isSingle = value)}
+        />
+      </div>
+      <div
+        class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
+      >
+        <p class="text-sm font-semibold text-text">{t.t("profile.trainer")}</p>
+        <Toggle
+          checked={isTrainer}
+          ariaLabel={t.t("profile.trainer")}
+          onchange={(value) => (isTrainer = value)}
         />
       </div>
     </div>

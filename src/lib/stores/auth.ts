@@ -78,3 +78,5 @@ export const filterSexualOrientation = writable<SexualOrientation | ''>('');
 export const filterMinAge = writable<number | null>(null);
 export const filterMaxAge = writable<number | null>(null);
 export const filterMaxDistanceKm = writable<number | null>(DEFAULT_DISTANCE_KM);
+export const filterSingle = writable<boolean>(false);
+export const filterTrainer = writable<boolean>(false);

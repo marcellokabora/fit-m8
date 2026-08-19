@@ -27,6 +27,8 @@
     filterMinAge,
     filterMaxAge,
     filterMaxDistanceKm,
+    filterSingle,
+    filterTrainer,
   } from "$lib/stores/auth";
   import { getDiscoverFeed, recordSwipe } from "$lib/firebase/swipe";
   import {
@@ -73,19 +75,25 @@
     $filterFormat === "1v1" &&
       $filterLevel === "" &&
       $filterGender === oppositeGender &&
-      $filterSexualOrientation === myOrientation,
+      $filterSexualOrientation === myOrientation &&
+      $filterSingle === true &&
+      $filterTrainer === false,
   );
   let isFriendsPreset = $derived(
     $filterFormat === "" &&
       $filterLevel === "" &&
       $filterGender === myGender &&
-      $filterSexualOrientation === "",
+      $filterSexualOrientation === "" &&
+      $filterSingle === false &&
+      $filterTrainer === false,
   );
   let isTrainerPreset = $derived(
     $filterFormat === "" &&
       $filterLevel === "expert" &&
       $filterGender === "" &&
-      $filterSexualOrientation === "",
+      $filterSexualOrientation === "" &&
+      $filterSingle === false &&
+      $filterTrainer === true,
   );
   // Any filter set beyond the defaults, that isn't one of the quick presets above (those highlight themselves)
   let isCustomFilter = $derived(
@@ -99,7 +107,9 @@
         $filterSexualOrientation !== "" ||
         $filterMinAge !== null ||
         $filterMaxAge !== null ||
-        $filterMaxDistanceKm !== DEFAULT_DISTANCE_KM),
+        $filterMaxDistanceKm !== DEFAULT_DISTANCE_KM ||
+        $filterSingle !== false ||
+        $filterTrainer !== false),
   );
 
   // Backfill coordinates for profiles saved before distance filtering existed —
@@ -168,6 +178,8 @@
         ? DEFAULT_DISTANCE_KM
         : filters.maxDistanceKm,
     );
+    filterSingle.set(filters.single ?? false);
+    filterTrainer.set(filters.trainer ?? false);
   }
 
   async function saveFilters() {
@@ -183,6 +195,8 @@
         minAge: get(filterMinAge),
         maxAge: get(filterMaxAge),
         maxDistanceKm: get(filterMaxDistanceKm),
+        single: get(filterSingle),
+        trainer: get(filterTrainer),
       },
     });
   }
@@ -194,6 +208,8 @@
     filterLevel.set("");
     filterGender.set(oppositeGender);
     filterSexualOrientation.set(myOrientation);
+    filterSingle.set(true);
+    filterTrainer.set(false);
     saveFilters();
   }
 
@@ -203,6 +219,8 @@
     filterLevel.set("");
     filterGender.set(myGender);
     filterSexualOrientation.set("");
+    filterSingle.set(false);
+    filterTrainer.set(false);
     saveFilters();
   }
 
@@ -212,6 +230,8 @@
     filterLevel.set("expert");
     filterGender.set("");
     filterSexualOrientation.set("");
+    filterSingle.set(false);
+    filterTrainer.set(true);
     saveFilters();
   }
 
@@ -246,6 +266,8 @@
       get(filterMaxAge),
       get(filterMaxDistanceKm),
       { lat: profile?.lat, lng: profile?.lng },
+      get(filterSingle),
+      get(filterTrainer),
     );
     loading = false;
   }
@@ -262,6 +284,8 @@
     $filterMinAge;
     $filterMaxAge;
     $filterMaxDistanceKm;
+    $filterSingle;
+    $filterTrainer;
 
     if (
       $filterActivity &&

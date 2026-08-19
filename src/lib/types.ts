@@ -72,6 +72,10 @@ export interface DiscoverFilters {
 	maxAge: number | null;
 	// max distance from the current user, in km; null/undefined = no distance filter
 	maxDistanceKm: number | null;
+	// only show profiles marked as single
+	single: boolean;
+	// only show profiles marked as trainers
+	trainer: boolean;
 }
 
 // Default distance filter applied until the user picks their own value or explicitly clears it to "Any"
@@ -92,6 +96,10 @@ export interface UserProfile {
 	lat?: number;
 	lng?: number;
 	activities: UserActivity[];
+	// relationship status: true = single, undefined/false = not single
+	isSingle?: boolean;
+	// true if this user offers/works as a trainer
+	isTrainer?: boolean;
 	// undefined until the user has confirmed filters at least once from the Discover screen
 	discoverFilters?: DiscoverFilters;
 	createdAt: Date;

@@ -71,7 +71,9 @@ export async function getDiscoverFeed(
 	minAge: number | null = null,
 	maxAge: number | null = null,
 	maxDistanceKm: number | null = null,
-	currentCoords: { lat?: number; lng?: number } = {}
+	currentCoords: { lat?: number; lng?: number } = {},
+	singleFilter: boolean = false,
+	trainerFilter: boolean = false
 ): Promise<UserProfile[]> {
 	// Get users who we already swiped
 	const sentSnap = await getDocs(collection(db, 'swipes', currentUid, 'sent'));
@@ -98,6 +100,8 @@ export async function getDiscoverFeed(
 			continue;
 		if (minAge !== null && data.age < minAge) continue;
 		if (maxAge !== null && data.age > maxAge) continue;
+		if (singleFilter && !data.isSingle) continue;
+		if (trainerFilter && !data.isTrainer) continue;
 
 		// Distance filter only applies when we know both locations; candidates without
 		// coordinates can't be verified as out of range, so they're kept rather than dropped.

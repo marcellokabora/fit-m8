@@ -4,6 +4,7 @@
   import BackHeader from "$lib/components/BackHeader.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import Toggle from "$lib/components/Toggle.svelte";
   import {
     authUser,
     userProfile,
@@ -15,8 +16,11 @@
     filterMinAge,
     filterMaxAge,
     filterMaxDistanceKm,
+    filterSingle,
+    filterTrainer,
   } from "$lib/stores/auth";
   import { getDiscoverFeed } from "$lib/firebase/swipe";
+  import { Loader2, RotateCcw, Users } from "@lucide/svelte";
   import {
     ACTIVITIES,
     GENDER_OPTIONS,
@@ -107,6 +111,8 @@
   let ageMinDraft = $state(get(filterMinAge) ?? AGE_MIN);
   let ageMaxDraft = $state(get(filterMaxAge) ?? AGE_MAX);
   let distanceDraft = $state<number | null>(get(filterMaxDistanceKm));
+  let draftSingle = $state(get(filterSingle));
+  let draftTrainer = $state(get(filterTrainer));
 
   function updateAgeMinDraft(value: number) {
     ageMinDraft = Math.min(value, ageMaxDraft);
@@ -129,10 +135,13 @@
     ageMinDraft = AGE_MIN;
     ageMaxDraft = AGE_MAX;
     distanceDraft = DEFAULT_DISTANCE_KM;
+    draftSingle = false;
+    draftTrainer = false;
   }
 
   // Live count of profiles matching the in-progress draft filters, shown inside the Save button.
   let previewCount = $state(0);
+  let previewLoading = $state(false);
   let previewToken = 0;
   let previewDebounce: ReturnType<typeof setTimeout> | undefined;
   let saveLabel = $derived(
@@ -145,8 +154,12 @@
 
   async function updatePreviewCount() {
     const uid = get(authUser)?.uid;
-    if (!uid) return;
+    if (!uid) {
+      previewLoading = false;
+      return;
+    }
     const token = ++previewToken;
+    previewLoading = true;
     const profile = get(userProfile);
     const results = await getDiscoverFeed(
       uid,
@@ -160,8 +173,13 @@
       ageMaxDraft === AGE_MAX ? null : ageMaxDraft,
       distanceDraft,
       { lat: profile?.lat, lng: profile?.lng },
+      draftSingle,
+      draftTrainer,
     );
-    if (token === previewToken) previewCount = results.length;
+    if (token === previewToken) {
+      previewCount = results.length;
+      previewLoading = false;
+    }
   }
 
   $effect(() => {
@@ -174,6 +192,9 @@
     ageMinDraft;
     ageMaxDraft;
     distanceDraft;
+    draftSingle;
+    draftTrainer;
+    previewLoading = true;
     clearTimeout(previewDebounce);
     previewDebounce = setTimeout(updatePreviewCount, 300);
   });
@@ -187,6 +208,8 @@
     filterMinAge.set(ageMinDraft === AGE_MIN ? null : ageMinDraft);
     filterMaxAge.set(ageMaxDraft === AGE_MAX ? null : ageMaxDraft);
     filterMaxDistanceKm.set(distanceDraft);
+    filterSingle.set(draftSingle);
+    filterTrainer.set(draftTrainer);
 
     const uid = get(authUser)?.uid;
     if (uid) {
@@ -200,6 +223,8 @@
           minAge: ageMinDraft === AGE_MIN ? null : ageMinDraft,
           maxAge: ageMaxDraft === AGE_MAX ? null : ageMaxDraft,
           maxDistanceKm: distanceDraft,
+          single: draftSingle,
+          trainer: draftTrainer,
         },
       });
     }
@@ -211,7 +236,11 @@
   <BackHeader href="/discover">
     <div class="flex flex-1 items-center justify-between">
       <h1 class="text-lg font-black text-text">{t.t("discover.filters")}</h1>
-      <button onclick={resetFilters} class="text-sm font-semibold text-primary">
+      <button
+        onclick={resetFilters}
+        class="flex items-center gap-1 text-sm font-semibold text-primary"
+      >
+        <RotateCcw class="size-4" />
         {t.t("common.clear")}
       </button>
     </div>
@@ -261,6 +290,28 @@
         value={draftOrientation}
         ariaLabel={t.t("common.orientation")}
         onchange={(value) => (draftOrientation = value)}
+      />
+    </div>
+
+    <!-- Single / Trainer -->
+    <div class="mb-5 flex items-center justify-between">
+      <p class="text-sm font-bold text-muted">
+        {t.t("discover.singleFilter")}
+      </p>
+      <Toggle
+        checked={draftSingle}
+        ariaLabel={t.t("discover.singleFilter")}
+        onchange={(value) => (draftSingle = value)}
+      />
+    </div>
+    <div class="mb-5 flex items-center justify-between">
+      <p class="text-sm font-bold text-muted">
+        {t.t("discover.trainerFilter")}
+      </p>
+      <Toggle
+        checked={draftTrainer}
+        ariaLabel={t.t("discover.trainerFilter")}
+        onchange={(value) => (draftTrainer = value)}
       />
     </div>
 
@@ -382,9 +433,15 @@
   <div class="border-t border-border bg-surface p-4">
     <button
       onclick={applyAndBack}
-      class="w-full rounded-2xl bg-primary py-3.5 font-bold text-white active:scale-95"
+      class="relative flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 font-bold text-white active:scale-95"
     >
-      {saveLabel}
+      <span class="flex items-center gap-2 {previewLoading ? 'opacity-0' : ''}">
+        <Users class="size-5" />
+        {saveLabel}
+      </span>
+      {#if previewLoading}
+        <Loader2 class="absolute size-5 animate-spin" />
+      {/if}
     </button>
   </div>
 </div>

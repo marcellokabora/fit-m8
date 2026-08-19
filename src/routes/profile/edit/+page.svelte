@@ -10,6 +10,7 @@
   import { get } from "svelte/store";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import { Check, Loader2, RotateCcw, X } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
@@ -36,7 +37,7 @@
   let languageOptions = $derived(
     LANGUAGES.map((option) => ({
       value: option.code,
-      label: t.t(`language.${option.code}` as any),
+      label: option.code.toUpperCase(),
     })),
   );
   let saving = $state(false);
@@ -52,6 +53,8 @@
     $userProfile?.orientation ?? "hetero",
   );
   let gender = $state<Gender | "">($userProfile?.gender ?? "");
+  let isSingle = $state($userProfile?.isSingle ?? false);
+  let isTrainer = $state($userProfile?.isTrainer ?? false);
   let photos = $state<string[]>(
     $userProfile?.photos ??
       ($userProfile?.photoURL ? [$userProfile.photoURL] : []),
@@ -67,6 +70,8 @@
       lng = $userProfile.lng;
       sexualOrientation = $userProfile.orientation ?? "hetero";
       gender = $userProfile.gender ?? "";
+      isSingle = $userProfile.isSingle ?? false;
+      isTrainer = $userProfile.isTrainer ?? false;
       photos =
         $userProfile.photos ??
         ($userProfile.photoURL ? [$userProfile.photoURL] : []);
@@ -90,6 +95,8 @@
         lng,
         gender,
         orientation: sexualOrientation,
+        isSingle,
+        isTrainer,
       });
     }
     saving = false;
@@ -186,6 +193,33 @@
       ariaLabel={t.t("common.orientation")}
       onchange={(value) => (sexualOrientation = value)}
     />
+  </div>
+
+  <!-- Status -->
+  <div class="px-5 pb-8">
+    <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+      {t.t("profile.statusTitle")}
+    </h3>
+    <div
+      class="flex items-center justify-between rounded-2xl bg-surface px-4 py-3"
+    >
+      <p class="text-sm font-semibold text-text">{t.t("profile.single")}</p>
+      <Toggle
+        checked={isSingle}
+        ariaLabel={t.t("profile.single")}
+        onchange={(value) => (isSingle = value)}
+      />
+    </div>
+    <div
+      class="mt-3 flex items-center justify-between rounded-2xl bg-surface px-4 py-3"
+    >
+      <p class="text-sm font-semibold text-text">{t.t("profile.trainer")}</p>
+      <Toggle
+        checked={isTrainer}
+        ariaLabel={t.t("profile.trainer")}
+        onchange={(value) => (isTrainer = value)}
+      />
+    </div>
   </div>
 
   <!-- Language -->
