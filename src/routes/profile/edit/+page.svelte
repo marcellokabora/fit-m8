@@ -11,7 +11,7 @@
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
-  import { X, RotateCcw } from "@lucide/svelte";
+  import { Check, Loader2, RotateCcw, X } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
   import {
@@ -121,8 +121,13 @@
     <button
       onclick={save}
       disabled={saving}
-      class="rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95 disabled:opacity-50"
+      class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95 disabled:opacity-50"
     >
+      {#if saving}
+        <Loader2 class="size-4 animate-spin" />
+      {:else}
+        <Check class="size-4" />
+      {/if}
       {saving ? t.t("common.saving") : t.t("common.save")}
     </button>
   </div>
@@ -148,7 +153,7 @@
       </h3>
       <textarea
         bind:value={bio}
-        rows={2}
+        rows={3}
         placeholder={t.t("profile.bio")}
         class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
       ></textarea>
@@ -171,7 +176,6 @@
       value={gender}
       ariaLabel={t.t("common.gender")}
       onchange={(value) => (gender = value)}
-      size="lg"
     />
     <h3 class="mb-2 mt-4 text-sm font-bold uppercase tracking-wide text-muted">
       {t.t("common.orientation")}
@@ -181,7 +185,6 @@
       value={sexualOrientation}
       ariaLabel={t.t("common.orientation")}
       onchange={(value) => (sexualOrientation = value)}
-      size="lg"
     />
   </div>
 
@@ -195,7 +198,6 @@
       value={$activeLanguage}
       ariaLabel={t.t("common.language")}
       onchange={(value) => activeLanguage.selectLanguage(value)}
-      size="lg"
     />
   </div>
 

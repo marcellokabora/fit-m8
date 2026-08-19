@@ -116,6 +116,9 @@ const MESSAGES = {
         'discover.noMorePlayers': 'No more players',
         'discover.matchTitle': "It's a Match!",
         'discover.matchHint': 'You can now chat and plan your session!',
+        'discover.matchNone': 'No matches found',
+        'discover.matchOne': 'Match 1 person',
+        'discover.matchMany': 'Match {count} people',
         'matches.subtitle': 'People you matched with',
         'matches.loadError': "Couldn't load matches",
         'matches.emptyTitle': 'No matches yet',
@@ -209,6 +212,9 @@ export type TranslationParams = Record<string, string | number>;
 const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string>>> = {
     en: {},
     es: {
+        'discover.matchNone': 'Ningún resultado',
+        'discover.matchOne': 'Conectar con 1 persona',
+        'discover.matchMany': 'Conectar con {count} personas',
         'profile.distanceAway': 'A {count} km',
         'intro.skip': 'Omitir',
         'intro.next': 'Siguiente',
@@ -224,6 +230,9 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'common.location': 'Ubicación'
     },
     pt: {
+        'discover.matchNone': 'Nenhum resultado',
+        'discover.matchOne': 'Ligar com 1 pessoa',
+        'discover.matchMany': 'Ligar com {count} pessoas',
         'profile.distanceAway': 'A {count} km',
         'intro.skip': 'Saltar',
         'intro.next': 'Seguinte',

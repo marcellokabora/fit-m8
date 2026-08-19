@@ -40,7 +40,7 @@ const db = getFirestore();
 const fakeProfiles = [
 	{
 		displayName: 'Sarah',
-		photoURL: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 19,
 		city: 'Barcelona',
 		gender: 'female',

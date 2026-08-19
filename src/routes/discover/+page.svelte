@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { fly, fade, scale } from "svelte/transition";
+  import { scale } from "svelte/transition";
   import {
     SlidersHorizontal,
     User,
@@ -14,7 +14,6 @@
     Zap,
     PartyPopper,
   } from "@lucide/svelte";
-  import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Loading from "$lib/components/Loading.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
   import {
@@ -32,9 +31,6 @@
   import { getDiscoverFeed, recordSwipe } from "$lib/firebase/swipe";
   import {
     ACTIVITIES,
-    GENDER_OPTIONS,
-    ORIENTATIONS,
-    SKILL_LEVEL_OPTIONS,
     DEFAULT_DISTANCE_KM,
     type DiscoverFilters,
     type Gender,
@@ -43,7 +39,6 @@
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import IntroSlides from "$lib/components/IntroSlides.svelte";
-  import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -56,56 +51,6 @@
     localStorage.setItem(INTRO_SEEN_KEY, "1");
   }
 
-  const FORMAT_FILTER_OPTIONS = [
-    { value: "", label: "" },
-    { value: "1v1", label: "1v1" },
-    { value: "2v2", label: "2v2" },
-    { value: "group", label: "4+" },
-  ] as const;
-
-  const GENDER_FILTER_OPTIONS = [
-    { value: "", label: "" },
-    ...GENDER_OPTIONS,
-  ] as const;
-
-  const LEVEL_FILTER_OPTIONS = [
-    { value: "", label: "" },
-    ...SKILL_LEVEL_OPTIONS,
-  ] as const;
-
-  const SEX_FILTER_OPTIONS = [
-    { value: "", label: "" },
-    ...ORIENTATIONS,
-  ] as const;
-
-  let formatFilterOptions = $derived(
-    FORMAT_FILTER_OPTIONS.map((option) => ({
-      ...option,
-      label: option.value ? t.format(option.value) : t.t("common.all"),
-    })),
-  );
-  let genderFilterOptions = $derived(
-    GENDER_FILTER_OPTIONS.map((option) => ({
-      ...option,
-      label: option.value ? t.gender(option.value) : t.t("common.all"),
-    })),
-  );
-  let levelFilterOptions = $derived(
-    LEVEL_FILTER_OPTIONS.map((option) => ({
-      ...option,
-      label: option.value ? t.skill(option.value) : t.t("common.all"),
-    })),
-  );
-  let sexFilterOptions = $derived(
-    SEX_FILTER_OPTIONS.map((option) => ({
-      ...option,
-      label: option.value ? t.orientation(option.value) : t.t("common.all"),
-    })),
-  );
-
-  const AGE_MIN = 18;
-  const AGE_MAX = 60;
-
   let users = $state<UserProfile[]>([]);
   let loading = $state(true);
   let matchBanner = $state(false);
@@ -115,9 +60,6 @@
         (profileActivity) => profileActivity.id === activity.id,
       ),
     ),
-  );
-  let hasCoords = $derived(
-    $userProfile?.lat !== undefined && $userProfile?.lng !== undefined,
   );
 
   // Used by the Dating/Friends quick-filter presets below
@@ -145,42 +87,20 @@
       $filterGender === "" &&
       $filterSexualOrientation === "",
   );
-
-  // Draft slider values track drag position live; the underlying filter
-  // stores (which trigger the Firestore query) only get updated on release.
-  let ageMinDraft = $state(AGE_MIN);
-  let ageMaxDraft = $state(AGE_MAX);
-  let distanceDraft = $state<number | null>(DEFAULT_DISTANCE_KM);
-
-  $effect(() => {
-    ageMinDraft = $filterMinAge ?? AGE_MIN;
-  });
-  $effect(() => {
-    ageMaxDraft = $filterMaxAge ?? AGE_MAX;
-  });
-  $effect(() => {
-    distanceDraft = $filterMaxDistanceKm;
-  });
-
-  function updateAgeMinDraft(value: number) {
-    ageMinDraft = Math.min(value, ageMaxDraft);
-  }
-
-  function updateAgeMaxDraft(value: number) {
-    ageMaxDraft = Math.max(value, ageMinDraft);
-  }
-
-  function commitAgeMin() {
-    filterMinAge.set(ageMinDraft === AGE_MIN ? null : ageMinDraft);
-  }
-
-  function commitAgeMax() {
-    filterMaxAge.set(ageMaxDraft === AGE_MAX ? null : ageMaxDraft);
-  }
-
-  function commitDistance() {
-    filterMaxDistanceKm.set(distanceDraft);
-  }
+  // Any filter set beyond the defaults, that isn't one of the quick presets above (those highlight themselves)
+  let isCustomFilter = $derived(
+    !isDatingPreset &&
+      !isFriendsPreset &&
+      !isTrainerPreset &&
+      ($filterActivity !== "" ||
+        $filterFormat !== "" ||
+        $filterLevel !== "" ||
+        $filterGender !== "" ||
+        $filterSexualOrientation !== "" ||
+        $filterMinAge !== null ||
+        $filterMaxAge !== null ||
+        $filterMaxDistanceKm !== DEFAULT_DISTANCE_KM),
+  );
 
   // Backfill coordinates for profiles saved before distance filtering existed —
   // only runs if the browser already granted geolocation, so it never prompts.
@@ -230,13 +150,8 @@
     photoIndex = 0;
   });
 
-  let filtersOpen = $state(false);
   // uid for which we've already synced filter stores from Firestore, so we don't redo it on every profile update
   let filtersSyncedFor = $state<string | null>(null);
-
-  function pickActivity(id: string) {
-    filterActivity.set(id);
-  }
 
   function applyFilters(filters: DiscoverFilters) {
     filterActivity.set(filters.activity);
@@ -270,11 +185,6 @@
         maxDistanceKm: get(filterMaxDistanceKm),
       },
     });
-  }
-
-  function closeFilters() {
-    filtersOpen = false;
-    saveFilters();
   }
 
   // Quick presets shown as buttons next to the filters icon; each resets activity to "any" and saves immediately
@@ -315,7 +225,7 @@
     if (profile.discoverFilters) {
       applyFilters(profile.discoverFilters);
     } else {
-      filtersOpen = true;
+      goto("/discover/filters");
     }
   });
 
@@ -490,214 +400,16 @@
         <Dumbbell class="size-5" />
       </button>
       <button
-        onclick={() => (filtersOpen = true)}
-        class="flex size-9 items-center justify-center rounded-full bg-surface shadow-sm"
+        onclick={() => goto("/discover/filters")}
+        class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
+          ? 'bg-primary text-white'
+          : 'bg-surface text-text'}"
         aria-label={t.t("discover.filters")}
       >
-        <SlidersHorizontal class="size-5 text-text" />
+        <SlidersHorizontal class="size-5" />
       </button>
     </div>
   </div>
-
-  <!-- Filters side nav -->
-  {#if filtersOpen}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      transition:fade={{ duration: 200 }}
-      class="fixed inset-0 z-50 flex justify-end bg-black/40"
-      onclick={closeFilters}
-    >
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div
-        onclick={(e) => e.stopPropagation()}
-        transition:fly={{ x: 300, duration: 250, opacity: 1 }}
-        class="flex h-full w-full max-w-sm flex-col overflow-y-auto bg-surface p-5"
-      >
-        <div class="mb-4 flex items-center justify-between">
-          <h2 class="text-lg font-black text-text">
-            {t.t("discover.filters")}
-          </h2>
-          <button
-            onclick={closeFilters}
-            class="flex size-8 items-center justify-center rounded-full bg-bg text-muted"
-          >
-            <X class="size-4" />
-          </button>
-        </div>
-
-        <!-- Format -->
-        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.format")}</p>
-        <div class="mb-5">
-          <SegmentedControl
-            options={formatFilterOptions}
-            value={$filterFormat}
-            ariaLabel={t.t("common.format")}
-            onchange={(value) => filterFormat.set(value)}
-          />
-        </div>
-
-        <!-- Level -->
-        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.level")}</p>
-        <div class="mb-5">
-          <SegmentedControl
-            options={levelFilterOptions}
-            value={$filterLevel}
-            ariaLabel={t.t("common.level")}
-            onchange={(value) => filterLevel.set(value)}
-          />
-        </div>
-
-        <!-- Gender -->
-        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.gender")}</p>
-        <div class="mb-5">
-          <SegmentedControl
-            options={genderFilterOptions}
-            value={$filterGender}
-            ariaLabel={t.t("common.gender")}
-            onchange={(value) => filterGender.set(value)}
-          />
-        </div>
-
-        <!-- Sex -->
-        <p class="mb-2 text-sm font-bold text-muted">
-          {t.t("common.orientation")}
-        </p>
-        <div class="mb-5">
-          <SegmentedControl
-            options={sexFilterOptions}
-            value={$filterSexualOrientation}
-            ariaLabel={t.t("common.orientation")}
-            onchange={(value) => filterSexualOrientation.set(value)}
-          />
-        </div>
-
-        <!-- Age -->
-        <div class="mb-2 flex items-center justify-between">
-          <p class="text-sm font-bold text-muted">{t.t("discover.ageRange")}</p>
-          <span class="text-xs font-semibold text-muted"
-            >{ageMinDraft} - {ageMaxDraft}</span
-          >
-        </div>
-        <div class="relative mb-5 h-6">
-          <div
-            class="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-border"
-          ></div>
-          <div
-            class="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary"
-            style="left: {((ageMinDraft - AGE_MIN) / (AGE_MAX - AGE_MIN)) *
-              100}%; right: {100 -
-              ((ageMaxDraft - AGE_MIN) / (AGE_MAX - AGE_MIN)) * 100}%;"
-          ></div>
-          <input
-            type="range"
-            min={AGE_MIN}
-            max={AGE_MAX}
-            value={ageMinDraft}
-            oninput={(e) =>
-              updateAgeMinDraft(
-                Number((e.currentTarget as HTMLInputElement).value),
-              )}
-            onchange={commitAgeMin}
-            class="range-thumb absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary"
-          />
-          <input
-            type="range"
-            min={AGE_MIN}
-            max={AGE_MAX}
-            value={ageMaxDraft}
-            oninput={(e) =>
-              updateAgeMaxDraft(
-                Number((e.currentTarget as HTMLInputElement).value),
-              )}
-            onchange={commitAgeMax}
-            class="range-thumb absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary"
-          />
-        </div>
-
-        <!-- Distance -->
-        <div class="mb-2 flex items-center justify-between">
-          <p class="text-sm font-bold text-muted">{t.t("discover.distance")}</p>
-          <span class="text-xs font-semibold text-muted">
-            {distanceDraft
-              ? t.t("discover.withinKm", { count: distanceDraft })
-              : t.t("common.any")}
-          </span>
-        </div>
-        <div class="relative mb-1 h-6">
-          <div
-            class="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-border"
-          ></div>
-          <div
-            class="absolute inset-y-0 left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary"
-            style="width: {((Math.min(distanceDraft ?? 30, 30) - 1) /
-              (30 - 1)) *
-              100}%;"
-          ></div>
-          <input
-            type="range"
-            min="1"
-            max="30"
-            step="1"
-            disabled={!hasCoords}
-            value={distanceDraft ?? 30}
-            oninput={(e) => {
-              distanceDraft = Number(
-                (e.currentTarget as HTMLInputElement).value,
-              );
-            }}
-            onchange={commitDistance}
-            class="absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary disabled:opacity-40"
-          />
-        </div>
-        <div class="mb-5">
-          {#if distanceDraft !== null}
-            <button
-              onclick={() => {
-                distanceDraft = null;
-                commitDistance();
-              }}
-              class="mt-1 text-xs font-semibold text-primary"
-            >
-              {t.t("common.clear")}
-            </button>
-          {/if}
-          {#if !hasCoords}
-            <p class="mt-1 text-xs text-muted">
-              {t.t("discover.locationHint")}
-            </p>
-          {/if}
-        </div>
-
-        <!-- Sport -->
-        <p class="mb-2 text-sm font-bold text-muted">{t.t("common.sports")}</p>
-        <div class="flex flex-col gap-1">
-          <button
-            onclick={() => pickActivity("")}
-            class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {$filterActivity ===
-            ''
-              ? 'bg-primary text-white'
-              : 'text-text hover:bg-bg'}"
-          >
-            {t.t("discover.allSports")}
-          </button>
-          {#each profileActivities as act}
-            <button
-              onclick={() => pickActivity(act.id)}
-              class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {$filterActivity ===
-              act.id
-                ? 'bg-primary text-white'
-                : 'text-text hover:bg-bg'}"
-            >
-              <ActivityIcon id={act.id} class="size-4" />
-              {t.activity(act.id)}
-            </button>
-          {/each}
-        </div>
-      </div>
-    </div>
-  {/if}
 
   <!-- Card stack -->
   <div
@@ -906,17 +618,3 @@
 {#if showIntro}
   <IntroSlides onclose={dismissIntro} />
 {/if}
-
-<style>
-  /* Two overlapping range inputs form one dual-thumb slider; only the thumbs
-     should capture pointer events so clicks pass through to the top-most track. */
-  .range-thumb {
-    pointer-events: none;
-  }
-  .range-thumb::-webkit-slider-thumb {
-    pointer-events: auto;
-  }
-  .range-thumb::-moz-range-thumb {
-    pointer-events: auto;
-  }
-</style>

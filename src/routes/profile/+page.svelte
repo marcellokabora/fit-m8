@@ -15,7 +15,7 @@
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import SportPickerModal from "$lib/components/SportPickerModal.svelte";
-  import { ChevronDown, MapPin, Plus, Trash2 } from "@lucide/svelte";
+  import { ChevronDown, MapPin, Pencil, Plus, Trash2 } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -116,8 +116,9 @@
     <h1 class="text-2xl font-black text-text">{t.t("nav.profile")}</h1>
     <a
       href="/profile/edit"
-      class="rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95"
+      class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95"
     >
+      <Pencil class="size-4" />
       {t.t("profile.edit")}
     </a>
   </div>
