@@ -14,6 +14,7 @@
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import SportPickerModal from "$lib/components/SportPickerModal.svelte";
   import { ChevronDown, MapPin, Plus, Trash2 } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
@@ -82,19 +83,13 @@
     selectedNewIds = [];
   }
 
-  function toggleNewSelection(id: string) {
-    selectedNewIds = selectedNewIds.includes(id)
-      ? selectedNewIds.filter((x) => x !== id)
-      : [...selectedNewIds, id];
-  }
-
   function confirmAddSport() {
     if (selectedNewIds.length === 0) return;
     void saveActivities([
       ...activities,
       ...selectedNewIds.map((id) => ({
         id,
-        format: "1v1" as ActivityFormat,
+        format: "all" as ActivityFormat,
         level: "basic" as SkillLevel,
       })),
     ]);
@@ -178,7 +173,8 @@
               <div class="flex-1">
                 <p class="font-bold text-text">{t.activity(act.id)}</p>
                 <p class="text-sm text-muted">
-                  {t.format(act.format)} · {t.skill(act.level)}
+                  {#if act.format !== "all"}{t.format(act.format)}·
+                  {/if}{t.skill(act.level)}
                 </p>
               </div>
               {#if expanded}
@@ -229,50 +225,8 @@
       </div>
     {/if}
 
-    {#if showAddSport}
-      <div
-        class="rounded-2xl border-2 border-dashed border-primary/40 bg-surface p-4"
-      >
-        <p class="mb-3 text-sm font-bold text-text">
-          {t.t("profile.addSport")}
-        </p>
-        {#if availableActivities.length === 0}
-          <p class="text-sm text-muted">{t.t("profile.allSports")}</p>
-        {:else}
-          <div class="grid grid-cols-2 gap-2">
-            {#each availableActivities as activity}
-              <button
-                onclick={() => toggleNewSelection(activity.id)}
-                class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 {selectedNewIds.includes(
-                  activity.id,
-                )
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border bg-bg'}"
-              >
-                <ActivityIcon id={activity.id} class="size-6 text-primary" />
-                <span class="text-xs font-semibold text-text"
-                  >{t.activity(activity.id)}</span
-                >
-              </button>
-            {/each}
-          </div>
-        {/if}
-        <div class="mt-4 flex gap-3">
-          <button
-            onclick={() => (showAddSport = false)}
-            class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
-            >{t.t("common.cancel")}</button
-          >
-          <button
-            onclick={confirmAddSport}
-            disabled={selectedNewIds.length === 0}
-            class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
-            >{selectedNewIds.length > 1
-              ? t.t("profile.addSports", { count: selectedNewIds.length })
-              : t.t("profile.addSportButton")}</button
-          >
-        </div>
-      </div>
+    {#if availableActivities.length === 0}
+      <p class="text-sm text-muted">{t.t("profile.allSports")}</p>
     {:else}
       <button
         onclick={openAddSport}
@@ -283,6 +237,16 @@
       </button>
     {/if}
   </div>
+
+  {#if showAddSport}
+    <SportPickerModal
+      activities={availableActivities}
+      bind:selectedIds={selectedNewIds}
+      {t}
+      onCancel={() => (showAddSport = false)}
+      onConfirm={confirmAddSport}
+    />
+  {/if}
 
   <!-- Logout -->
   <div class="mt-auto px-5 pt-8">

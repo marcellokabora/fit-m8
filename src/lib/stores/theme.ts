@@ -89,8 +89,8 @@ export interface ThemeState {
     mode: ThemeMode;
 }
 
-const THEME_KEY = 'fitmate-theme';
-const MODE_KEY = 'fitmate-theme-mode';
+const THEME_KEY = 'fit-m8-theme';
+const MODE_KEY = 'fit-m8-theme-mode';
 const DEFAULT_STATE: ThemeState = { themeId: THEMES[0].id, mode: 'dark' };
 
 function applyState(state: ThemeState) {

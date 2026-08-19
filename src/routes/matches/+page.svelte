@@ -144,7 +144,8 @@
             </p>
             <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
               <ActivityIcon id={match.activity} class="size-3.5" />
-              {t.activity(match.activity)} · {t.format(match.format)}
+              {t.activity(match.activity)}{#if match.format !== "all"}·
+                {t.format(match.format)}{/if}
             </p>
             <!-- {#if match.lastMessage}
               <p

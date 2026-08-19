@@ -40,6 +40,16 @@
         : [],
   );
 
+  let mySportIds = $derived(
+    new Set(($userProfile?.activities ?? []).map((a) => a.id)),
+  );
+  // Stable sort keeps each group in its original order, shared sports just move to the front
+  let sortedActivities = $derived(
+    [...(profile?.activities ?? [])].sort(
+      (a, b) => Number(!mySportIds.has(a.id)) - Number(!mySportIds.has(b.id)),
+    ),
+  );
+
   $effect(() => {
     loading = true;
     notFound = false;
@@ -105,7 +115,7 @@
         <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
       {:else}
         <div class="flex flex-col gap-3">
-          {#each profile.activities as act}
+          {#each sortedActivities as act}
             {@const info = ACTIVITIES.find((a) => a.id === act.id)}
             <div
               class="flex items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm"
@@ -116,9 +126,19 @@
                 <ActivityIcon id={act.id} class="size-5" />
               </span>
               <div class="flex-1">
-                <p class="font-bold text-text">{t.activity(act.id)}</p>
+                <p class="flex items-center gap-2 font-bold text-text">
+                  {t.activity(act.id)}
+                  {#if mySportIds.has(act.id)}
+                    <span
+                      class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
+                    >
+                      {t.t("profile.inCommon")}
+                    </span>
+                  {/if}
+                </p>
                 <p class="text-sm text-muted">
-                  {t.format(act.format)} · {t.skill(act.level)}
+                  {#if act.format !== "all"}{t.format(act.format)}·
+                  {/if}{t.skill(act.level)}
                 </p>
               </div>
             </div>

@@ -5,6 +5,9 @@
   import {
     SlidersHorizontal,
     User,
+    Users,
+    Heart,
+    Dumbbell,
     X,
     Moon,
     Check,
@@ -34,6 +37,7 @@
     SKILL_LEVEL_OPTIONS,
     DEFAULT_DISTANCE_KM,
     type DiscoverFilters,
+    type Gender,
     type UserProfile,
   } from "$lib/types";
   import { get } from "svelte/store";
@@ -44,7 +48,7 @@
 
   let t = $derived(createTranslator($activeLanguage));
 
-  const INTRO_SEEN_KEY = "fitmate-intro-seen";
+  const INTRO_SEEN_KEY = "fit-m8-intro-seen";
   let showIntro = $state(false);
 
   function dismissIntro() {
@@ -56,6 +60,7 @@
     { value: "", label: "" },
     { value: "1v1", label: "1v1" },
     { value: "2v2", label: "2v2" },
+    { value: "group", label: "4+" },
   ] as const;
 
   const GENDER_FILTER_OPTIONS = [
@@ -113,6 +118,32 @@
   );
   let hasCoords = $derived(
     $userProfile?.lat !== undefined && $userProfile?.lng !== undefined,
+  );
+
+  // Used by the Dating/Friends quick-filter presets below
+  let myGender: Gender | "" = $derived($userProfile?.gender ?? "");
+  let oppositeGender: Gender | "" = $derived(
+    myGender === "male" ? "female" : myGender === "female" ? "male" : "",
+  );
+  let myOrientation = $derived($userProfile?.orientation ?? "hetero");
+
+  let isDatingPreset = $derived(
+    $filterFormat === "1v1" &&
+      $filterLevel === "" &&
+      $filterGender === oppositeGender &&
+      $filterSexualOrientation === myOrientation,
+  );
+  let isFriendsPreset = $derived(
+    $filterFormat === "" &&
+      $filterLevel === "" &&
+      $filterGender === myGender &&
+      $filterSexualOrientation === "",
+  );
+  let isTrainerPreset = $derived(
+    $filterFormat === "" &&
+      $filterLevel === "expert" &&
+      $filterGender === "" &&
+      $filterSexualOrientation === "",
   );
 
   // Draft slider values track drag position live; the underlying filter
@@ -246,6 +277,34 @@
     saveFilters();
   }
 
+  // Quick presets shown as buttons next to the filters icon; each resets activity to "any" and saves immediately
+  function applyDatingPreset() {
+    filterActivity.set("");
+    filterFormat.set("1v1");
+    filterLevel.set("");
+    filterGender.set(oppositeGender);
+    filterSexualOrientation.set(myOrientation);
+    saveFilters();
+  }
+
+  function applyFriendsPreset() {
+    filterActivity.set("");
+    filterFormat.set("");
+    filterLevel.set("");
+    filterGender.set(myGender);
+    filterSexualOrientation.set("");
+    saveFilters();
+  }
+
+  function applyTrainerPreset() {
+    filterActivity.set("");
+    filterFormat.set("");
+    filterLevel.set("expert");
+    filterGender.set("");
+    filterSexualOrientation.set("");
+    saveFilters();
+  }
+
   // Sync filter stores from the saved profile once per user; if none saved yet, open the modal for first-time setup
   $effect(() => {
     const uid = $authUser?.uid;
@@ -267,6 +326,7 @@
     const profile = get(userProfile);
     users = await getDiscoverFeed(
       uid,
+      (profile?.activities ?? []).map((a) => a.id),
       get(filterActivity),
       get(filterFormat),
       get(filterLevel),
@@ -403,6 +463,33 @@
     <h1 class="text-2xl font-black text-text">{t.t("nav.discover")}</h1>
     <div class="flex items-center gap-2">
       <button
+        onclick={applyDatingPreset}
+        class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
+          ? 'bg-primary text-white'
+          : 'bg-surface text-text'}"
+        aria-label={t.t("discover.datingPreset")}
+      >
+        <Heart class="size-5" />
+      </button>
+      <button
+        onclick={applyFriendsPreset}
+        class="flex size-9 items-center justify-center rounded-full shadow-sm {isFriendsPreset
+          ? 'bg-primary text-white'
+          : 'bg-surface text-text'}"
+        aria-label={t.t("discover.friendsPreset")}
+      >
+        <Users class="size-5" />
+      </button>
+      <button
+        onclick={applyTrainerPreset}
+        class="flex size-9 items-center justify-center rounded-full shadow-sm {isTrainerPreset
+          ? 'bg-primary text-white'
+          : 'bg-surface text-text'}"
+        aria-label={t.t("discover.trainerPreset")}
+      >
+        <Dumbbell class="size-5" />
+      </button>
+      <button
         onclick={() => (filtersOpen = true)}
         class="flex size-9 items-center justify-center rounded-full bg-surface shadow-sm"
         aria-label={t.t("discover.filters")}
@@ -426,7 +513,7 @@
       <div
         onclick={(e) => e.stopPropagation()}
         transition:fly={{ x: 300, duration: 250, opacity: 1 }}
-        class="flex h-full w-full max-w-xs flex-col overflow-y-auto bg-surface p-5"
+        class="flex h-full w-full max-w-sm flex-col overflow-y-auto bg-surface p-5"
       >
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-lg font-black text-text">

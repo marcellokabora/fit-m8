@@ -62,6 +62,7 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 
 export async function getDiscoverFeed(
 	currentUid: string,
+	myActivityIds: string[],
 	activityFilter: string,
 	formatFilter: ActivityFormat | '',
 	levelFilter: SkillLevel | '',
@@ -81,6 +82,8 @@ export async function getDiscoverFeed(
 	const snap = await getDocs(q);
 
 	const hasOrigin = currentCoords.lat !== undefined && currentCoords.lng !== undefined;
+	// "All sports" means any sport we ourselves practice, not literally any sport on the platform
+	const relevantActivityIds = activityFilter ? [activityFilter] : myActivityIds;
 
 	const candidates: UserProfile[] = [];
 	for (const d of snap.docs) {
@@ -103,20 +106,19 @@ export async function getDiscoverFeed(
 			if (km > maxDistanceKm) continue;
 		}
 
-		// Activity filters must match the same activity entry.
-		if (activityFilter || formatFilter || levelFilter) {
-			const match = data.activities?.some(
-				(a) =>
-					(!activityFilter || a.id === activityFilter) &&
-					(!formatFilter || a.format === formatFilter || a.format === 'all') &&
-					(!levelFilter || a.level === levelFilter)
-			);
-			if (!match) continue;
-		}
+		// Candidate must share one of our own sports (or the specifically chosen one), matching format/level too.
+		const match = data.activities?.some(
+			(a) =>
+				relevantActivityIds.includes(a.id) &&
+				(!formatFilter || a.format === formatFilter || a.format === 'all') &&
+				(!levelFilter || a.level === levelFilter)
+		);
+		if (!match) continue;
 		candidates.push({ uid: d.id, ...data });
 	}
 	return candidates;
 }
+
 
 // Deletes every recorded swipe so previously liked/passed profiles reappear in the discover feed.
 export async function resetSwipes(uid: string) {

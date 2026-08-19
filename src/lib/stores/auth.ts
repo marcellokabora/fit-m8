@@ -11,7 +11,7 @@ import {
 	type User
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, deleteField, serverTimestamp } from 'firebase/firestore';
-import { DEFAULT_DISTANCE_KM, type Gender, type SexualOrientation, type SkillLevel, type UserProfile } from '$lib/types';
+import { DEFAULT_DISTANCE_KM, type ActivityFormat, type Gender, type SexualOrientation, type SkillLevel, type UserProfile } from '$lib/types';
 
 function createAuthStore() {
 	// undefined = auth state not yet resolved (still reading persisted session)
@@ -71,7 +71,7 @@ function createUserProfileStore() {
 export const userProfile = createUserProfileStore();
 
 export const filterActivity = writable<string>('');
-export const filterFormat = writable<'1v1' | '2v2' | ''>('');
+export const filterFormat = writable<Exclude<ActivityFormat, 'all'> | ''>('');
 export const filterLevel = writable<SkillLevel | ''>('');
 export const filterGender = writable<Gender | ''>('');
 export const filterSexualOrientation = writable<SexualOrientation | ''>('');

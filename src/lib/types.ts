@@ -4,13 +4,15 @@ export type MatchStatus = 'pending' | 'confirmed' | 'declined';
 export const ACTIVITY_FORMAT_OPTIONS = [
 	{ value: 'all', label: 'All' },
 	{ value: '1v1', label: '1v1' },
-	{ value: '2v2', label: '2v2' }
+	{ value: '2v2', label: '2v2' },
+	{ value: 'group', label: '4+' }
 ] as const;
 
 export type ActivityFormat = (typeof ACTIVITY_FORMAT_OPTIONS)[number]['value'];
 
 export const SKILL_LEVEL_OPTIONS = [
 	{ value: 'basic', label: 'Basic' },
+	{ value: 'medium', label: 'Medium' },
 	{ value: 'expert', label: 'Expert' }
 ] as const;
 
@@ -62,7 +64,7 @@ export interface UserActivity {
 
 export interface DiscoverFilters {
 	activity: string;
-	format: '1v1' | '2v2' | '';
+	format: Exclude<ActivityFormat, 'all'> | '';
 	level: SkillLevel | '';
 	gender: Gender | '';
 	orientation: SexualOrientation | '';
