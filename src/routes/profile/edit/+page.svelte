@@ -13,7 +13,8 @@
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
-  import { Check, Loader2, RotateCcw, Trash2, X } from "@lucide/svelte";
+  import BackHeader from "$lib/components/BackHeader.svelte";
+  import { Check, Crown, Loader2, RotateCcw, Trash2 } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
   import { deleteAccount } from "$lib/firebase/account";
@@ -101,7 +102,8 @@
         gender,
         orientation: sexualOrientation,
         isSingle,
-        isTrainer,
+        // Trainer status requires an active Premium subscription, even if the toggle was left on from before
+        isTrainer: $userProfile?.isPremium ? isTrainer : false,
       });
     }
     saving = false;
@@ -134,31 +136,23 @@
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg">
-  <!-- Header -->
-  <div
-    class="sticky top-0 z-10 flex items-center justify-between bg-bg px-5 pb-3 pt-5"
-  >
-    <a
-      href="/profile"
-      aria-label={t.t("common.close")}
-      class="flex size-9 items-center justify-center rounded-full text-text active:scale-95"
-    >
-      <X class="size-5" />
-    </a>
-    <h1 class="text-lg font-black text-text">{t.t("profile.editTitle")}</h1>
-    <button
-      onclick={save}
-      disabled={saving}
-      class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95 disabled:opacity-50"
-    >
-      {#if saving}
-        <Loader2 class="size-4 animate-spin" />
-      {:else}
-        <Check class="size-4" />
-      {/if}
-      {saving ? t.t("common.saving") : t.t("common.save")}
-    </button>
-  </div>
+  <BackHeader href="/profile" class="bg-bg">
+    <div class="flex flex-1 items-center justify-between">
+      <h1 class="text-lg font-black text-text">{t.t("profile.editTitle")}</h1>
+      <button
+        onclick={save}
+        disabled={saving}
+        class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95 disabled:opacity-50"
+      >
+        {#if saving}
+          <Loader2 class="size-4 animate-spin" />
+        {:else}
+          <Check class="size-4" />
+        {/if}
+        {saving ? t.t("common.saving") : t.t("common.save")}
+      </button>
+    </div>
+  </BackHeader>
 
   <!-- Photos + basic info -->
   <div class="flex flex-col items-center gap-3 px-5 pb-6">
@@ -238,12 +232,31 @@
     <div
       class="mt-3 flex items-center justify-between rounded-2xl bg-surface px-4 py-3"
     >
-      <p class="text-sm font-semibold text-text">{t.t("profile.trainer")}</p>
-      <Toggle
-        checked={isTrainer}
-        ariaLabel={t.t("profile.trainer")}
-        onchange={(value) => (isTrainer = value)}
-      />
+      <div class="flex items-center gap-2">
+        <p class="text-sm font-semibold text-text">{t.t("profile.trainer")}</p>
+        {#if !$userProfile?.isPremium}
+          <span
+            class="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
+          >
+            <Crown class="size-3" />
+            {t.t("profile.premiumFeature")}
+          </span>
+        {/if}
+      </div>
+      {#if $userProfile?.isPremium}
+        <Toggle
+          checked={isTrainer}
+          ariaLabel={t.t("profile.trainer")}
+          onchange={(value) => (isTrainer = value)}
+        />
+      {:else}
+        <button
+          onclick={() => goto("/premium")}
+          class="rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary active:scale-95"
+        >
+          {t.t("profile.goPremium")}
+        </button>
+      {/if}
     </div>
   </div>
 

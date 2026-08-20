@@ -80,6 +80,21 @@ const MESSAGES = {
         'auth.haveAccount': 'Already have an account?',
         'auth.signUp': 'Sign up',
         'auth.passwordMismatch': 'Passwords do not match',
+        'auth.forgotPassword': 'Forgot password?',
+        'auth.enterEmailFirst': 'Enter your email address above first',
+        'auth.resetEmailSent': 'Password reset email sent. Check your inbox.',
+        'auth.verifyEmailTitle': 'Verify your email',
+        'auth.verifyEmailHint': "We've sent a verification link to {email}. Confirm it to start appearing in Discover.",
+        'auth.resendVerification': 'Resend verification email',
+        'auth.verificationEmailSent': 'Verification email sent. Check your inbox.',
+        'auth.iHaveVerified': "I've verified my email",
+        'auth.stillNotVerified': "Still not verified. Check your inbox (and spam folder).",
+        'auth.errorEmailInUse': 'An account with this email already exists. Try signing in instead.',
+        'auth.errorInvalidEmail': 'Enter a valid email address.',
+        'auth.errorWeakPassword': 'Choose a stronger password (at least 6 characters).',
+        'auth.errorInvalidCredential': 'Incorrect email or password.',
+        'auth.errorTooManyRequests': 'Too many attempts. Please wait a moment and try again.',
+        'auth.emailVerifiedSuccess': 'Your email has been verified!',
         'errors.generic': 'Something went wrong',
         'onboarding.chooseLanguage': 'Choose your language',
         'onboarding.languageHint': 'You can change this later in your settings',
@@ -231,7 +246,8 @@ const MESSAGES = {
         'premium.activeHint': 'Thanks for supporting Fit-M8! Every premium feature is unlocked.',
         'premium.cancelButton': 'Cancel subscription',
         'profile.goPremium': 'Go Premium',
-        'profile.premiumMember': 'Premium member'
+        'profile.premiumMember': 'Premium member',
+        'profile.premiumFeature': 'Premium'
     },
     es: {
         'meta.description': 'Conecta con personas para hacer deporte cerca de ti', 'language.en': 'Inglés', 'language.es': 'Español', 'language.pt': 'Portugués',
@@ -249,6 +265,21 @@ export type TranslationParams = Record<string, string | number>;
 const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string>>> = {
     en: {},
     es: {
+        'auth.forgotPassword': '¿Olvidaste tu contraseña?',
+        'auth.enterEmailFirst': 'Introduce primero tu correo electrónico',
+        'auth.resetEmailSent': 'Correo de restablecimiento enviado. Revisa tu bandeja de entrada.',
+        'auth.verifyEmailTitle': 'Verifica tu correo electrónico',
+        'auth.verifyEmailHint': 'Hemos enviado un enlace de verificación a {email}. Confírmalo para empezar a aparecer en Descubrir.',
+        'auth.resendVerification': 'Reenviar correo de verificación',
+        'auth.verificationEmailSent': 'Correo de verificación enviado. Revisa tu bandeja de entrada.',
+        'auth.iHaveVerified': 'Ya he verificado mi correo',
+        'auth.stillNotVerified': 'Todavía no está verificado. Revisa tu bandeja de entrada (y spam).',
+        'auth.errorEmailInUse': 'Ya existe una cuenta con este correo. Intenta iniciar sesión.',
+        'auth.errorInvalidEmail': 'Introduce un correo electrónico válido.',
+        'auth.errorWeakPassword': 'Elige una contraseña más segura (al menos 6 caracteres).',
+        'auth.errorInvalidCredential': 'Correo o contraseña incorrectos.',
+        'auth.errorTooManyRequests': 'Demasiados intentos. Espera un momento e intenta de nuevo.',
+        'auth.emailVerifiedSuccess': '¡Tu correo electrónico ha sido verificado!',
         'discover.matchNone': 'Ningún resultado',
         'discover.matchOne': 'Conectar con 1 persona',
         'discover.matchMany': 'Conectar con {count} personas',
@@ -301,9 +332,25 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'premium.activeHint': '¡Gracias por apoyar a Fit-M8! Todas las funciones premium están desbloqueadas.',
         'premium.cancelButton': 'Cancelar suscripción',
         'profile.goPremium': 'Hazte Premium',
-        'profile.premiumMember': 'Miembro Premium'
+        'profile.premiumMember': 'Miembro Premium',
+        'profile.premiumFeature': 'Premium'
     },
     pt: {
+        'auth.forgotPassword': 'Esqueceste-te da palavra-passe?',
+        'auth.enterEmailFirst': 'Introduz primeiro o teu email',
+        'auth.resetEmailSent': 'Email de redefinição enviado. Verifica a tua caixa de entrada.',
+        'auth.verifyEmailTitle': 'Verifica o teu email',
+        'auth.verifyEmailHint': 'Enviámos um link de verificação para {email}. Confirma-o para começares a aparecer em Descobrir.',
+        'auth.resendVerification': 'Reenviar email de verificação',
+        'auth.verificationEmailSent': 'Email de verificação enviado. Verifica a tua caixa de entrada.',
+        'auth.iHaveVerified': 'Já verifiquei o meu email',
+        'auth.stillNotVerified': 'Ainda não verificado. Verifica a tua caixa de entrada (e spam).',
+        'auth.errorEmailInUse': 'Já existe uma conta com este email. Tenta iniciar sessão.',
+        'auth.errorInvalidEmail': 'Introduz um email válido.',
+        'auth.errorWeakPassword': 'Escolhe uma palavra-passe mais forte (pelo menos 6 caracteres).',
+        'auth.errorInvalidCredential': 'Email ou palavra-passe incorretos.',
+        'auth.errorTooManyRequests': 'Demasiadas tentativas. Espera um momento e tenta novamente.',
+        'auth.emailVerifiedSuccess': 'O teu email foi verificado!',
         'discover.matchNone': 'Nenhum resultado',
         'discover.matchOne': 'Ligar com 1 pessoa',
         'discover.matchMany': 'Ligar com {count} pessoas',
@@ -351,7 +398,8 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'premium.activeHint': 'Obrigado por apoiares o Fit-M8! Todas as funcionalidades premium estão desbloqueadas.',
         'premium.cancelButton': 'Cancelar subscrição',
         'profile.goPremium': 'Torna-te Premium',
-        'profile.premiumMember': 'Membro Premium'
+        'profile.premiumMember': 'Membro Premium',
+        'profile.premiumFeature': 'Premium'
     }
 };
 

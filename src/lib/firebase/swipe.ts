@@ -92,6 +92,10 @@ export async function getDiscoverFeed(
 		if (alreadySwiped.has(d.id)) continue;
 		const data = d.data() as Omit<UserProfile, 'uid'>;
 
+		// Unverified email/password accounts stay hidden from Discover until they confirm their inbox;
+		// `undefined` means the profile predates this field (or is a Google account), so it's kept.
+		if (data.emailVerified === false) continue;
+
 		if (genderFilter && data.gender !== genderFilter) continue;
 		if (
 			sexualOrientationFilter &&

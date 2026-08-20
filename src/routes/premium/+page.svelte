@@ -41,7 +41,11 @@
     saving = true;
     try {
       // No payment provider wired up yet — this just flips the flag to unblock the rest of the feature.
-      await userProfile.save(uid, { isPremium: value });
+      // Trainer status requires an active subscription, so cancelling revokes it too.
+      await userProfile.save(uid, {
+        isPremium: value,
+        ...(value ? {} : { isTrainer: false }),
+      });
     } catch (e: any) {
       error = e.message;
     } finally {

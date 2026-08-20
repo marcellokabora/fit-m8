@@ -421,6 +421,7 @@ async function seedDatabase() {
 				lat,
 				lng,
 				uid: userId,
+				emailVerified: true,
 				createdAt: FieldValue.serverTimestamp(),
 				updatedAt: FieldValue.serverTimestamp()
 			};

@@ -15,10 +15,32 @@
   let password = $state("");
   let passwordVisible = $state(false);
   let error = $state("");
+  let info = $state("");
   let loading = $state(false);
+  let resetSending = $state(false);
+
+  function authErrorMessage(e: any) {
+    switch (e?.code) {
+      case "auth/email-already-in-use":
+        return t.t("auth.errorEmailInUse");
+      case "auth/invalid-email":
+        return t.t("auth.errorInvalidEmail");
+      case "auth/weak-password":
+        return t.t("auth.errorWeakPassword");
+      case "auth/wrong-password":
+      case "auth/user-not-found":
+      case "auth/invalid-credential":
+        return t.t("auth.errorInvalidCredential");
+      case "auth/too-many-requests":
+        return t.t("auth.errorTooManyRequests");
+      default:
+        return e?.message ?? t.t("errors.generic");
+    }
+  }
 
   async function handleEmail() {
     error = "";
+    info = "";
     loading = true;
     try {
       if (mode === "login") {
@@ -28,9 +50,27 @@
       }
       goto("/discover");
     } catch (e: any) {
-      error = e.message ?? t.t("errors.generic");
+      error = authErrorMessage(e);
     } finally {
       loading = false;
+    }
+  }
+
+  async function handleForgotPassword() {
+    error = "";
+    info = "";
+    if (!email) {
+      error = t.t("auth.enterEmailFirst");
+      return;
+    }
+    resetSending = true;
+    try {
+      await authUser.resetPassword(email);
+      info = t.t("auth.resetEmailSent");
+    } catch (e: any) {
+      error = authErrorMessage(e);
+    } finally {
+      resetSending = false;
     }
   }
 
@@ -42,7 +82,7 @@
       if (provider === "google") await authUser.signInGoogle();
       goto("/discover");
     } catch (e: any) {
-      error = e.message ?? t.t("errors.generic");
+      error = authErrorMessage(e);
     } finally {
       loading = false;
     }
@@ -149,6 +189,21 @@
         {/if}
       </button>
     </div>
+    {#if mode === "login"}
+      <button
+        type="button"
+        onclick={handleForgotPassword}
+        disabled={resetSending}
+        class="self-end text-sm font-semibold text-primary disabled:opacity-50"
+      >
+        {resetSending ? t.t("auth.loading") : t.t("auth.forgotPassword")}
+      </button>
+    {/if}
+    {#if info}
+      <p class="rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary">
+        {info}
+      </p>
+    {/if}
     {#if error}
       <p class="rounded-xl bg-error/10 px-4 py-3 text-sm text-error">{error}</p>
     {/if}

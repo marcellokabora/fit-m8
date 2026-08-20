@@ -2,6 +2,7 @@
   import "../app.css";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
+  import { get } from "svelte/store";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { activeLanguage } from "$lib/stores/language";
   import { activeTheme } from "$lib/stores/theme";
@@ -32,6 +33,12 @@
         const hasProfile = await userProfile.load(user.uid);
         if (!hasProfile && path !== "/onboarding") {
           goto("/onboarding");
+        } else if (hasProfile) {
+          // Catches users who verified their email link after their profile was already created
+          const profile = get(userProfile);
+          if (user.emailVerified && profile?.emailVerified !== true) {
+            await userProfile.save(user.uid, { emailVerified: true });
+          }
         }
       }
     });

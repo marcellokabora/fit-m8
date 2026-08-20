@@ -113,6 +113,8 @@ export interface UserProfile {
 	isTrainer?: boolean;
 	// true once the user has subscribed to Fit-M8 Premium
 	isPremium?: boolean;
+	// true for Google accounts (auto-verified) or once an email/password user confirms their inbox link
+	emailVerified?: boolean;
 	// undefined until the user has confirmed filters at least once from the Discover screen
 	discoverFilters?: DiscoverFilters;
 	createdAt: Date;

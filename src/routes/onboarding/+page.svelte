@@ -60,7 +60,6 @@
   let gender = $state<Gender>("male");
   let sexualOrientation = $state<SexualOrientation>("hetero");
   let isSingle = $state(false);
-  let isTrainer = $state(false);
   let city = $state("");
   let lat = $state<number | undefined>(undefined);
   let lng = $state<number | undefined>(undefined);
@@ -116,13 +115,13 @@
         gender,
         orientation: sexualOrientation,
         isSingle,
-        isTrainer,
         city,
         lat,
         lng,
         photos,
         photoURL: photos[0] || user.photoURL || "",
         activities,
+        emailVerified: user.emailVerified,
       });
       goto("/discover");
     } catch (e: any) {
@@ -202,16 +201,6 @@
           checked={isSingle}
           ariaLabel={t.t("profile.single")}
           onchange={(value) => (isSingle = value)}
-        />
-      </div>
-      <div
-        class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
-      >
-        <p class="text-sm font-semibold text-text">{t.t("profile.trainer")}</p>
-        <Toggle
-          checked={isTrainer}
-          ariaLabel={t.t("profile.trainer")}
-          onchange={(value) => (isTrainer = value)}
         />
       </div>
     </div>

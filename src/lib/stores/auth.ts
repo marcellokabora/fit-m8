@@ -7,11 +7,21 @@ import {
 	FacebookAuthProvider,
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword,
+	sendEmailVerification,
+	sendPasswordResetEmail,
+	reload,
 	signOut,
 	type User
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, deleteField, serverTimestamp } from 'firebase/firestore';
 import { DEFAULT_DISTANCE_KM, type ActivityFormat, type Gender, type SexualOrientation, type SkillLevel, type UserProfile } from '$lib/types';
+
+// Sends the verification link back to our own app instead of Firebase's generic confirmation page
+function verificationActionSettings() {
+	return {
+		url: typeof window !== 'undefined' ? `${window.location.origin}/discover?verified=1` : ''
+	};
+}
 
 function createAuthStore() {
 	// undefined = auth state not yet resolved (still reading persisted session)
@@ -27,8 +37,24 @@ function createAuthStore() {
 		signInFacebook: () => signInWithPopup(auth, new FacebookAuthProvider()),
 		signInEmail: (email: string, password: string) =>
 			signInWithEmailAndPassword(auth, email, password),
-		registerEmail: (email: string, password: string) =>
-			createUserWithEmailAndPassword(auth, email, password),
+		registerEmail: async (email: string, password: string) => {
+			const credential = await createUserWithEmailAndPassword(auth, email, password);
+			// Google accounts arrive pre-verified; email/password accounts must confirm their inbox first
+			await sendEmailVerification(credential.user, verificationActionSettings());
+			return credential;
+		},
+		resetPassword: (email: string) => sendPasswordResetEmail(auth, email),
+		resendVerificationEmail: () => {
+			if (!auth.currentUser) throw new Error('Not signed in');
+			return sendEmailVerification(auth.currentUser, verificationActionSettings());
+		},
+		// Re-reads the auth user from Firebase so `emailVerified` reflects a link the user just clicked
+		refreshUser: async () => {
+			if (!auth.currentUser) return false;
+			await reload(auth.currentUser);
+			set(auth.currentUser);
+			return auth.currentUser.emailVerified;
+		},
 		signOut: () => signOut(auth)
 	};
 }
