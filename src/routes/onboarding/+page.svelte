@@ -8,6 +8,7 @@
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
     BIO_MAX_LENGTH,
+    MAX_SPORTS_FREE,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
@@ -82,7 +83,7 @@
     if (selectedActivities.includes(id)) {
       selectedActivities = selectedActivities.filter((a) => a !== id);
       delete activitySettings[id];
-    } else {
+    } else if (selectedActivities.length < MAX_SPORTS_FREE) {
       selectedActivities = [...selectedActivities, id];
       activitySettings[id] = { format: "all", level: "basic" };
     }
@@ -218,14 +219,17 @@
     <h2 class="mb-1 text-2xl font-black text-text">
       {t.t("onboarding.yourSports")}
     </h2>
-    <p class="mb-6 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
+    <p class="mb-1 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
+    <p class="mb-6 text-xs font-semibold text-muted">
+      {t.t("sports.maxHint", { max: MAX_SPORTS_FREE })}
+    </p>
     <div class="grid grid-cols-2 gap-3">
       {#each ACTIVITIES as activity}
+        {@const selected = selectedActivities.includes(activity.id)}
         <button
           onclick={() => toggleActivity(activity.id)}
-          class="flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all active:scale-95 {selectedActivities.includes(
-            activity.id,
-          )
+          disabled={!selected && selectedActivities.length >= MAX_SPORTS_FREE}
+          class="flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all active:scale-95 disabled:opacity-40 {selected
             ? 'border-primary bg-primary/10'
             : 'border-border bg-surface'}"
         >

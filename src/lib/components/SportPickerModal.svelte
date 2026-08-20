@@ -6,12 +6,14 @@
   let {
     activities,
     selectedIds = $bindable([]),
+    max,
     t,
     onCancel,
     onConfirm,
   }: {
     activities: readonly { id: string }[];
     selectedIds?: string[];
+    max: number;
     t: Translator;
     onCancel: () => void;
     onConfirm: () => void;
@@ -29,9 +31,11 @@
   );
 
   function toggle(id: string) {
-    selectedIds = selectedIds.includes(id)
-      ? selectedIds.filter((x) => x !== id)
-      : [...selectedIds, id];
+    if (selectedIds.includes(id)) {
+      selectedIds = selectedIds.filter((x) => x !== id);
+    } else if (selectedIds.length < max) {
+      selectedIds = [...selectedIds, id];
+    }
   }
 
   // Autofocus the search field as soon as the picker takes over the screen.
@@ -52,6 +56,9 @@
         <X class="size-4" />
       </button>
     </div>
+    <p class="mb-3 text-xs font-semibold text-muted">
+      {t.t("sports.maxHint", { max })}
+    </p>
     <div class="relative">
       <Search
         class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
@@ -74,11 +81,11 @@
     {:else}
       <div class="grid grid-cols-2 gap-2 pt-1">
         {#each filtered as activity}
+          {@const selected = selectedIds.includes(activity.id)}
           <button
             onclick={() => toggle(activity.id)}
-            class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 {selectedIds.includes(
-              activity.id,
-            )
+            disabled={!selected && selectedIds.length >= max}
+            class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 disabled:opacity-40 {selected
               ? 'border-primary bg-primary/10'
               : 'border-border bg-surface'}"
           >

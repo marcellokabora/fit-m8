@@ -5,6 +5,7 @@
     ACTIVITIES,
     ACTIVITY_FORMAT_OPTIONS,
     SKILL_LEVEL_OPTIONS,
+    getMaxSports,
     type ActivityFormat,
     type SkillLevel,
     type UserActivity,
@@ -15,7 +16,14 @@
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import SportPickerModal from "$lib/components/SportPickerModal.svelte";
-  import { ChevronDown, MapPin, Pencil, Plus, Trash2 } from "@lucide/svelte";
+  import {
+    ChevronDown,
+    Crown,
+    MapPin,
+    Pencil,
+    Plus,
+    Trash2,
+  } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -39,6 +47,10 @@
   );
   let availableActivities = $derived(
     ACTIVITIES.filter((a) => !activities.some((act) => act.id === a.id)),
+  );
+  let maxSports = $derived(getMaxSports($userProfile?.isPremium));
+  let remainingSportSlots = $derived(
+    Math.max(0, maxSports - activities.length),
   );
 
   let photos = $derived(
@@ -228,6 +240,10 @@
 
     {#if availableActivities.length === 0}
       <p class="text-sm text-muted">{t.t("profile.allSports")}</p>
+    {:else if remainingSportSlots === 0}
+      <p class="text-sm text-muted">
+        {t.t("sports.maxReached", { max: maxSports })}
+      </p>
     {:else}
       <button
         onclick={openAddSport}
@@ -243,14 +259,28 @@
     <SportPickerModal
       activities={availableActivities}
       bind:selectedIds={selectedNewIds}
+      max={remainingSportSlots}
       {t}
       onCancel={() => (showAddSport = false)}
       onConfirm={confirmAddSport}
     />
   {/if}
 
-  <!-- Logout -->
+  <!-- Premium -->
   <div class="mt-auto px-5 pt-8">
+    <a
+      href="/premium"
+      class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95"
+    >
+      <Crown class="size-5" />
+      {$userProfile?.isPremium
+        ? t.t("profile.premiumMember")
+        : t.t("profile.goPremium")}
+    </a>
+  </div>
+
+  <!-- Logout -->
+  <div class="px-5 pt-4">
     <button
       onclick={logout}
       class="mt-5 w-full rounded-2xl border-2 border-error/30 py-4 text-base font-semibold text-error active:scale-95"

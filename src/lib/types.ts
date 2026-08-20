@@ -83,6 +83,15 @@ export const DEFAULT_DISTANCE_KM = 10;
 
 export const BIO_MAX_LENGTH = 200;
 
+// Maximum number of sports/activities a user profile can have at once
+export const MAX_SPORTS_FREE = 6;
+export const MAX_SPORTS_PREMIUM = 12;
+export const PREMIUM_PRICE_USD = 9.99;
+
+export function getMaxSports(isPremium?: boolean) {
+	return isPremium ? MAX_SPORTS_PREMIUM : MAX_SPORTS_FREE;
+}
+
 export interface UserProfile {
 	uid: string;
 	displayName: string;
@@ -102,6 +111,8 @@ export interface UserProfile {
 	isSingle?: boolean;
 	// true if this user offers/works as a trainer
 	isTrainer?: boolean;
+	// true once the user has subscribed to Fit-M8 Premium
+	isPremium?: boolean;
 	// undefined until the user has confirmed filters at least once from the Discover screen
 	discoverFilters?: DiscoverFilters;
 	createdAt: Date;
