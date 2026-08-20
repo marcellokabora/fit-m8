@@ -147,6 +147,15 @@ function createThemeStore() {
                 if (typeof window !== 'undefined') window.localStorage.setItem(MODE_KEY, mode);
                 return next;
             });
+        },
+        // Clears the saved preference and reverts to the default look, e.g. after account deletion.
+        reset: () => {
+            if (typeof window !== 'undefined') {
+                window.localStorage.removeItem(THEME_KEY);
+                window.localStorage.removeItem(MODE_KEY);
+            }
+            applyState(DEFAULT_STATE);
+            set(DEFAULT_STATE);
         }
     };
 }

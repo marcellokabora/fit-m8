@@ -149,7 +149,16 @@ const MESSAGES = {
         'profile.addSportButton': 'Add sport',
         'profile.resetSwipes': 'Reset swipes',
         'profile.resettingSwipes': 'Resetting...',
+        'profile.resetSwipesTitle': 'Reset swipes?',
+        'profile.resetSwipesHint': "This also removes your current matches. This can't be undone.",
         'profile.discovery': 'Discovery',
+        'profile.dangerZone': 'Danger zone',
+        'profile.deleteAccount': 'Delete account',
+        'profile.deletingAccount': 'Deleting...',
+        'profile.deleteAccountTitle': 'Delete account?',
+        'profile.deleteAccountHint': "This permanently deletes your profile, photos, swipes, matches and messages. This can't be undone.",
+        'errors.requiresRecentLogin': 'Please sign out and sign back in, then try again.',
+        'common.delete': 'Delete',
         'profile.statusTitle': 'Status',
         'profile.single': 'Single',
         'profile.trainer': 'Trainer',
@@ -247,7 +256,16 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'common.gotIt': 'Entendido',
         'profile.share': 'Compartir',
         'profile.messageLockedTitle': 'Mensajería próximamente',
-        'profile.messageLockedHint': 'Los mensajes directos se desbloquean cuando esta persona se suscriba a Fit-M8. ¡Conecta con ella para poder chatear!'
+        'profile.messageLockedHint': 'Los mensajes directos se desbloquean cuando esta persona se suscriba a Fit-M8. ¡Conecta con ella para poder chatear!',
+        'profile.resetSwipesTitle': '¿Restablecer desplazamientos?',
+        'profile.resetSwipesHint': 'Esto también eliminará tus coincidencias actuales. Esta acción no se puede deshacer.',
+        'profile.dangerZone': 'Zona de peligro',
+        'profile.deleteAccount': 'Eliminar cuenta',
+        'profile.deletingAccount': 'Eliminando...',
+        'profile.deleteAccountTitle': '¿Eliminar cuenta?',
+        'profile.deleteAccountHint': 'Esto elimina permanentemente tu perfil, fotos, deslizamientos, coincidencias y mensajes. Esta acción no se puede deshacer.',
+        'errors.requiresRecentLogin': 'Por seguridad, cierra sesión y vuelve a iniciar sesión antes de continuar.',
+        'common.delete': 'Eliminar'
     },
     pt: {
         'discover.matchNone': 'Nenhum resultado',
@@ -270,7 +288,16 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'common.gotIt': 'Entendido',
         'profile.share': 'Partilhar',
         'profile.messageLockedTitle': 'Mensagens brevemente',
-        'profile.messageLockedHint': 'As mensagens diretas ficam disponíveis quando esta pessoa subscrever o Fit-M8. Combina com ela para poderes conversar!'
+        'profile.messageLockedHint': 'As mensagens diretas ficam disponíveis quando esta pessoa subscrever o Fit-M8. Combina com ela para poderes conversar!',
+        'profile.resetSwipesTitle': 'Repor deslizes?',
+        'profile.resetSwipesHint': 'Isto também remove as tuas combinações atuais. Esta ação não pode ser revertida.',
+        'profile.dangerZone': 'Zona de perigo',
+        'profile.deleteAccount': 'Eliminar conta',
+        'profile.deletingAccount': 'A eliminar...',
+        'profile.deleteAccountTitle': 'Eliminar conta?',
+        'profile.deleteAccountHint': 'Isto elimina permanentemente o teu perfil, fotos, deslizes, combinações e mensagens. Esta ação não pode ser revertida.',
+        'errors.requiresRecentLogin': 'Por segurança, termina sessão e inicia sessão novamente antes de continuar.',
+        'common.delete': 'Eliminar'
     }
 };
 
@@ -353,6 +380,13 @@ function createLanguageStore() {
             if (!LANGUAGES.some((option) => option.code === language)) return;
             applyLanguage(language);
             if (typeof window !== 'undefined') window.localStorage.setItem(LANGUAGE_KEY, language);
+            set(language);
+        },
+        // Clears the saved preference and reverts to the browser/default language, e.g. after account deletion.
+        reset: () => {
+            if (typeof window !== 'undefined') window.localStorage.removeItem(LANGUAGE_KEY);
+            const language = browserLanguage();
+            applyLanguage(language);
             set(language);
         }
     };

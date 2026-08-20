@@ -36,29 +36,24 @@
   <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
     {t.t("appearance.appTheme")}
   </h3>
-  <div class="grid grid-cols-3 gap-3">
+  <div class="flex justify-between gap-2">
     {#each THEMES as theme}
       <button
         onclick={() => activeTheme.selectTheme(theme.id)}
-        class="flex flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all active:scale-95 {$activeTheme.themeId ===
-        theme.id
-          ? 'border-primary bg-primary/10'
-          : 'border-border bg-surface'}"
+        aria-label={t.t(`appearance.${theme.id}` as any)}
+        class="relative flex size-10 items-center justify-center rounded-full shadow-sm transition-transform active:scale-95"
+        style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.secondary} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
+        'dark'
+          ? theme.dark.bg
+          : theme.light.bg}, 0 0 0 {$activeTheme.themeId === theme.id
+          ? '5px'
+          : '3px'} {$activeTheme.themeId === theme.id
+          ? theme.primary
+          : 'transparent'}"
       >
-        <span
-          class="relative flex size-10 items-center justify-center rounded-full shadow-sm"
-          style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.secondary} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
-          'dark'
-            ? theme.dark.bg
-            : theme.light.bg}"
-        >
-          {#if $activeTheme.themeId === theme.id}
-            <Check class="size-5 text-white drop-shadow" />
-          {/if}
-        </span>
-        <span class="text-xs font-semibold text-text"
-          >{t.t(`appearance.${theme.id}` as any)}</span
-        >
+        {#if $activeTheme.themeId === theme.id}
+          <Check class="size-5 text-white drop-shadow" />
+        {/if}
       </button>
     {/each}
   </div>

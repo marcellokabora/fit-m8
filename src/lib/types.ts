@@ -81,6 +81,8 @@ export interface DiscoverFilters {
 // Default distance filter applied until the user picks their own value or explicitly clears it to "Any"
 export const DEFAULT_DISTANCE_KM = 10;
 
+export const BIO_MAX_LENGTH = 200;
+
 export interface UserProfile {
 	uid: string;
 	displayName: string;

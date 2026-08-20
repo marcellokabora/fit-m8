@@ -4,6 +4,7 @@
   import {
     ORIENTATIONS,
     GENDER_OPTIONS,
+    BIO_MAX_LENGTH,
     type SexualOrientation,
     type Gender,
   } from "$lib/types";
@@ -12,9 +13,10 @@
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
-  import { Check, Loader2, RotateCcw, X } from "@lucide/svelte";
+  import { Check, Loader2, RotateCcw, Trash2, X } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
+  import { deleteAccount } from "$lib/firebase/account";
   import {
     activeLanguage,
     createTranslator,
@@ -43,6 +45,9 @@
   let saving = $state(false);
   let confirmResetSwipes = $state(false);
   let resettingSwipes = $state(false);
+  let confirmDeleteAccount = $state(false);
+  let deletingAccount = $state(false);
+  let deleteAccountError = $state<string | null>(null);
 
   let displayName = $state($userProfile?.displayName ?? "");
   let bio = $state($userProfile?.bio ?? "");
@@ -110,6 +115,22 @@
     resettingSwipes = false;
     confirmResetSwipes = false;
   }
+
+  async function handleDeleteAccount() {
+    const user = get(authUser);
+    if (!user) return;
+    deletingAccount = true;
+    deleteAccountError = null;
+    try {
+      await deleteAccount(user);
+    } catch (err) {
+      deletingAccount = false;
+      deleteAccountError =
+        err instanceof Error && err.message.includes("requires-recent-login")
+          ? t.t("errors.requiresRecentLogin")
+          : t.t("errors.generic");
+    }
+  }
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg">
@@ -160,10 +181,14 @@
       </h3>
       <textarea
         bind:value={bio}
-        rows={3}
+        rows={4}
+        maxlength={BIO_MAX_LENGTH}
         placeholder={t.t("profile.bio")}
         class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
       ></textarea>
+      <p class="mt-1 text-right text-xs text-muted">
+        {bio.length}/{BIO_MAX_LENGTH}
+      </p>
     </div>
     <div class="w-full">
       <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
@@ -240,34 +265,12 @@
     <AppearancePicker />
   </div>
 
-  <!-- Reset swipes -->
+  <!-- Danger zone -->
   <div class="px-5 pb-8">
     <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      {t.t("profile.discovery")}
+      {t.t("profile.dangerZone")}
     </h3>
-    {#if confirmResetSwipes}
-      <div
-        class="rounded-2xl border-2 border-dashed border-error/40 bg-surface p-4"
-      >
-        <div class="flex gap-3">
-          <button
-            onclick={() => (confirmResetSwipes = false)}
-            class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
-          >
-            {t.t("common.cancel")}
-          </button>
-          <button
-            onclick={handleResetSwipes}
-            disabled={resettingSwipes}
-            class="flex-1 rounded-2xl bg-error py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
-          >
-            {resettingSwipes
-              ? t.t("profile.resettingSwipes")
-              : t.t("profile.resetSwipes")}
-          </button>
-        </div>
-      </div>
-    {:else}
+    <div class="flex flex-col gap-3">
       <button
         onclick={() => (confirmResetSwipes = true)}
         class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-error/40 py-3 text-sm font-bold text-error active:scale-95"
@@ -275,6 +278,84 @@
         <RotateCcw class="size-4" />
         {t.t("profile.resetSwipes")}
       </button>
-    {/if}
+      <button
+        onclick={() => (confirmDeleteAccount = true)}
+        class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-error/40 py-3 text-sm font-bold text-error active:scale-95"
+      >
+        <Trash2 class="size-4" />
+        {t.t("profile.deleteAccount")}
+      </button>
+    </div>
   </div>
 </div>
+
+{#if confirmResetSwipes}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="flex flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+    >
+      <RotateCcw class="size-12 text-error" />
+      <h2 class="text-lg font-black text-text">
+        {t.t("profile.resetSwipesTitle")}
+      </h2>
+      <p class="text-sm text-muted">{t.t("profile.resetSwipesHint")}</p>
+      <div class="flex w-full gap-3">
+        <button
+          onclick={() => (confirmResetSwipes = false)}
+          disabled={resettingSwipes}
+          class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95 disabled:opacity-50"
+        >
+          {t.t("common.cancel")}
+        </button>
+        <button
+          onclick={handleResetSwipes}
+          disabled={resettingSwipes}
+          class="flex-1 rounded-2xl bg-error py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        >
+          {resettingSwipes
+            ? t.t("profile.resettingSwipes")
+            : t.t("profile.resetSwipes")}
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+{#if confirmDeleteAccount}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="flex flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+    >
+      <Trash2 class="size-12 text-error" />
+      <h2 class="text-lg font-black text-text">
+        {t.t("profile.deleteAccountTitle")}
+      </h2>
+      <p class="text-sm text-muted">{t.t("profile.deleteAccountHint")}</p>
+      {#if deleteAccountError}
+        <p class="text-sm font-semibold text-error">{deleteAccountError}</p>
+      {/if}
+      <div class="flex w-full gap-3">
+        <button
+          onclick={() => (confirmDeleteAccount = false)}
+          disabled={deletingAccount}
+          class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95 disabled:opacity-50"
+        >
+          {t.t("common.cancel")}
+        </button>
+        <button
+          onclick={handleDeleteAccount}
+          disabled={deletingAccount}
+          class="flex-1 rounded-2xl bg-error py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        >
+          {deletingAccount
+            ? t.t("profile.deletingAccount")
+            : t.t("common.delete")}
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}

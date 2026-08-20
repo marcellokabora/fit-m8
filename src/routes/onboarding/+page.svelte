@@ -7,6 +7,7 @@
     GENDER_OPTIONS,
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
+    BIO_MAX_LENGTH,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
@@ -159,8 +160,12 @@
         bind:value={bio}
         placeholder={t.t("onboarding.bioOptional")}
         rows={3}
+        maxlength={BIO_MAX_LENGTH}
         class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
       ></textarea>
+      <p class="-mt-3 text-right text-xs text-muted">
+        {bio.length}/{BIO_MAX_LENGTH}
+      </p>
       <div class="flex gap-3">
         <input
           type="number"
