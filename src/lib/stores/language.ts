@@ -38,6 +38,8 @@ const MESSAGES = {
         'common.letsGo': "Let's go!",
         'common.like': 'Like',
         'common.pass': 'Pass',
+        'common.message': 'Message',
+        'common.gotIt': 'Got it',
         'common.back': 'Back',
         'common.loading': 'Loading...',
         'common.chat': 'Chat',
@@ -134,6 +136,9 @@ const MESSAGES = {
         'chat.placeholder': 'Type a message...',
         'profile.edit': 'Edit',
         'profile.editTitle': 'Edit profile',
+        'profile.share': 'Share',
+        'profile.messageLockedTitle': 'Messaging coming soon',
+        'profile.messageLockedHint': 'Direct messages unlock once this person subscribes to Fit-M8. Match with them to start chatting instead!',
         'profile.bio': 'Your bio...',
         'profile.signOut': 'Sign out',
         'profile.notFound': 'User not found',
@@ -237,7 +242,12 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'discover.trainerFilter': 'Mostrar solo entrenadores',
         'profile.statusTitle': 'Estado',
         'profile.single': 'Soltero/a',
-        'profile.trainer': 'Entrenador/a'
+        'profile.trainer': 'Entrenador/a',
+        'common.message': 'Mensaje',
+        'common.gotIt': 'Entendido',
+        'profile.share': 'Compartir',
+        'profile.messageLockedTitle': 'Mensajería próximamente',
+        'profile.messageLockedHint': 'Los mensajes directos se desbloquean cuando esta persona se suscriba a Fit-M8. ¡Conecta con ella para poder chatear!'
     },
     pt: {
         'discover.matchNone': 'Nenhum resultado',
@@ -255,7 +265,12 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'common.language': 'Idioma',
         'common.name': 'Nome',
         'common.biography': 'Biografia',
-        'common.location': 'Localização'
+        'common.location': 'Localização',
+        'common.message': 'Mensagem',
+        'common.gotIt': 'Entendido',
+        'profile.share': 'Partilhar',
+        'profile.messageLockedTitle': 'Mensagens brevemente',
+        'profile.messageLockedHint': 'As mensagens diretas ficam disponíveis quando esta pessoa subscrever o Fit-M8. Combina com ela para poderes conversar!'
     }
 };
 

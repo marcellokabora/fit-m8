@@ -40,7 +40,7 @@
   });
 </script>
 
-<div class="fixed inset-0 z-50 flex flex-col bg-bg">
+<div class="fixed inset-0 z-50 mx-auto flex w-full flex-col bg-bg md:max-w-md">
   <div class="sticky top-0 z-10 bg-bg px-5 pb-3 pt-5 shadow-sm">
     <div class="mb-3 flex items-center justify-between">
       <h2 class="text-lg font-black text-text">{t.t("profile.addSport")}</h2>

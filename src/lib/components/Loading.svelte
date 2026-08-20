@@ -12,7 +12,7 @@
 <div
   transition:fade={{ duration: 200 }}
   class="{fullscreen
-    ? 'fixed inset-0 z-50 bg-bg'
+    ? 'fixed inset-0 z-50 mx-auto w-full bg-bg md:max-w-md'
     : ''} flex flex-col items-center justify-center gap-4"
 >
   <div

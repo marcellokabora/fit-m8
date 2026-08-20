@@ -19,7 +19,7 @@
 </script>
 
 <nav
-  class="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface pb-safe"
+  class="fixed bottom-0 inset-x-0 z-40 mx-auto w-full border-t border-border bg-surface pb-safe md:max-w-md"
 >
   <div class="flex">
     {#each tabs as tab}

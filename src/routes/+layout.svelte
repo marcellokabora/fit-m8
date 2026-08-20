@@ -47,6 +47,10 @@
   {/if}
 </svelte:head>
 
-<div class="min-h-dvh bg-bg font-sans">
-  {@render children()}
+<div class="min-h-dvh bg-black font-sans md:flex md:justify-center">
+  <div
+    class="relative flex min-h-dvh w-full flex-col bg-bg md:max-w-md md:border-x md:border-border md:shadow-2xl"
+  >
+    {@render children()}
+  </div>
 </div>

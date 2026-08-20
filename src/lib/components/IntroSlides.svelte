@@ -23,7 +23,7 @@
 </script>
 
 <div
-  class="fixed inset-0 z-50 flex flex-col bg-bg px-6 pb-10 pt-10"
+  class="fixed inset-0 z-50 mx-auto flex w-full flex-col bg-bg px-6 pb-10 pt-10 md:max-w-md"
   transition:fade={{ duration: 150 }}
 >
   <div class="mb-8 flex items-center gap-2">

@@ -1,14 +1,24 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { goto } from "$app/navigation";
+  import { get } from "svelte/store";
   import { db } from "$lib/firebase/client";
   import { doc, getDoc } from "firebase/firestore";
   import { ACTIVITIES, type UserProfile } from "$lib/types";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
-  import { userProfile } from "$lib/stores/auth";
+  import ActionButtons from "$lib/components/ActionButtons.svelte";
+  import { authUser, userProfile } from "$lib/stores/auth";
+  import { recordSwipe } from "$lib/firebase/swipe";
   import { distanceKm } from "$lib/location";
-  import { MapPin, LoaderCircle } from "@lucide/svelte";
+  import {
+    MapPin,
+    LoaderCircle,
+    PartyPopper,
+    MessageCircle,
+    X,
+  } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -17,6 +27,10 @@
   let profile = $state<UserProfile | null>(null);
   let loading = $state(true);
   let notFound = $state(false);
+  let alreadyMatched = $state(false);
+  let swiping = $state(false);
+  let matchBanner = $state(false);
+  let showMessageModal = $state(false);
   let distanceAway = $derived.by(() => {
     if (
       !$userProfile ||
@@ -50,10 +64,20 @@
     ),
   );
 
+  // Buttons only make sense for someone else's profile you haven't already matched with
+  let showActions = $derived(
+    !!profile &&
+      !!$authUser &&
+      $authUser.uid !== profile.uid &&
+      !alreadyMatched,
+  );
+
   $effect(() => {
     loading = true;
     notFound = false;
     profile = null;
+    alreadyMatched = false;
+    const currentUid = get(authUser)?.uid;
     getDoc(doc(db, "users", uid)).then((snap) => {
       if (snap.exists()) {
         profile = { uid, ...(snap.data() as Omit<UserProfile, "uid">) };
@@ -62,10 +86,61 @@
       }
       loading = false;
     });
+    if (currentUid && currentUid !== uid) {
+      const matchId = [currentUid, uid].sort().join("_");
+      getDoc(doc(db, "matches", matchId)).then((snap) => {
+        alreadyMatched = snap.exists();
+      });
+    }
   });
+
+  async function handleSwipe(direction: "like" | "pass") {
+    const currentUid = get(authUser)?.uid;
+    if (!currentUid || !profile || swiping) return;
+    swiping = true;
+    // Prefer an activity we share with them so the recorded swipe reflects what actually matched
+    const sharedActivity =
+      profile.activities?.find((a) => mySportIds.has(a.id)) ??
+      profile.activities?.[0];
+    const isMatch = await recordSwipe(
+      currentUid,
+      profile.uid,
+      direction,
+      sharedActivity?.id ?? "",
+      sharedActivity?.format ?? "all",
+    );
+    if (isMatch) {
+      matchBanner = true;
+      setTimeout(() => goto("/matches"), 1800);
+    } else {
+      goto("/discover");
+    }
+  }
+
+  async function handleShare() {
+    if (!profile || typeof navigator === "undefined") return;
+    const url = `${location.origin}/profile/${profile.uid}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: profile.displayName, url });
+      } catch {
+        // user cancelled the share sheet, nothing to do
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // clipboard unavailable, nothing more we can do
+    }
+  }
+
+  function handleMessage() {
+    showMessageModal = true;
+  }
 </script>
 
-<div class="flex min-h-dvh flex-col bg-bg pb-12">
+<div class="flex min-h-dvh flex-col bg-bg {showActions ? 'pb-28' : 'pb-12'}">
   <BackHeader title={t.t("nav.profile")} class="bg-bg" />
 
   {#if loading}
@@ -148,3 +223,66 @@
     </div>
   {/if}
 </div>
+
+{#if showActions}
+  <div
+    class="fixed inset-x-0 bottom-0 z-40 mx-auto w-full border-t border-border bg-surface p-4 pb-safe md:max-w-md"
+  >
+    <ActionButtons
+      onPass={() => handleSwipe("pass")}
+      onLike={() => handleSwipe("like")}
+      disabled={swiping}
+      passLabel={t.t("common.pass")}
+      likeLabel={t.t("common.like")}
+      onShare={handleShare}
+      shareLabel={t.t("profile.share")}
+      onMessage={handleMessage}
+      messageLabel={t.t("common.message")}
+    />
+  </div>
+{/if}
+
+{#if showMessageModal}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="relative flex flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+    >
+      <button
+        onclick={() => (showMessageModal = false)}
+        aria-label={t.t("common.close")}
+        class="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
+      >
+        <X class="size-4" />
+      </button>
+      <MessageCircle class="size-12 text-primary" />
+      <h2 class="text-lg font-black text-text">
+        {t.t("profile.messageLockedTitle")}
+      </h2>
+      <p class="text-sm text-muted">{t.t("profile.messageLockedHint")}</p>
+      <button
+        onclick={() => (showMessageModal = false)}
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+      >
+        {t.t("common.gotIt")}
+      </button>
+    </div>
+  </div>
+{/if}
+
+{#if matchBanner}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="flex flex-col items-center gap-4 rounded-3xl bg-surface p-10 shadow-2xl text-center mx-6"
+    >
+      <PartyPopper class="size-16 text-primary" />
+      <h2 class="text-3xl font-black text-primary">
+        {t.t("discover.matchTitle")}
+      </h2>
+      <p class="text-muted">{t.t("discover.matchHint")}</p>
+    </div>
+  </div>
+{/if}

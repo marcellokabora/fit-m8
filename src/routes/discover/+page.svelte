@@ -7,15 +7,16 @@
     User,
     Users,
     Heart,
-    Dumbbell,
+    GraduationCap,
     X,
     Moon,
     Check,
-    Zap,
     PartyPopper,
+    MessageCircle,
   } from "@lucide/svelte";
   import Loading from "$lib/components/Loading.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
+  import ActionButtons from "$lib/components/ActionButtons.svelte";
   import {
     authUser,
     userProfile,
@@ -83,7 +84,7 @@
     $filterFormat === "" &&
       $filterLevel === "" &&
       $filterGender === myGender &&
-      $filterSexualOrientation === "" &&
+      $filterSexualOrientation === myOrientation &&
       $filterSingle === false &&
       $filterTrainer === false,
   );
@@ -218,7 +219,7 @@
     filterFormat.set("");
     filterLevel.set("");
     filterGender.set(myGender);
-    filterSexualOrientation.set("");
+    filterSexualOrientation.set(myOrientation);
     filterSingle.set(false);
     filterTrainer.set(false);
     saveFilters();
@@ -384,6 +385,30 @@
     }
   }
 
+  async function handleShare() {
+    const top = users[0];
+    if (!top || typeof navigator === "undefined") return;
+    const url = `${location.origin}/profile/${top.uid}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: top.displayName, url });
+      } catch {
+        // user cancelled the share sheet, nothing to do
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // clipboard unavailable, nothing more we can do
+    }
+  }
+
+  let showMessageModal = $state(false);
+  function handleMessage() {
+    showMessageModal = true;
+  }
+
   let rotation = $derived(
     dragging || exiting ? Math.max(-20, Math.min(20, currentX * 0.08)) : 0,
   );
@@ -421,7 +446,7 @@
           : 'bg-surface text-text'}"
         aria-label={t.t("discover.trainerPreset")}
       >
-        <Dumbbell class="size-5" />
+        <GraduationCap class="size-5" />
       </button>
       <button
         onclick={() => goto("/discover/filters")}
@@ -584,31 +609,25 @@
       </div>
 
       <!-- Action buttons -->
-      <div class="mt-4 flex shrink-0 gap-6">
-        <button
-          onclick={() => swipe("pass")}
-          disabled={exiting}
-          aria-label={t.t("common.pass")}
-          class="flex size-16 items-center justify-center rounded-full bg-surface text-3xl shadow-lg transition-transform active:scale-90 disabled:opacity-50"
-        >
-          <X class="size-7 text-error" />
-        </button>
-        <button
-          onclick={() => swipe("like")}
-          disabled={exiting}
-          aria-label={t.t("common.like")}
-          class="flex size-16 items-center justify-center rounded-full bg-primary text-3xl text-white shadow-lg transition-transform active:scale-90 disabled:opacity-50"
-        >
-          <Zap class="size-7" />
-        </button>
-      </div>
+      <ActionButtons
+        class="mt-4"
+        onPass={() => swipe("pass")}
+        onLike={() => swipe("like")}
+        disabled={exiting}
+        passLabel={t.t("common.pass")}
+        likeLabel={t.t("common.like")}
+        onShare={handleShare}
+        shareLabel={t.t("profile.share")}
+        onMessage={handleMessage}
+        messageLabel={t.t("common.message")}
+      />
     {/if}
   </div>
 
   <!-- Match banner -->
   {#if matchBanner}
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 backdrop-blur-sm md:max-w-md"
     >
       <div
         class="flex flex-col items-center gap-4 rounded-3xl bg-surface p-10 shadow-2xl text-center mx-6"
@@ -638,6 +657,35 @@
 
   <BottomNav active="discover" />
 </div>
+
+{#if showMessageModal}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="relative flex flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+    >
+      <button
+        onclick={() => (showMessageModal = false)}
+        aria-label={t.t("common.close")}
+        class="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
+      >
+        <X class="size-4" />
+      </button>
+      <MessageCircle class="size-12 text-primary" />
+      <h2 class="text-lg font-black text-text">
+        {t.t("profile.messageLockedTitle")}
+      </h2>
+      <p class="text-sm text-muted">{t.t("profile.messageLockedHint")}</p>
+      <button
+        onclick={() => (showMessageModal = false)}
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+      >
+        {t.t("common.gotIt")}
+      </button>
+    </div>
+  </div>
+{/if}
 
 {#if showIntro}
   <IntroSlides onclose={dismissIntro} />
