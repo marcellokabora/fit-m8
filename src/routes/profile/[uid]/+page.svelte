@@ -170,22 +170,22 @@
         {#if distanceAway !== null}
           <span>{t.t("profile.distanceAway", { count: distanceAway })}</span>
         {/if}
+        {#if profile.orientation === "gay"}
+          <span
+            class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
+          >
+            {t.orientation("gay")}
+          </span>
+        {/if}
+        {#if profile.isTrainer}
+          <span
+            class="flex items-center gap-1 rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary-dark"
+          >
+            <GraduationCap class="size-3.5" />
+            {t.t("profile.trainer")}
+          </span>
+        {/if}
       </div>
-      {#if profile.orientation === "gay"}
-        <span
-          class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
-        >
-          {t.orientation("gay")}
-        </span>
-      {/if}
-      {#if profile.isTrainer}
-        <span
-          class="flex items-center gap-1 rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary-dark"
-        >
-          <GraduationCap class="size-3.5" />
-          {t.t("profile.trainer")}
-        </span>
-      {/if}
       {#if profile.bio}
         <p class="text-center text-sm text-muted text-balance">{profile.bio}</p>
       {/if}

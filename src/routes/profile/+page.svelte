@@ -279,6 +279,12 @@
     </a>
   </div>
 
+  <!-- Legal -->
+  <div class="flex justify-center gap-4 px-5 pt-8 text-xs text-muted">
+    <a href="/terms" class="underline">Terms of Service</a>
+    <a href="/privacy" class="underline">Privacy Policy</a>
+  </div>
+
   <!-- Logout -->
   <div class="px-5 pt-4">
     <button

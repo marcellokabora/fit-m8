@@ -229,4 +229,13 @@
       {mode === "login" ? t.t("auth.signUp") : t.t("auth.signIn")}
     </a>
   </p>
+
+  {#if mode === "register"}
+    <p class="mt-4 text-center text-xs text-muted">
+      By continuing, you agree to our
+      <a href="/terms" class="font-semibold text-primary">Terms of Service</a>
+      and
+      <a href="/privacy" class="font-semibold text-primary">Privacy Policy</a>.
+    </p>
+  {/if}
 </div>
