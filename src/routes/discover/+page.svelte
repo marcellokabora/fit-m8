@@ -736,13 +736,13 @@
           <div class="flex gap-3 w-full">
             <button
               onclick={() => (matchBanner = false)}
-              class="flex-1 rounded-2xl border-2 border-border py-3 font-semibold text-text"
+              class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text"
             >
               {t.t("common.keepSwiping")}
             </button>
             <a
               href="/matches"
-              class="flex-1 rounded-2xl bg-primary py-3 text-center font-bold text-white"
+              class="flex-1 rounded-2xl bg-primary py-3 text-center text-sm font-bold text-white"
             >
               {t.t("matches.viewMatches")}
             </a>

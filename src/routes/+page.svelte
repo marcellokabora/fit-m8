@@ -3,7 +3,7 @@
   import { authUser } from "$lib/stores/auth";
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
   import Logo from "$lib/components/Logo.svelte";
   import Loading from "$lib/components/Loading.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
@@ -59,12 +59,12 @@
   {/if}
 
   <!-- Logo / Hero -->
-  <div class="mt-4 flex flex-col items-center gap-4 text-text">
-    <div
+  <div class="flex flex-col items-center gap-4 text-text">
+    <!-- <div
       class="flex size-24 items-center justify-center rounded-3xl bg-primary text-white shadow-xl overflow-auto"
     >
       <Logo class="h-full w-full" />
-    </div>
+    </div> -->
     {#if ready}
       <h1 transition:fade class="font-display text-5xl tracking-wide">
         Fit-M8
@@ -73,21 +73,15 @@
         {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
       </p>
     {/if}
+    <div class="mt-2">
+      <LanguagePicker />
+    </div>
   </div>
 
-  <LanguagePicker />
-
   {#if ready}
-    <!-- Activity bubbles -->
-    <div transition:fade class="flex flex-wrap justify-center gap-3">
-      {#each HERO_ACTIVITIES as activity}
-        <span
-          class="flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary"
-        >
-          <ActivityIcon id={activity.id} class="size-4" />
-          {t.activity(activity.id)}
-        </span>
-      {/each}
+    <!-- Activity carousel -->
+    <div transition:fade class="flex w-full justify-center">
+      <ActivityCarousel activities={HERO_ACTIVITIES} {t} />
     </div>
 
     <!-- CTA -->

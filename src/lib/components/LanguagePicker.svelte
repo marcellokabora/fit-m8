@@ -27,7 +27,7 @@
 
 <div
   bind:this={containerEl}
-  class="flex flex-col items-center gap-4 absolute top-4 right-4"
+  class="flex flex-col items-center gap-4"
   role="group"
   aria-label={t.t("onboarding.chooseLanguage")}
   title={t.t("onboarding.chooseLanguage")}

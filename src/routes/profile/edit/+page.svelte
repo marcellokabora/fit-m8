@@ -318,14 +318,14 @@
         <button
           onclick={() => (confirmResetSwipes = false)}
           disabled={resettingSwipes}
-          class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95 disabled:opacity-50"
+          class="flex-1 rounded-2xl border-2 border-border py-3 text-xs font-semibold text-text active:scale-95 disabled:opacity-50"
         >
           {t.t("common.cancel")}
         </button>
         <button
           onclick={handleResetSwipes}
           disabled={resettingSwipes}
-          class="flex-1 rounded-2xl bg-error py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+          class="flex-1 rounded-2xl bg-error px-2 py-3 text-xs font-bold text-white active:scale-95 disabled:opacity-50"
         >
           {resettingSwipes
             ? t.t("profile.resettingSwipes")
@@ -355,14 +355,14 @@
         <button
           onclick={() => (confirmDeleteAccount = false)}
           disabled={deletingAccount}
-          class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95 disabled:opacity-50"
+          class="flex-1 rounded-2xl border-2 border-border py-3 text-xs font-semibold text-text active:scale-95 disabled:opacity-50"
         >
           {t.t("common.cancel")}
         </button>
         <button
           onclick={handleDeleteAccount}
           disabled={deletingAccount}
-          class="flex-1 rounded-2xl bg-error py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+          class="flex-1 rounded-2xl bg-error py-3 text-xs font-bold text-white active:scale-95 disabled:opacity-50"
         >
           {deletingAccount
             ? t.t("profile.deletingAccount")

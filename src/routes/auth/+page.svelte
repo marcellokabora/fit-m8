@@ -92,12 +92,12 @@
 <div class="flex min-h-dvh flex-col bg-bg px-6 pb-10 pt-16">
   <!-- Header -->
   <div class="mb-8 flex flex-col items-center gap-2">
-    <a
+    <!-- <a
       href="/"
       class="mb-2 flex size-14 items-center justify-center rounded-2xl bg-primary text-white overflow-auto"
     >
       <Logo class="h-full w-full" />
-    </a>
+    </a> -->
     <h1 class="font-display text-2xl tracking-wide text-text">
       {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
     </h1>
