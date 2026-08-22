@@ -15,7 +15,6 @@
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import SportPickerModal from "$lib/components/SportPickerModal.svelte";
   import {
     ChevronDown,
     Crown,
@@ -30,8 +29,6 @@
   let t = $derived(createTranslator($activeLanguage));
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let expandedActivityId = $state<string | null>(null);
-  let showAddSport = $state(false);
-  let selectedNewIds = $state<string[]>([]);
 
   let formatOptions = $derived(
     ACTIVITY_FORMAT_OPTIONS.map((option) => ({
@@ -88,25 +85,6 @@
   function removeSport(id: string) {
     if (expandedActivityId === id) expandedActivityId = null;
     void saveActivities(activities.filter((act) => act.id !== id));
-  }
-
-  function openAddSport() {
-    showAddSport = true;
-    selectedNewIds = [];
-  }
-
-  function confirmAddSport() {
-    if (selectedNewIds.length === 0) return;
-    void saveActivities([
-      ...activities,
-      ...selectedNewIds.map((id) => ({
-        id,
-        format: "all" as ActivityFormat,
-        level: "basic" as SkillLevel,
-      })),
-    ]);
-    showAddSport = false;
-    selectedNewIds = [];
   }
 
   async function logout() {
@@ -245,26 +223,15 @@
         {t.t("sports.maxReached", { max: maxSports })}
       </p>
     {:else}
-      <button
-        onclick={openAddSport}
+      <a
+        href="/profile/add-sport"
         class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
         <Plus class="size-4" />
         {t.t("profile.addSportButton")}
-      </button>
+      </a>
     {/if}
   </div>
-
-  {#if showAddSport}
-    <SportPickerModal
-      activities={availableActivities}
-      bind:selectedIds={selectedNewIds}
-      max={remainingSportSlots}
-      {t}
-      onCancel={() => (showAddSport = false)}
-      onConfirm={confirmAddSport}
-    />
-  {/if}
 
   <!-- Premium -->
   <div class="mt-auto px-5 pt-8">

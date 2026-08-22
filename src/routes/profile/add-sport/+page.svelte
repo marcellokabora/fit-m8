@@ -1,70 +1,79 @@
 <script lang="ts">
-  import { X, Search } from "@lucide/svelte";
+  import { goto } from "$app/navigation";
+  import { Search } from "@lucide/svelte";
+  import BackHeader from "$lib/components/BackHeader.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import type { Translator } from "$lib/stores/language";
+  import { authUser, userProfile } from "$lib/stores/auth";
+  import {
+    ACTIVITIES,
+    getMaxSports,
+    type ActivityFormat,
+    type SkillLevel,
+  } from "$lib/types";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  let {
-    activities,
-    selectedIds = $bindable([]),
-    max,
-    t,
-    onCancel,
-    onConfirm,
-  }: {
-    activities: readonly { id: string }[];
-    selectedIds?: string[];
-    max: number;
-    t: Translator;
-    onCancel: () => void;
-    onConfirm: () => void;
-  } = $props();
+  let t = $derived(createTranslator($activeLanguage));
+
+  let profileActivities = $derived($userProfile?.activities ?? []);
+  let availableActivities = $derived(
+    ACTIVITIES.filter((a) => !profileActivities.some((act) => act.id === a.id)),
+  );
+  let maxSports = $derived(getMaxSports($userProfile?.isPremium));
+  let remainingSlots = $derived(
+    Math.max(0, maxSports - profileActivities.length),
+  );
 
   let query = $state("");
-  let searchEl = $state<HTMLInputElement | null>(null);
+  let selectedIds = $state<string[]>([]);
 
   let filtered = $derived(
     query.trim()
-      ? activities.filter((a) =>
+      ? availableActivities.filter((a) =>
           t.activity(a.id).toLowerCase().includes(query.trim().toLowerCase()),
         )
-      : activities,
+      : availableActivities,
   );
 
   function toggle(id: string) {
     if (selectedIds.includes(id)) {
       selectedIds = selectedIds.filter((x) => x !== id);
-    } else if (selectedIds.length < max) {
+    } else if (selectedIds.length < remainingSlots) {
       selectedIds = [...selectedIds, id];
     }
   }
 
-  // Autofocus the search field as soon as the picker takes over the screen.
-  $effect(() => {
-    searchEl?.focus();
-  });
+  async function confirm() {
+    if (selectedIds.length === 0) return;
+    const uid = $authUser?.uid;
+    if (!uid) return;
+    await userProfile.save(uid, {
+      activities: [
+        ...profileActivities,
+        ...selectedIds.map((id) => ({
+          id,
+          format: "all" as ActivityFormat,
+          level: "basic" as SkillLevel,
+        })),
+      ],
+    });
+    goto("/profile");
+  }
 </script>
 
-<div class="fixed inset-0 z-50 mx-auto flex w-full flex-col bg-bg md:max-w-md">
-  <div class="sticky top-0 z-10 bg-bg px-5 pb-3 pt-5 shadow-sm">
-    <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-lg font-black text-text">{t.t("profile.addSport")}</h2>
-      <button
-        onclick={onCancel}
-        class="flex size-8 items-center justify-center rounded-full bg-surface text-muted"
-        aria-label={t.t("common.close")}
-      >
-        <X class="size-4" />
-      </button>
-    </div>
+<div class="flex h-dvh flex-col overflow-hidden bg-bg">
+  <BackHeader href="/profile">
+    <h1 class="text-lg font-black text-text">{t.t("profile.addSport")}</h1>
+  </BackHeader>
+
+  <div class="px-5 pb-3">
     <p class="mb-3 text-xs font-semibold text-muted">
-      {t.t("sports.maxHint", { max })}
+      {t.t("sports.maxHint", { max: remainingSlots })}
     </p>
     <div class="relative">
       <Search
         class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
       />
       <input
-        bind:this={searchEl}
         type="text"
         bind:value={query}
         placeholder={t.t("common.search")}
@@ -73,7 +82,7 @@
     </div>
   </div>
 
-  <div class="flex-1 overflow-y-auto px-5 pb-4">
+  <div class="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
     {#if filtered.length === 0}
       <p class="mt-6 text-center text-sm text-muted">
         {t.t("common.noResults")}
@@ -84,7 +93,7 @@
           {@const selected = selectedIds.includes(activity.id)}
           <button
             onclick={() => toggle(activity.id)}
-            disabled={!selected && selectedIds.length >= max}
+            disabled={!selected && selectedIds.length >= remainingSlots}
             class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 disabled:opacity-40 {selected
               ? 'border-primary bg-primary/10'
               : 'border-border bg-surface'}"
@@ -99,19 +108,11 @@
     {/if}
   </div>
 
-  <div
-    class="sticky bottom-0 flex gap-3 border-t-2 border-border bg-bg px-5 py-4"
-  >
+  <div class="border-t border-border bg-surface p-4">
     <button
-      onclick={onCancel}
-      class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
-    >
-      {t.t("common.cancel")}
-    </button>
-    <button
-      onclick={onConfirm}
+      onclick={confirm}
       disabled={selectedIds.length === 0}
-      class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+      class="w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
     >
       {selectedIds.length > 1
         ? t.t("profile.addSports", { count: selectedIds.length })

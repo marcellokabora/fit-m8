@@ -182,6 +182,9 @@
     }
   }
 
+  // Age/distance are dragged sliders: querying on every "input" tick would fire on
+  // every pixel of movement, so those trigger the query on "change" (release) instead
+  // via triggerPreviewUpdate below, not through this effect.
   $effect(() => {
     // Referenced so this effect reruns whenever any draft filter changes.
     draftActivity;
@@ -189,15 +192,24 @@
     draftLevel;
     draftGender;
     draftOrientation;
-    ageMinDraft;
-    ageMaxDraft;
-    distanceDraft;
     draftSingle;
     draftTrainer;
+    triggerPreviewUpdate();
+  });
+
+  function triggerPreviewUpdate() {
     previewLoading = true;
     clearTimeout(previewDebounce);
     previewDebounce = setTimeout(updatePreviewCount, 300);
-  });
+  }
+
+  // Called on slider "change" (release), not "input" (drag), so the query fires once
+  // when the user stops moving the slider instead of on every intermediate value.
+  function onSliderRelease() {
+    clearTimeout(previewDebounce);
+    previewLoading = true;
+    updatePreviewCount();
+  }
 
   async function applyAndBack() {
     filterActivity.set(draftActivity);
@@ -341,6 +353,7 @@
           updateAgeMinDraft(
             Number((e.currentTarget as HTMLInputElement).value),
           )}
+        onchange={onSliderRelease}
         class="range-thumb absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary"
       />
       <input
@@ -352,6 +365,7 @@
           updateAgeMaxDraft(
             Number((e.currentTarget as HTMLInputElement).value),
           )}
+        onchange={onSliderRelease}
         class="range-thumb absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary"
       />
     </div>
@@ -384,13 +398,17 @@
         oninput={(e) => {
           distanceDraft = Number((e.currentTarget as HTMLInputElement).value);
         }}
+        onchange={onSliderRelease}
         class="absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary disabled:opacity-40"
       />
     </div>
     <div class="mb-5">
       {#if distanceDraft !== null}
         <button
-          onclick={() => (distanceDraft = null)}
+          onclick={() => {
+            distanceDraft = null;
+            onSliderRelease();
+          }}
           class="mt-1 text-xs font-semibold text-primary"
         >
           {t.t("common.clear")}

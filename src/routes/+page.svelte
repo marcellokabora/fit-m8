@@ -59,7 +59,7 @@
   {/if}
 
   <!-- Logo / Hero -->
-  <div class="flex flex-col items-center gap-4 text-text">
+  <div class="flex flex-col items-center gap-4 text-text relative">
     <!-- <div
       class="flex size-24 items-center justify-center rounded-3xl bg-primary text-white shadow-xl overflow-auto"
     >

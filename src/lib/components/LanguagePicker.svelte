@@ -27,12 +27,14 @@
 
 <div
   bind:this={containerEl}
-  class="flex flex-col items-center gap-4"
+  class="absolute left-1/2 flex -translate-x-1/2 flex-col items-center gap-5"
   role="group"
   aria-label={t.t("onboarding.chooseLanguage")}
   title={t.t("onboarding.chooseLanguage")}
 >
-  <div class="flex flex-col rounded-xl border-2 border-border bg-surface p-1">
+  <div
+    class="flex flex-col rounded-2xl border-2 border-border bg-surface p-1.5"
+  >
     {#each LANGUAGES as option}
       {#if option.code === $activeLanguage}
         <button
@@ -41,9 +43,9 @@
           aria-expanded={open}
           aria-label={t.t(`language.${option.code}` as any)}
           aria-pressed="true"
-          class="flex items-center gap-1.5 rounded-lg bg-primary px-2.5 py-1.5 text-xs font-bold text-white transition-colors"
+          class="flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2 text-sm font-bold text-white transition-colors"
         >
-          <Languages class="size-3.5" />
+          <Languages class="size-4.5" />
           {option.code.toUpperCase()}
         </button>
       {:else if open}
@@ -53,7 +55,7 @@
           onclick={() => selectLanguage(option.code)}
           aria-label={t.t(`language.${option.code}` as any)}
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1.5 text-xs font-bold text-muted transition-colors"
+          class="rounded-xl px-3.5 py-2 text-sm font-bold text-muted transition-colors"
         >
           {option.code.toUpperCase()}
         </button>

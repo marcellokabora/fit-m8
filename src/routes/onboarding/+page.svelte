@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { onMount, untrack } from "svelte";
   import { goto } from "$app/navigation";
+  import { page } from "$app/state";
+  import { browser } from "$app/environment";
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
     ACTIVITIES,
@@ -25,8 +28,45 @@
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  let step = $state(1);
   const TOTAL_STEPS = 5;
+  const DRAFT_KEY = "fit-m8-onboarding-draft";
+
+  type OnboardingDraft = {
+    step: number;
+    displayName: string;
+    bio: string;
+    age: number;
+    gender: Gender;
+    sexualOrientation: SexualOrientation;
+    isSingle: boolean;
+    city: string;
+    lat?: number;
+    lng?: number;
+    selectedActivities: string[];
+    activitySettings: Record<
+      string,
+      { format: ActivityFormat; level: SkillLevel }
+    >;
+    photos: string[];
+  };
+
+  function loadDraft(): Partial<OnboardingDraft> {
+    if (!browser) return {};
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  const draft = loadDraft();
+  const urlStepParam = Number(page.url.searchParams.get("step"));
+  let step = $state(
+    urlStepParam >= 1 && urlStepParam <= TOTAL_STEPS
+      ? urlStepParam
+      : (draft.step ?? 1),
+  );
   let t = $derived(createTranslator($activeLanguage));
   let genderOptions = $derived(
     GENDER_OPTIONS.map((option) => ({
@@ -54,29 +94,78 @@
   );
 
   // Step 1 — Basic info
-  let displayName = $state("");
-  let bio = $state("");
-  let age = $state<number>(25);
-  let gender = $state<Gender>("male");
-  let sexualOrientation = $state<SexualOrientation>("hetero");
-  let isSingle = $state(false);
-  let city = $state("");
-  let lat = $state<number | undefined>(undefined);
-  let lng = $state<number | undefined>(undefined);
+  let displayName = $state(draft.displayName ?? "");
+  let bio = $state(draft.bio ?? "");
+  let age = $state<number>(draft.age ?? 25);
+  let gender = $state<Gender>(draft.gender ?? "male");
+  let sexualOrientation = $state<SexualOrientation>(
+    draft.sexualOrientation ?? "hetero",
+  );
+  let isSingle = $state(draft.isSingle ?? false);
+  let city = $state(draft.city ?? "");
+  let lat = $state<number | undefined>(draft.lat);
+  let lng = $state<number | undefined>(draft.lng);
 
   // Step 2 — Activities
-  let selectedActivities = $state<string[]>([]);
+  let selectedActivities = $state<string[]>(draft.selectedActivities ?? []);
 
   // Step 3 — For each selected activity: format + level
   let activitySettings = $state<
     Record<string, { format: ActivityFormat; level: SkillLevel }>
-  >({});
+  >(draft.activitySettings ?? {});
 
   // Step 4 — Photos (optional, up to 3)
-  let photos = $state<string[]>([]);
+  let photos = $state<string[]>(draft.photos ?? []);
   let saving = $state(false);
   let error = $state("");
   let uid = $derived($authUser?.uid ?? "");
+
+  // Persist progress locally so leaving and coming back (or a refresh) restores it.
+  $effect(() => {
+    if (!browser) return;
+    const data: OnboardingDraft = {
+      step,
+      displayName,
+      bio,
+      age,
+      gender,
+      sexualOrientation,
+      isSingle,
+      city,
+      lat,
+      lng,
+      selectedActivities,
+      activitySettings,
+      photos,
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+  });
+
+  // Drives step from the URL so browser back/forward move between onboarding steps.
+  $effect(() => {
+    const urlStep = Number(page.url.searchParams.get("step"));
+    if (
+      urlStep >= 1 &&
+      urlStep <= TOTAL_STEPS &&
+      urlStep !== untrack(() => step)
+    ) {
+      step = urlStep;
+    }
+  });
+
+  onMount(() => {
+    if (page.url.searchParams.get("step") !== String(step)) {
+      const url = new URL(page.url);
+      url.searchParams.set("step", String(step));
+      goto(url, { replaceState: true, keepFocus: true, noScroll: true });
+    }
+  });
+
+  function pushStepUrl() {
+    const url = new URL(page.url);
+    url.searchParams.set("step", String(step));
+    goto(url, { keepFocus: true, noScroll: true });
+  }
 
   function toggleActivity(id: string) {
     if (selectedActivities.includes(id)) {
@@ -89,11 +178,15 @@
   }
 
   function next() {
-    if (step < TOTAL_STEPS) step++;
+    if (step < TOTAL_STEPS) {
+      step++;
+      pushStepUrl();
+    }
   }
 
   function back() {
-    if (step > 1) step--;
+    // Native history keeps the URL step and the browser's own back/forward buttons in sync.
+    if (step > 1) history.back();
   }
 
   async function save() {
@@ -123,6 +216,7 @@
         activities,
         emailVerified: user.emailVerified,
       });
+      localStorage.removeItem(DRAFT_KEY);
       goto("/discover");
     } catch (e: any) {
       error = e.message;
@@ -132,181 +226,187 @@
   }
 </script>
 
-<div class="flex min-h-dvh flex-col bg-bg px-6 pb-10 pt-10">
+<div class="flex h-dvh flex-col overflow-hidden bg-bg">
   <!-- Progress -->
-  <div class="mb-8 flex items-center gap-2">
-    {#each Array(TOTAL_STEPS) as _, i}
-      <div
-        class="h-1.5 flex-1 rounded-full transition-all {i + 1 <= step
-          ? 'bg-primary'
-          : 'bg-gray-200'}"
-      ></div>
-    {/each}
+  <div class="shrink-0 px-6 pt-10">
+    <div class="mb-8 flex items-center gap-2">
+      {#each Array(TOTAL_STEPS) as _, i}
+        <div
+          class="h-1.5 flex-1 rounded-full transition-all {i + 1 <= step
+            ? 'bg-primary'
+            : 'bg-gray-200'}"
+        ></div>
+      {/each}
+    </div>
   </div>
 
-  {#if step === 1}
-    <h2 class="mb-1 text-2xl font-black text-text">
-      {t.t("onboarding.aboutYou")}
-    </h2>
-    <p class="mb-6 text-sm text-muted">{t.t("onboarding.aboutYouHint")}</p>
-    <div class="flex flex-col gap-4">
-      <input
-        type="text"
-        bind:value={displayName}
-        placeholder={t.t("onboarding.name")}
-        class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-      />
-      <textarea
-        bind:value={bio}
-        placeholder={t.t("onboarding.bioOptional")}
-        rows={3}
-        maxlength={BIO_MAX_LENGTH}
-        class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-      ></textarea>
-      <p class="-mt-3 text-right text-xs text-muted">
-        {bio.length}/{BIO_MAX_LENGTH}
-      </p>
-      <div class="flex gap-3">
+  <div class="min-h-0 flex-1 overflow-y-auto px-6 pb-28">
+    {#if step === 1}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.aboutYou")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">{t.t("onboarding.aboutYouHint")}</p>
+      <div class="flex flex-col gap-4">
         <input
-          type="number"
-          bind:value={age}
-          min={16}
-          max={80}
-          placeholder={t.t("onboarding.age")}
-          class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+          type="text"
+          bind:value={displayName}
+          placeholder={t.t("onboarding.name")}
+          class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
         />
-        <LocationPicker bind:city bind:lat bind:lng />
-      </div>
-      <SegmentedControl
-        options={genderOptions}
-        value={gender}
-        ariaLabel={t.t("common.gender")}
-        onchange={(value) => (gender = value)}
-        size="lg"
-      />
-      <div>
+        <textarea
+          bind:value={bio}
+          placeholder={t.t("onboarding.bioOptional")}
+          rows={3}
+          maxlength={BIO_MAX_LENGTH}
+          class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+        ></textarea>
+        <p class="-mt-3 text-right text-xs text-muted">
+          {bio.length}/{BIO_MAX_LENGTH}
+        </p>
+        <div class="flex gap-3">
+          <input
+            type="number"
+            bind:value={age}
+            min={16}
+            max={80}
+            placeholder={t.t("onboarding.age")}
+            class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+          />
+          <LocationPicker bind:city bind:lat bind:lng />
+        </div>
         <SegmentedControl
-          options={orientationOptions}
-          value={sexualOrientation}
-          ariaLabel={t.t("common.orientation")}
-          onchange={(value) => (sexualOrientation = value)}
+          options={genderOptions}
+          value={gender}
+          ariaLabel={t.t("common.gender")}
+          onchange={(value) => (gender = value)}
           size="lg"
         />
-      </div>
-      <div
-        class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
-      >
-        <p class="text-sm font-semibold text-text">{t.t("profile.single")}</p>
-        <Toggle
-          checked={isSingle}
-          ariaLabel={t.t("profile.single")}
-          onchange={(value) => (isSingle = value)}
-        />
-      </div>
-    </div>
-  {:else if step === 2}
-    <h2 class="mb-1 text-2xl font-black text-text">
-      {t.t("onboarding.yourSports")}
-    </h2>
-    <p class="mb-1 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
-    <p class="mb-6 text-xs font-semibold text-muted">
-      {t.t("sports.maxHint", { max: MAX_SPORTS_FREE })}
-    </p>
-    <div class="grid grid-cols-2 gap-3">
-      {#each ACTIVITIES as activity}
-        {@const selected = selectedActivities.includes(activity.id)}
-        <button
-          onclick={() => toggleActivity(activity.id)}
-          disabled={!selected && selectedActivities.length >= MAX_SPORTS_FREE}
-          class="flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all active:scale-95 disabled:opacity-40 {selected
-            ? 'border-primary bg-primary/10'
-            : 'border-border bg-surface'}"
+        <div>
+          <SegmentedControl
+            options={orientationOptions}
+            value={sexualOrientation}
+            ariaLabel={t.t("common.orientation")}
+            onchange={(value) => (sexualOrientation = value)}
+            size="lg"
+          />
+        </div>
+        <div
+          class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
         >
-          <ActivityIcon id={activity.id} class="size-7 text-primary" />
-          <span class="text-sm font-semibold text-text"
-            >{t.activity(activity.id)}</span
+          <p class="text-sm font-semibold text-text">{t.t("profile.single")}</p>
+          <Toggle
+            checked={isSingle}
+            ariaLabel={t.t("profile.single")}
+            onchange={(value) => (isSingle = value)}
+          />
+        </div>
+      </div>
+    {:else if step === 2}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.yourSports")}
+      </h2>
+      <p class="mb-1 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
+      <p class="mb-6 text-xs font-semibold text-muted">
+        {t.t("sports.maxHint", { max: MAX_SPORTS_FREE })}
+      </p>
+      <div class="grid grid-cols-2 gap-3">
+        {#each ACTIVITIES as activity}
+          {@const selected = selectedActivities.includes(activity.id)}
+          <button
+            onclick={() => toggleActivity(activity.id)}
+            disabled={!selected && selectedActivities.length >= MAX_SPORTS_FREE}
+            class="flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all active:scale-95 disabled:opacity-40 {selected
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-surface'}"
           >
-        </button>
-      {/each}
-    </div>
-  {:else if step === 3}
-    <h2 class="mb-1 text-2xl font-black text-text">
-      {t.t("onboarding.yourSettings")}
-    </h2>
-    <p class="mb-6 text-sm text-muted">{t.t("onboarding.settingsHint")}</p>
-    <div class="flex flex-col gap-5">
-      {#each selectedActivities as id}
-        {@const activity = ACTIVITIES.find((a) => a.id === id)}
-        {@const settings = activitySettings[id]}
-        <div class="rounded-2xl border-2 border-border bg-surface p-4">
-          <p class="mb-3 flex items-center gap-2 font-bold text-text">
-            <ActivityIcon {id} class="size-4 text-primary" />
-            {activity ? t.activity(activity.id) : t.activity(id)}
-          </p>
-          <div class="mb-3">
-            <p
-              class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
+            <ActivityIcon id={activity.id} class="size-7 text-primary" />
+            <span class="text-sm font-semibold text-text"
+              >{t.activity(activity.id)}</span
             >
-              {t.t("common.format")}
+          </button>
+        {/each}
+      </div>
+    {:else if step === 3}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.yourSettings")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">{t.t("onboarding.settingsHint")}</p>
+      <div class="flex flex-col gap-5">
+        {#each selectedActivities as id}
+          {@const activity = ACTIVITIES.find((a) => a.id === id)}
+          {@const settings = activitySettings[id]}
+          <div class="rounded-2xl border-2 border-border bg-surface p-4">
+            <p class="mb-3 flex items-center gap-2 font-bold text-text">
+              <ActivityIcon {id} class="size-4 text-primary" />
+              {activity ? t.activity(activity.id) : t.activity(id)}
             </p>
-            <SegmentedControl
-              options={formatOptions}
-              value={settings.format}
-              ariaLabel={t.t("common.format")}
-              onchange={(value) => (activitySettings[id].format = value)}
-            />
-          </div>
-          <div>
-            <p
-              class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-            >
-              {t.t("common.level")}
-            </p>
-            <div class="flex gap-2">
-              {#each skillOptions as level}
-                <button
-                  onclick={() =>
-                    (activitySettings[id].level = level.value as SkillLevel)}
-                  class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {settings.level ===
-                  level.value
-                    ? 'border-secondary-dark bg-secondary text-white'
-                    : 'border-border text-muted'}"
-                >
-                  {t.skill(level.value)}
-                </button>
-              {/each}
+            <div class="mb-3">
+              <p
+                class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
+              >
+                {t.t("common.format")}
+              </p>
+              <SegmentedControl
+                options={formatOptions}
+                value={settings.format}
+                ariaLabel={t.t("common.format")}
+                onchange={(value) => (activitySettings[id].format = value)}
+              />
+            </div>
+            <div>
+              <p
+                class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
+              >
+                {t.t("common.level")}
+              </p>
+              <div class="flex gap-2">
+                {#each skillOptions as level}
+                  <button
+                    onclick={() =>
+                      (activitySettings[id].level = level.value as SkillLevel)}
+                    class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {settings.level ===
+                    level.value
+                      ? 'border-secondary-dark bg-secondary text-white'
+                      : 'border-border text-muted'}"
+                  >
+                    {t.skill(level.value)}
+                  </button>
+                {/each}
+              </div>
             </div>
           </div>
-        </div>
-      {/each}
-    </div>
-  {:else if step === 4}
-    <h2 class="mb-1 text-2xl font-black text-text">
-      {t.t("onboarding.profilePhotos")}
-    </h2>
-    <p class="mb-6 text-sm text-muted">
-      {t.t("onboarding.photosHint")}
-    </p>
-    <div class="flex flex-1 flex-col items-center justify-center gap-4">
-      <div class="w-full">
-        <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
+        {/each}
       </div>
-    </div>
-  {:else if step === 5}
-    <h2 class="mb-1 text-2xl font-black text-text">
-      {t.t("onboarding.makeItYours")}
-    </h2>
-    <p class="mb-6 text-sm text-muted">{t.t("onboarding.appearanceHint")}</p>
-    <AppearancePicker />
-    {#if error}
-      <p class="mt-4 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
-        {error}
+    {:else if step === 4}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.profilePhotos")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">
+        {t.t("onboarding.photosHint")}
       </p>
+      <div class="flex flex-1 flex-col items-center justify-center gap-4">
+        <div class="w-full">
+          <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
+        </div>
+      </div>
+    {:else if step === 5}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.makeItYours")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">{t.t("onboarding.appearanceHint")}</p>
+      <AppearancePicker />
+      {#if error}
+        <p class="mt-4 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
+          {error}
+        </p>
+      {/if}
     {/if}
-  {/if}
+  </div>
 
   <!-- Navigation -->
-  <div class="mt-auto flex gap-3 pt-8">
+  <div
+    class="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full gap-3 border-t border-border bg-bg px-6 py-4 pb-safe md:max-w-md"
+  >
     {#if step > 1}
       <button
         onclick={back}
