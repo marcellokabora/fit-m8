@@ -80,7 +80,7 @@ Fit-M8 is a mobile-first Progressive Web App built with SvelteKit, TailwindCSS, 
 | `/discover`       | Swipe cards + activity/format filters |
 | `/matches`        | Real-time matches list                |
 | `/chat/[matchId]` | Real-time chat per match              |
-| `/profile`        | View & edit profile                   |
+| `/profile`        | View & edit profile1                  |
 
 ## Deploy
 
