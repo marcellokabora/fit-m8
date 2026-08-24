@@ -24,6 +24,7 @@ jobs:
           PUBLIC_FIREBASE_STORAGE_BUCKET: fitmate-d2035.firebasestorage.app
           PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "911761176212"
           PUBLIC_FIREBASE_APP_ID: 1:911761176212:web:87d3b0e5118e82e09b6681
+          PUBLIC_FIREBASE_VAPID_KEY: BOQJqoJARZhW2OvweILnxRDd6Z_LE5p4LVhmSg-ie0zOrM4ME4v50bWgyugTkqfjigsVrK-V5rX0GoZSEx-Mv90
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
