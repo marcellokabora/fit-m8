@@ -8,6 +8,8 @@
   import { activeTheme } from "$lib/stores/theme";
   import { onMount } from "svelte";
   import { registerSW } from "virtual:pwa-register";
+  import { initForegroundMessaging } from "$lib/firebase/notifications";
+  import { startPresenceHeartbeat } from "$lib/firebase/presence";
   import { createTranslator } from "$lib/stores/language";
 
   let { children } = $props();
@@ -23,10 +25,14 @@
       registerSW({ immediate: true });
     }
 
+    let stopPresence: (() => void) | null = null;
+
     return authUser.subscribe(async (user) => {
       if (user === undefined) return; // still resolving persisted session
       const path = page.url.pathname;
       if (!user) {
+        stopPresence?.();
+        stopPresence = null;
         userProfile.set(null);
         if (!PUBLIC_ROUTES.includes(path)) goto("/auth");
       } else if (user) {
@@ -39,6 +45,9 @@
           if (user.emailVerified && profile?.emailVerified !== true) {
             await userProfile.save(user.uid, { emailVerified: true });
           }
+          // Re-attach the foreground push listener; no-op if permission was never granted
+          initForegroundMessaging();
+          if (!stopPresence) stopPresence = startPresenceHeartbeat(user.uid);
         }
       }
     });

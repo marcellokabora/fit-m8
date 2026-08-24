@@ -18,12 +18,12 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    const title = payload.notification?.title ?? 'Fit-M8';
-    self.registration.showNotification(title, {
-        body: payload.notification?.body,
+    const { title, body, url } = payload.data ?? {};
+    self.registration.showNotification(title ?? 'Fit-M8', {
+        body,
         icon: '/icons/icon-192.png',
         badge: '/icons/icon-192.png',
-        data: payload.data
+        data: { url }
     });
 });
 

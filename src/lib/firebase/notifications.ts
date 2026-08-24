@@ -1,13 +1,10 @@
 import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
-import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, setDoc, arrayUnion } from 'firebase/firestore';
 import { db, firebaseApp, firebaseConfig } from '$lib/firebase/client';
 import { PUBLIC_FIREBASE_VAPID_KEY } from '$env/static/public';
 
 const SW_PATH = '/notifications/firebase-messaging-sw.js';
 const SW_SCOPE = '/notifications/';
-
-// last token obtained in this session, so disabling can remove the exact one we added
-let activeToken: string | null = null;
 
 export async function pushNotificationsSupported(): Promise<boolean> {
     if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator))
@@ -20,13 +17,27 @@ async function registerMessagingServiceWorker() {
     return navigator.serviceWorker.register(`${SW_PATH}?${params}`, { scope: SW_SCOPE });
 }
 
-// Requests permission, obtains an FCM token and stores it on the user's profile.
-// Returns false if the browser doesn't support push, or the user denies permission.
-export async function enablePushNotifications(uid: string): Promise<boolean> {
-    if (!(await pushNotificationsSupported())) return false;
+function handleForegroundMessage(registration: ServiceWorkerRegistration, messaging: ReturnType<typeof getMessaging>) {
+    // Foreground messages don't trigger the background handler, so show them ourselves.
+    // Data-only payload (see functions/index.js) — a "notification" field would make the
+    // browser auto-display it in addition to this call, showing it twice.
+    onMessage(messaging, (payload) => {
+        registration.showNotification(payload.data?.title ?? 'Fit-M8', {
+            body: payload.data?.body,
+            icon: '/icons/icon-192.png',
+            data: { url: payload.data?.url }
+        });
+    });
+}
+
+// Requests permission and returns an FCM token, or null if unsupported/denied.
+// Doesn't persist anything — the caller decides when/where to save the token
+// (the user's Firestore doc may not exist yet, e.g. during onboarding).
+export async function requestPushToken(): Promise<string | null> {
+    if (!(await pushNotificationsSupported())) return null;
 
     const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return false;
+    if (permission !== 'granted') return null;
 
     const registration = await registerMessagingServiceWorker();
     const messaging = getMessaging(firebaseApp);
@@ -34,29 +45,24 @@ export async function enablePushNotifications(uid: string): Promise<boolean> {
         vapidKey: PUBLIC_FIREBASE_VAPID_KEY,
         serviceWorkerRegistration: registration
     });
-    if (!token) return false;
+    if (!token) return null;
 
-    activeToken = token;
-    await updateDoc(doc(db, 'users', uid), { fcmTokens: arrayUnion(token) });
-
-    // Foreground messages don't trigger the background handler, so show them ourselves.
-    onMessage(messaging, (payload) => {
-        const title = payload.notification?.title ?? 'Fit-M8';
-        registration.showNotification(title, {
-            body: payload.notification?.body,
-            icon: '/icons/icon-192.png',
-            data: payload.data
-        });
-    });
-
-    return true;
+    handleForegroundMessage(registration, messaging);
+    return token;
 }
 
-// Removes this device's token so it stops receiving push notifications.
-// Browsers don't allow revoking Notification permission from script, so the
-// permission itself stays granted; only the server-side token is dropped.
-export async function disablePushNotifications(uid: string): Promise<void> {
-    if (!activeToken) return;
-    await updateDoc(doc(db, 'users', uid), { fcmTokens: arrayRemove(activeToken) });
-    activeToken = null;
+export async function savePushToken(uid: string, token: string): Promise<void> {
+    await setDoc(doc(db, 'users', uid), { fcmTokens: arrayUnion(token) }, { merge: true });
 }
+
+// Re-attaches the foreground message listener on later app loads, for a device that
+// already granted permission — doesn't re-prompt or write anything to Firestore.
+export async function initForegroundMessaging(): Promise<void> {
+    if (!(await pushNotificationsSupported())) return;
+    if (Notification.permission !== 'granted') return;
+
+    const registration = await navigator.serviceWorker.getRegistration(SW_SCOPE);
+    if (!registration) return;
+    handleForegroundMessage(registration, getMessaging(firebaseApp));
+}
+

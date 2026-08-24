@@ -119,6 +119,9 @@ export interface UserProfile {
 	discoverFilters?: DiscoverFilters;
 	// FCM registration tokens for devices that opted into push notifications (one per browser/device)
 	fcmTokens?: string[];
+	// updated every ~20s while the app is open and visible; used server-side to skip
+	// push notifications for a user who's actively looking at the app right now
+	lastActiveAt?: Date;
 	createdAt: Date;
 	updatedAt: Date;
 }

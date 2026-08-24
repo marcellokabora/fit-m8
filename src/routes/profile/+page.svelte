@@ -15,14 +15,7 @@
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import Toggle from "$lib/components/Toggle.svelte";
   import {
-    enablePushNotifications,
-    disablePushNotifications,
-    pushNotificationsSupported,
-  } from "$lib/firebase/notifications";
-  import {
-    Bell,
     ChevronDown,
     Crown,
     MapPin,
@@ -30,38 +23,12 @@
     Plus,
     Trash2,
   } from "@lucide/svelte";
-  import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let expandedActivityId = $state<string | null>(null);
-
-  let pushSupported = $state(false);
-  let pushBlocked = $state(false);
-  let pushBusy = $state(false);
-  let pushEnabled = $derived(($userProfile?.fcmTokens?.length ?? 0) > 0);
-
-  onMount(async () => {
-    pushSupported = await pushNotificationsSupported();
-    pushBlocked = pushSupported && Notification.permission === "denied";
-  });
-
-  async function togglePush(next: boolean) {
-    const uid = $authUser?.uid;
-    if (!uid || pushBusy) return;
-    pushBusy = true;
-    if (next) {
-      const granted = await enablePushNotifications(uid);
-      pushBlocked = !granted && Notification.permission === "denied";
-      if (granted) await userProfile.load(uid);
-    } else {
-      await disablePushNotifications(uid);
-      await userProfile.load(uid);
-    }
-    pushBusy = false;
-  }
 
   let formatOptions = $derived(
     ACTIVITY_FORMAT_OPTIONS.map((option) => ({
@@ -266,30 +233,6 @@
       </a>
     {/if}
   </div>
-
-  <!-- Notifications -->
-  {#if pushSupported}
-    <div class="mt-8 flex items-center gap-4 px-5">
-      <span
-        class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-      >
-        <Bell class="size-5" />
-      </span>
-      <div class="flex-1">
-        <p class="font-bold text-text">{t.t("profile.pushNotifications")}</p>
-        <p class="text-sm text-muted">
-          {pushBlocked
-            ? t.t("profile.pushNotificationsBlocked")
-            : t.t("profile.pushNotificationsHint")}
-        </p>
-      </div>
-      <Toggle
-        checked={pushEnabled}
-        ariaLabel={t.t("profile.pushNotifications")}
-        onchange={togglePush}
-      />
-    </div>
-  {/if}
 
   <!-- Premium -->
   <div class="mt-auto px-5 pt-8">

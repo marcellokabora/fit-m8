@@ -19,16 +19,21 @@
     type Gender,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import { Zap } from "@lucide/svelte";
+  import { Bell, Check, MapPin, Zap } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
+  import {
+    requestPushToken,
+    savePushToken,
+    pushNotificationsSupported,
+  } from "$lib/firebase/notifications";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  const TOTAL_STEPS = 5;
+  const TOTAL_STEPS = 6;
   const DRAFT_KEY = "fit-m8-onboarding-draft";
 
   type OnboardingDraft = {
@@ -93,7 +98,7 @@
     })),
   );
 
-  // Step 1 — Basic info
+  // Step 2 — Basic info
   let displayName = $state(draft.displayName ?? "");
   let bio = $state(draft.bio ?? "");
   let age = $state<number>(draft.age ?? 25);
@@ -106,19 +111,34 @@
   let lat = $state<number | undefined>(draft.lat);
   let lng = $state<number | undefined>(draft.lng);
 
-  // Step 2 — Activities
+  // Step 3 — Activities
   let selectedActivities = $state<string[]>(draft.selectedActivities ?? []);
 
-  // Step 3 — For each selected activity: format + level
+  // Step 4 — For each selected activity: format + level
   let activitySettings = $state<
     Record<string, { format: ActivityFormat; level: SkillLevel }>
   >(draft.activitySettings ?? {});
 
-  // Step 4 — Photos (optional, up to 3)
+  // Step 5 — Photos (optional, up to 3)
   let photos = $state<string[]>(draft.photos ?? []);
   let saving = $state(false);
   let error = $state("");
   let uid = $derived($authUser?.uid ?? "");
+
+  // Step 1 — Push notification permission (not persisted in the draft; re-requesting
+  // after a refresh is instant once the browser has already granted/denied it)
+  let pushSupported = $state(false);
+  let pushToken = $state<string | null>(null);
+  let pushRequesting = $state(false);
+  let pushDenied = $state(false);
+
+  async function enableNotifications() {
+    if (pushRequesting || pushToken) return;
+    pushRequesting = true;
+    pushToken = await requestPushToken();
+    pushDenied = !pushToken;
+    pushRequesting = false;
+  }
 
   // Persist progress locally so leaving and coming back (or a refresh) restores it.
   $effect(() => {
@@ -159,6 +179,9 @@
       url.searchParams.set("step", String(step));
       goto(url, { replaceState: true, keepFocus: true, noScroll: true });
     }
+    pushNotificationsSupported().then(
+      (supported) => (pushSupported = supported),
+    );
   });
 
   function pushStepUrl() {
@@ -216,6 +239,7 @@
         activities,
         emailVerified: user.emailVerified,
       });
+      if (pushToken) await savePushToken(user.uid, pushToken);
       localStorage.removeItem(DRAFT_KEY);
       // Matches Discover's intro-modal flag; new users just saw onboarding, so skip it too
       localStorage.setItem("fit-m8-intro-seen", "1");
@@ -246,6 +270,72 @@
   <div class="min-h-0 flex-1 overflow-y-auto px-6 pb-28">
     {#if step === 1}
       <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.permissionsTitle")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">{t.t("onboarding.permissionsHint")}</p>
+      <div class="flex flex-col gap-4">
+        {#if pushSupported}
+          <div class="rounded-2xl border-2 border-border bg-surface p-4">
+            <div class="mb-3 flex items-center gap-3">
+              <span
+                class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+              >
+                <Bell class="size-5" />
+              </span>
+              <div class="flex-1">
+                <p class="font-bold text-text">
+                  {t.t("onboarding.notificationsTitle")}
+                </p>
+                <p class="text-sm text-muted">
+                  {t.t("onboarding.notificationsHint")}
+                </p>
+              </div>
+            </div>
+            {#if pushToken}
+              <p class="flex items-center gap-1 text-xs font-bold text-primary">
+                <Check class="size-4" />
+                {t.t("onboarding.notificationsEnabled")}
+              </p>
+            {:else}
+              <button
+                type="button"
+                onclick={enableNotifications}
+                disabled={pushRequesting}
+                class="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+              >
+                {pushRequesting
+                  ? t.t("common.loading")
+                  : t.t("onboarding.enableNotifications")}
+              </button>
+              {#if pushDenied}
+                <p class="mt-2 text-xs text-muted">
+                  {t.t("onboarding.notificationsBlocked")}
+                </p>
+              {/if}
+            {/if}
+          </div>
+        {/if}
+        <div class="rounded-2xl border-2 border-border bg-surface p-4">
+          <div class="mb-3 flex items-center gap-3">
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <MapPin class="size-5" />
+            </span>
+            <div class="flex-1">
+              <p class="font-bold text-text">
+                {t.t("onboarding.locationTitle")}
+              </p>
+              <p class="text-sm text-muted">
+                {t.t("onboarding.locationHint")}
+              </p>
+            </div>
+          </div>
+          <LocationPicker bind:city bind:lat bind:lng />
+        </div>
+      </div>
+    {:else if step === 2}
+      <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.aboutYou")}
       </h2>
       <p class="mb-6 text-sm text-muted">{t.t("onboarding.aboutYouHint")}</p>
@@ -266,17 +356,14 @@
         <p class="-mt-3 text-right text-xs text-muted">
           {bio.length}/{BIO_MAX_LENGTH}
         </p>
-        <div class="flex gap-3">
-          <input
-            type="number"
-            bind:value={age}
-            min={16}
-            max={80}
-            placeholder={t.t("onboarding.age")}
-            class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-          />
-          <LocationPicker bind:city bind:lat bind:lng />
-        </div>
+        <input
+          type="number"
+          bind:value={age}
+          min={16}
+          max={80}
+          placeholder={t.t("onboarding.age")}
+          class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+        />
         <SegmentedControl
           options={genderOptions}
           value={gender}
@@ -304,7 +391,7 @@
           />
         </div>
       </div>
-    {:else if step === 2}
+    {:else if step === 3}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.yourSports")}
       </h2>
@@ -329,7 +416,7 @@
           </button>
         {/each}
       </div>
-    {:else if step === 3}
+    {:else if step === 4}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.yourSettings")}
       </h2>
@@ -380,7 +467,7 @@
           </div>
         {/each}
       </div>
-    {:else if step === 4}
+    {:else if step === 5}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.profilePhotos")}
       </h2>
@@ -392,7 +479,7 @@
           <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
         </div>
       </div>
-    {:else if step === 5}
+    {:else if step === 6}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.makeItYours")}
       </h2>
@@ -421,7 +508,7 @@
     {#if step < TOTAL_STEPS}
       <button
         onclick={next}
-        disabled={step === 1 && (!displayName || !city)}
+        disabled={step === 2 && !displayName}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {t.t("common.continue")}
