@@ -217,7 +217,10 @@
         emailVerified: user.emailVerified,
       });
       localStorage.removeItem(DRAFT_KEY);
-      goto("/discover");
+      // Matches Discover's intro-modal flag; new users just saw onboarding, so skip it too
+      localStorage.setItem("fit-m8-intro-seen", "1");
+      // Land on the profile tab instead of Discover so new users skip the intro modal for now
+      goto("/profile");
     } catch (e: any) {
       error = e.message;
     } finally {

@@ -20,13 +20,18 @@
     filterTrainer,
   } from "$lib/stores/auth";
   import { getDiscoverFeed } from "$lib/firebase/swipe";
-  import { Loader2, RotateCcw, Users } from "@lucide/svelte";
+  import {
+    Loader2,
+    RotateCcw,
+    Users,
+    Heart,
+    GraduationCap,
+  } from "@lucide/svelte";
   import {
     ACTIVITIES,
     GENDER_OPTIONS,
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
-    DEFAULT_DISTANCE_KM,
     type ActivityFormat,
     type Gender,
     type SexualOrientation,
@@ -97,6 +102,13 @@
     $userProfile?.lat !== undefined && $userProfile?.lng !== undefined,
   );
 
+  // Used by the Dating/Friends/Trainer quick-preset buttons in the header
+  let myGender: Gender | "" = $derived($userProfile?.gender ?? "");
+  let oppositeGender: Gender | "" = $derived(
+    myGender === "male" ? "female" : myGender === "female" ? "male" : "",
+  );
+  let myOrientation = $derived($userProfile?.orientation ?? "hetero");
+
   // This page edits its own drafts only; the shared filter stores (which drive the
   // discover feed) are updated in one shot when "Save" is pressed, not while editing.
   let draftActivity = $state(get(filterActivity));
@@ -126,6 +138,62 @@
     draftActivity = id;
   }
 
+  let isDatingPreset = $derived(
+    draftFormat === "1v1" &&
+      draftLevel === "" &&
+      draftGender === oppositeGender &&
+      draftOrientation === myOrientation &&
+      draftSingle === true &&
+      draftTrainer === false,
+  );
+  let isFriendsPreset = $derived(
+    draftFormat === "" &&
+      draftLevel === "" &&
+      draftGender === myGender &&
+      draftOrientation === myOrientation &&
+      draftSingle === false &&
+      draftTrainer === false,
+  );
+  let isTrainerPreset = $derived(
+    draftFormat === "" &&
+      draftLevel === "expert" &&
+      draftGender === "" &&
+      draftOrientation === "" &&
+      draftSingle === false &&
+      draftTrainer === true,
+  );
+
+  // Quick presets shown as buttons in the header; each resets activity to "any"
+  function applyDatingPreset() {
+    draftActivity = "";
+    draftFormat = "1v1";
+    draftLevel = "";
+    draftGender = oppositeGender;
+    draftOrientation = myOrientation;
+    draftSingle = true;
+    draftTrainer = false;
+  }
+
+  function applyFriendsPreset() {
+    draftActivity = "";
+    draftFormat = "";
+    draftLevel = "";
+    draftGender = myGender;
+    draftOrientation = myOrientation;
+    draftSingle = false;
+    draftTrainer = false;
+  }
+
+  function applyTrainerPreset() {
+    draftActivity = "";
+    draftFormat = "";
+    draftLevel = "expert";
+    draftGender = "";
+    draftOrientation = "";
+    draftSingle = false;
+    draftTrainer = true;
+  }
+
   function resetFilters() {
     draftActivity = "";
     draftFormat = "";
@@ -134,7 +202,7 @@
     draftOrientation = "";
     ageMinDraft = AGE_MIN;
     ageMaxDraft = AGE_MAX;
-    distanceDraft = DEFAULT_DISTANCE_KM;
+    distanceDraft = null;
     draftSingle = false;
     draftTrainer = false;
   }
@@ -248,13 +316,42 @@
   <BackHeader href="/discover">
     <div class="flex flex-1 items-center justify-between">
       <h1 class="text-lg font-black text-text">{t.t("discover.filters")}</h1>
-      <button
-        onclick={resetFilters}
-        class="flex items-center gap-1 text-sm font-semibold text-primary"
-      >
-        <RotateCcw class="size-4" />
-        {t.t("common.clear")}
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          onclick={applyDatingPreset}
+          class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
+            ? 'bg-primary text-white'
+            : 'bg-surface text-text'}"
+          aria-label={t.t("discover.datingPreset")}
+        >
+          <Heart class="size-5" />
+        </button>
+        <button
+          onclick={applyFriendsPreset}
+          class="flex size-9 items-center justify-center rounded-full shadow-sm {isFriendsPreset
+            ? 'bg-primary text-white'
+            : 'bg-surface text-text'}"
+          aria-label={t.t("discover.friendsPreset")}
+        >
+          <Users class="size-5" />
+        </button>
+        <button
+          onclick={applyTrainerPreset}
+          class="flex size-9 items-center justify-center rounded-full shadow-sm {isTrainerPreset
+            ? 'bg-primary text-white'
+            : 'bg-surface text-text'}"
+          aria-label={t.t("discover.trainerPreset")}
+        >
+          <GraduationCap class="size-5" />
+        </button>
+        <button
+          onclick={resetFilters}
+          class="flex size-9 items-center justify-center rounded-full bg-surface text-primary shadow-sm"
+          aria-label={t.t("common.clear")}
+        >
+          <RotateCcw class="size-5" />
+        </button>
+      </div>
     </div>
   </BackHeader>
 

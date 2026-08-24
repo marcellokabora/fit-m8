@@ -164,7 +164,8 @@
               <div class="flex-1">
                 <p class="font-bold text-text">{t.activity(act.id)}</p>
                 <p class="text-sm text-muted">
-                  {#if act.format !== "all"}{t.format(act.format)}·
+                  {#if act.format !== "all"}{t.format(act.format)}
+                    <span class="px-1">·</span>
                   {/if}{t.skill(act.level)}
                 </p>
               </div>
