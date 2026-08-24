@@ -117,6 +117,8 @@ export interface UserProfile {
 	emailVerified?: boolean;
 	// undefined until the user has confirmed filters at least once from the Discover screen
 	discoverFilters?: DiscoverFilters;
+	// FCM registration tokens for devices that opted into push notifications (one per browser/device)
+	fcmTokens?: string[];
 	createdAt: Date;
 	updatedAt: Date;
 }
