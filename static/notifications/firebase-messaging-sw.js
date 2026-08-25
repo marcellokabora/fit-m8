@@ -15,6 +15,12 @@ firebase.initializeApp({
     appId: params.get('appId')
 });
 
+// Take over from any older cached copy of this worker immediately, so devices with the
+// app already open pick up notification payload/format changes right away instead of
+// waiting for every tab to be closed first.
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
+
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
