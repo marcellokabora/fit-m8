@@ -5,6 +5,7 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
+  import PresetHint from "$lib/components/PresetHint.svelte";
   import {
     authUser,
     userProfile,
@@ -356,6 +357,8 @@
   </BackHeader>
 
   <div class="min-h-0 flex-1 overflow-y-auto px-5 pb-6">
+    <PresetHint class="mt-5" />
+
     <!-- Format -->
     <p class="mb-2 text-sm font-bold text-muted">{t.t("common.format")}</p>
     <div class="mb-5">

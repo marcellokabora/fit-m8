@@ -133,6 +133,11 @@ const MESSAGES = {
         'discover.datingPreset': 'Dating',
         'discover.friendsPreset': 'Friends',
         'discover.trainerPreset': 'Trainer',
+        'discover.presetHintToggle': 'Dating, Friends, or Trainer?',
+        'discover.presetHintSubtitle': 'See what each quick filter sets for you.',
+        'discover.presetHintDatingBody': 'Sets gender and orientation filters so you meet people you could hit it off with.',
+        'discover.presetHintFriendsBody': 'Turns off dating filters and simply finds training partners to share a session with.',
+        'discover.presetHintTrainerBody': 'Filters by Expert level to find experienced players and trainers who can help you improve.',
         'discover.ageRange': 'Age range',
         'discover.distance': 'Distance',
         'discover.locationHint': 'Enable location detection in your profile to filter by distance.',
@@ -298,6 +303,11 @@ export type TranslationParams = Record<string, string | number>;
 const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string>>> = {
     en: {},
     es: {
+        'discover.presetHintToggle': '¿Citas, amistad o entrenador?',
+        'discover.presetHintSubtitle': 'Descubre qué ajusta cada filtro rápido.',
+        'discover.presetHintDatingBody': 'Configura los filtros de género y orientación para conocer a personas con las que conectes.',
+        'discover.presetHintFriendsBody': 'Desactiva los filtros de citas y busca compañeros de entrenamiento para compartir una sesión.',
+        'discover.presetHintTrainerBody': 'Filtra por nivel Experto para encontrar jugadores y entrenadores con experiencia que te ayuden a mejorar.',
         'auth.forgotPassword': '¿Olvidaste tu contraseña?',
         'auth.enterEmailFirst': 'Introduce primero tu correo electrónico',
         'auth.resetEmailSent': 'Correo de restablecimiento enviado. Revisa tu bandeja de entrada.',
@@ -484,7 +494,12 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'profile.socialLinkPlaceholder': 'instagram.com/o-teu-utilizador',
         'profile.invalidSocialLink': 'Introduz um link válido',
         'common.add': 'Adicionar',
-        'common.remove': 'Remover'
+        'common.remove': 'Remover',
+        'discover.presetHintToggle': 'Encontros, amizade ou treinador?',
+        'discover.presetHintSubtitle': 'Descobre o que cada filtro rápido ajusta.',
+        'discover.presetHintDatingBody': 'Define os filtros de género e orientação para conheceres pessoas com quem possas conectar-te.',
+        'discover.presetHintFriendsBody': 'Desativa os filtros de encontros e encontra parceiros de treino para partilhar uma sessão.',
+        'discover.presetHintTrainerBody': 'Filtra por nível Especialista para encontrares jogadores e treinadores experientes que te ajudem a melhorar.'
     }
 };
 

@@ -23,6 +23,7 @@ Thumbs.db
 firebase-key.json
 firebase-key.*.json
 serviceAccountKey.json
+.firebase
 
 # Seed script (contains fake data, run locally only)
 seed.cjs

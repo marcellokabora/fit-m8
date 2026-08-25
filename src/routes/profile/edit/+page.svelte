@@ -363,7 +363,7 @@
   </div>
 
   <!-- Language -->
-  <div class="px-5 pb-8">
+  <div class="px-5">
     <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
       {t.t("common.language")}
     </h3>
