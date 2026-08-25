@@ -24,6 +24,7 @@ exports.onMatchCreated = onDocumentCreated('matches/{matchId}', async (event) =>
             db.collection('users').doc(uid).set({ pendingMatch: true }, { merge: true })
         )
     );
+    console.log(`onMatchCreated: flagged pendingMatch for ${match.userIds.join(', ')}`);
 });
 
 exports.onMessageCreated = onDocumentCreated(
@@ -37,6 +38,7 @@ exports.onMessageCreated = onDocumentCreated(
         if (!recipientUid) return;
 
         await db.collection('users').doc(recipientUid).set({ pendingMessage: true }, { merge: true });
+        console.log(`onMessageCreated: flagged pendingMessage for ${recipientUid}`);
     }
 );
 
@@ -48,6 +50,9 @@ async function push(userRef, tokens, title, body) {
         tokens,
         data: { title, body, url: '/matches' }
     });
+    console.log(
+        `push(${userRef.id}): "${title}" to ${tokens.length} token(s), ${response.successCount} succeeded, ${response.failureCount} failed`
+    );
 
     const staleTokens = response.responses
         .map((result, i) => (result.success ? null : tokens[i]))
@@ -71,6 +76,9 @@ exports.sendPendingNotifications = onSchedule({ schedule: 'every 5 minutes', reg
         db.collection('users').where('pendingMatch', '==', true).where('lastActiveAt', '<=', cutoff).get(),
         db.collection('users').where('pendingMessage', '==', true).where('lastActiveAt', '<=', cutoff).get()
     ]);
+    console.log(
+        `sendPendingNotifications: ${matchSnap.size} pending match(es), ${messageSnap.size} pending message(s) offline since before ${cutoff.toISOString()}`
+    );
 
     await Promise.all([
         ...matchSnap.docs.map(async (userDoc) => {

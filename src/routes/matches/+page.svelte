@@ -1,6 +1,13 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { LoaderCircle, Users, User, Crown } from "@lucide/svelte";
+  import {
+    LoaderCircle,
+    Users,
+    User,
+    Crown,
+    PartyPopper,
+    MessageCircle,
+  } from "@lucide/svelte";
   import { authUser } from "$lib/stores/auth";
   import { db } from "$lib/firebase/client";
   import {
@@ -179,19 +186,14 @@
                 <span class="px-1">·</span>
                 {t.format(match.format)}{/if}
             </p>
-            <!-- {#if match.lastMessage}
-              <p
-                class="mt-0.5 truncate text-sm {unread
-                  ? 'font-bold text-text'
-                  : 'text-muted'}"
-              >
-                {match.lastMessage}
-              </p>
-            {/if} -->
           </div>
           <div class="flex flex-col items-end gap-1">
             {#if unread}
-              <span class="size-2.5 rounded-full bg-red-500"></span>
+              {#if match.lastMessageAt}
+                <MessageCircle class="size-5 fill-red-500 text-red-500" />
+              {:else}
+                <PartyPopper class="size-5 fill-red-500 text-red-500" />
+              {/if}
             {:else}
               <span
                 class="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"
