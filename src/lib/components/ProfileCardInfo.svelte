@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MapPin, GraduationCap } from "@lucide/svelte";
+  import { MapPin, GraduationCap, Crown } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import type { UserProfile } from "$lib/types";
   import type { Translator } from "$lib/stores/language";
@@ -28,6 +28,12 @@
     <h3 class="text-xl font-black text-text">
       {user.displayName}
     </h3>
+    {#if user.isPremium}
+      <Crown
+        class="size-4 shrink-0 text-primary"
+        aria-label={t.t("profile.premiumMember")}
+      />
+    {/if}
     {#if user.age}
       <span class="text-sm text-muted">{user.age}</span>
     {/if}

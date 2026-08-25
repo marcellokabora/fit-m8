@@ -274,7 +274,13 @@ const MESSAGES = {
         'premium.cancelButton': 'Cancel subscription',
         'profile.goPremium': 'Go Premium',
         'profile.premiumMember': 'Premium member',
-        'profile.premiumFeature': 'Premium'
+        'profile.premiumFeature': 'Premium',
+        'profile.socialLinks': 'Social links',
+        'profile.socialLinksHint': 'Add links to your Instagram, WhatsApp, or other profiles',
+        'profile.socialLinkPlaceholder': 'instagram.com/you',
+        'profile.invalidSocialLink': 'Enter a valid link',
+        'common.add': 'Add',
+        'common.remove': 'Remove'
     },
     es: {
         'meta.description': 'Conecta con personas para hacer deporte cerca de ti', 'language.en': 'Inglés', 'language.es': 'Español', 'language.pt': 'Portugués',
@@ -380,7 +386,13 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'chat.reportDetailsPlaceholder': 'Añade detalles (opcional)',
         'chat.reportSubmit': 'Enviar denuncia',
         'chat.reporting': 'Enviando...',
-        'chat.reportSuccess': 'Denuncia enviada. Gracias por avisarnos.'
+        'chat.reportSuccess': 'Denuncia enviada. Gracias por avisarnos.',
+        'profile.socialLinks': 'Redes sociales',
+        'profile.socialLinksHint': 'Añade enlaces a tu Instagram, WhatsApp u otros perfiles',
+        'profile.socialLinkPlaceholder': 'instagram.com/tu_usuario',
+        'profile.invalidSocialLink': 'Introduce un enlace válido',
+        'common.add': 'Añadir',
+        'common.remove': 'Eliminar'
     },
     pt: {
         'auth.forgotPassword': 'Esqueceste-te da palavra-passe?',
@@ -466,7 +478,13 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'chat.reportDetailsPlaceholder': 'Adiciona detalhes (opcional)',
         'chat.reportSubmit': 'Enviar denúncia',
         'chat.reporting': 'A enviar...',
-        'chat.reportSuccess': 'Denúncia enviada. Obrigado por nos avisares.'
+        'chat.reportSuccess': 'Denúncia enviada. Obrigado por nos avisares.',
+        'profile.socialLinks': 'Redes sociais',
+        'profile.socialLinksHint': 'Adiciona links do teu Instagram, WhatsApp ou outros perfis',
+        'profile.socialLinkPlaceholder': 'instagram.com/o-teu-utilizador',
+        'profile.invalidSocialLink': 'Introduz um link válido',
+        'common.add': 'Adicionar',
+        'common.remove': 'Remover'
     }
 };
 

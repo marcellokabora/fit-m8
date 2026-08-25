@@ -32,9 +32,14 @@ function createUnreadMatchesStore() {
                 const unread = new Set<string>();
                 for (const d of snap.docs) {
                     const match = d.data() as Omit<Match, 'id'>;
-                    if (!match.lastMessageAt || match.lastMessageSenderId === user.uid) continue;
                     const readAt = toMillis(match.readBy?.[user.uid]);
-                    if (readAt < toMillis(match.lastMessageAt)) unread.add(d.id);
+                    if (match.lastMessageAt) {
+                        if (match.lastMessageSenderId === user.uid) continue;
+                        if (readAt < toMillis(match.lastMessageAt)) unread.add(d.id);
+                    } else if (readAt === 0) {
+                        // Brand new match with no messages yet and never opened — notify about it too.
+                        unread.add(d.id);
+                    }
                 }
                 set(unread);
             });

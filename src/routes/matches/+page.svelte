@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { LoaderCircle, Users, User } from "@lucide/svelte";
+  import { LoaderCircle, Users, User, Crown } from "@lucide/svelte";
   import { authUser } from "$lib/stores/auth";
   import { db } from "$lib/firebase/client";
   import {
@@ -164,8 +164,14 @@
             {/if}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="font-bold text-text truncate">
+            <p class="flex items-center gap-1 font-bold text-text truncate">
               {other?.displayName ?? t.t("matches.fallback")}
+              {#if other?.isPremium}
+                <Crown
+                  class="size-3.5 shrink-0 text-primary"
+                  aria-label={t.t("profile.premiumMember")}
+                />
+              {/if}
             </p>
             <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
               <ActivityIcon id={match.activity} class="size-3.5" />

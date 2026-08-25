@@ -14,10 +14,19 @@
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
-  import { Check, Crown, Loader2, RotateCcw, Trash2 } from "@lucide/svelte";
+  import {
+    Check,
+    Crown,
+    Loader2,
+    Plus,
+    RotateCcw,
+    Trash2,
+  } from "@lucide/svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
+  import SocialIcon from "$lib/components/SocialIcon.svelte";
   import { resetSwipes } from "$lib/firebase/swipe";
   import { deleteAccount } from "$lib/firebase/account";
+  import { detectSocialPlatform, normalizeSocialLink } from "$lib/social";
   import {
     activeLanguage,
     createTranslator,
@@ -65,6 +74,9 @@
     $userProfile?.photos ??
       ($userProfile?.photoURL ? [$userProfile.photoURL] : []),
   );
+  let socialLinks = $state<string[]>($userProfile?.socialLinks ?? []);
+  let newSocialLink = $state("");
+  let socialLinkError = $state(false);
   let uid = $derived($authUser?.uid ?? "");
 
   $effect(() => {
@@ -81,12 +93,30 @@
       photos =
         $userProfile.photos ??
         ($userProfile.photoURL ? [$userProfile.photoURL] : []);
+      socialLinks = $userProfile.socialLinks ?? [];
     }
   });
 
   function handlePhotosChange(next: string[]) {
     if (!uid) return;
     userProfile.save(uid, { photos: next, photoURL: next[0] ?? "" });
+  }
+
+  function addSocialLink() {
+    const url = normalizeSocialLink(newSocialLink);
+    try {
+      new URL(url);
+    } catch {
+      socialLinkError = true;
+      return;
+    }
+    socialLinkError = false;
+    socialLinks = [...socialLinks, url];
+    newSocialLink = "";
+  }
+
+  function removeSocialLink(index: number) {
+    socialLinks = socialLinks.filter((_, i) => i !== index);
   }
 
   async function save() {
@@ -104,6 +134,7 @@
         isSingle,
         // Trainer status requires an active Premium subscription, even if the toggle was left on from before
         isTrainer: $userProfile?.isPremium ? isTrainer : false,
+        socialLinks,
       });
     }
     saving = false;
@@ -270,6 +301,65 @@
         </button>
       {/if}
     </div>
+  </div>
+
+  <!-- Social links -->
+  <div class="px-5 pb-8">
+    <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+      {t.t("profile.socialLinks")}
+    </h3>
+    <p class="mb-3 text-sm text-muted">{t.t("profile.socialLinksHint")}</p>
+    {#if socialLinks.length > 0}
+      <div class="mb-3 flex flex-col gap-2">
+        {#each socialLinks as link, index}
+          {@const platform = detectSocialPlatform(link)}
+          <div
+            class="flex items-center gap-3 rounded-2xl bg-surface px-4 py-3 shadow-sm"
+          >
+            <span
+              class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <SocialIcon url={link} class="size-4.5" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-bold text-text">
+                {platform.label}
+              </p>
+              <p class="truncate text-xs text-muted">{link}</p>
+            </div>
+            <button
+              onclick={() => removeSocialLink(index)}
+              aria-label={`${t.t("common.remove")} ${platform.label}`}
+              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-error/10 text-error active:scale-95"
+            >
+              <Trash2 class="size-4" />
+            </button>
+          </div>
+        {/each}
+      </div>
+    {/if}
+    <div class="flex gap-2">
+      <input
+        type="text"
+        bind:value={newSocialLink}
+        onkeydown={(e) =>
+          e.key === "Enter" && (e.preventDefault(), addSocialLink())}
+        placeholder={t.t("profile.socialLinkPlaceholder")}
+        class="w-full min-w-0 flex-1 rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm text-text outline-none focus:border-primary"
+      />
+      <button
+        onclick={addSocialLink}
+        aria-label={t.t("common.add")}
+        class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary active:scale-95"
+      >
+        <Plus class="size-5" />
+      </button>
+    </div>
+    {#if socialLinkError}
+      <p class="mt-1.5 text-xs font-semibold text-error">
+        {t.t("profile.invalidSocialLink")}
+      </p>
+    {/if}
   </div>
 
   <!-- Language -->

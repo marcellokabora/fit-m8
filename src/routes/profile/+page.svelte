@@ -12,6 +12,7 @@
   } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
@@ -25,6 +26,7 @@
   } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import { detectSocialPlatform } from "$lib/social";
 
   let t = $derived(createTranslator($activeLanguage));
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
@@ -135,6 +137,21 @@
       <p class="text-center text-sm text-muted text-balance">
         {$userProfile.bio}
       </p>
+    {/if}
+    {#if $userProfile?.socialLinks?.length}
+      <div class="flex flex-wrap justify-center gap-2">
+        {#each $userProfile.socialLinks as link}
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={detectSocialPlatform(link).label}
+            class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
+          >
+            <SocialIcon url={link} class="size-4.5" />
+          </a>
+        {/each}
+      </div>
     {/if}
   </div>
 

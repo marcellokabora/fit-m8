@@ -6,6 +6,7 @@
   import { doc, getDoc } from "firebase/firestore";
   import { ACTIVITIES, type UserProfile } from "$lib/types";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import SocialIcon from "$lib/components/SocialIcon.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
@@ -18,9 +19,11 @@
     PartyPopper,
     MessageCircle,
     GraduationCap,
+    Crown,
     X,
   } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import { detectSocialPlatform } from "$lib/social";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -156,7 +159,15 @@
     <PhotoGallery {photos} alt={profile.displayName} />
 
     <div class="flex flex-col items-center gap-3 px-5 pb-6 pt-4">
-      <h2 class="text-xl font-black text-text">{profile.displayName}</h2>
+      <h2 class="flex items-center gap-1.5 text-xl font-black text-text">
+        {profile.displayName}
+        {#if profile.isPremium}
+          <Crown
+            class="size-4 shrink-0 text-primary"
+            aria-label={t.t("profile.premiumMember")}
+          />
+        {/if}
+      </h2>
       <div class="flex items-center gap-2 text-sm text-muted">
         {#if profile.age}
           <span>{profile.age}</span>
@@ -188,6 +199,21 @@
       </div>
       {#if profile.bio}
         <p class="text-center text-sm text-muted text-balance">{profile.bio}</p>
+      {/if}
+      {#if profile.socialLinks?.length}
+        <div class="flex flex-wrap justify-center gap-2">
+          {#each profile.socialLinks as link}
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={detectSocialPlatform(link).label}
+              class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
+            >
+              <SocialIcon url={link} class="size-4.5" />
+            </a>
+          {/each}
+        </div>
       {/if}
     </div>
 
