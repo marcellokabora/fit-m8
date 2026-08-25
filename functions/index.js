@@ -6,11 +6,12 @@ const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 initializeApp();
 const db = getFirestore();
 
-// A heartbeat older than this means the app isn't in view anymore (see startPresenceHeartbeat).
-const ACTIVE_THRESHOLD_MS = 45_000;
+// A heartbeat older than this means the user is considered offline (see startPresenceHeartbeat).
+// Pushes for matches/messages are only sent once the recipient has been offline this long.
+const OFFLINE_THRESHOLD_MS = 2 * 60_000;
 
 // Sends to every token on file for `uid` and prunes any FCM reports as invalid/unregistered.
-// Skipped entirely if the recipient is currently active in the app — they'll see the
+// Skipped entirely if the recipient hasn't been offline long enough yet — they'll see the
 // update live via Firestore listeners, so a push would just be a redundant interruption.
 async function notifyUser(uid, { title, body, url }) {
     const userRef = db.collection('users').doc(uid);
@@ -20,7 +21,7 @@ async function notifyUser(uid, { title, body, url }) {
     if (!tokens?.length) return;
 
     const lastActiveMs = user?.lastActiveAt?.toMillis?.();
-    if (lastActiveMs && Date.now() - lastActiveMs < ACTIVE_THRESHOLD_MS) return;
+    if (lastActiveMs && Date.now() - lastActiveMs < OFFLINE_THRESHOLD_MS) return;
 
     // Data-only payload: a top-level "notification" field makes the browser auto-display it
     // *in addition to* our service worker's onBackgroundMessage handler, showing it twice.

@@ -153,3 +153,15 @@ export interface Message {
 	text: string;
 	timestamp: Date;
 }
+
+export type ReportReason = 'harassment' | 'inappropriate' | 'fake_profile' | 'spam' | 'other';
+
+export interface Report {
+	id: string;
+	reporterId: string;
+	reportedUid: string;
+	matchId: string;
+	reason: ReportReason;
+	details?: string;
+	createdAt: Date;
+}

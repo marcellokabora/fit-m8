@@ -35,6 +35,31 @@
     }
   }
 
+  function toMillis(val: unknown): number {
+    if (!val) return 0;
+    if (typeof val === "object" && val !== null && "toMillis" in val) {
+      return (val as { toMillis: () => number }).toMillis();
+    }
+    if (val instanceof Date) return val.getTime();
+    return 0;
+  }
+
+  // Most recent activity on a match: the last message time, or when it was made if no messages yet
+  function activityMillis(match: Match): number {
+    return toMillis(match.lastMessageAt) || toMillis(match.createdAt);
+  }
+
+  // Unread conversations first, then newest activity (new messages/matches) first within each group
+  let sortedMatches = $derived(
+    [...matches].sort((a, b) => {
+      const unreadDiff =
+        Number($unreadMatches.has(b.id)) - Number($unreadMatches.has(a.id));
+      return unreadDiff !== 0
+        ? unreadDiff
+        : activityMillis(b) - activityMillis(a);
+    }),
+  );
+
   // Re-run once auth state resolves ($authUser starts as undefined while loading)
   $effect(() => {
     const uid = $authUser?.uid;
@@ -116,7 +141,7 @@
     </div>
   {:else}
     <div class="flex flex-col gap-3 px-5">
-      {#each matches as match}
+      {#each sortedMatches as match}
         {@const activity = ACTIVITIES.find((a) => a.id === match.activity)}
         {@const otherUid = match.userIds.find((id) => id !== $authUser?.uid)}
         {@const other = otherUid ? otherUsers[otherUid] : undefined}
@@ -144,7 +169,8 @@
             </p>
             <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
               <ActivityIcon id={match.activity} class="size-3.5" />
-              {t.activity(match.activity)}{#if match.format !== "all"}·
+              {t.activity(match.activity)}{#if match.format !== "all"}
+                <span class="px-1">·</span>
                 {t.format(match.format)}{/if}
             </p>
             <!-- {#if match.lastMessage}

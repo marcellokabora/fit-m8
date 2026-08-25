@@ -10,11 +10,13 @@
     title,
     class: className = "",
     children,
+    actions,
   }: {
     href?: string;
     title?: string;
     class?: string;
     children?: Snippet;
+    actions?: Snippet;
   } = $props();
 </script>
 
@@ -42,5 +44,8 @@
     {@render children()}
   {:else if title}
     <h1 class="text-lg font-black text-text">{title}</h1>
+  {/if}
+  {#if actions}
+    {@render actions()}
   {/if}
 </div>

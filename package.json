@@ -10,7 +10,8 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"verify-user": "node verify-user.cjs"
+		"verify-user": "node verify-user.cjs",
+		"deploy:functions": "firebase deploy --only functions"
 	},
 	"devDependencies": {
 		"@iconify-json/material-symbols": "^1.2.88",
@@ -20,6 +21,7 @@
 		"@sveltejs/kit": "^2.63.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@tailwindcss/vite": "^4.3.3",
+		"firebase-tools": "^15.28.1",
 		"svelte": "^5.56.1",
 		"svelte-check": "^4.6.0",
 		"tailwindcss": "^4.3.3",

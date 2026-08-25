@@ -1,6 +1,7 @@
 import {
 	collection,
 	doc,
+	deleteDoc,
 	setDoc,
 	getDoc,
 	query,
@@ -149,3 +150,15 @@ export async function resetSwipes(uid: string) {
 	matchesSnap.docs.forEach((d) => batch.delete(d.ref));
 	await batch.commit();
 }
+
+// Deletes a single match and its chat thread (used from the chat screen's "remove match" action).
+export async function unmatch(matchId: string) {
+	const messagesSnap = await getDocs(collection(db, 'chats', matchId, 'messages'));
+	if (!messagesSnap.empty) {
+		const messagesBatch = writeBatch(db);
+		messagesSnap.docs.forEach((m) => messagesBatch.delete(m.ref));
+		await messagesBatch.commit();
+	}
+	await deleteDoc(doc(db, 'matches', matchId));
+}
+
