@@ -122,6 +122,9 @@
     <h2 class="text-xl font-black text-text">
       {$userProfile?.displayName ?? "—"}
     </h2>
+    {#if $authUser?.email}
+      <p class="text-sm text-muted">{$authUser.email}</p>
+    {/if}
     {#if $userProfile?.city}
       <p class="flex items-center gap-1 text-sm text-muted">
         <MapPin class="size-4" />

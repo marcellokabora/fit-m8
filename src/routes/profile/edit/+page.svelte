@@ -169,6 +169,18 @@
         class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base font-bold text-text w-full outline-none focus:border-primary"
       />
     </div>
+    {#if $authUser?.email}
+      <div class="w-full">
+        <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+          {t.t("common.email")}
+        </h3>
+        <p
+          class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base text-muted w-full"
+        >
+          {$authUser.email}
+        </p>
+      </div>
+    {/if}
     <div class="w-full">
       <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
         {t.t("common.biography")}

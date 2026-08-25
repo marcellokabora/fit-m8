@@ -633,7 +633,7 @@
               onpointermove={onPointerMove}
               onpointerup={onPointerUp}
               onpointercancel={onPointerUp}
-              in:scale={{ start: 0.95, duration: 220, opacity: 0.6 }}
+              in:scale={{ start: 0.95, duration: 220, opacity: 1 }}
               style="transform: translateX({currentX}px) rotate({rotation}deg); transition: {dragging
                 ? 'none'
                 : exiting
