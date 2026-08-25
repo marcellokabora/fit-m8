@@ -57,12 +57,14 @@ export async function savePushToken(uid: string, token: string): Promise<void> {
 
 // Re-attaches the foreground message listener on later app loads, for a device that
 // already granted permission — doesn't re-prompt or write anything to Firestore.
+// Re-registers (not just getRegistration) so the browser's update algorithm runs and
+// picks up any new deploy of the SW script instead of running a stale cached copy
+// indefinitely (browsers otherwise only re-check on their own ~24h schedule).
 export async function initForegroundMessaging(): Promise<void> {
     if (!(await pushNotificationsSupported())) return;
     if (Notification.permission !== 'granted') return;
 
-    const registration = await navigator.serviceWorker.getRegistration(SW_SCOPE);
-    if (!registration) return;
+    const registration = await registerMessagingServiceWorker();
     handleForegroundMessage(registration, getMessaging(firebaseApp));
 }
 
