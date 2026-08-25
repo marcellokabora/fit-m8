@@ -106,7 +106,9 @@
   }
 
   onMount(() => {
-    pushNotificationsSupported().then((supported) => (pushSupported = supported));
+    pushNotificationsSupported().then(
+      (supported) => (pushSupported = supported),
+    );
   });
 
   $effect(() => {
@@ -430,9 +432,7 @@
           class="flex w-full items-center justify-center gap-2 rounded-2xl bg-surface border-2 border-border py-3 text-sm font-bold active:scale-95 disabled:opacity-60"
         >
           <Bell class="size-4" />
-          {pushRequesting
-            ? "..."
-            : t.t("onboarding.enableNotifications")}
+          {pushRequesting ? "..." : t.t("onboarding.enableNotifications")}
         </button>
         {#if pushDenied}
           <p class="mt-2 text-xs font-semibold text-error">
