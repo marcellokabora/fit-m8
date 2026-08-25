@@ -18,16 +18,28 @@ async function notifyUser(uid, { title, body, url }) {
     const userSnap = await userRef.get();
     const user = userSnap.data();
     const tokens = user?.fcmTokens;
-    if (!tokens?.length) return;
+    if (!tokens?.length) {
+        console.log(`notifyUser(${uid}): skipped, no fcmTokens on file`);
+        return;
+    }
 
     const lastActiveMs = user?.lastActiveAt?.toMillis?.();
-    if (lastActiveMs && Date.now() - lastActiveMs < OFFLINE_THRESHOLD_MS) return;
+    if (lastActiveMs && Date.now() - lastActiveMs < OFFLINE_THRESHOLD_MS) {
+        console.log(`notifyUser(${uid}): skipped, active ${Date.now() - lastActiveMs}ms ago`);
+        return;
+    }
 
     // Data-only payload: a top-level "notification" field makes the browser auto-display it
     // *in addition to* our service worker's onBackgroundMessage handler, showing it twice.
     const response = await getMessaging().sendEachForMulticast({
         tokens,
         data: { title, body: body ?? '', url: url ?? '/' }
+    });
+    console.log(
+        `notifyUser(${uid}): sent title=${JSON.stringify(title)} body=${JSON.stringify(body)} to ${tokens.length} token(s), ${response.successCount} succeeded, ${response.failureCount} failed`
+    );
+    response.responses.forEach((result, i) => {
+        if (!result.success) console.log(`notifyUser(${uid}): token ${i} failed: ${result.error?.message}`);
     });
 
     const staleTokens = response.responses

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
@@ -15,6 +16,7 @@
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import {
+    Bell,
     Check,
     Crown,
     Loader2,
@@ -27,6 +29,11 @@
   import { resetSwipes } from "$lib/firebase/swipe";
   import { deleteAccount } from "$lib/firebase/account";
   import { detectSocialPlatform, normalizeSocialLink } from "$lib/social";
+  import {
+    requestPushToken,
+    savePushToken,
+    pushNotificationsSupported,
+  } from "$lib/firebase/notifications";
   import {
     activeLanguage,
     createTranslator,
@@ -78,6 +85,29 @@
   let newSocialLink = $state("");
   let socialLinkError = $state(false);
   let uid = $derived($authUser?.uid ?? "");
+
+  let pushSupported = $state(false);
+  let pushRequesting = $state(false);
+  let pushDenied = $state(false);
+  // Reflects only *this session's* successful request — resets on reload either way,
+  // since Notification permission state can't be read back out as "token saved".
+  let pushJustEnabled = $state(false);
+
+  async function enableNotifications() {
+    if (!uid || pushRequesting) return;
+    pushRequesting = true;
+    const token = await requestPushToken();
+    pushDenied = !token;
+    if (token) {
+      await savePushToken(uid, token);
+      pushJustEnabled = true;
+    }
+    pushRequesting = false;
+  }
+
+  onMount(() => {
+    pushNotificationsSupported().then((supported) => (pushSupported = supported));
+  });
 
   $effect(() => {
     if ($userProfile) {
@@ -379,6 +409,39 @@
   <div class="px-5 pt-8 pb-8">
     <AppearancePicker />
   </div>
+
+  <!-- Notifications -->
+  {#if pushSupported}
+    <div class="px-5 pb-8">
+      <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+        {t.t("onboarding.notificationsTitle")}
+      </h3>
+      {#if pushJustEnabled}
+        <div
+          class="flex items-center gap-2 rounded-2xl bg-success/10 py-3 px-4 text-sm font-bold text-success"
+        >
+          <Check class="size-4" />
+          {t.t("onboarding.notificationsEnabled")}
+        </div>
+      {:else}
+        <button
+          onclick={enableNotifications}
+          disabled={pushRequesting}
+          class="flex w-full items-center justify-center gap-2 rounded-2xl bg-surface border-2 border-border py-3 text-sm font-bold active:scale-95 disabled:opacity-60"
+        >
+          <Bell class="size-4" />
+          {pushRequesting
+            ? "..."
+            : t.t("onboarding.enableNotifications")}
+        </button>
+        {#if pushDenied}
+          <p class="mt-2 text-xs font-semibold text-error">
+            {t.t("onboarding.notificationsBlocked")}
+          </p>
+        {/if}
+      {/if}
+    </div>
+  {/if}
 
   <!-- Danger zone -->
   <div class="px-5 pb-8">
