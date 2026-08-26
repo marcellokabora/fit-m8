@@ -55,7 +55,7 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Emma',
-		photoURL: 'https://images.unsplash.com/photo-1612534847738-b3af9bc31f0c?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1767128890609-227bdfdb7f5c?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 33,
 		city: 'Barcelona',
 		gender: 'female',
@@ -70,7 +70,7 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Lisa',
-		photoURL: 'https://images.unsplash.com/photo-1612534847738-b3af9bc31f0c?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1747302867351-853219af9723?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 45,
 		city: 'Barcelona',
 		gender: 'female',
@@ -85,7 +85,7 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Maria',
-		photoURL: 'https://images.unsplash.com/photo-1626225015999-2e53f6aaa008?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1733141732153-ef58e01fbe86?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 21,
 		city: 'Barcelona',
 		gender: 'female',
@@ -115,16 +115,16 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Anna',
-		photoURL: 'https://images.unsplash.com/photo-1659303388076-de1535159d6c?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1565133259541-6c75cef7551e?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 50,
 		city: 'Barcelona',
 		gender: 'female',
 		orientation: 'hetero',
-		bio: 'Ping pong is life! 🏓',
+		bio: 'Jogging keeps me sane! 🏃‍♀️',
 		isSingle: false,
 		isTrainer: false,
 		activities: [
-			{ id: 'ping-pong', format: '1v1', level: 'expert' },
+			{ id: 'jogging', format: '1v1', level: 'expert' },
 			{ id: 'swimming', format: '1v1', level: 'basic' }
 		]
 	},
@@ -145,16 +145,16 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Lucia',
-		photoURL: 'https://images.unsplash.com/photo-1656653121475-e33829581294?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1628258116233-b61f47e74ed4?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 29,
 		city: 'Barcelona',
 		gender: 'female',
 		orientation: 'gay',
-		bio: 'Martial arts enthusiast! Come train with me 🥋',
+		bio: 'Daily jogger, always up for a run 🏃‍♀️',
 		isSingle: true,
 		isTrainer: true,
 		activities: [
-			{ id: 'martial-arts', format: '1v1', level: 'basic' },
+			{ id: 'jogging', format: '1v1', level: 'basic' },
 			{ id: 'gym', format: '1v1', level: 'expert' }
 		]
 	},
@@ -205,7 +205,7 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Daniel',
-		photoURL: 'https://images.unsplash.com/photo-1612534847738-b3af9bc31f0c?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1767128890583-b3f8dc30bdbc?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 47,
 		city: 'Barcelona',
 		gender: 'male',
@@ -280,7 +280,7 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Nico',
-		photoURL: 'https://images.unsplash.com/photo-1612534847738-b3af9bc31f0c?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1747027694256-575ee28c793e?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 49,
 		city: 'Barcelona',
 		gender: 'male',
@@ -310,16 +310,16 @@ const fakeProfiles = [
 	},
 	{
 		displayName: 'Eric',
-		photoURL: 'https://images.unsplash.com/photo-1656653121475-e33829581294?auto=format&fit=crop&w=900&h=1200&q=85',
+		photoURL: 'https://images.unsplash.com/photo-1732139775274-b241f8ee98de?auto=format&fit=crop&w=900&h=1200&q=85',
 		age: 40,
 		city: 'Barcelona',
 		gender: 'male',
 		orientation: 'gay',
-		bio: 'Training martial arts and looking for partners 🥋',
+		bio: 'Jogging keeps me focused! 🏃',
 		isSingle: true,
 		isTrainer: true,
 		activities: [
-			{ id: 'martial-arts', format: '1v1', level: 'expert' },
+			{ id: 'jogging', format: '1v1', level: 'expert' },
 			{ id: 'frescobol', format: '1v1', level: 'basic' }
 		]
 	},

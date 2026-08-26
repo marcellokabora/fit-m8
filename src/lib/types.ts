@@ -38,7 +38,7 @@ export const ACTIVITIES = [
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾' },
 	{ id: 'beach-volley', label: 'Beach Volley', emoji: '🏐' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀' },
-	{ id: 'soccer', label: 'Soccer', emoji: '⚽' },
+	{ id: 'soccer', label: 'Football', emoji: '⚽' },
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },
 	{ id: 'swimming', label: 'Swimming', emoji: '🏊' },
 	{ id: 'hiking', label: 'Hiking', emoji: '🥾' },
@@ -86,7 +86,7 @@ export const BIO_MAX_LENGTH = 200;
 
 // Maximum number of sports/activities a user profile can have at once
 export const MAX_SPORTS_FREE = 6;
-export const MAX_SPORTS_PREMIUM = 12;
+export const MAX_SPORTS_PREMIUM = 100;
 export const PREMIUM_PRICE_USD = 9.99;
 
 export function getMaxSports(isPremium?: boolean) {

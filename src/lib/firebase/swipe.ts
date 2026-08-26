@@ -81,7 +81,9 @@ export async function getDiscoverFeed(
 	const alreadySwiped = new Set(sentSnap.docs.map((d) => d.id));
 	alreadySwiped.add(currentUid);
 
-	let q = query(collection(db, 'users'), limit(20));
+	// High cap rather than unbounded: keeps the read cost predictable while comfortably
+	// covering the current user base for filtering below.
+	let q = query(collection(db, 'users'), limit(500));
 	const snap = await getDocs(q);
 
 	const hasOrigin = currentCoords.lat !== undefined && currentCoords.lng !== undefined;
