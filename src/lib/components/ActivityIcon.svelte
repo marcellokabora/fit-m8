@@ -4,6 +4,7 @@
   import Tennis from "~icons/material-symbols/sports-tennis";
   import BeachVolley from "~icons/material-symbols/sports-volleyball";
   import Basketball from "~icons/material-symbols/sports-basketball";
+  import Soccer from "~icons/material-symbols/sports-soccer";
   import Cycling from "~icons/material-symbols/pedal-bike";
   import Swimming from "~icons/material-symbols/pool";
   import Hiking from "~icons/material-symbols/hiking";
@@ -32,6 +33,7 @@
     tennis: Tennis,
     "beach-volley": BeachVolley,
     basketball: Basketball,
+    soccer: Soccer,
     cycling: Cycling,
     swimming: Swimming,
     hiking: Hiking,

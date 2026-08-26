@@ -3,15 +3,14 @@
     Heart,
     Users,
     GraduationCap,
-    ChevronDown,
-    ChevronUp,
+    CircleQuestionMark,
   } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let { class: className = "" }: { class?: string } = $props();
 
   let t = $derived(createTranslator($activeLanguage));
-  let expanded = $state(false);
+  let open = $state(false);
 
   const ROWS = [
     {
@@ -35,41 +34,48 @@
   ] as const;
 </script>
 
-<div class="mb-5 rounded-2xl bg-surface shadow-sm {className}">
-  <button
-    onclick={() => (expanded = !expanded)}
-    class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
-    aria-expanded={expanded}
+<button
+  onclick={() => (open = true)}
+  class="flex size-9 items-center justify-center rounded-full bg-surface text-text shadow-sm {className}"
+  aria-label={t.t("discover.presetHintToggle")}
+>
+  <CircleQuestionMark class="size-5" />
+</button>
+
+{#if open}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
   >
-    <span>
-      <span class="block text-sm font-bold text-text"
-        >{t.t("discover.presetHintToggle")}</span
-      >
-      <span class="block text-xs text-muted"
-        >{t.t("discover.presetHintSubtitle")}</span
-      >
-    </span>
-    {#if expanded}
-      <ChevronUp class="size-4 shrink-0 text-muted" />
-    {:else}
-      <ChevronDown class="size-4 shrink-0 text-muted" />
-    {/if}
-  </button>
-  {#if expanded}
-    <div class="flex flex-col gap-3 px-4 pb-4">
-      {#each ROWS as row}
-        <div class="flex items-start gap-3">
-          <div
-            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-          >
-            <row.icon class="size-4" />
+    <div
+      class="flex w-full flex-col gap-4 rounded-3xl bg-surface p-6 shadow-2xl"
+    >
+      <div>
+        <h2 class="text-lg font-black text-text">
+          {t.t("discover.presetHintToggle")}
+        </h2>
+        <p class="text-xs text-muted">{t.t("discover.presetHintSubtitle")}</p>
+      </div>
+      <div class="flex flex-col gap-3">
+        {#each ROWS as row}
+          <div class="flex items-start gap-3">
+            <div
+              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <row.icon class="size-4" />
+            </div>
+            <div>
+              <p class="text-sm font-bold text-text">{t.t(row.title)}</p>
+              <p class="text-xs text-muted">{t.t(row.body)}</p>
+            </div>
           </div>
-          <div>
-            <p class="text-sm font-bold text-text">{t.t(row.title)}</p>
-            <p class="text-xs text-muted">{t.t(row.body)}</p>
-          </div>
-        </div>
-      {/each}
+        {/each}
+      </div>
+      <button
+        onclick={() => (open = false)}
+        class="w-full rounded-2xl bg-primary py-3 text-xs font-bold text-white active:scale-95"
+      >
+        {t.t("common.close")}
+      </button>
     </div>
-  {/if}
-</div>
+  </div>
+{/if}

@@ -11,7 +11,11 @@
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
     BIO_MAX_LENGTH,
+    DEFAULT_DISTANCE_KM,
     MAX_SPORTS_FREE,
+    MIN_AGE,
+    calculateAge,
+    type DiscoverFilters,
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
@@ -19,7 +23,16 @@
     type Gender,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import { Bell, Check, MapPin, Zap } from "@lucide/svelte";
+  import { isInBarcelona } from "$lib/location";
+  import {
+    Bell,
+    Check,
+    GraduationCap,
+    Heart,
+    MapPin,
+    Users,
+    Zap,
+  } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
@@ -36,11 +49,19 @@
   const TOTAL_STEPS = 6;
   const DRAFT_KEY = "fit-m8-onboarding-draft";
 
+  const HOW_IT_WORKS = [
+    { key: "dating", preset: "dating", icon: Heart },
+    { key: "friends", preset: "friends", icon: Users },
+    { key: "experts", preset: "trainer", icon: GraduationCap },
+  ] as const;
+
+  type DiscoverPreset = (typeof HOW_IT_WORKS)[number]["preset"];
+
   type OnboardingDraft = {
     step: number;
     displayName: string;
     bio: string;
-    age: number;
+    birthdate: string;
     gender: Gender;
     sexualOrientation: SexualOrientation;
     isSingle: boolean;
@@ -52,6 +73,7 @@
       string,
       { format: ActivityFormat; level: SkillLevel }
     >;
+    discoverPreset: DiscoverPreset | null;
     photos: string[];
   };
 
@@ -98,10 +120,18 @@
     })),
   );
 
-  // Step 2 — Basic info
+  // Step 1 — Basic info
   let displayName = $state(draft.displayName ?? "");
   let bio = $state(draft.bio ?? "");
-  let age = $state<number>(draft.age ?? 25);
+  let birthdate = $state(draft.birthdate ?? "");
+  let age = $derived(birthdate ? calculateAge(birthdate) : 0);
+  // Native date input max — caps the picker at the most recent day someone could turn MIN_AGE
+  let maxBirthdate = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - MIN_AGE);
+    return d.toISOString().slice(0, 10);
+  })();
+  let isUnderage = $derived(birthdate !== "" && age < MIN_AGE);
   let gender = $state<Gender>(draft.gender ?? "male");
   let sexualOrientation = $state<SexualOrientation>(
     draft.sexualOrientation ?? "hetero",
@@ -110,14 +140,24 @@
   let city = $state(draft.city ?? "");
   let lat = $state<number | undefined>(draft.lat);
   let lng = $state<number | undefined>(draft.lng);
+  // Launching in Barcelona only — blocks onboarding for anyone outside the metro area.
+  let locationValid = $derived(city !== "" && isInBarcelona(lat, lng));
+  let oppositeGender = $derived<Gender | "">(
+    gender === "male" ? "female" : gender === "female" ? "male" : "",
+  );
 
-  // Step 3 — Activities
+  // Step 2 — Activities
   let selectedActivities = $state<string[]>(draft.selectedActivities ?? []);
 
-  // Step 4 — For each selected activity: format + level
+  // Step 3 — For each selected activity: format + level
   let activitySettings = $state<
     Record<string, { format: ActivityFormat; level: SkillLevel }>
   >(draft.activitySettings ?? {});
+
+  // Step 4 — Which quick preset to land on Discover with
+  let discoverPreset = $state<DiscoverPreset | null>(
+    draft.discoverPreset ?? null,
+  );
 
   // Step 5 — Photos (optional, up to 3)
   let photos = $state<string[]>(draft.photos ?? []);
@@ -147,7 +187,7 @@
       step,
       displayName,
       bio,
-      age,
+      birthdate,
       gender,
       sexualOrientation,
       isSingle,
@@ -156,6 +196,7 @@
       lng,
       selectedActivities,
       activitySettings,
+      discoverPreset,
       photos,
     };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
@@ -214,6 +255,13 @@
 
   async function save() {
     error = "";
+    // Belt-and-suspenders: the Continue button already blocks this, but step can be
+    // reached directly via the ?step= URL param, so re-check before writing to Firestore.
+    if (!birthdate || age < MIN_AGE || !locationValid) {
+      step = 1;
+      pushStepUrl();
+      return;
+    }
     saving = true;
     const user = get(authUser);
     if (!user) return;
@@ -222,6 +270,26 @@
       id,
       ...activitySettings[id],
     }));
+
+    const discoverFilters: DiscoverFilters | undefined = discoverPreset
+      ? {
+          activity: "",
+          format: discoverPreset === "dating" ? "1v1" : "",
+          level: discoverPreset === "trainer" ? "expert" : "",
+          gender:
+            discoverPreset === "dating"
+              ? oppositeGender
+              : discoverPreset === "friends"
+                ? gender
+                : "",
+          orientation: discoverPreset === "trainer" ? "" : sexualOrientation,
+          minAge: null,
+          maxAge: null,
+          maxDistanceKm: DEFAULT_DISTANCE_KM,
+          single: discoverPreset === "dating",
+          trainer: discoverPreset === "trainer",
+        }
+      : undefined;
 
     try {
       await userProfile.save(user.uid, {
@@ -238,13 +306,12 @@
         photoURL: photos[0] || user.photoURL || "",
         activities,
         emailVerified: user.emailVerified,
+        discoverFilters,
       });
       if (pushToken) await savePushToken(user.uid, pushToken);
       localStorage.removeItem(DRAFT_KEY);
-      // Matches Discover's intro-modal flag; new users just saw onboarding, so skip it too
-      localStorage.setItem("fit-m8-intro-seen", "1");
-      // Land on the profile tab instead of Discover so new users skip the intro modal for now
-      goto("/profile");
+      // The chosen preset drives the initial Discover feed, so land there directly
+      goto("/discover");
     } catch (e: any) {
       error = e.message;
     } finally {
@@ -270,10 +337,97 @@
   <div class="min-h-0 flex-1 overflow-y-auto px-6 pb-28">
     {#if step === 1}
       <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.permissionsTitle")}
+        {t.t("onboarding.aboutYou")}
       </h2>
-      <p class="mb-6 text-sm text-muted">{t.t("onboarding.permissionsHint")}</p>
+      <p class="mb-6 text-sm text-muted">{t.t("onboarding.aboutYouHint")}</p>
       <div class="flex flex-col gap-4">
+        <input
+          type="text"
+          bind:value={displayName}
+          placeholder={t.t("onboarding.name")}
+          class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+        />
+        <textarea
+          bind:value={bio}
+          placeholder={t.t("onboarding.bioOptional")}
+          rows={3}
+          maxlength={BIO_MAX_LENGTH}
+          class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
+        ></textarea>
+        <p class="-mt-3 text-right text-xs text-muted">
+          {bio.length}/{BIO_MAX_LENGTH}
+        </p>
+        <div>
+          <label
+            for="onboarding-birthdate"
+            class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
+          >
+            {t.t("onboarding.birthdate")}
+          </label>
+          <input
+            id="onboarding-birthdate"
+            type="date"
+            bind:value={birthdate}
+            max={maxBirthdate}
+            class="w-full rounded-2xl border-2 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary {isUnderage
+              ? 'border-error'
+              : 'border-border'}"
+          />
+          {#if isUnderage}
+            <p class="mt-2 text-xs font-semibold text-error">
+              {t.t("onboarding.underageError")}
+            </p>
+          {/if}
+        </div>
+        <SegmentedControl
+          options={genderOptions}
+          value={gender}
+          ariaLabel={t.t("common.gender")}
+          onchange={(value) => (gender = value)}
+          size="lg"
+        />
+        <div>
+          <SegmentedControl
+            options={orientationOptions}
+            value={sexualOrientation}
+            ariaLabel={t.t("common.orientation")}
+            onchange={(value) => (sexualOrientation = value)}
+            size="lg"
+          />
+        </div>
+        <div
+          class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
+        >
+          <p class="text-sm font-semibold text-text">{t.t("profile.single")}</p>
+          <Toggle
+            checked={isSingle}
+            ariaLabel={t.t("profile.single")}
+            onchange={(value) => (isSingle = value)}
+          />
+        </div>
+        <div class="rounded-2xl border-2 border-border bg-surface p-4">
+          <div class="mb-3 flex items-center gap-3">
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <MapPin class="size-5" />
+            </span>
+            <div class="flex-1">
+              <p class="font-bold text-text">
+                {t.t("onboarding.locationTitle")}
+              </p>
+              <p class="text-sm text-muted">
+                {t.t("onboarding.locationHint")}
+              </p>
+            </div>
+          </div>
+          <LocationPicker bind:city bind:lat bind:lng />
+          {#if city && !locationValid}
+            <p class="mt-2 text-xs font-medium text-red-500">
+              {t.t("location.outsideBarcelona")}
+            </p>
+          {/if}
+        </div>
         {#if pushSupported}
           <div class="rounded-2xl border-2 border-border bg-surface p-4">
             <div class="mb-3 flex items-center gap-3">
@@ -315,83 +469,8 @@
             {/if}
           </div>
         {/if}
-        <div class="rounded-2xl border-2 border-border bg-surface p-4">
-          <div class="mb-3 flex items-center gap-3">
-            <span
-              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-            >
-              <MapPin class="size-5" />
-            </span>
-            <div class="flex-1">
-              <p class="font-bold text-text">
-                {t.t("onboarding.locationTitle")}
-              </p>
-              <p class="text-sm text-muted">
-                {t.t("onboarding.locationHint")}
-              </p>
-            </div>
-          </div>
-          <LocationPicker bind:city bind:lat bind:lng />
-        </div>
       </div>
     {:else if step === 2}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.aboutYou")}
-      </h2>
-      <p class="mb-6 text-sm text-muted">{t.t("onboarding.aboutYouHint")}</p>
-      <div class="flex flex-col gap-4">
-        <input
-          type="text"
-          bind:value={displayName}
-          placeholder={t.t("onboarding.name")}
-          class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-        />
-        <textarea
-          bind:value={bio}
-          placeholder={t.t("onboarding.bioOptional")}
-          rows={3}
-          maxlength={BIO_MAX_LENGTH}
-          class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-        ></textarea>
-        <p class="-mt-3 text-right text-xs text-muted">
-          {bio.length}/{BIO_MAX_LENGTH}
-        </p>
-        <input
-          type="number"
-          bind:value={age}
-          min={16}
-          max={80}
-          placeholder={t.t("onboarding.age")}
-          class="w-24 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-        />
-        <SegmentedControl
-          options={genderOptions}
-          value={gender}
-          ariaLabel={t.t("common.gender")}
-          onchange={(value) => (gender = value)}
-          size="lg"
-        />
-        <div>
-          <SegmentedControl
-            options={orientationOptions}
-            value={sexualOrientation}
-            ariaLabel={t.t("common.orientation")}
-            onchange={(value) => (sexualOrientation = value)}
-            size="lg"
-          />
-        </div>
-        <div
-          class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
-        >
-          <p class="text-sm font-semibold text-text">{t.t("profile.single")}</p>
-          <Toggle
-            checked={isSingle}
-            ariaLabel={t.t("profile.single")}
-            onchange={(value) => (isSingle = value)}
-          />
-        </div>
-      </div>
-    {:else if step === 3}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.yourSports")}
       </h2>
@@ -416,7 +495,7 @@
           </button>
         {/each}
       </div>
-    {:else if step === 4}
+    {:else if step === 3}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.yourSettings")}
       </h2>
@@ -467,6 +546,40 @@
           </div>
         {/each}
       </div>
+    {:else if step === 4}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.howItWorks")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">
+        {t.t("onboarding.howItWorksHint")}
+      </p>
+      <div class="flex flex-col gap-4">
+        {#each HOW_IT_WORKS as slide}
+          {@const selected = discoverPreset === slide.preset}
+          <button
+            type="button"
+            onclick={() => (discoverPreset = slide.preset)}
+            aria-pressed={selected}
+            class="flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition-colors {selected
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-surface'}"
+          >
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <slide.icon class="size-5" />
+            </span>
+            <div>
+              <p class="font-bold text-text">
+                {t.t(`intro.${slide.key}.title`)}
+              </p>
+              <p class="text-sm text-muted">
+                {t.t(`intro.${slide.key}.body`)}
+              </p>
+            </div>
+          </button>
+        {/each}
+      </div>
     {:else if step === 5}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.profilePhotos")}
@@ -508,7 +621,9 @@
     {#if step < TOTAL_STEPS}
       <button
         onclick={next}
-        disabled={step === 2 && !displayName}
+        disabled={(step === 1 &&
+          (!displayName || !birthdate || isUnderage || !locationValid)) ||
+          (step === 4 && !discoverPreset)}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {t.t("common.continue")}

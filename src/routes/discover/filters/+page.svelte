@@ -318,6 +318,7 @@
     <div class="flex flex-1 items-center justify-between">
       <h1 class="text-lg font-black text-text">{t.t("discover.filters")}</h1>
       <div class="flex items-center gap-2">
+        <PresetHint />
         <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
@@ -357,8 +358,6 @@
   </BackHeader>
 
   <div class="min-h-0 flex-1 overflow-y-auto px-5 pb-6">
-    <PresetHint class="mt-5" />
-
     <!-- Format -->
     <p class="mb-2 text-sm font-bold text-muted">{t.t("common.format")}</p>
     <div class="mb-5">

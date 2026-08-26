@@ -38,6 +38,7 @@ export const ACTIVITIES = [
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾' },
 	{ id: 'beach-volley', label: 'Beach Volley', emoji: '🏐' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀' },
+	{ id: 'soccer', label: 'Soccer', emoji: '⚽' },
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },
 	{ id: 'swimming', label: 'Swimming', emoji: '🏊' },
 	{ id: 'hiking', label: 'Hiking', emoji: '🥾' },
@@ -90,6 +91,22 @@ export const PREMIUM_PRICE_USD = 9.99;
 
 export function getMaxSports(isPremium?: boolean) {
 	return isPremium ? MAX_SPORTS_PREMIUM : MAX_SPORTS_FREE;
+}
+
+// Minimum age to use the app (see Terms of Service) — enforced both at onboarding and in firestore.rules
+export const MIN_AGE = 18;
+
+// birthdate is a 'YYYY-MM-DD' string (native <input type="date"> value)
+export function calculateAge(birthdate: string): number {
+	const dob = new Date(birthdate);
+	if (Number.isNaN(dob.getTime())) return 0;
+	const today = new Date();
+	let age = today.getFullYear() - dob.getFullYear();
+	const hasHadBirthdayThisYear =
+		today.getMonth() > dob.getMonth() ||
+		(today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+	if (!hasHadBirthdayThisYear) age--;
+	return age;
 }
 
 export interface UserProfile {

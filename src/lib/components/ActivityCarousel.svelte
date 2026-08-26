@@ -73,7 +73,7 @@
       >
         <span
           class={i === pos
-            ? "flex items-center gap-2 rounded-full bg-primary/10 px-5 py-3 text-base font-semibold text-primary transition-transform duration-350"
+            ? "flex scale-110 items-center gap-2 rounded-full bg-primary/10 px-5 py-3 text-base font-semibold text-primary transition-transform duration-350"
             : "flex scale-75 items-center gap-2 px-5 py-3 text-base font-semibold text-muted transition-transform duration-350"}
         >
           <ActivityIcon
