@@ -1,6 +1,6 @@
 {
     "name": "functions",
-    "description": "Cloud Functions for Fit-M8 push notifications",
+    "description": "Cloud Functions for FIT-M8 push notifications",
     "private": true,
     "engines": {
         "node": "22"

@@ -55,7 +55,7 @@
 </script>
 
 <svelte:head>
-  <title>Fit-M8</title>
+  <title>FIT-M8</title>
   <meta name="description" content={t.t("meta.description")} />
   {#if import.meta.env.PROD}
     <!-- manifest is only generated/served by vite-plugin-pwa in production builds -->

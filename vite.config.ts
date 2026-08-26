@@ -28,8 +28,8 @@ export default defineConfig({
 				enabled: false
 			},
 			manifest: {
-				name: 'Fit-M8',
-				short_name: 'Fit-M8',
+				name: 'FIT-M8',
+				short_name: 'FIT-M8',
 				description: 'Match people for sports activities',
 				theme_color: '#0b0f17',
 				background_color: '#0b0f17',

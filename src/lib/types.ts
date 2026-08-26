@@ -113,7 +113,7 @@ export interface UserProfile {
 	isTrainer?: boolean;
 	// social/chat profile URLs (Instagram, WhatsApp, etc.) shown on the profile, platform auto-detected from the URL
 	socialLinks?: string[];
-	// true once the user has subscribed to Fit-M8 Premium
+	// true once the user has subscribed to FIT-M8 Premium
 	isPremium?: boolean;
 	// true for Google accounts (auto-verified) or once an email/password user confirms their inbox link
 	emailVerified?: boolean;

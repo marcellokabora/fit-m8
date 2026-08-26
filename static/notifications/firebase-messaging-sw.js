@@ -27,7 +27,7 @@ messaging.onBackgroundMessage((payload) => {
     const { title, body, url } = payload.data ?? {};
     // No "badge" here: Android renders it as a solid-color silhouette using only the
     // icon's alpha channel, and icon-192.png is fully opaque, so it showed as a white square.
-    self.registration.showNotification(title ?? 'Fit-M8', {
+    self.registration.showNotification(title ?? 'FIT-M8', {
         body,
         icon: '/icons/icon-192.png',
         data: { url }

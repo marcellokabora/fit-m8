@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>Privacy Policy · Fit-M8</title>
+  <title>Privacy Policy · FIT-M8</title>
 </svelte:head>
 
 <BackHeader title="Privacy Policy" class="bg-bg" />
@@ -14,7 +14,7 @@
   <p class="text-xs text-muted">Last updated: {LAST_UPDATED}</p>
 
   <p>
-    Fit-M8 ("Fit-M8", "we", "us", or "our") operates the Fit-M8 mobile and web
+    FIT-M8 ("FIT-M8", "we", "us", or "our") operates the FIT-M8 mobile and web
     application (the "App"). This Privacy Policy explains what information we
     collect, how we use it, and the choices you have. By creating an account or
     using the App, you agree to the collection and use of information as
@@ -119,7 +119,7 @@
   <section class="flex flex-col gap-2">
     <h2 class="text-base font-bold text-text">7. Children's privacy</h2>
     <p>
-      Fit-M8 is not intended for anyone under 18 years old. We do not knowingly
+      FIT-M8 is not intended for anyone under 18 years old. We do not knowingly
       collect information from minors. If you believe a minor has created an
       account, please contact us so we can remove it.
     </p>

@@ -22,7 +22,7 @@ function handleForegroundMessage(registration: ServiceWorkerRegistration, messag
     // Data-only payload (see functions/index.js) — a "notification" field would make the
     // browser auto-display it in addition to this call, showing it twice.
     onMessage(messaging, (payload) => {
-        registration.showNotification(payload.data?.title ?? 'Fit-M8', {
+        registration.showNotification(payload.data?.title ?? 'FIT-M8', {
             body: payload.data?.body,
             icon: '/icons/icon-192.png',
             data: { url: payload.data?.url }

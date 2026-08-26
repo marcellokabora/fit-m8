@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>Terms of Service · Fit-M8</title>
+  <title>Terms of Service · FIT-M8</title>
 </svelte:head>
 
 <BackHeader title="Terms of Service" class="bg-bg" />
@@ -14,8 +14,8 @@
   <p class="text-xs text-muted">Last updated: {LAST_UPDATED}</p>
 
   <p>
-    These Terms of Service ("Terms") govern your use of the Fit-M8 application
-    (the "App"), operated by Fit-M8 ("we", "us", or "our"). By creating an
+    These Terms of Service ("Terms") govern your use of the FIT-M8 application
+    (the "App"), operated by FIT-M8 ("we", "us", or "our"). By creating an
     account or using the App, you agree to these Terms. If you do not agree, do
     not use the App.
   </p>
@@ -23,7 +23,7 @@
   <section class="flex flex-col gap-2">
     <h2 class="text-base font-bold text-text">1. Eligibility</h2>
     <p>
-      You must be at least 18 years old to create an account or use Fit-M8. By
+      You must be at least 18 years old to create an account or use FIT-M8. By
       using the App, you confirm that you are 18 or older and that you have the
       legal capacity to agree to these Terms.
     </p>
@@ -41,7 +41,7 @@
 
   <section class="flex flex-col gap-2">
     <h2 class="text-base font-bold text-text">3. Acceptable use</h2>
-    <p>When using Fit-M8, you agree that you will not:</p>
+    <p>When using FIT-M8, you agree that you will not:</p>
     <ul class="list-disc space-y-1 pl-5">
       <li>
         Post content that is illegal, harassing, hateful, sexually explicit,
@@ -68,7 +68,7 @@
     <h2 class="text-base font-bold text-text">4. User content</h2>
     <p>
       You retain ownership of the photos, bio, and messages you submit to the
-      App ("User Content"). By submitting User Content, you grant Fit-M8 a
+      App ("User Content"). By submitting User Content, you grant FIT-M8 a
       non-exclusive, worldwide, royalty-free license to host, store, and display
       it within the App for the purpose of operating the service (e.g. showing
       your profile to other users, and messages to your matches).
@@ -78,7 +78,7 @@
   <section class="flex flex-col gap-2">
     <h2 class="text-base font-bold text-text">5. Matching and no guarantee</h2>
     <p>
-      Fit-M8 helps you find potential sports partners based on the information
+      FIT-M8 helps you find potential sports partners based on the information
       you and other users provide. We do not guarantee that you will find a
       match, that matches will meet in person, or that other users' information
       is accurate. You are solely responsible for your interactions with other
@@ -90,7 +90,7 @@
   <section class="flex flex-col gap-2">
     <h2 class="text-base font-bold text-text">6. Premium subscription</h2>
     <p>
-      Fit-M8 offers an optional paid subscription ("Premium") that unlocks
+      FIT-M8 offers an optional paid subscription ("Premium") that unlocks
       additional features. Pricing and included features are shown in the App
       and may change over time. You may cancel your subscription at any time
       from within the App.
@@ -122,7 +122,7 @@
     <h2 class="text-base font-bold text-text">9. Disclaimer and liability</h2>
     <p>
       The App is provided "as is" without warranties of any kind. To the maximum
-      extent permitted by law, Fit-M8 is not liable for any indirect,
+      extent permitted by law, FIT-M8 is not liable for any indirect,
       incidental, or consequential damages arising from your use of the App or
       your interactions with other users.
     </p>
@@ -141,7 +141,7 @@
     <h2 class="text-base font-bold text-text">11. Governing law</h2>
     <p>
       These Terms are governed by the laws of the European Union and the member
-      state in which Fit-M8 operates, without regard to conflict of law
+      state in which FIT-M8 operates, without regard to conflict of law
       principles.
     </p>
   </section>

@@ -43,18 +43,9 @@
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
-  import IntroSlides from "$lib/components/IntroSlides.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
-
-  const INTRO_SEEN_KEY = "fit-m8-intro-seen";
-  let showIntro = $state(false);
-
-  function dismissIntro() {
-    showIntro = false;
-    localStorage.setItem(INTRO_SEEN_KEY, "1");
-  }
 
   let users = $state<UserProfile[]>([]);
   let loading = $state(true);
@@ -164,7 +155,6 @@
       });
     }
     if (typeof navigator === "undefined") return;
-    if (!localStorage.getItem(INTRO_SEEN_KEY)) showIntro = true;
     if (!("geolocation" in navigator) || !("permissions" in navigator)) return;
     navigator.permissions
       .query({ name: "geolocation" as PermissionName })
@@ -782,8 +772,4 @@
       </button>
     </div>
   </div>
-{/if}
-
-{#if showIntro}
-  <IntroSlides onclose={dismissIntro} />
 {/if}

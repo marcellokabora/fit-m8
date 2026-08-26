@@ -67,7 +67,7 @@
     </div> -->
     {#if ready}
       <h1 transition:fade class="font-display text-5xl tracking-wide">
-        Fit-M8
+        FIT-M8
       </h1>
       <p transition:fade class="text-center text-lg font-medium text-muted">
         {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
