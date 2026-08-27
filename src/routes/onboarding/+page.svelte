@@ -273,7 +273,7 @@
 
     const discoverFilters: DiscoverFilters | undefined = discoverPreset
       ? {
-          activity: "",
+          activities: [],
           format: discoverPreset === "dating" ? "1v1" : "",
           level: discoverPreset === "trainer" ? "expert" : "",
           gender:
@@ -286,8 +286,8 @@
           minAge: null,
           maxAge: null,
           maxDistanceKm: DEFAULT_DISTANCE_KM,
-          single: discoverPreset === "dating",
-          trainer: discoverPreset === "trainer",
+          single: discoverPreset === "dating" ? "yes" : "",
+          trainer: discoverPreset === "trainer" ? "yes" : "",
         }
       : undefined;
 

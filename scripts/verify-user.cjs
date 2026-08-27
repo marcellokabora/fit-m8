@@ -1,5 +1,5 @@
 // Dev helper: marks a test user's email as verified in Firebase Auth, bypassing the real inbox link.
-// Usage: node verify-user.cjs someone@example.com
+// Usage: npm run verify-user -- someone@example.com
 const admin = require('firebase-admin');
 const { getAuth } = require('firebase-admin/auth');
 const fs = require('fs');
@@ -34,7 +34,7 @@ admin.initializeApp({
 async function main() {
     const email = process.argv[2];
     if (!email) {
-        console.error('Usage: node verify-user.cjs <email>');
+        console.error('Usage: npm run verify-user -- <email>');
         process.exit(1);
     }
 

@@ -17,7 +17,8 @@ import type {
 	Gender,
 	SexualOrientation,
 	SkillLevel,
-	UserProfile
+	UserProfile,
+	YesNoFilter
 } from '$lib/types';
 import { distanceKm } from '$lib/location';
 
@@ -64,7 +65,7 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 export async function getDiscoverFeed(
 	currentUid: string,
 	myActivityIds: string[],
-	activityFilter: string,
+	activityFilter: string[],
 	formatFilter: ActivityFormat | '',
 	levelFilter: SkillLevel | '',
 	genderFilter: Gender | '' = '',
@@ -73,8 +74,8 @@ export async function getDiscoverFeed(
 	maxAge: number | null = null,
 	maxDistanceKm: number | null = null,
 	currentCoords: { lat?: number; lng?: number } = {},
-	singleFilter: boolean = false,
-	trainerFilter: boolean = false
+	singleFilter: YesNoFilter = '',
+	trainerFilter: YesNoFilter = ''
 ): Promise<UserProfile[]> {
 	// Get users who we already swiped
 	const sentSnap = await getDocs(collection(db, 'swipes', currentUid, 'sent'));
@@ -88,7 +89,7 @@ export async function getDiscoverFeed(
 
 	const hasOrigin = currentCoords.lat !== undefined && currentCoords.lng !== undefined;
 	// "All sports" means any sport we ourselves practice, not literally any sport on the platform
-	const relevantActivityIds = activityFilter ? [activityFilter] : myActivityIds;
+	const relevantActivityIds = activityFilter.length ? activityFilter : myActivityIds;
 
 	const candidates: UserProfile[] = [];
 	for (const d of snap.docs) {
@@ -107,8 +108,10 @@ export async function getDiscoverFeed(
 			continue;
 		if (minAge !== null && data.age < minAge) continue;
 		if (maxAge !== null && data.age > maxAge) continue;
-		if (singleFilter && !data.isSingle) continue;
-		if (trainerFilter && !data.isTrainer) continue;
+		if (singleFilter === 'yes' && !data.isSingle) continue;
+		if (singleFilter === 'no' && data.isSingle) continue;
+		if (trainerFilter === 'yes' && !data.isTrainer) continue;
+		if (trainerFilter === 'no' && data.isTrainer) continue;
 
 		// Distance filter only applies when we know both locations; candidates without
 		// coordinates can't be verified as out of range, so they're kept rather than dropped.

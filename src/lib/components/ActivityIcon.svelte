@@ -19,6 +19,8 @@
   import Golf from "~icons/material-symbols/sports-golf";
   import MartialArts from "~icons/material-symbols/sports-martial-arts";
   import Paddleboard from "~icons/material-symbols/kayaking";
+  import Rollerblade from "~icons/material-symbols/roller-skating";
+  import Skateboard from "~icons/material-symbols/skateboarding";
   import Generic from "~icons/material-symbols/sports-outline";
   import type { ActivityId } from "$lib/types";
 
@@ -48,6 +50,8 @@
     golf: Golf,
     "martial-arts": MartialArts,
     paddleboard: Paddleboard,
+    rollerblade: Rollerblade,
+    skateboard: Skateboard,
   };
 
   let Icon = $derived(ICONS[id] ?? Generic);

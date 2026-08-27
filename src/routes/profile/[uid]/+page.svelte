@@ -7,7 +7,6 @@
   import { ACTIVITIES, type UserProfile } from "$lib/types";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
-  import BackHeader from "$lib/components/BackHeader.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
@@ -145,7 +144,32 @@
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg {showActions ? 'pb-28' : 'pb-12'}">
-  <BackHeader title={t.t("nav.profile")} class="bg-bg" />
+  <div
+    class="sticky top-0 z-10 flex items-center justify-between gap-3 bg-bg px-4 pb-3 pt-5"
+  >
+    <div class="flex items-center gap-1.5">
+      {#if profile}
+        <h1 class="text-lg font-black text-text">
+          {profile.displayName}{#if profile.age}, {profile.age}{/if}
+        </h1>
+        {#if profile.isPremium}
+          <Crown
+            class="size-4 shrink-0 text-primary"
+            aria-label={t.t("profile.premiumMember")}
+          />
+        {/if}
+      {:else}
+        <h1 class="text-lg font-black text-text">{t.t("nav.profile")}</h1>
+      {/if}
+    </div>
+    <button
+      onclick={() => history.back()}
+      aria-label={t.t("common.close")}
+      class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
+    >
+      <X class="size-5 text-text" />
+    </button>
+  </div>
 
   {#if loading}
     <div class="flex flex-1 items-center justify-center text-muted">
@@ -158,69 +182,61 @@
   {:else}
     <PhotoGallery {photos} alt={profile.displayName} />
 
-    <div class="flex flex-col items-center gap-3 px-5 pb-6 pt-4">
-      <h2 class="flex items-center gap-1.5 text-xl font-black text-text">
-        {profile.displayName}
-        {#if profile.isPremium}
-          <Crown
-            class="size-4 shrink-0 text-primary"
-            aria-label={t.t("profile.premiumMember")}
-          />
+    <div class="flex flex-col gap-3 px-5 pb-6 pt-4">
+      <div
+        class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
+      >
+        <div class="flex flex-wrap items-center gap-2 text-sm text-muted">
+          {#if profile.city}
+            <span class="flex items-center gap-0.5">
+              <MapPin class="size-3.5" />
+              {profile.city}
+            </span>
+          {/if}
+          {#if distanceAway !== null}
+            <span>{t.t("profile.distanceAway", { count: distanceAway })}</span>
+          {/if}
+          {#if profile.orientation === "gay"}
+            <span
+              class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
+            >
+              {t.orientation("gay")}
+            </span>
+          {/if}
+          {#if profile.isTrainer}
+            <span
+              class="flex items-center gap-1 rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary-dark"
+            >
+              <GraduationCap class="size-3.5" />
+              {t.t("profile.trainer")}
+            </span>
+          {/if}
+        </div>
+        {#if profile.bio}
+          <p class="text-left text-sm text-muted text-balance">{profile.bio}</p>
         {/if}
-      </h2>
-      <div class="flex items-center gap-2 text-sm text-muted">
-        {#if profile.age}
-          <span>{profile.age}</span>
-        {/if}
-        {#if profile.city}
-          <span class="flex items-center gap-0.5">
-            <MapPin class="size-3.5" />
-            {profile.city}
-          </span>
-        {/if}
-        {#if distanceAway !== null}
-          <span>{t.t("profile.distanceAway", { count: distanceAway })}</span>
-        {/if}
-        {#if profile.orientation === "gay"}
-          <span
-            class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
-          >
-            {t.orientation("gay")}
-          </span>
-        {/if}
-        {#if profile.isTrainer}
-          <span
-            class="flex items-center gap-1 rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary-dark"
-          >
-            <GraduationCap class="size-3.5" />
-            {t.t("profile.trainer")}
-          </span>
+        {#if profile.socialLinks?.length}
+          <div class="flex flex-wrap gap-2">
+            {#each profile.socialLinks as link}
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={detectSocialPlatform(link).label}
+                class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
+              >
+                <SocialIcon url={link} class="size-4.5" />
+              </a>
+            {/each}
+          </div>
         {/if}
       </div>
-      {#if profile.bio}
-        <p class="text-center text-sm text-muted text-balance">{profile.bio}</p>
-      {/if}
-      {#if profile.socialLinks?.length}
-        <div class="flex flex-wrap justify-center gap-2">
-          {#each profile.socialLinks as link}
-            <a
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={detectSocialPlatform(link).label}
-              class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
-            >
-              <SocialIcon url={link} class="size-4.5" />
-            </a>
-          {/each}
-        </div>
-      {/if}
     </div>
 
     <div class="px-5">
-      <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+      <!-- <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
         {t.t("common.sports")}
-      </h3>
+      </h3> -->
       {#if (profile.activities?.length ?? 0) === 0}
         <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
       {:else}

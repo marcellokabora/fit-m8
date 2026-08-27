@@ -26,7 +26,7 @@ serviceAccountKey.json
 .firebase
 
 # Seed script (contains fake data, run locally only)
-seed.cjs
+scripts/seed.cjs
 
 # Vite
 vite.config.js.timestamp-*

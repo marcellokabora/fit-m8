@@ -52,7 +52,9 @@ export const ACTIVITIES = [
 	{ id: 'rock-climbing', label: 'Rock Climbing', emoji: '🧗' },
 	{ id: 'golf', label: 'Golf', emoji: '⛳' },
 	{ id: 'martial-arts', label: 'Martial Arts', emoji: '🥋' },
-	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶' }
+	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶' },
+	{ id: 'rollerblade', label: 'Rollerblading', emoji: '🛼' },
+	{ id: 'skateboard', label: 'Skateboarding', emoji: '🛹' }
 ] as const;
 
 export type ActivityId = (typeof ACTIVITIES)[number]['id'];
@@ -63,8 +65,12 @@ export interface UserActivity {
 	level: SkillLevel;
 }
 
+// '' = no filter (all), 'yes' = only matching profiles, 'no' = only non-matching profiles
+export type YesNoFilter = '' | 'yes' | 'no';
+
 export interface DiscoverFilters {
-	activity: string;
+	// empty array = any of the current user's own sports (see relevantActivityIds in getDiscoverFeed)
+	activities: string[];
 	format: Exclude<ActivityFormat, 'all'> | '';
 	level: SkillLevel | '';
 	gender: Gender | '';
@@ -73,10 +79,10 @@ export interface DiscoverFilters {
 	maxAge: number | null;
 	// max distance from the current user, in km; null/undefined = no distance filter
 	maxDistanceKm: number | null;
-	// only show profiles marked as single
-	single: boolean;
-	// only show profiles marked as trainers
-	trainer: boolean;
+	// filter by profiles marked as single
+	single: YesNoFilter;
+	// filter by profiles marked as trainers
+	trainer: YesNoFilter;
 }
 
 // Default distance filter applied until the user picks their own value or explicitly clears it to "Any"
@@ -85,7 +91,7 @@ export const DEFAULT_DISTANCE_KM = 10;
 export const BIO_MAX_LENGTH = 200;
 
 // Maximum number of sports/activities a user profile can have at once
-export const MAX_SPORTS_FREE = 6;
+export const MAX_SPORTS_FREE = 10;
 export const MAX_SPORTS_PREMIUM = 100;
 export const PREMIUM_PRICE_USD = 9.99;
 

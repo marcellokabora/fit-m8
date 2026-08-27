@@ -4,12 +4,11 @@
   import BackHeader from "$lib/components/BackHeader.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import Toggle from "$lib/components/Toggle.svelte";
   import PresetHint from "$lib/components/PresetHint.svelte";
   import {
     authUser,
     userProfile,
-    filterActivity,
+    filterActivities,
     filterFormat,
     filterLevel,
     filterGender,
@@ -37,6 +36,7 @@
     type Gender,
     type SexualOrientation,
     type SkillLevel,
+    type YesNoFilter,
   } from "$lib/types";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -64,6 +64,12 @@
     ...ORIENTATIONS,
   ] as const;
 
+  const YES_NO_FILTER_OPTIONS = [
+    { value: "", label: "" },
+    { value: "yes", label: "" },
+    { value: "no", label: "" },
+  ] as const;
+
   let formatFilterOptions = $derived(
     FORMAT_FILTER_OPTIONS.map((option) => ({
       ...option,
@@ -86,6 +92,17 @@
     SEX_FILTER_OPTIONS.map((option) => ({
       ...option,
       label: option.value ? t.orientation(option.value) : t.t("common.all"),
+    })),
+  );
+  let yesNoFilterOptions = $derived(
+    YES_NO_FILTER_OPTIONS.map((option) => ({
+      ...option,
+      label:
+        option.value === ""
+          ? t.t("common.all")
+          : option.value === "yes"
+            ? t.t("common.yes")
+            : t.t("common.no"),
     })),
   );
 
@@ -112,7 +129,6 @@
 
   // This page edits its own drafts only; the shared filter stores (which drive the
   // discover feed) are updated in one shot when "Save" is pressed, not while editing.
-  let draftActivity = $state(get(filterActivity));
   let draftFormat = $state<Exclude<ActivityFormat, "all"> | "">(
     get(filterFormat),
   );
@@ -124,8 +140,9 @@
   let ageMinDraft = $state(get(filterMinAge) ?? AGE_MIN);
   let ageMaxDraft = $state(get(filterMaxAge) ?? AGE_MAX);
   let distanceDraft = $state<number | null>(get(filterMaxDistanceKm));
-  let draftSingle = $state(get(filterSingle));
-  let draftTrainer = $state(get(filterTrainer));
+  let draftActivities = $state<string[]>(get(filterActivities));
+  let draftSingle = $state<YesNoFilter>(get(filterSingle));
+  let draftTrainer = $state<YesNoFilter>(get(filterTrainer));
 
   function updateAgeMinDraft(value: number) {
     ageMinDraft = Math.min(value, ageMaxDraft);
@@ -136,7 +153,13 @@
   }
 
   function pickActivity(id: string) {
-    draftActivity = id;
+    if (id === "") {
+      draftActivities = [];
+      return;
+    }
+    draftActivities = draftActivities.includes(id)
+      ? draftActivities.filter((activityId) => activityId !== id)
+      : [...draftActivities, id];
   }
 
   let isDatingPreset = $derived(
@@ -144,59 +167,59 @@
       draftLevel === "" &&
       draftGender === oppositeGender &&
       draftOrientation === myOrientation &&
-      draftSingle === true &&
-      draftTrainer === false,
+      draftSingle === "yes" &&
+      draftTrainer === "",
   );
   let isFriendsPreset = $derived(
     draftFormat === "" &&
       draftLevel === "" &&
       draftGender === myGender &&
       draftOrientation === myOrientation &&
-      draftSingle === false &&
-      draftTrainer === false,
+      draftSingle === "" &&
+      draftTrainer === "",
   );
   let isTrainerPreset = $derived(
     draftFormat === "" &&
       draftLevel === "expert" &&
       draftGender === "" &&
       draftOrientation === "" &&
-      draftSingle === false &&
-      draftTrainer === true,
+      draftSingle === "" &&
+      draftTrainer === "yes",
   );
 
-  // Quick presets shown as buttons in the header; each resets activity to "any"
+  // Quick presets shown as buttons in the header; each resets sport selection to "any"
   function applyDatingPreset() {
-    draftActivity = "";
+    draftActivities = [];
     draftFormat = "1v1";
     draftLevel = "";
     draftGender = oppositeGender;
     draftOrientation = myOrientation;
-    draftSingle = true;
-    draftTrainer = false;
+    draftSingle = "yes";
+    draftTrainer = "";
   }
 
   function applyFriendsPreset() {
-    draftActivity = "";
+    draftActivities = [];
     draftFormat = "";
     draftLevel = "";
     draftGender = myGender;
     draftOrientation = myOrientation;
-    draftSingle = false;
-    draftTrainer = false;
+    draftSingle = "";
+    draftTrainer = "";
   }
 
   function applyTrainerPreset() {
-    draftActivity = "";
+    draftActivities = [];
     draftFormat = "";
     draftLevel = "expert";
     draftGender = "";
     draftOrientation = "";
-    draftSingle = false;
-    draftTrainer = true;
+    draftSingle = "";
+    draftTrainer = "yes";
   }
 
   function resetFilters() {
-    draftActivity = "";
+    draftActivities = [];
     draftFormat = "";
     draftLevel = "";
     draftGender = "";
@@ -204,8 +227,8 @@
     ageMinDraft = AGE_MIN;
     ageMaxDraft = AGE_MAX;
     distanceDraft = null;
-    draftSingle = false;
-    draftTrainer = false;
+    draftSingle = "";
+    draftTrainer = "";
   }
 
   // Live count of profiles matching the in-progress draft filters, shown inside the Save button.
@@ -233,7 +256,7 @@
     const results = await getDiscoverFeed(
       uid,
       (profile?.activities ?? []).map((a) => a.id),
-      draftActivity,
+      draftActivities,
       draftFormat,
       draftLevel,
       draftGender,
@@ -256,7 +279,7 @@
   // via triggerPreviewUpdate below, not through this effect.
   $effect(() => {
     // Referenced so this effect reruns whenever any draft filter changes.
-    draftActivity;
+    draftActivities;
     draftFormat;
     draftLevel;
     draftGender;
@@ -281,7 +304,7 @@
   }
 
   async function applyAndBack() {
-    filterActivity.set(draftActivity);
+    filterActivities.set(draftActivities);
     filterFormat.set(draftFormat);
     filterLevel.set(draftLevel);
     filterGender.set(draftGender);
@@ -296,7 +319,7 @@
     if (uid) {
       await userProfile.save(uid, {
         discoverFilters: {
-          activity: draftActivity,
+          activities: draftActivities,
           format: draftFormat,
           level: draftLevel,
           gender: draftGender,
@@ -404,23 +427,27 @@
       />
     </div>
 
-    <!-- Single / Trainer -->
-    <div class="mb-5 flex items-center justify-between">
-      <p class="text-sm font-bold text-muted">
-        {t.t("discover.singleFilter")}
-      </p>
-      <Toggle
-        checked={draftSingle}
+    <!-- Single -->
+    <p class="mb-2 text-sm font-bold text-muted">
+      {t.t("discover.singleFilter")}
+    </p>
+    <div class="mb-5">
+      <SegmentedControl
+        options={yesNoFilterOptions}
+        value={draftSingle}
         ariaLabel={t.t("discover.singleFilter")}
         onchange={(value) => (draftSingle = value)}
       />
     </div>
-    <div class="mb-5 flex items-center justify-between">
-      <p class="text-sm font-bold text-muted">
-        {t.t("discover.trainerFilter")}
-      </p>
-      <Toggle
-        checked={draftTrainer}
+
+    <!-- Trainer -->
+    <p class="mb-2 text-sm font-bold text-muted">
+      {t.t("discover.trainerFilter")}
+    </p>
+    <div class="mb-5">
+      <SegmentedControl
+        options={yesNoFilterOptions}
+        value={draftTrainer}
         ariaLabel={t.t("discover.trainerFilter")}
         onchange={(value) => (draftTrainer = value)}
       />
@@ -522,11 +549,11 @@
 
     <!-- Sport -->
     <p class="mb-2 text-sm font-bold text-muted">{t.t("common.sports")}</p>
-    <div class="flex flex-col gap-1">
+    <div class="grid grid-cols-2 gap-1">
       <button
         onclick={() => pickActivity("")}
-        class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivity ===
-        ''
+        class="col-span-2 flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.length ===
+        0
           ? 'bg-primary text-white'
           : 'text-text hover:bg-bg'}"
       >
@@ -535,13 +562,14 @@
       {#each profileActivities as act}
         <button
           onclick={() => pickActivity(act.id)}
-          class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivity ===
-          act.id
+          class="flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.includes(
+            act.id,
+          )
             ? 'bg-primary text-white'
             : 'text-text hover:bg-bg'}"
         >
-          <ActivityIcon id={act.id} class="size-4" />
-          {t.activity(act.id)}
+          <ActivityIcon id={act.id} class="size-4 shrink-0" />
+          <span class="truncate">{t.activity(act.id)}</span>
         </button>
       {/each}
     </div>

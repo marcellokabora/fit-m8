@@ -10,7 +10,9 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"verify-user": "node verify-user.cjs",
+		"verify-user": "node scripts/verify-user.cjs",
+		"seed": "node scripts/seed.cjs",
+		"set-admin": "node scripts/set-admin.cjs",
 		"deploy:functions": "firebase deploy --only functions"
 	},
 	"devDependencies": {

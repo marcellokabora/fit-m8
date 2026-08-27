@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { authUser, userProfile } from "$lib/stores/auth";
+  import { isAdmin } from "$lib/stores/admin";
   import {
     ACTIVITIES,
     ACTIVITY_FORMAT_OPTIONS,
@@ -22,6 +23,7 @@
     MapPin,
     Pencil,
     Plus,
+    ShieldUser,
     Trash2,
   } from "@lucide/svelte";
   import { slide } from "svelte/transition";
@@ -105,7 +107,9 @@
   <div
     class="sticky top-0 z-10 flex items-center justify-between bg-bg px-5 pb-3 pt-5"
   >
-    <h1 class="text-2xl font-black text-text">{t.t("nav.profile")}</h1>
+    <h1 class="text-2xl font-black text-text">
+      {$userProfile?.displayName ?? t.t("nav.profile")}{#if $userProfile?.age}, {$userProfile.age}{/if}
+    </h1>
     <a
       href="/profile/edit"
       class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95"
@@ -120,39 +124,40 @@
     {photos}
     alt={$userProfile?.displayName ?? t.t("common.profilePhoto")}
   />
-  <div class="flex flex-col items-center gap-3 px-5 pb-6 pt-4">
-    <h2 class="text-xl font-black text-text">
-      {$userProfile?.displayName ?? "—"}
-    </h2>
-    {#if $authUser?.email}
-      <p class="text-sm text-muted">{$authUser.email}</p>
-    {/if}
-    {#if $userProfile?.city}
-      <p class="flex items-center gap-1 text-sm text-muted">
-        <MapPin class="size-4" />
-        {$userProfile.city}
-      </p>
-    {/if}
-    {#if $userProfile?.bio}
-      <p class="text-center text-sm text-muted text-balance">
-        {$userProfile.bio}
-      </p>
-    {/if}
-    {#if $userProfile?.socialLinks?.length}
-      <div class="flex flex-wrap justify-center gap-2">
-        {#each $userProfile.socialLinks as link}
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={detectSocialPlatform(link).label}
-            class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
-          >
-            <SocialIcon url={link} class="size-4.5" />
-          </a>
-        {/each}
-      </div>
-    {/if}
+  <div class="flex flex-col gap-3 px-5 pb-6 pt-4">
+    <div
+      class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
+    >
+      {#if $userProfile?.city}
+        <p class="flex items-center gap-1 text-sm text-muted">
+          <MapPin class="size-4" />
+          {$userProfile.city}
+        </p>
+      {/if}
+      {#if $userProfile?.bio}
+        <p class="text-left text-sm text-muted text-balance">
+          {$userProfile.bio}
+        </p>
+      {/if}
+      {#if $authUser?.email}
+        <p class="text-sm text-muted">{$authUser.email}</p>
+      {/if}
+      {#if $userProfile?.socialLinks?.length}
+        <div class="flex flex-wrap gap-2">
+          {#each $userProfile.socialLinks as link}
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={detectSocialPlatform(link).label}
+              class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
+            >
+              <SocialIcon url={link} class="size-4.5" />
+            </a>
+          {/each}
+        </div>
+      {/if}
+    </div>
   </div>
 
   <!-- Activities -->
@@ -265,6 +270,15 @@
         ? t.t("profile.premiumMember")
         : t.t("profile.goPremium")}
     </a>
+    {#if $isAdmin}
+      <a
+        href="/admin/fake-profiles"
+        class="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
+      >
+        <ShieldUser class="size-4" />
+        Manage fake profiles
+      </a>
+    {/if}
   </div>
 
   <!-- Legal -->

@@ -1,3 +1,13 @@
+<script module lang="ts">
+  import type { UserProfile } from "$lib/types";
+
+  // Module scope so returning here from a profile page reuses the same feed instead of refetching/reshuffling it
+  let users = $state<UserProfile[]>([]);
+  let loading = $state(true);
+  let filtersSyncedFor = $state<string | null>(null);
+  let lastLoadedKey = $state<string | null>(null);
+</script>
+
 <script lang="ts">
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
@@ -22,7 +32,7 @@
   import {
     authUser,
     userProfile,
-    filterActivity,
+    filterActivities,
     filterFormat,
     filterLevel,
     filterGender,
@@ -39,7 +49,6 @@
     DEFAULT_DISTANCE_KM,
     type DiscoverFilters,
     type Gender,
-    type UserProfile,
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
@@ -47,8 +56,6 @@
 
   let t = $derived(createTranslator($activeLanguage));
 
-  let users = $state<UserProfile[]>([]);
-  let loading = $state(true);
   let matchBanner = $state(false);
   let profileActivities = $derived(
     ACTIVITIES.filter((activity) =>
@@ -70,31 +77,31 @@
       $filterLevel === "" &&
       $filterGender === oppositeGender &&
       $filterSexualOrientation === myOrientation &&
-      $filterSingle === true &&
-      $filterTrainer === false,
+      $filterSingle === "yes" &&
+      $filterTrainer === "",
   );
   let isFriendsPreset = $derived(
     $filterFormat === "" &&
       $filterLevel === "" &&
       $filterGender === myGender &&
       $filterSexualOrientation === myOrientation &&
-      $filterSingle === false &&
-      $filterTrainer === false,
+      $filterSingle === "" &&
+      $filterTrainer === "",
   );
   let isTrainerPreset = $derived(
     $filterFormat === "" &&
       $filterLevel === "expert" &&
       $filterGender === "" &&
       $filterSexualOrientation === "" &&
-      $filterSingle === false &&
-      $filterTrainer === true,
+      $filterSingle === "" &&
+      $filterTrainer === "yes",
   );
   // Any filter set beyond the defaults, that isn't one of the quick presets above (those highlight themselves)
   let isCustomFilter = $derived(
     !isDatingPreset &&
       !isFriendsPreset &&
       !isTrainerPreset &&
-      ($filterActivity !== "" ||
+      ($filterActivities.length > 0 ||
         $filterFormat !== "" ||
         $filterLevel !== "" ||
         $filterGender !== "" ||
@@ -102,8 +109,8 @@
         $filterMinAge !== null ||
         $filterMaxAge !== null ||
         $filterMaxDistanceKm !== DEFAULT_DISTANCE_KM ||
-        $filterSingle !== false ||
-        $filterTrainer !== false),
+        $filterSingle !== "" ||
+        $filterTrainer !== ""),
   );
 
   // Email/password accounts must confirm their inbox link before they're visible in Discover;
@@ -198,11 +205,8 @@
     photoIndex = 0;
   });
 
-  // uid for which we've already synced filter stores from Firestore, so we don't redo it on every profile update
-  let filtersSyncedFor = $state<string | null>(null);
-
   function applyFilters(filters: DiscoverFilters) {
-    filterActivity.set(filters.activity);
+    filterActivities.set(filters.activities ?? []);
     filterFormat.set(filters.format);
     filterLevel.set(filters.level);
     filterGender.set(filters.gender);
@@ -216,8 +220,8 @@
         ? DEFAULT_DISTANCE_KM
         : filters.maxDistanceKm,
     );
-    filterSingle.set(filters.single ?? false);
-    filterTrainer.set(filters.trainer ?? false);
+    filterSingle.set(filters.single ?? "");
+    filterTrainer.set(filters.trainer ?? "");
   }
 
   async function saveFilters() {
@@ -225,7 +229,7 @@
     if (!uid) return;
     await userProfile.save(uid, {
       discoverFilters: {
-        activity: get(filterActivity),
+        activities: get(filterActivities),
         format: get(filterFormat),
         level: get(filterLevel),
         gender: get(filterGender),
@@ -239,37 +243,37 @@
     });
   }
 
-  // Quick presets shown as buttons next to the filters icon; each resets activity to "any" and saves immediately
+  // Quick presets shown as buttons next to the filters icon; each resets sport selection to "any" and saves immediately
   function applyDatingPreset() {
-    filterActivity.set("");
+    filterActivities.set([]);
     filterFormat.set("1v1");
     filterLevel.set("");
     filterGender.set(oppositeGender);
     filterSexualOrientation.set(myOrientation);
-    filterSingle.set(true);
-    filterTrainer.set(false);
+    filterSingle.set("yes");
+    filterTrainer.set("");
     saveFilters();
   }
 
   function applyFriendsPreset() {
-    filterActivity.set("");
+    filterActivities.set([]);
     filterFormat.set("");
     filterLevel.set("");
     filterGender.set(myGender);
     filterSexualOrientation.set(myOrientation);
-    filterSingle.set(false);
-    filterTrainer.set(false);
+    filterSingle.set("");
+    filterTrainer.set("");
     saveFilters();
   }
 
   function applyTrainerPreset() {
-    filterActivity.set("");
+    filterActivities.set([]);
     filterFormat.set("");
     filterLevel.set("expert");
     filterGender.set("");
     filterSexualOrientation.set("");
-    filterSingle.set(false);
-    filterTrainer.set(true);
+    filterSingle.set("");
+    filterTrainer.set("yes");
     saveFilters();
   }
 
@@ -293,7 +297,7 @@
     users = await getDiscoverFeed(
       uid,
       (profile?.activities ?? []).map((a) => a.id),
-      get(filterActivity),
+      get(filterActivities),
       get(filterFormat),
       get(filterLevel),
       get(filterGender),
@@ -308,11 +312,12 @@
     loading = false;
   }
 
-  // Reload when auth resolves or filters change
+  // Reload when auth resolves or filters change; skipped if we already loaded this exact feed
+  // (e.g. navigating back from a profile page shouldn't refetch and reshuffle the cards)
   $effect(() => {
     $authUser;
     $userProfile;
-    $filterActivity;
+    $filterActivities;
     $filterFormat;
     $filterLevel;
     $filterGender;
@@ -324,13 +329,34 @@
     $filterTrainer;
 
     if (
-      $filterActivity &&
-      !profileActivities.some((activity) => activity.id === $filterActivity)
+      $filterActivities.length > 0 &&
+      $filterActivities.some(
+        (id) => !profileActivities.some((activity) => activity.id === id),
+      )
     ) {
-      filterActivity.set("");
+      filterActivities.set(
+        $filterActivities.filter((id) =>
+          profileActivities.some((activity) => activity.id === id),
+        ),
+      );
       return;
     }
 
+    const key = JSON.stringify([
+      $authUser?.uid,
+      $filterActivities,
+      $filterFormat,
+      $filterLevel,
+      $filterGender,
+      $filterSexualOrientation,
+      $filterMinAge,
+      $filterMaxAge,
+      $filterMaxDistanceKm,
+      $filterSingle,
+      $filterTrainer,
+    ]);
+    if (key === lastLoadedKey) return;
+    lastLoadedKey = key;
     loadFeed();
   });
 
@@ -402,7 +428,12 @@
       (typeof window !== "undefined" ? window.innerWidth : 400) * 1.2;
     currentX = direction === "like" ? flyDistance : -flyDistance;
 
-    const activity = get(filterActivity) || top.activities[0]?.id || "";
+    // Prefer a sport both users share that's actually in the active filter, falling back to their first shared sport
+    const activityFilter = get(filterActivities);
+    const activity =
+      top.activities.find((a) => activityFilter.includes(a.id))?.id ||
+      top.activities[0]?.id ||
+      "";
     const format = get(filterFormat) || top.activities[0]?.format || "all";
 
     const [isMatch] = await Promise.all([

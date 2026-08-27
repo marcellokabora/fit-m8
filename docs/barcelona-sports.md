@@ -44,7 +44,8 @@ mentioned above:
 | Cycling          | `cycling`           |
 | Football         | `soccer`            |
 | Basketball       | `basketball`        |
+| Skateboarding    | `skateboard`        |
+| Rollerblading    | `rollerblade`       |
 
-Sports mentioned in the source material with no corresponding activity yet: kayaking,
-skateboarding, rollerblading. Not added since they're not currently tracked as activities in
-the app.
+Sports mentioned in the source material with no corresponding activity yet: kayaking. Not
+added since it isn't currently tracked as an activity in the app.
