@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from "svelte";
   import { goto } from "$app/navigation";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
@@ -20,6 +21,7 @@
   import {
     ChevronDown,
     Crown,
+    GripVertical,
     MapPin,
     Pencil,
     Plus,
@@ -89,6 +91,68 @@
   function removeSport(id: string) {
     if (expandedActivityId === id) expandedActivityId = null;
     void saveActivities(activities.filter((act) => act.id !== id));
+  }
+
+  // Sport order = priority, ranked from top to bottom, and drives how high a shared sport
+  // ranks a profile in other users' Discover feeds (see getDiscoverFeed's `priority`).
+  let rowEls = $state<(HTMLDivElement | null)[]>([]);
+  let dragIndex = $state<number | null>(null);
+  let dragOffsetY = $state(0);
+  let dragStartClientY = 0;
+  let dragBaseTop = 0;
+
+  function startDrag(e: PointerEvent, index: number) {
+    e.preventDefault();
+    e.stopPropagation();
+    expandedActivityId = null;
+    dragIndex = index;
+    dragOffsetY = 0;
+    dragStartClientY = e.clientY;
+    dragBaseTop = rowEls[index]?.offsetTop ?? 0;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  async function onDragMove(e: PointerEvent) {
+    if (dragIndex === null) return;
+    dragOffsetY = e.clientY - dragStartClientY;
+    const draggedEl = rowEls[dragIndex];
+    if (!draggedEl) return;
+    const draggedCenter =
+      dragBaseTop + dragOffsetY + draggedEl.offsetHeight / 2;
+
+    let targetIndex = dragIndex;
+    for (let i = 0; i < activities.length; i++) {
+      if (i === dragIndex) continue;
+      const el = rowEls[i];
+      if (!el) continue;
+      if (
+        draggedCenter >= el.offsetTop &&
+        draggedCenter < el.offsetTop + el.offsetHeight
+      ) {
+        targetIndex = i;
+        break;
+      }
+    }
+    if (targetIndex !== dragIndex) {
+      const next = [...activities];
+      const [moved] = next.splice(dragIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      activities = next;
+      dragIndex = targetIndex;
+      await tick();
+      const newTop = rowEls[targetIndex]?.offsetTop;
+      if (newTop !== undefined) {
+        dragStartClientY += newTop - dragBaseTop;
+        dragBaseTop = newTop;
+      }
+    }
+  }
+
+  function endDrag() {
+    if (dragIndex === null) return;
+    dragIndex = null;
+    dragOffsetY = 0;
+    void saveActivities(activities);
   }
 
   async function logout() {
@@ -166,12 +230,26 @@
       {t.t("common.mySports")}
     </h3>
     {#if activities.length === 0}
-      <p class="mb-3 text-sm text-muted">{t.t("common.noActivities")}</p>
+      <p class="mb-3 text-sm text-muted">
+        {t.t("common.noActivities")}
+      </p>
     {:else}
+      <p class="mb-3 text-xs font-semibold text-muted text-balance">
+        {t.t("sports.reorderHint")}
+      </p>
       <div class="mb-3 flex flex-col gap-3">
-        {#each activities as act}
+        {#each activities as act, i (act.id)}
           {@const expanded = expandedActivityId === act.id}
-          <div class="rounded-2xl bg-surface shadow-sm">
+          {@const dragging = dragIndex === i}
+          <div
+            bind:this={rowEls[i]}
+            class="rounded-2xl bg-surface shadow-sm {dragging
+              ? 'relative z-20 shadow-lg'
+              : ''}"
+            style={dragging
+              ? `transform: translateY(${dragOffsetY}px)`
+              : undefined}
+          >
             <div
               role="button"
               tabindex="0"
@@ -181,6 +259,18 @@
                 toggleExpandActivity(act.id)}
               class="flex items-center gap-4 p-4"
             >
+              <button
+                type="button"
+                aria-label={t.t("common.dragToReorder")}
+                onpointerdown={(e) => startDrag(e, i)}
+                onpointermove={onDragMove}
+                onpointerup={endDrag}
+                onpointercancel={endDrag}
+                onclick={(e) => e.stopPropagation()}
+                class="touch-none text-muted active:cursor-grabbing"
+              >
+                <GripVertical class="size-5" />
+              </button>
               <span
                 class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
               >

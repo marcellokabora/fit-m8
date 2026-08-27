@@ -91,7 +91,10 @@ export async function getDiscoverFeed(
 	// "All sports" means any sport we ourselves practice, not literally any sport on the platform
 	const relevantActivityIds = activityFilter.length ? activityFilter : myActivityIds;
 
-	const candidates: UserProfile[] = [];
+	// Ranked by `priority`, the index of the candidate's own best-matching sport in their
+	// `activities` list — e.g. someone who lists beach volley as their #1 sport outranks
+	// someone who only has it in 2nd/3rd place, so top-of-list sports surface first.
+	const candidates: { profile: UserProfile; priority: number }[] = [];
 	for (const d of snap.docs) {
 		if (alreadySwiped.has(d.id)) continue;
 		const data = d.data() as Omit<UserProfile, 'uid'>;
@@ -120,17 +123,24 @@ export async function getDiscoverFeed(
 			if (km > maxDistanceKm) continue;
 		}
 
-		// Candidate must share one of our own sports (or the specifically chosen one), matching format/level too.
-		const match = data.activities?.some(
-			(a) =>
+		// Candidate must share one of our own sports (or the specifically chosen one), matching format/level too;
+		// `priority` tracks the earliest (highest-priority) matching sport in the candidate's own list.
+		let priority = Infinity;
+		data.activities?.forEach((a, index) => {
+			if (
+				index < priority &&
 				relevantActivityIds.includes(a.id) &&
 				(!formatFilter || a.format === formatFilter || a.format === 'all') &&
 				(!levelFilter || a.level === levelFilter)
-		);
-		if (!match) continue;
-		candidates.push({ uid: d.id, ...data });
+			) {
+				priority = index;
+			}
+		});
+		if (priority === Infinity) continue;
+		candidates.push({ profile: { uid: d.id, ...data }, priority });
 	}
-	return candidates;
+	candidates.sort((a, b) => a.priority - b.priority);
+	return candidates.map((c) => c.profile);
 }
 
 

@@ -12,7 +12,14 @@
   } from "firebase/firestore";
   import { db } from "$lib/firebase/client";
   import { isAdmin } from "$lib/stores/admin";
-  import { ACTIVITIES, type UserProfile } from "$lib/types";
+  import {
+    ACTIVITIES,
+    GENDER_OPTIONS,
+    ORIENTATIONS,
+    type Gender,
+    type SexualOrientation,
+    type UserProfile,
+  } from "$lib/types";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import {
     LoaderCircle,
@@ -20,22 +27,57 @@
     Check,
     ShieldAlert,
     X,
+    Heart,
+    Dumbbell,
+    Rainbow,
   } from "@lucide/svelte";
+
+  interface ProfileDraft {
+    photoURL: string;
+    displayName: string;
+    bio: string;
+    age: string;
+    gender: Gender | "";
+    orientation: SexualOrientation | "";
+    city: string;
+    isSingle: boolean;
+    isTrainer: boolean;
+  }
 
   let loading = $state(true);
   let profiles = $state<UserProfile[]>([]);
-  let drafts = $state<Record<string, string>>({});
+  let drafts = $state<Record<string, ProfileDraft>>({});
   let saving = $state<Record<string, boolean>>({});
   let savedFlash = $state<Record<string, boolean>>({});
   let selectedSport = $state<string | null>(null);
+  let genderFilter = $state<Gender | "">("");
+  let sortBy = $state<"name" | "age">("name");
   let selectedProfile = $state<UserProfile | null>(null);
+
+  function draftOf(p: UserProfile): ProfileDraft {
+    return {
+      photoURL: p.photoURL ?? "",
+      displayName: p.displayName ?? "",
+      bio: p.bio ?? "",
+      age: p.age ? String(p.age) : "",
+      gender: p.gender ?? "",
+      orientation: p.orientation ?? "",
+      city: p.city ?? "",
+      isSingle: !!p.isSingle,
+      isTrainer: !!p.isTrainer,
+    };
+  }
 
   function activityLabel(id?: string) {
     const info = ACTIVITIES.find((a) => a.id === id);
     return info ? `${info.emoji} ${info.label}` : (id ?? "—");
   }
 
-  // Counts by first sport, so gaps toward "10 people per sport" are visible at a glance
+  function activityName(id?: string) {
+    return ACTIVITIES.find((a) => a.id === id)?.label ?? id ?? "—";
+  }
+
+  // Counts by first sport, ordered alphabetically by sport name
   let sportCounts = $derived.by(() => {
     const counts = new Map<string, number>();
     for (const p of profiles) {
@@ -43,14 +85,22 @@
       if (!id) continue;
       counts.set(id, (counts.get(id) ?? 0) + 1);
     }
-    return [...counts.entries()].sort((a, b) => a[1] - b[1]);
+    return [...counts.entries()].sort((a, b) =>
+      activityName(a[0]).localeCompare(activityName(b[0])),
+    );
   });
 
-  let filteredProfiles = $derived(
-    selectedSport
+  let filteredProfiles = $derived.by(() => {
+    let list = selectedSport
       ? profiles.filter((p) => p.activities?.[0]?.id === selectedSport)
-      : profiles,
-  );
+      : profiles;
+    if (genderFilter) list = list.filter((p) => p.gender === genderFilter);
+    return [...list].sort((a, b) =>
+      sortBy === "age"
+        ? (a.age ?? 0) - (b.age ?? 0)
+        : a.displayName.localeCompare(b.displayName),
+    );
+  });
 
   async function loadProfiles() {
     loading = true;
@@ -65,7 +115,7 @@
     profiles = snap.docs
       .map((d) => ({ uid: d.id, ...(d.data() as Omit<UserProfile, "uid">) }))
       .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    for (const p of profiles) drafts[p.uid] = p.photoURL ?? "";
+    for (const p of profiles) drafts[p.uid] = draftOf(p);
     loading = false;
   }
 
@@ -75,24 +125,40 @@
     else goto("/discover");
   });
 
-  async function savePhoto(uid: string) {
-    const url = drafts[uid]?.trim();
-    if (!url || !/^https?:\/\//.test(url)) return;
+  async function saveProfile(uid: string) {
+    const d = drafts[uid];
+    if (!d) return;
+    const url = d.photoURL.trim();
+    if (url && !/^https?:\/\//.test(url)) return;
+    const name = d.displayName.trim();
+    if (!name) return;
+    const age = Number(d.age);
+
     saving = { ...saving, [uid]: true };
+    const update: Partial<UserProfile> = {
+      photoURL: url,
+      photos: url ? [url] : [],
+      displayName: name,
+      bio: d.bio.trim(),
+      age,
+      gender: d.gender,
+      orientation: d.orientation || null,
+      city: d.city.trim(),
+      isSingle: d.isSingle,
+      isTrainer: d.isTrainer,
+    };
     await setDoc(
       doc(db, "users", uid),
-      { photoURL: url, photos: [url], updatedAt: serverTimestamp() },
+      { ...update, updatedAt: serverTimestamp() },
       { merge: true },
     );
-    profiles = profiles.map((p) =>
-      p.uid === uid ? { ...p, photoURL: url, photos: [url] } : p,
-    );
-    if (selectedProfile?.uid === uid) {
-      selectedProfile = { ...selectedProfile, photoURL: url, photos: [url] };
-    }
+    profiles = profiles.map((p) => (p.uid === uid ? { ...p, ...update } : p));
     saving = { ...saving, [uid]: false };
     savedFlash = { ...savedFlash, [uid]: true };
     setTimeout(() => (savedFlash = { ...savedFlash, [uid]: false }), 1500);
+    if (selectedProfile?.uid === uid) {
+      selectedProfile = null;
+    }
   }
 </script>
 
@@ -112,9 +178,6 @@
     </div>
   {:else}
     <div class="px-5 pb-4">
-      <h2 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
-        Coverage by first sport
-      </h2>
       <select
         bind:value={selectedSport}
         class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text"
@@ -131,6 +194,25 @@
           Showing {filteredProfiles.length} of {profiles.length} profiles
         </p>
       {/if}
+
+      <div class="mt-3 flex gap-2">
+        <select
+          bind:value={genderFilter}
+          class="flex-1 rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text"
+        >
+          <option value="">All genders</option>
+          {#each GENDER_OPTIONS as opt}
+            <option value={opt.value}>{opt.label}</option>
+          {/each}
+        </select>
+        <select
+          bind:value={sortBy}
+          class="flex-1 rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text"
+        >
+          <option value="name">Sort by name</option>
+          <option value="age">Sort by age</option>
+        </select>
+      </div>
     </div>
 
     {#if loading}
@@ -167,6 +249,18 @@
                 >
               </p>
             </div>
+            {#if p.isSingle}
+              <Heart class="size-4 shrink-0 text-primary" aria-label="Single" />
+            {/if}
+            {#if p.isTrainer}
+              <Dumbbell
+                class="size-4 shrink-0 text-muted"
+                aria-label="Trainer"
+              />
+            {/if}
+            {#if p.orientation === "gay"}
+              <Rainbow class="size-4 shrink-0 text-muted" aria-label="Gay" />
+            {/if}
           </button>
         {/each}
       </div>
@@ -176,6 +270,7 @@
 
 {#if selectedProfile}
   {@const p = selectedProfile}
+  {@const d = drafts[p.uid]}
   <div
     class="fixed inset-0 z-50 mx-auto flex w-full flex-col overflow-y-auto bg-bg p-5 pb-8 md:max-w-md"
   >
@@ -190,9 +285,9 @@
       </button>
     </div>
 
-    {#if p.photoURL}
+    {#if d.photoURL}
       <img
-        src={p.photoURL}
+        src={d.photoURL}
         alt={p.displayName}
         class="mb-4 aspect-square w-full rounded-2xl object-cover"
       />
@@ -204,17 +299,116 @@
       </div>
     {/if}
 
-    <div class="mb-4 flex items-center gap-2">
+    <div class="mb-4 flex flex-col gap-2">
+      <label
+        class="text-xs font-semibold uppercase text-muted"
+        for="photoURL-{p.uid}">Photo URL</label
+      >
       <input
+        id="photoURL-{p.uid}"
         type="url"
         placeholder="https://images.unsplash.com/..."
-        bind:value={drafts[p.uid]}
+        bind:value={d.photoURL}
         class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text placeholder:text-muted"
       />
+
+      <label
+        class="text-xs font-semibold uppercase text-muted"
+        for="name-{p.uid}">Name</label
+      >
+      <input
+        id="name-{p.uid}"
+        type="text"
+        bind:value={d.displayName}
+        class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+      />
+
+      <div class="grid grid-cols-2 gap-2">
+        <div class="flex flex-col gap-1">
+          <label
+            class="text-xs font-semibold uppercase text-muted"
+            for="age-{p.uid}">Age</label
+          >
+          <input
+            id="age-{p.uid}"
+            type="number"
+            min="18"
+            bind:value={d.age}
+            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label
+            class="text-xs font-semibold uppercase text-muted"
+            for="city-{p.uid}">City</label
+          >
+          <input
+            id="city-{p.uid}"
+            type="text"
+            bind:value={d.city}
+            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label
+            class="text-xs font-semibold uppercase text-muted"
+            for="gender-{p.uid}">Gender</label
+          >
+          <select
+            id="gender-{p.uid}"
+            bind:value={d.gender}
+            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+          >
+            <option value="">—</option>
+            {#each GENDER_OPTIONS as opt}
+              <option value={opt.value}>{opt.label}</option>
+            {/each}
+          </select>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label
+            class="text-xs font-semibold uppercase text-muted"
+            for="orientation-{p.uid}">Orientation</label
+          >
+          <select
+            id="orientation-{p.uid}"
+            bind:value={d.orientation}
+            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+          >
+            <option value="">—</option>
+            {#each ORIENTATIONS as opt}
+              <option value={opt.value}>{opt.label}</option>
+            {/each}
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <label class="flex items-center gap-1.5 text-sm text-text">
+          <input type="checkbox" bind:checked={d.isSingle} />
+          Single
+        </label>
+        <label class="flex items-center gap-1.5 text-sm text-text">
+          <input type="checkbox" bind:checked={d.isTrainer} />
+          Trainer
+        </label>
+      </div>
+
+      <label
+        class="text-xs font-semibold uppercase text-muted"
+        for="bio-{p.uid}">Bio</label
+      >
+      <textarea
+        id="bio-{p.uid}"
+        rows="3"
+        bind:value={d.bio}
+        class="w-full min-w-0 resize-none rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+      ></textarea>
+
       <button
-        onclick={() => savePhoto(p.uid)}
+        onclick={() => saveProfile(p.uid)}
         disabled={saving[p.uid]}
-        class="flex shrink-0 items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        class="mt-1 flex items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
       >
         {#if saving[p.uid]}
           <LoaderCircle class="size-4 animate-spin" />
@@ -225,40 +419,6 @@
         {/if}
       </button>
     </div>
-
-    <dl class="mb-4 grid grid-cols-2 gap-3 text-sm">
-      <div>
-        <dt class="text-xs font-semibold uppercase text-muted">Gender</dt>
-        <dd class="text-text">{p.gender || "—"}</dd>
-      </div>
-      <div>
-        <dt class="text-xs font-semibold uppercase text-muted">Age</dt>
-        <dd class="text-text">{p.age ?? "—"}</dd>
-      </div>
-      <div>
-        <dt class="text-xs font-semibold uppercase text-muted">City</dt>
-        <dd class="text-text">{p.city || "—"}</dd>
-      </div>
-      <div>
-        <dt class="text-xs font-semibold uppercase text-muted">Orientation</dt>
-        <dd class="text-text">{p.orientation || "—"}</dd>
-      </div>
-      <div>
-        <dt class="text-xs font-semibold uppercase text-muted">Single</dt>
-        <dd class="text-text">{p.isSingle ? "Yes" : "No"}</dd>
-      </div>
-      <div>
-        <dt class="text-xs font-semibold uppercase text-muted">Trainer</dt>
-        <dd class="text-text">{p.isTrainer ? "Yes" : "No"}</dd>
-      </div>
-    </dl>
-
-    {#if p.bio}
-      <div class="mb-4">
-        <p class="mb-1 text-xs font-semibold uppercase text-muted">Bio</p>
-        <p class="text-sm text-text">{p.bio}</p>
-      </div>
-    {/if}
 
     <div>
       <p class="mb-2 text-xs font-semibold uppercase text-muted">Activities</p>
