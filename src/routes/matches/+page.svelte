@@ -1,13 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import {
-    LoaderCircle,
-    Users,
-    User,
-    Crown,
-    PartyPopper,
-    MessageCircle,
-  } from "@lucide/svelte";
+  import { LoaderCircle, Users, User, Crown } from "@lucide/svelte";
   import { authUser } from "$lib/stores/auth";
   import { db } from "$lib/firebase/client";
   import {
@@ -189,11 +182,12 @@
           </div>
           <div class="flex flex-col items-end gap-1">
             {#if unread}
-              {#if match.lastMessageAt}
-                <MessageCircle class="size-5 fill-red-500 text-red-500" />
-              {:else}
-                <PartyPopper class="size-5 fill-red-500 text-red-500" />
-              {/if}
+              <span
+                class="rounded-full bg-red-500 px-2.5 py-0.5 text-xs font-bold text-white"
+                >{match.lastMessageAt
+                  ? t.t("common.chat")
+                  : t.t("common.match")}</span
+              >
             {:else}
               <span
                 class="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white"
