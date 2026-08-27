@@ -57,7 +57,7 @@
   <div class="mt-3 flex flex-nowrap gap-2 overflow-hidden">
     {#if user.isTrainer}
       <span
-        class="flex shrink-0 items-center gap-1 rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-secondary-dark"
+        class="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
       >
         <GraduationCap class="size-3.5" />
         {t.t("profile.trainer")}

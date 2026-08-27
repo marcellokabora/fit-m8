@@ -28,3 +28,13 @@ export async function deleteAccount(user: User) {
     }
 }
 
+// Admin-only: wipes another user's profile doc + stored photos. Does not touch their Firebase
+// Auth account — client SDKs can only delete the *currently signed-in* user, not an arbitrary
+// one, so removing the Auth account itself would require a server-side (Admin SDK) function.
+export async function adminDeleteUserData(uid: string) {
+    await deleteDoc(doc(db, 'users', uid));
+
+    const avatarsList = await listAll(ref(storage, `avatars/${uid}`));
+    await Promise.all(avatarsList.items.map((item) => deleteObject(item)));
+}
+

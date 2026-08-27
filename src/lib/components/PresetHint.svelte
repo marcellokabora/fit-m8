@@ -4,6 +4,8 @@
     Users,
     GraduationCap,
     CircleQuestionMark,
+    Dumbbell,
+    ListOrdered,
   } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -11,6 +13,21 @@
 
   let t = $derived(createTranslator($activeLanguage));
   let open = $state(false);
+
+  const CONCEPT_ROWS = [
+    {
+      key: "sports",
+      icon: Dumbbell,
+      title: "discover.presetHintIntroTitle",
+      body: "discover.presetHintIntroBody",
+    },
+    {
+      key: "order",
+      icon: ListOrdered,
+      title: "discover.presetHintOrderTitle",
+      body: "discover.presetHintOrderBody",
+    },
+  ] as const;
 
   const ROWS = [
     {
@@ -47,32 +64,54 @@
     class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
   >
     <div
-      class="flex w-full flex-col gap-4 rounded-3xl bg-surface p-6 shadow-2xl"
+      class="flex max-h-[85vh] w-full flex-col gap-6 overflow-y-auto rounded-3xl bg-surface p-7 shadow-2xl"
     >
       <div>
-        <h2 class="text-lg font-black text-text">
+        <h2 class="text-2xl font-black text-text">
           {t.t("discover.presetHintToggle")}
         </h2>
-        <p class="text-xs text-muted">{t.t("discover.presetHintSubtitle")}</p>
+        <p class="mt-1 text-sm text-muted">
+          {t.t("discover.presetHintSubtitle")}
+        </p>
       </div>
-      <div class="flex flex-col gap-3">
-        {#each ROWS as row}
-          <div class="flex items-start gap-3">
+
+      <div class="flex flex-col gap-4">
+        {#each CONCEPT_ROWS as row}
+          <div class="flex items-start gap-4">
             <div
-              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+              class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
             >
-              <row.icon class="size-4" />
+              <row.icon class="size-5" />
             </div>
             <div>
-              <p class="text-sm font-bold text-text">{t.t(row.title)}</p>
-              <p class="text-xs text-muted">{t.t(row.body)}</p>
+              <p class="text-base font-bold text-text">{t.t(row.title)}</p>
+              <p class="mt-0.5 text-sm text-muted">{t.t(row.body)}</p>
             </div>
           </div>
         {/each}
       </div>
+
+      <div class="border-t border-border pt-5">
+        <div class="flex flex-col gap-4">
+          {#each ROWS as row}
+            <div class="flex items-start gap-4">
+              <div
+                class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+              >
+                <row.icon class="size-4" />
+              </div>
+              <div>
+                <p class="text-sm font-bold text-text">{t.t(row.title)}</p>
+                <p class="mt-0.5 text-xs text-muted">{t.t(row.body)}</p>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+
       <button
         onclick={() => (open = false)}
-        class="w-full rounded-2xl bg-primary py-3 text-xs font-bold text-white active:scale-95"
+        class="w-full rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95"
       >
         {t.t("common.close")}
       </button>

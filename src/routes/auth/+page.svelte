@@ -230,12 +230,10 @@
     </a>
   </p>
 
-  {#if mode === "register"}
-    <p class="mt-4 text-center text-xs text-muted">
-      By continuing, you agree to our
-      <a href="/terms" class="font-semibold text-primary">Terms of Service</a>
-      and
-      <a href="/privacy" class="font-semibold text-primary">Privacy Policy</a>.
-    </p>
-  {/if}
+  <p
+    class="mt-auto flex justify-center gap-4 pt-6 text-center text-xs text-muted"
+  >
+    <a href="/terms" class="font-semibold text-primary">Terms of Service</a>
+    <a href="/privacy" class="font-semibold text-primary">Privacy Policy</a>
+  </p>
 </div>

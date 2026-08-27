@@ -97,7 +97,7 @@
           <button
             onclick={() => removePhoto(index)}
             aria-label={t.t("common.removePhoto")}
-            class="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-error text-white shadow-sm active:scale-95"
+            class="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-primary text-white shadow-sm active:scale-95"
           >
             <X class="size-3.5" />
           </button>

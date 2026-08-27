@@ -42,7 +42,7 @@
         onclick={() => activeTheme.selectTheme(theme.id)}
         aria-label={t.t(`appearance.${theme.id}` as any)}
         class="relative flex size-10 items-center justify-center rounded-full shadow-sm transition-transform active:scale-95"
-        style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.secondary} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
+        style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.primaryDark} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
         'dark'
           ? theme.dark.bg
           : theme.light.bg}, 0 0 0 {$activeTheme.themeId === theme.id

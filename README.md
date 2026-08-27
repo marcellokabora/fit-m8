@@ -18,16 +18,15 @@ FIT-M8 is a mobile-first Progressive Web App built with SvelteKit, TailwindCSS, 
 
 ## Brand Colors
 
-| Token       | Hex       | Usage                  |
-| ----------- | --------- | ---------------------- |
-| `primary`   | `#0066FF` | Buttons, active states |
-| `secondary` | `#FF5A36` | CTA, highlights        |
-| `bg`        | `#F5F7FA` | App background         |
-| `surface`   | `#FFFFFF` | Cards                  |
-| `text`      | `#0D0D0D` | Body text              |
-| `muted`     | `#6B7280` | Subtext                |
-| `error`     | `#FF3B30` | Errors                 |
-| `success`   | `#34C759` | Success states         |
+| Token     | Hex       | Usage                  |
+| --------- | --------- | ---------------------- |
+| `primary` | `#0066FF` | Buttons, active states |
+| `bg`      | `#F5F7FA` | App background         |
+| `surface` | `#FFFFFF` | Cards                  |
+| `text`    | `#0D0D0D` | Body text              |
+| `muted`   | `#6B7280` | Subtext                |
+| `error`   | `#FF3B30` | Errors                 |
+| `success` | `#34C759` | Success states         |
 
 ## Setup
 

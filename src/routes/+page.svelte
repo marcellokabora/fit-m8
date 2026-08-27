@@ -80,7 +80,7 @@
 
   {#if ready}
     <!-- Activity carousel -->
-    <div transition:fade class="flex w-full justify-center">
+    <div transition:fade class="flex w-full justify-center mt-6">
       <ActivityCarousel activities={HERO_ACTIVITIES} {t} />
     </div>
 

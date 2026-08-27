@@ -46,7 +46,7 @@
 </script>
 
 <div
-  class="relative mx-auto w-full max-w-xs overflow-hidden"
+  class="activity-carousel relative mx-auto w-full max-w-xs overflow-hidden"
   style={`height: ${ITEM_HEIGHT + PEEK_HEIGHT * 2}px`}
 >
   <div
@@ -86,3 +86,12 @@
     {/each}
   </div>
 </div>
+
+<style>
+  /* hide on short viewports where the carousel would push other content off-screen */
+  @media (max-height: 700px) {
+    .activity-carousel {
+      display: none;
+    }
+  }
+</style>

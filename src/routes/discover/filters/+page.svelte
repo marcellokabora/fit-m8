@@ -371,7 +371,7 @@
         </button>
         <button
           onclick={resetFilters}
-          class="flex size-9 items-center justify-center rounded-full bg-surface text-primary shadow-sm p-1"
+          class="flex size-9 items-center justify-center rounded-full bg-surface text-primary shadow-sm p-1 mr-1"
           aria-label={t.t("common.clear")}
         >
           <RotateCcw class="size-5" />

@@ -23,7 +23,7 @@
 </script>
 
 <div
-  class="relative aspect-4/5 w-full overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20"
+  class="relative aspect-4/5 w-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary-dark/20"
 >
   {#if photos.length > 1}
     <div class="absolute left-1/2 top-6 z-0 flex w-1/3 -translate-x-1/2 gap-1">

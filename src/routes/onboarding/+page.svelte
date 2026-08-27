@@ -88,6 +88,8 @@
   }
 
   const draft = loadDraft();
+  // Google sign-in already carries a name + profile photo — reuse them as defaults below
+  const googleAccount = get(authUser);
   const urlStepParam = Number(page.url.searchParams.get("step"));
   let step = $state(
     urlStepParam >= 1 && urlStepParam <= TOTAL_STEPS
@@ -121,7 +123,9 @@
   );
 
   // Step 1 — Basic info
-  let displayName = $state(draft.displayName ?? "");
+  let displayName = $state(
+    draft.displayName ?? googleAccount?.displayName ?? "",
+  );
   let bio = $state(draft.bio ?? "");
   let birthdate = $state(draft.birthdate ?? "");
   let age = $derived(birthdate ? calculateAge(birthdate) : 0);
@@ -159,8 +163,10 @@
     draft.discoverPreset ?? null,
   );
 
-  // Step 5 — Photos (optional, up to 3)
-  let photos = $state<string[]>(draft.photos ?? []);
+  // Step 5 — Photos (optional, up to 3) — default slot 1 to the Google account photo
+  let photos = $state<string[]>(
+    draft.photos ?? (googleAccount?.photoURL ? [googleAccount.photoURL] : []),
+  );
   let saving = $state(false);
   let error = $state("");
   let uid = $derived($authUser?.uid ?? "");
@@ -262,6 +268,11 @@
       pushStepUrl();
       return;
     }
+    if (selectedActivities.length === 0) {
+      step = 2;
+      pushStepUrl();
+      return;
+    }
     saving = true;
     const user = get(authUser);
     if (!user) return;
@@ -358,21 +369,25 @@
           {bio.length}/{BIO_MAX_LENGTH}
         </p>
         <div>
-          <label
-            for="onboarding-birthdate"
-            class="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted"
-          >
-            {t.t("onboarding.birthdate")}
-          </label>
-          <input
-            id="onboarding-birthdate"
-            type="date"
-            bind:value={birthdate}
-            max={maxBirthdate}
-            class="w-full rounded-2xl border-2 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary {isUnderage
+          <div
+            class="flex items-center justify-between rounded-2xl border-2 bg-surface px-4 py-4 {isUnderage
               ? 'border-error'
               : 'border-border'}"
-          />
+          >
+            <label
+              for="onboarding-birthdate"
+              class="text-sm font-semibold text-text"
+            >
+              {t.t("onboarding.birthdate")}
+            </label>
+            <input
+              id="onboarding-birthdate"
+              type="date"
+              bind:value={birthdate}
+              max={maxBirthdate}
+              class="bg-transparent text-right text-base text-text outline-none"
+            />
+          </div>
           {#if isUnderage}
             <p class="mt-2 text-xs font-semibold text-error">
               {t.t("onboarding.underageError")}
@@ -495,6 +510,11 @@
           </button>
         {/each}
       </div>
+      {#if selectedActivities.length === 0}
+        <p class="mt-4 text-xs font-semibold text-error">
+          {t.t("onboarding.selectAtLeastOneSport")}
+        </p>
+      {/if}
     {:else if step === 3}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.yourSettings")}
@@ -535,7 +555,7 @@
                       (activitySettings[id].level = level.value as SkillLevel)}
                     class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {settings.level ===
                     level.value
-                      ? 'border-secondary-dark bg-secondary text-white'
+                      ? 'border-primary-dark bg-primary text-white'
                       : 'border-border text-muted'}"
                   >
                     {t.skill(level.value)}
@@ -553,14 +573,19 @@
       <p class="mb-6 text-sm text-muted">
         {t.t("onboarding.howItWorksHint")}
       </p>
-      <div class="flex flex-col gap-4">
+      <div
+        class="flex flex-col gap-4"
+        role="radiogroup"
+        aria-label={t.t("onboarding.howItWorks")}
+      >
         {#each HOW_IT_WORKS as slide}
           {@const selected = discoverPreset === slide.preset}
           <button
             type="button"
             onclick={() => (discoverPreset = slide.preset)}
-            aria-pressed={selected}
-            class="flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition-colors {selected
+            role="radio"
+            aria-checked={selected}
+            class="flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors {selected
               ? 'border-primary bg-primary/10'
               : 'border-border bg-surface'}"
           >
@@ -569,7 +594,7 @@
             >
               <slide.icon class="size-5" />
             </span>
-            <div>
+            <div class="flex-1">
               <p class="font-bold text-text">
                 {t.t(`intro.${slide.key}.title`)}
               </p>
@@ -577,6 +602,17 @@
                 {t.t(`intro.${slide.key}.body`)}
               </p>
             </div>
+            <!-- Radio indicator — makes clear only one of these can be picked, and it must be tapped to check it -->
+            <span
+              aria-hidden="true"
+              class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 {selected
+                ? 'border-primary bg-primary'
+                : 'border-border'}"
+            >
+              {#if selected}
+                <Check class="size-3.5 text-white" />
+              {/if}
+            </span>
           </button>
         {/each}
       </div>
@@ -623,6 +659,7 @@
         onclick={next}
         disabled={(step === 1 &&
           (!displayName || !birthdate || isUnderage || !locationValid)) ||
+          (step === 2 && selectedActivities.length === 0) ||
           (step === 4 && !discoverPreset)}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
@@ -632,7 +669,7 @@
       <button
         onclick={save}
         disabled={saving}
-        class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-secondary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
+        class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {saving ? t.t("common.saving") : t.t("common.letsGo")}
         {#if !saving}

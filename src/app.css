@@ -3,8 +3,6 @@
 @theme {
   --color-primary: #0066ff;
   --color-primary-dark: #0047cc;
-  --color-secondary: #ff5a36;
-  --color-secondary-dark: #e6431f;
   --color-bg: #0b0f17;
   --color-surface: #161c27;
   --color-text: #f2f4f8;
@@ -15,6 +13,16 @@
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Righteous", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Tells the browser to render native controls (date picker icon, etc.) in the matching
+   palette instead of always-black — theme.ts sets data-theme-mode on <html> at runtime */
+html {
+  color-scheme: light;
+}
+
+html[data-theme-mode="dark"] {
+  color-scheme: dark;
 }
 
 html,

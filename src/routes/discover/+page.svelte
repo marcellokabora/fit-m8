@@ -52,6 +52,7 @@
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
+  import PresetHint from "$lib/components/PresetHint.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -538,6 +539,7 @@
     <div class="flex items-center justify-between px-5 pb-3 pt-5">
       <h1 class="text-2xl font-black text-text">{t.t("nav.discover")}</h1>
       <div class="flex items-center gap-2">
+        <PresetHint />
         <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
@@ -608,7 +610,7 @@
               class="absolute inset-0 flex flex-col scale-[0.94] overflow-hidden rounded-3xl bg-surface shadow-md"
             >
               <div
-                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"
+                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
               >
                 {#if users[2].photos?.[0] ?? users[2].photoURL}
                   <img
@@ -628,7 +630,7 @@
               class="absolute inset-0 flex flex-col scale-[0.97] overflow-hidden rounded-3xl bg-surface shadow-md"
             >
               <div
-                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"
+                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
               >
                 {#if users[1].photos?.[0] ?? users[1].photoURL}
                   <img
@@ -683,7 +685,7 @@
               <!-- Profile image area (fills remaining vertical space) -->
               <div
                 bind:this={photoEl}
-                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center"
+                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
               >
                 {#if currentPhotos[photoIndex]}
                   <img

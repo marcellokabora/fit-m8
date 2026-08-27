@@ -27,6 +27,7 @@
     Plus,
     ShieldUser,
     Trash2,
+    Users,
   } from "@lucide/svelte";
   import { slide } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
@@ -224,6 +225,30 @@
     </div>
   </div>
 
+  {#if $isAdmin}
+    <div
+      class="mx-5 mb-6 flex flex-col gap-2 rounded-2xl bg-surface p-3 shadow-sm"
+    >
+      <p class="px-1 text-xs font-bold uppercase tracking-wide text-muted">
+        Admin
+      </p>
+      <a
+        href="/admin/fake-profiles"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
+      >
+        <ShieldUser class="size-4" />
+        Fake profiles
+      </a>
+      <a
+        href="/admin/users"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
+      >
+        <Users class="size-4" />
+        Users profiles
+      </a>
+    </div>
+  {/if}
+
   <!-- Activities -->
   <div class="px-5">
     <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
@@ -360,15 +385,6 @@
         ? t.t("profile.premiumMember")
         : t.t("profile.goPremium")}
     </a>
-    {#if $isAdmin}
-      <a
-        href="/admin/fake-profiles"
-        class="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
-      >
-        <ShieldUser class="size-4" />
-        Manage fake profiles
-      </a>
-    {/if}
   </div>
 
   <!-- Legal -->
