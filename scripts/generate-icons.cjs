@@ -62,19 +62,30 @@ async function loadContent() {
     return { buffer: cropData, width: cropInfo.width, height: cropInfo.height, channels: cropInfo.channels };
 }
 
+// padding may be negative to intentionally bleed the artwork past the canvas edge (it's
+// rendered on an oversized canvas first, then center-cropped back down to `size`).
 async function canvasWithContent({ content, size, padding }) {
     const box = size - padding * 2;
     const scale = Math.min(box / content.width, box / content.height);
+    const rw = Math.round(content.width * scale);
+    const rh = Math.round(content.height * scale);
     const resized = await sharp(content.buffer, {
         raw: { width: content.width, height: content.height, channels: content.channels }
     })
-        .resize(Math.round(content.width * scale), Math.round(content.height * scale))
+        .resize(rw, rh)
         .png()
         .toBuffer();
 
-    return sharp({
-        create: { width: size, height: size, channels: 3, background: BG }
-    }).composite([{ input: resized, gravity: "center" }]);
+    const canvasSize = Math.max(size, rw, rh);
+    const big = await sharp({
+        create: { width: canvasSize, height: canvasSize, channels: 3, background: BG }
+    })
+        .composite([{ input: resized, gravity: "center" }])
+        .png()
+        .toBuffer();
+
+    const offset = Math.round((canvasSize - size) / 2);
+    return sharp(big).extract({ left: offset, top: offset, width: size, height: size });
 }
 
 async function render(pipeline, outPath) {
@@ -90,10 +101,11 @@ async function main() {
     await render(await canvasWithContent({ content, size: 192, padding: 20 }), path.join(iconsDir, "icon-192.png"));
     await render(await canvasWithContent({ content, size: 512, padding: 54 }), path.join(iconsDir, "icon-512.png"));
 
-    // Maskable icons need the artwork inside the safe-zone circle (inner ~80%), so use
-    // extra padding since OS shells (Android adaptive icons) crop the outer edges.
-    await render(await canvasWithContent({ content, size: 192, padding: 38 }), path.join(iconsDir, "icon-192-maskable.png"));
-    await render(await canvasWithContent({ content, size: 512, padding: 102 }), path.join(iconsDir, "icon-512-maskable.png"));
+    // Maskable icons: negative padding so the mark bleeds past the safe-zone circle and gets
+    // cut off at the extremities (head, legs) the same way on every side, instead of floating
+    // with visible margin on one side and touching the edge on another.
+    await render(await canvasWithContent({ content, size: 192, padding: -15 }), path.join(iconsDir, "icon-192-maskable.png"));
+    await render(await canvasWithContent({ content, size: 512, padding: -40 }), path.join(iconsDir, "icon-512-maskable.png"));
 
     // Favicon (rendered larger than displayed size for crisp downscaling by the browser).
     await render(await canvasWithContent({ content, size: 96, padding: 10 }), path.join(ROOT, "static", "favicon.png"));
