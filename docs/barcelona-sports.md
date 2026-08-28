@@ -3,49 +3,87 @@
 Barcelona's climate and geography — wedged between the Mediterranean and the Collserola
 hills — make it a major hub for both casual outdoor sports and organized club play.
 
-## Beach & Coastal Sports
+## Activity groups
 
-- **Beach Volleyball** — Hugely popular along Nova Icària, Bogatell, and Barceloneta. Dozens
-  of nets are set up daily for pickup games and local leagues.
-- **Paddlesurf (SUP) & Kayaking** — Very common during early mornings along the coastline,
-  especially off Barceloneta and Port Fòrum.
-- **Swimming & Open Water** — Popular year-round, both in public municipal pools (CEMs) and
-  open-sea swimming lines.
+Candidate grouping for organizing the full activity catalog (existing + future additions)
+into categories:
 
-## Urban & Racket Sports
-
-- **Padel** — Massively popular across Catalonia. Courts are everywhere, from local municipal
-  sports centers to rooftop clubs.
-- **Skateboarding & Rollerblading** — Barcelona is widely considered the skateboarding capital
-  of Europe. MACBA, Fòrum, and the seafront promenade are iconic spots.
-- **Running & Cycling** — The seafront promenade, Carretera de les Aigües (in Collserola), and
-  Montjuïc park are prime running routes. Road and gravel cycling are also huge for quick
-  escapes into the mountains.
-
-## Field & Team Sports
-
-- **Football (7-a-side & 11-a-side)** — Played constantly across municipal turf fields. Apps
-  like CeleBreak make it easy to join casual pickup matches.
-- **Basketball** — Plenty of outdoor public courts (e.g. Parc de l'Espanya Industrial or Parc
-  de Monterols) host regular pickup games.
+- **Aerial & Acrobatics** — Aerial Hoops, Pole Dance
+- **Aqua & Water Sports** — Swimming, Kayak, Canoe, Stand-up Paddleboarding, Surfing,
+  Wakeboarding
+- **Ball & Racquet Sports** — Padel, Tennis, Badminton, Squash, Football, Basketball, Table
+  Tennis
+- **Combat & Martial Arts** — Boxing, Kickboxing, Muay Thai, Brazilian Jiu-Jitsu, Judo,
+  Karate, Krav Maga
+- **Cycling & Mobility** — Indoor Cycling/Spinning, Outdoor Cycling, Mobility Workouts
+- **Dance & Movement** — Salsa, Bachata, Hip Hop, Contemporary Dance, Barre, Trampolining
+- **Fitness & Strength** — Gym Open Training, Functional Training, Cross-training, Bootcamp,
+  Bodybuilding, Calisthenics
+- **Mind & Body** — Yoga, Pilates, Meditation, Breathwork
+- **Outdoor & Adventure** — Beach Volleyball, Bouldering, Rock Climbing, Running, Hiking,
+  Skateboarding
+- **Wellness & Recovery** — Sauna, Cryotherapy, Massage, Spa, Infrared Cabins
 
 ## Mapping to FIT-M8 activities
 
-Relevant `ActivityId`s already defined in [types.ts](../src/lib/types.ts) for the sports
-mentioned above:
+Relevant `ActivityId`s already defined in [types.ts](../src/lib/types.ts), organized by the
+groups above. Entries with no `ActivityId` are not yet tracked as activities in the app.
 
-| Barcelona sport  | FIT-M8 `ActivityId` |
-| ---------------- | ------------------- |
-| Beach Volleyball | `beach-volley`      |
-| Paddlesurf (SUP) | `paddleboard`       |
-| Swimming         | `swimming`          |
-| Padel            | `padel`             |
-| Running          | `jogging`           |
-| Cycling          | `cycling`           |
-| Football         | `soccer`            |
-| Basketball       | `basketball`        |
-| Skateboarding    | `skateboard`        |
-| Rollerblading    | `rollerblade`       |
+| Group                 | Sport                   | FIT-M8 `ActivityId` |
+| --------------------- | ----------------------- | ------------------- |
+| Aerial & Acrobatics   | Aerial Hoops            | —                   |
+| Aerial & Acrobatics   | Pole Dance              | —                   |
+| Aqua & Water Sports   | Swimming                | `swimming`          |
+| Aqua & Water Sports   | Kayak                   | —                   |
+| Aqua & Water Sports   | Canoe                   | —                   |
+| Aqua & Water Sports   | Stand-up Paddleboarding | `paddleboard`       |
+| Aqua & Water Sports   | Surfing                 | `surf`              |
+| Aqua & Water Sports   | Wakeboarding            | —                   |
+| Ball & Racquet Sports | Padel                   | `padel`             |
+| Ball & Racquet Sports | Tennis                  | `tennis`            |
+| Ball & Racquet Sports | Badminton               | `badminton`         |
+| Ball & Racquet Sports | Squash                  | `squash`            |
+| Ball & Racquet Sports | Football                | `soccer`            |
+| Ball & Racquet Sports | Basketball              | `basketball`        |
+| Ball & Racquet Sports | Table Tennis            | `ping-pong`         |
+| Combat & Martial Arts | Boxing                  | `martial-arts`      |
+| Combat & Martial Arts | Kickboxing              | `martial-arts`      |
+| Combat & Martial Arts | Muay Thai               | `martial-arts`      |
+| Combat & Martial Arts | Brazilian Jiu-Jitsu     | `martial-arts`      |
+| Combat & Martial Arts | Judo                    | `martial-arts`      |
+| Combat & Martial Arts | Karate                  | `martial-arts`      |
+| Combat & Martial Arts | Krav Maga               | `martial-arts`      |
+| Cycling & Mobility    | Indoor Cycling/Spinning | `cycling`           |
+| Cycling & Mobility    | Outdoor Cycling         | `cycling`           |
+| Cycling & Mobility    | Mobility Workouts       | —                   |
+| Dance & Movement      | Salsa                   | —                   |
+| Dance & Movement      | Bachata                 | —                   |
+| Dance & Movement      | Hip Hop                 | —                   |
+| Dance & Movement      | Contemporary Dance      | —                   |
+| Dance & Movement      | Barre                   | —                   |
+| Dance & Movement      | Trampolining            | —                   |
+| Fitness & Strength    | Gym Open Training       | `gym`               |
+| Fitness & Strength    | Functional Training     | —                   |
+| Fitness & Strength    | Cross-training          | —                   |
+| Fitness & Strength    | Bootcamp                | —                   |
+| Fitness & Strength    | Bodybuilding            | —                   |
+| Fitness & Strength    | Calisthenics            | `calisthenics`      |
+| Mind & Body           | Yoga                    | `yoga`              |
+| Mind & Body           | Pilates                 | —                   |
+| Mind & Body           | Meditation              | —                   |
+| Mind & Body           | Breathwork              | —                   |
+| Outdoor & Adventure   | Beach Volleyball        | `beach-volley`      |
+| Outdoor & Adventure   | Footvolley              | `footvolley`        |
+| Outdoor & Adventure   | Bouldering              | `rock-climbing`     |
+| Outdoor & Adventure   | Rock Climbing           | `rock-climbing`     |
+| Outdoor & Adventure   | Running                 | `jogging`           |
+| Outdoor & Adventure   | Hiking                  | `hiking`            |
+| Outdoor & Adventure   | Skateboarding           | `skateboard`        |
+| Wellness & Recovery   | Sauna                   | —                   |
+| Wellness & Recovery   | Cryotherapy             | —                   |
+| Wellness & Recovery   | Massage                 | —                   |
+| Wellness & Recovery   | Spa                     | —                   |
+| Wellness & Recovery   | Infrared Cabins         | —                   |
 
-Sports mentioned in the source material with no corresponding activity yet: kayaking. Not
-added since it isn't currently tracked as an activity in the app.
+Existing `ActivityId`s not covered by the list above: `frescobol`, `golf`, `pickleball`,
+`rollerblade`.

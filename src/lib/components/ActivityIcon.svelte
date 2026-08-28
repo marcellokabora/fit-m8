@@ -3,6 +3,7 @@
   import Padel from "~icons/material-symbols/padel";
   import Tennis from "~icons/material-symbols/sports-tennis";
   import BeachVolley from "~icons/material-symbols/sports-volleyball";
+  import Footvolley from "~icons/mdi/volleyball";
   import Basketball from "~icons/material-symbols/sports-basketball";
   import Soccer from "~icons/material-symbols/sports-soccer";
   import Cycling from "~icons/material-symbols/pedal-bike";
@@ -15,10 +16,12 @@
   import Frescobol from "~icons/mdi/racquetball";
   import Gym from "~icons/material-symbols/sports-gymnastics";
   import Calisthenics from "~icons/mdi/arm-flex";
+  import Yoga from "~icons/mdi/yoga";
   import RockClimbing from "~icons/mdi/rock-climbing";
   import Golf from "~icons/material-symbols/sports-golf";
   import MartialArts from "~icons/material-symbols/sports-martial-arts";
   import Paddleboard from "~icons/material-symbols/kayaking";
+  import Surf from "~icons/material-symbols/surfing";
   import Rollerblade from "~icons/material-symbols/roller-skating";
   import Skateboard from "~icons/material-symbols/skateboarding";
   import Generic from "~icons/material-symbols/sports-outline";
@@ -34,6 +37,7 @@
     padel: Padel,
     tennis: Tennis,
     "beach-volley": BeachVolley,
+    footvolley: Footvolley,
     basketball: Basketball,
     soccer: Soccer,
     cycling: Cycling,
@@ -46,10 +50,12 @@
     frescobol: Frescobol,
     gym: Gym,
     calisthenics: Calisthenics,
+    yoga: Yoga,
     "rock-climbing": RockClimbing,
     golf: Golf,
     "martial-arts": MartialArts,
     paddleboard: Paddleboard,
+    surf: Surf,
     rollerblade: Rollerblade,
     skateboard: Skateboard,
   };

@@ -1,15 +1,6 @@
-<script module lang="ts">
-  import type { UserProfile } from "$lib/types";
-
-  // Module scope so returning here from a profile page reuses the same feed instead of refetching/reshuffling it
-  let users = $state<UserProfile[]>([]);
-  let loading = $state(true);
-  let filtersSyncedFor = $state<string | null>(null);
-  let lastLoadedKey = $state<string | null>(null);
-</script>
-
 <script lang="ts">
   import { onMount } from "svelte";
+  import type { UserProfile } from "$lib/types";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { scale } from "svelte/transition";
@@ -56,6 +47,11 @@
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
+
+  let users = $state<UserProfile[]>([]);
+  let loading = $state(true);
+  let filtersSyncedFor = $state<string | null>(null);
+  let lastLoadedKey = $state<string | null>(null);
 
   let matchBanner = $state(false);
   let profileActivities = $derived(
@@ -584,7 +580,7 @@
       class="relative flex min-h-0 flex-1 flex-col items-center justify-center px-5"
     >
       {#if loading}
-        <Loading fullscreen={false} />
+        <Loading fullscreen={false} class="absolute inset-0" />
       {:else if users.length === 0}
         <div class="flex flex-col items-center gap-4 text-center">
           <Moon class="size-16 text-muted" />

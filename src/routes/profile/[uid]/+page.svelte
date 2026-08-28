@@ -18,6 +18,7 @@
     PartyPopper,
     MessageCircle,
     GraduationCap,
+    Rainbow,
     Crown,
     X,
   } from "@lucide/svelte";
@@ -158,6 +159,18 @@
             aria-label={t.t("profile.premiumMember")}
           />
         {/if}
+        {#if profile.orientation === "gay"}
+          <Rainbow
+            class="size-4 shrink-0 text-primary"
+            aria-label={t.orientation("gay")}
+          />
+        {/if}
+        {#if profile.isTrainer}
+          <GraduationCap
+            class="size-4 shrink-0 text-primary"
+            aria-label={t.t("profile.trainer")}
+          />
+        {/if}
       {:else}
         <h1 class="text-lg font-black text-text">{t.t("nav.profile")}</h1>
       {/if}
@@ -183,10 +196,10 @@
     <PhotoGallery {photos} alt={profile.displayName} />
 
     <div class="flex flex-col gap-3 px-5 pb-6 pt-4">
-      <div
-        class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
-      >
-        <div class="flex flex-wrap items-center gap-2 text-sm text-muted">
+      {#if profile.city || distanceAway !== null}
+        <div
+          class="flex flex-wrap items-center gap-2 rounded-2xl bg-surface p-4 text-sm text-muted shadow-sm"
+        >
           {#if profile.city}
             <span class="flex items-center gap-0.5">
               <MapPin class="size-3.5" />
@@ -196,22 +209,11 @@
           {#if distanceAway !== null}
             <span>{t.t("profile.distanceAway", { count: distanceAway })}</span>
           {/if}
-          {#if profile.orientation === "gay"}
-            <span
-              class="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
-            >
-              {t.orientation("gay")}
-            </span>
-          {/if}
-          {#if profile.isTrainer}
-            <span
-              class="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary"
-            >
-              <GraduationCap class="size-3.5" />
-              {t.t("profile.trainer")}
-            </span>
-          {/if}
         </div>
+      {/if}
+      <div
+        class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
+      >
         {#if profile.bio}
           <p class="text-left text-sm text-muted text-balance">{profile.bio}</p>
         {/if}

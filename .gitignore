@@ -25,6 +25,29 @@ firebase-key.*.json
 serviceAccountKey.json
 .firebase
 
+# Android signing (Bubblewrap/TWA) - never commit keystores or their passwords
+*.keystore
+*.jks
+key.properties
+
+# Bubblewrap/TWA generated Android project - fully regeneratable from twa-manifest.json
+# via `bubblewrap init`/`update`, so keep it out of version control (twa-manifest.json
+# itself IS tracked - it's the small source-of-truth config, not generated boilerplate).
+.gradle/
+/app/
+/gradle/
+/gradlew
+/gradlew.bat
+/build.gradle
+/settings.gradle
+/gradle.properties
+/local.properties
+/manifest-checksum.txt
+/store_icon.png
+*.apk
+*.apk.idsig
+*.aab
+
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

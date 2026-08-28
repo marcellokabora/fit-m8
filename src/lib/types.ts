@@ -37,6 +37,7 @@ export const ACTIVITIES = [
 	{ id: 'padel', label: 'Padel', emoji: '🎾' },
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾' },
 	{ id: 'beach-volley', label: 'Beach Volley', emoji: '🏐' },
+	{ id: 'footvolley', label: 'Footvolley', emoji: '🏐' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀' },
 	{ id: 'soccer', label: 'Football', emoji: '⚽' },
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },
@@ -49,11 +50,11 @@ export const ACTIVITIES = [
 	{ id: 'frescobol', label: 'Frescobol', emoji: '🏖️' },
 	{ id: 'gym', label: 'Gym Training', emoji: '💪' },
 	{ id: 'calisthenics', label: 'Calisthenics', emoji: '🤸' },
+	{ id: 'yoga', label: 'Yoga', emoji: '🧘' },
 	{ id: 'rock-climbing', label: 'Rock Climbing', emoji: '🧗' },
 	{ id: 'golf', label: 'Golf', emoji: '⛳' },
 	{ id: 'martial-arts', label: 'Martial Arts', emoji: '🥋' },
-	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶' },
-	{ id: 'rollerblade', label: 'Rollerblading', emoji: '🛼' },
+	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶' }, { id: 'surf', label: 'Surfing', emoji: '🏄' }, { id: 'rollerblade', label: 'Rollerblading', emoji: '🛼' },
 	{ id: 'skateboard', label: 'Skateboarding', emoji: '🛹' }
 ] as const;
 

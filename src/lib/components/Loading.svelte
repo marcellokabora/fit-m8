@@ -6,14 +6,15 @@
   let {
     fullscreen = true,
     message = "",
-  }: { fullscreen?: boolean; message?: string } = $props();
+    class: className = "",
+  }: { fullscreen?: boolean; message?: string; class?: string } = $props();
 </script>
 
 <div
   transition:fade={{ duration: 200 }}
   class="{fullscreen
     ? 'fixed inset-0 z-50 mx-auto w-full bg-bg md:max-w-md'
-    : ''} flex flex-col items-center justify-center gap-4"
+    : ''} flex flex-col items-center justify-center gap-4 {className}"
 >
   <div
     class="size-10 animate-spin rounded-full border-4 border-primary/30 border-t-primary"

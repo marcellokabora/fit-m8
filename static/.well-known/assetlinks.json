@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "app.fit_m8.twa",
+            "sha256_cert_fingerprints": [
+                "DC:13:F7:6E:53:7A:64:5D:67:52:07:54:C6:7A:A1:C4:FA:5D:46:98:C0:E9:6D:EB:B3:EE:70:2F:08:51:0E:55"
+            ]
+        }
+    }
+]

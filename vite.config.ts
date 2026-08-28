@@ -28,19 +28,30 @@ export default defineConfig({
 				enabled: false
 			},
 			manifest: {
+				id: '/',
 				name: 'FIT-M8',
 				short_name: 'FIT-M8',
 				description: 'Match people for sports activities',
-				theme_color: '#0b0f17',
-				background_color: '#0b0f17',
+				theme_color: '#1a1006',
+				background_color: '#1a1006',
 				display: 'standalone',
 				orientation: 'portrait',
 				start_url: '/',
 				icons: [
 					{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
 					{ src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-					{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
-					{ src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+					{
+						src: '/icons/icon-192-maskable.png',
+						sizes: '192x192',
+						type: 'image/png',
+						purpose: 'maskable'
+					},
+					{
+						src: '/icons/icon-512-maskable.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'maskable'
+					}
 				]
 			}
 		})
