@@ -10,6 +10,14 @@ const SRC_JPG = path.join(ROOT, "static", "fit-m8.jpg");
 
 const BG = { r: 0x1a, g: 0x10, b: 0x06 }; // --color-bg
 const FG_THRESHOLD = 40; // pixels darker than this (per channel) are treated as background
+const FG_HUE_MARGIN = 30; // require R meaningfully above B so gray JPEG artifacts aren't mistaken for the orange mark
+
+// The mark is orange (high R, low B); the near-black background sometimes contains a faint
+// gray compression speck that's bright enough to clear FG_THRESHOLD but isn't part of the
+// artwork. Checking R-B rules those specks out so they can't skew the content bounding box.
+function isForeground(r, g, b) {
+    return r > FG_THRESHOLD && r - b > FG_HUE_MARGIN;
+}
 
 // The source jpg's own near-black background isn't an exact match for --color-bg, and the
 // artwork isn't centered in the 1024x1024 canvas, so: crop to the actual content bounds,
@@ -22,7 +30,7 @@ async function loadContent() {
     for (let y = 0; y < height; y += 2) {
         for (let x = 0; x < width; x += 2) {
             const i = (y * width + x) * channels;
-            if (data[i] > FG_THRESHOLD || data[i + 1] > FG_THRESHOLD || data[i + 2] > FG_THRESHOLD) {
+            if (isForeground(data[i], data[i + 1], data[i + 2])) {
                 if (x < minX) minX = x;
                 if (x > maxX) maxX = x;
                 if (y < minY) minY = y;
@@ -42,13 +50,9 @@ async function loadContent() {
         .raw()
         .toBuffer({ resolveWithObject: true });
 
-    // Recolor the near-black background field to the exact brand color.
+    // Recolor everything that isn't the orange mark to the exact brand color.
     for (let i = 0; i < cropData.length; i += cropInfo.channels) {
-        if (
-            cropData[i] < FG_THRESHOLD &&
-            cropData[i + 1] < FG_THRESHOLD &&
-            cropData[i + 2] < FG_THRESHOLD
-        ) {
+        if (!isForeground(cropData[i], cropData[i + 1], cropData[i + 2])) {
             cropData[i] = BG.r;
             cropData[i + 1] = BG.g;
             cropData[i + 2] = BG.b;
