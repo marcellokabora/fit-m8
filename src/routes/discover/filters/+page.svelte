@@ -110,11 +110,11 @@
   const AGE_MAX = 60;
 
   let profileActivities = $derived(
-    ACTIVITIES.filter((activity) =>
-      $userProfile?.activities?.some(
-        (profileActivity) => profileActivity.id === activity.id,
-      ),
-    ),
+    ($userProfile?.activities ?? [])
+      .map((profileActivity) =>
+        ACTIVITIES.find((activity) => activity.id === profileActivity.id),
+      )
+      .filter((activity) => activity !== undefined),
   );
   let hasCoords = $derived(
     $userProfile?.lat !== undefined && $userProfile?.lng !== undefined,

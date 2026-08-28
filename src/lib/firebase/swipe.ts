@@ -91,10 +91,10 @@ export async function getDiscoverFeed(
 	// "All sports" means any sport we ourselves practice, not literally any sport on the platform
 	const relevantActivityIds = activityFilter.length ? activityFilter : myActivityIds;
 
-	// Ranked by `priority`, the index of the candidate's own best-matching sport in their
-	// `activities` list — e.g. someone who lists beach volley as their #1 sport outranks
-	// someone who only has it in 2nd/3rd place, so top-of-list sports surface first.
-	const candidates: { profile: UserProfile; priority: number }[] = [];
+	// Ranked by `priority` (index of the shared sport in OUR OWN list, e.g. ping pong first if
+	// it's our #1 sport), then by `candidatePriority` (index of that same sport in THEIR list) as
+	// a tie-break, so someone who also has ping pong as their #1 sport outranks someone who has it lower.
+	const candidates: { profile: UserProfile; priority: number; candidatePriority: number }[] = [];
 	for (const d of snap.docs) {
 		if (alreadySwiped.has(d.id)) continue;
 		const data = d.data() as Omit<UserProfile, 'uid'>;
@@ -124,22 +124,28 @@ export async function getDiscoverFeed(
 		}
 
 		// Candidate must share one of our own sports (or the specifically chosen one), matching format/level too;
-		// `priority` tracks the earliest (highest-priority) matching sport in the candidate's own list.
+		// `priority` is the earliest matching sport in OUR OWN list; `candidatePriority` is where that
+		// same sport sits in THEIR list.
 		let priority = Infinity;
-		data.activities?.forEach((a, index) => {
-			if (
-				index < priority &&
-				relevantActivityIds.includes(a.id) &&
-				(!formatFilter || a.format === formatFilter || a.format === 'all') &&
-				(!levelFilter || a.level === levelFilter)
-			) {
-				priority = index;
-			}
-		});
+		let candidatePriority = Infinity;
+		for (let index = 0; index < relevantActivityIds.length; index++) {
+			const activityId = relevantActivityIds[index];
+			const candidateIndex =
+				data.activities?.findIndex(
+					(a) =>
+						a.id === activityId &&
+						(!formatFilter || a.format === formatFilter || a.format === 'all') &&
+						(!levelFilter || a.level === levelFilter)
+				) ?? -1;
+			if (candidateIndex === -1) continue;
+			priority = index;
+			candidatePriority = candidateIndex;
+			break;
+		}
 		if (priority === Infinity) continue;
-		candidates.push({ profile: { uid: d.id, ...data }, priority });
+		candidates.push({ profile: { uid: d.id, ...data }, priority, candidatePriority });
 	}
-	candidates.sort((a, b) => a.priority - b.priority);
+	candidates.sort((a, b) => a.priority - b.priority || a.candidatePriority - b.candidatePriority);
 	return candidates.map((c) => c.profile);
 }
 
