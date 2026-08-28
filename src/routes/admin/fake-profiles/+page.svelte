@@ -8,6 +8,7 @@
     getDocs,
     doc,
     setDoc,
+    deleteDoc,
     serverTimestamp,
   } from "firebase/firestore";
   import { db } from "$lib/firebase/client";
@@ -30,6 +31,7 @@
     Heart,
     Dumbbell,
     Rainbow,
+    Trash2,
   } from "@lucide/svelte";
 
   interface ProfileDraft {
@@ -53,6 +55,8 @@
   let genderFilter = $state<Gender | "">("");
   let sortBy = $state<"name" | "age">("name");
   let selectedProfile = $state<UserProfile | null>(null);
+  let confirmDelete = $state(false);
+  let deleting = $state(false);
 
   function draftOf(p: UserProfile): ProfileDraft {
     return {
@@ -160,6 +164,16 @@
       selectedProfile = null;
     }
   }
+
+  async function deleteProfile(uid: string) {
+    deleting = true;
+    await deleteDoc(doc(db, "users", uid));
+    profiles = profiles.filter((p) => p.uid !== uid);
+    delete drafts[uid];
+    deleting = false;
+    confirmDelete = false;
+    selectedProfile = null;
+  }
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
@@ -223,7 +237,10 @@
       <div class="flex flex-col gap-3 px-5">
         {#each filteredProfiles as p (p.uid)}
           <button
-            onclick={() => (selectedProfile = p)}
+            onclick={() => {
+              selectedProfile = p;
+              confirmDelete = false;
+            }}
             class="flex items-center gap-3 rounded-2xl bg-surface p-3 text-left shadow-sm active:scale-[0.99]"
           >
             {#if p.photoURL}
@@ -272,166 +289,202 @@
   {@const p = selectedProfile}
   {@const d = drafts[p.uid]}
   <div
-    class="fixed inset-0 z-50 mx-auto flex w-full flex-col overflow-y-auto bg-bg p-5 pb-8 md:max-w-md"
+    class="fixed inset-0 z-50 mx-auto flex w-full flex-col bg-bg md:max-w-md"
   >
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-black text-text">{p.displayName}</h2>
-      <button
-        onclick={() => (selectedProfile = null)}
-        aria-label="Close"
-        class="flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
-      >
-        <X class="size-4" />
-      </button>
-    </div>
-
-    {#if d.photoURL}
-      <img
-        src={d.photoURL}
-        alt={p.displayName}
-        class="mb-4 aspect-square w-full rounded-2xl object-cover"
-      />
-    {:else}
-      <div
-        class="mb-4 flex aspect-square w-full items-center justify-center rounded-2xl bg-bg text-muted"
-      >
-        <ImageOff class="size-10" />
-      </div>
-    {/if}
-
-    <div class="mb-4 flex flex-col gap-2">
-      <label
-        class="text-xs font-semibold uppercase text-muted"
-        for="photoURL-{p.uid}">Photo URL</label
-      >
-      <input
-        id="photoURL-{p.uid}"
-        type="url"
-        placeholder="https://images.unsplash.com/..."
-        bind:value={d.photoURL}
-        class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text placeholder:text-muted"
-      />
-
-      <label
-        class="text-xs font-semibold uppercase text-muted"
-        for="name-{p.uid}">Name</label
-      >
-      <input
-        id="name-{p.uid}"
-        type="text"
-        bind:value={d.displayName}
-        class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-      />
-
-      <div class="grid grid-cols-2 gap-2">
-        <div class="flex flex-col gap-1">
-          <label
-            class="text-xs font-semibold uppercase text-muted"
-            for="age-{p.uid}">Age</label
-          >
-          <input
-            id="age-{p.uid}"
-            type="number"
-            min="18"
-            bind:value={d.age}
-            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-          />
-        </div>
-        <div class="flex flex-col gap-1">
-          <label
-            class="text-xs font-semibold uppercase text-muted"
-            for="city-{p.uid}">City</label
-          >
-          <input
-            id="city-{p.uid}"
-            type="text"
-            bind:value={d.city}
-            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-          />
-        </div>
-        <div class="flex flex-col gap-1">
-          <label
-            class="text-xs font-semibold uppercase text-muted"
-            for="gender-{p.uid}">Gender</label
-          >
-          <select
-            id="gender-{p.uid}"
-            bind:value={d.gender}
-            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-          >
-            <option value="">—</option>
-            {#each GENDER_OPTIONS as opt}
-              <option value={opt.value}>{opt.label}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="flex flex-col gap-1">
-          <label
-            class="text-xs font-semibold uppercase text-muted"
-            for="orientation-{p.uid}">Orientation</label
-          >
-          <select
-            id="orientation-{p.uid}"
-            bind:value={d.orientation}
-            class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-          >
-            <option value="">—</option>
-            {#each ORIENTATIONS as opt}
-              <option value={opt.value}>{opt.label}</option>
-            {/each}
-          </select>
-        </div>
+    <div class="flex-1 overflow-y-auto p-5">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-black text-text">{p.displayName}</h2>
+        <button
+          onclick={() => (selectedProfile = null)}
+          aria-label="Close"
+          class="flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
+        >
+          <X class="size-4" />
+        </button>
       </div>
 
-      <div class="flex items-center gap-4">
-        <label class="flex items-center gap-1.5 text-sm text-text">
-          <input type="checkbox" bind:checked={d.isSingle} />
-          Single
-        </label>
-        <label class="flex items-center gap-1.5 text-sm text-text">
-          <input type="checkbox" bind:checked={d.isTrainer} />
-          Trainer
-        </label>
-      </div>
+      {#if d.photoURL}
+        <img
+          src={d.photoURL}
+          alt={p.displayName}
+          class="mb-4 aspect-square w-full rounded-2xl object-cover"
+        />
+      {:else}
+        <div
+          class="mb-4 flex aspect-square w-full items-center justify-center rounded-2xl bg-bg text-muted"
+        >
+          <ImageOff class="size-10" />
+        </div>
+      {/if}
 
-      <label
-        class="text-xs font-semibold uppercase text-muted"
-        for="bio-{p.uid}">Bio</label
-      >
-      <textarea
-        id="bio-{p.uid}"
-        rows="3"
-        bind:value={d.bio}
-        class="w-full min-w-0 resize-none rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-      ></textarea>
+      <div class="mb-4 flex flex-col gap-2">
+        <label
+          class="text-xs font-semibold uppercase text-muted"
+          for="photoURL-{p.uid}">Photo URL</label
+        >
+        <input
+          id="photoURL-{p.uid}"
+          type="url"
+          placeholder="https://images.unsplash.com/..."
+          bind:value={d.photoURL}
+          class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text placeholder:text-muted"
+        />
 
-      <button
-        onclick={() => saveProfile(p.uid)}
-        disabled={saving[p.uid]}
-        class="mt-1 flex items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
-      >
-        {#if saving[p.uid]}
-          <LoaderCircle class="size-4 animate-spin" />
-        {:else if savedFlash[p.uid]}
-          <Check class="size-4" />
-        {:else}
-          Save
-        {/if}
-      </button>
-    </div>
+        <label
+          class="text-xs font-semibold uppercase text-muted"
+          for="name-{p.uid}">Name</label
+        >
+        <input
+          id="name-{p.uid}"
+          type="text"
+          bind:value={d.displayName}
+          class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+        />
 
-    <div>
-      <p class="mb-2 text-xs font-semibold uppercase text-muted">Activities</p>
-      <div class="flex flex-col gap-1.5">
-        {#each p.activities ?? [] as act}
-          <div
-            class="flex items-center justify-between rounded-lg bg-bg px-3 py-1.5 text-sm"
-          >
-            <span class="text-text">{activityLabel(act.id)}</span>
-            <span class="text-muted">{act.format} · {act.level}</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col gap-1">
+            <label
+              class="text-xs font-semibold uppercase text-muted"
+              for="age-{p.uid}">Age</label
+            >
+            <input
+              id="age-{p.uid}"
+              type="number"
+              min="18"
+              bind:value={d.age}
+              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+            />
           </div>
-        {/each}
+          <div class="flex flex-col gap-1">
+            <label
+              class="text-xs font-semibold uppercase text-muted"
+              for="city-{p.uid}">City</label
+            >
+            <input
+              id="city-{p.uid}"
+              type="text"
+              bind:value={d.city}
+              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label
+              class="text-xs font-semibold uppercase text-muted"
+              for="gender-{p.uid}">Gender</label
+            >
+            <select
+              id="gender-{p.uid}"
+              bind:value={d.gender}
+              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+            >
+              <option value="">—</option>
+              {#each GENDER_OPTIONS as opt}
+                <option value={opt.value}>{opt.label}</option>
+              {/each}
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label
+              class="text-xs font-semibold uppercase text-muted"
+              for="orientation-{p.uid}">Orientation</label
+            >
+            <select
+              id="orientation-{p.uid}"
+              bind:value={d.orientation}
+              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+            >
+              <option value="">—</option>
+              {#each ORIENTATIONS as opt}
+                <option value={opt.value}>{opt.label}</option>
+              {/each}
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-1.5 text-sm text-text">
+            <input type="checkbox" bind:checked={d.isSingle} />
+            Single
+          </label>
+          <label class="flex items-center gap-1.5 text-sm text-text">
+            <input type="checkbox" bind:checked={d.isTrainer} />
+            Trainer
+          </label>
+        </div>
+
+        <label
+          class="text-xs font-semibold uppercase text-muted"
+          for="bio-{p.uid}">Bio</label
+        >
+        <textarea
+          id="bio-{p.uid}"
+          rows="3"
+          bind:value={d.bio}
+          class="w-full min-w-0 resize-none rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+        ></textarea>
       </div>
+
+      <div class="mb-4">
+        <p class="mb-2 text-xs font-semibold uppercase text-muted">
+          Activities
+        </p>
+        <div class="flex flex-col gap-1.5">
+          {#each p.activities ?? [] as act}
+            <div
+              class="flex items-center justify-between rounded-lg bg-bg px-3 py-1.5 text-sm"
+            >
+              <span class="text-text">{activityLabel(act.id)}</span>
+              <span class="text-muted">{act.format} · {act.level}</span>
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="flex gap-2 border-t border-border bg-bg px-5 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]"
+    >
+      {#if confirmDelete}
+        <button
+          onclick={() => (confirmDelete = false)}
+          disabled={deleting}
+          class="flex-1 rounded-lg border-2 border-border py-2 text-sm font-bold text-text active:scale-95 disabled:opacity-50"
+        >
+          Cancel
+        </button>
+        <button
+          onclick={() => deleteProfile(p.uid)}
+          disabled={deleting}
+          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-error px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        >
+          {#if deleting}
+            <LoaderCircle class="size-4 animate-spin" />
+          {:else}
+            Confirm delete
+          {/if}
+        </button>
+      {:else}
+        <button
+          onclick={() => saveProfile(p.uid)}
+          disabled={saving[p.uid]}
+          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        >
+          {#if saving[p.uid]}
+            <LoaderCircle class="size-4 animate-spin" />
+          {:else if savedFlash[p.uid]}
+            <Check class="size-4" />
+          {:else}
+            Save
+          {/if}
+        </button>
+        <button
+          onclick={() => (confirmDelete = true)}
+          aria-label="Delete profile"
+          class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-error/10 text-error active:scale-95"
+        >
+          <Trash2 class="size-4" />
+        </button>
+      {/if}
     </div>
   </div>
 {/if}

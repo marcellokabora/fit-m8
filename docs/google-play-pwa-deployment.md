@@ -97,11 +97,63 @@ placeholder + `firebase.json` hosting `ignore` exception for the dotfile-prefixe
 - [ ] D2. Graphics: - App icon 512×512 → reuse `static/icons/icon-512.png`. - Feature graphic 1024×500 → **new asset needed**, not covered by
       `scripts/generate-icons.cjs`. - Phone screenshots (2–8, real captures, portrait, min 320px side) → capture from a
       live/staging build (discover, matches, chat, profile screens).
-- [ ] D3. Questionnaires: Content rating, Data Safety (declare account/profile info,
-      location, photos, presence, chat messages — consistent with `/privacy`), Target
-      audience, Ads declaration, Dating/social declarations if prompted.
+- [ ] D3. Questionnaires: Content rating, Data Safety, Target audience, Ads declaration,
+      Dating/social declarations if prompted.
+
+  **Draft Data Safety answers** (based on `/privacy` and the codebase — verify each
+  category against Play Console's current definitions before submitting, this isn't legal
+  advice):
+
+  | Data type                          | Collected?     | Shared with 3rd parties? | Purpose                                  |
+  | ---------------------------------- | -------------- | ------------------------ | ---------------------------------------- |
+  | Name                               | Yes (required) | No                       | Account management, App functionality    |
+  | Email address                      | Yes (required) | No                       | Account management                       |
+  | Approximate location               | Yes (required) | No                       | App functionality (matching/distance)    |
+  | Photos                             | Yes (required) | No                       | App functionality (profile display)      |
+  | In-app messages                    | Yes (required) | No                       | App functionality (chat between matches) |
+  | App interactions (swipes/matches)  | Yes            | No                       | App functionality, Analytics             |
+  | Device/other IDs (FCM push token)  | Yes            | No                       | App functionality (notifications)        |
+  | Crash logs & diagnostics           | Yes            | **Yes — with Google**    | Analytics (Firebase Crashlytics)         |
+  | App interactions / usage analytics | Yes            | **Yes — with Google**    | Analytics (Firebase Analytics)           |
+
+  Notes:
+  - "Required" = app doesn't work without it (matches `/privacy` §1). App activity/device ID
+    rows are collected but not strictly required for basic account creation.
+  - Firebase Analytics and Crashlytics send data to Google's servers, which Play Console's
+    Data Safety form generally wants declared as "shared with a third party" (Google) even
+    though it's a processor under your control — check the in-console guidance for the
+    current wording, this area of policy changes over time.
+  - Data safety says "Is data encrypted in transit?" → Yes (HTTPS/Firebase). "Can users
+    request data deletion?" → Yes (Profile → Delete account, per `/privacy` §5).
+  - Account deletion: point to the in-app flow (`/privacy` §5) when Play asks for a data
+    deletion mechanism/URL.
+
+  **Content rating questionnaire (IARC)** — answer honestly per-question, but expect these
+  themes to apply and push the rating to Teen/Mature (16+/18+) in most territories:
+  - Users can communicate with each other (chat) → Yes.
+  - User-generated content (profile photos, bio text) → Yes.
+  - App shares the user's location with other users (approximate distance) → Yes.
+  - App facilitates meeting/dating other users → Yes (this is the main driver of a higher
+    rating for match-making apps).
+  - Digital purchases (Premium) → Yes.
+  - Violence/sexual content/gambling/drugs → No (not app content itself), but note some
+    territories still rate "dating"-category apps 18+ regardless, independent of these
+    answers — the app already enforces a minimum age of 18 in `/privacy` §7, so an 18+/Mature
+    outcome is expected and fine.
+
 - [ ] D4. App content → App access: provide reviewers a test account or documented login
       instructions (app requires auth).
+
+  **App access draft**: mark "All functionality is available without special access" as
+  **No** (login required), then provide either:
+  - A pre-created test account (email/password) with a completed onboarding profile, so the
+    reviewer lands on Discover with visible profiles — the repo's `npm run seed`
+    (`scripts/seed.cjs`) already populates fake profiles in Firestore, so a fresh test
+    account should have people to swipe on/match with immediately.
+  - Or written instructions: "Sign up with any email via the in-app registration form (Auth
+    → Sign up), complete the short onboarding (pick sports, location, photo), then land on
+    Discover." Only needed if you don't want to hand over a specific test account's
+    credentials directly in the console.
 
 ## Phase E — Release (needs A–D complete)
 
