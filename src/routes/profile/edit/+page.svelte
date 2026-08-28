@@ -6,6 +6,8 @@
     ORIENTATIONS,
     GENDER_OPTIONS,
     BIO_MAX_LENGTH,
+    MIN_AGE,
+    calculateAge,
     type SexualOrientation,
     type Gender,
   } from "$lib/types";
@@ -15,6 +17,7 @@
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import BackHeader from "$lib/components/BackHeader.svelte";
+  import BirthdateField from "$lib/components/BirthdateField.svelte";
   import {
     Bell,
     Check,
@@ -68,6 +71,11 @@
 
   let displayName = $state($userProfile?.displayName ?? "");
   let bio = $state($userProfile?.bio ?? "");
+  // Only `age` is persisted, not the exact date, so this starts blank rather than guessing a birthdate
+  let birthdate = $state("");
+  let isUnderage = $derived(
+    birthdate !== "" && calculateAge(birthdate) < MIN_AGE,
+  );
   let city = $state($userProfile?.city ?? "");
   let lat = $state<number | undefined>($userProfile?.lat);
   let lng = $state<number | undefined>($userProfile?.lng);
@@ -152,12 +160,15 @@
   }
 
   async function save() {
+    if (isUnderage) return;
     saving = true;
     const uid = get(authUser)?.uid;
     if (uid) {
       await userProfile.save(uid, {
         displayName,
         bio,
+        // Only overwrite the stored age if a new birthdate was actually entered
+        ...(birthdate ? { age: calculateAge(birthdate) } : {}),
         city,
         lat,
         lng,
@@ -204,7 +215,7 @@
       <h1 class="text-lg font-black text-text">{t.t("profile.editTitle")}</h1>
       <button
         onclick={save}
-        disabled={saving}
+        disabled={saving || isUnderage}
         class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95 disabled:opacity-50"
       >
         {#if saving}
@@ -230,6 +241,13 @@
         type="text"
         bind:value={displayName}
         class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base font-bold text-text w-full outline-none focus:border-primary"
+      />
+    </div>
+    <div class="w-full">
+      <BirthdateField
+        bind:value={birthdate}
+        label={t.t("onboarding.birthdate")}
+        underageMessage={t.t("onboarding.underageError")}
       />
     </div>
     {#if $authUser?.email}

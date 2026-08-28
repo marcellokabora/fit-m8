@@ -22,7 +22,6 @@
     ChevronDown,
     Crown,
     GripVertical,
-    MapPin,
     Pencil,
     Plus,
     ShieldUser,
@@ -189,23 +188,14 @@
     {photos}
     alt={$userProfile?.displayName ?? t.t("common.profilePhoto")}
   />
-  <div class="flex flex-col gap-3 px-5 pb-6 pt-4">
+  <div class="flex flex-col gap-3 px-5 pb-6 pt-6">
     <div
       class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
     >
-      {#if $userProfile?.city}
-        <p class="flex items-center gap-1 text-sm text-muted">
-          <MapPin class="size-4" />
-          {$userProfile.city}
-        </p>
-      {/if}
       {#if $userProfile?.bio}
         <p class="text-left text-sm text-muted text-balance">
           {$userProfile.bio}
         </p>
-      {/if}
-      {#if $authUser?.email}
-        <p class="text-sm text-muted">{$authUser.email}</p>
       {/if}
       {#if $userProfile?.socialLinks?.length}
         <div class="flex flex-wrap gap-2">
@@ -229,9 +219,9 @@
     <div
       class="mx-5 mb-6 flex flex-col gap-2 rounded-2xl bg-surface p-3 shadow-sm"
     >
-      <p class="px-1 text-xs font-bold uppercase tracking-wide text-muted">
+      <!-- <p class="px-1 text-xs font-bold uppercase tracking-wide text-muted">
         Admin
-      </p>
+      </p> -->
       <a
         href="/admin/fake-profiles"
         class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"

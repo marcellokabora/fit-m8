@@ -91,10 +91,11 @@ export async function getDiscoverFeed(
 	// "All sports" means any sport we ourselves practice, not literally any sport on the platform
 	const relevantActivityIds = activityFilter.length ? activityFilter : myActivityIds;
 
-	// Ranked by `priority` (index of the shared sport in OUR OWN list, e.g. ping pong first if
-	// it's our #1 sport), then by `candidatePriority` (index of that same sport in THEIR list) as
-	// a tie-break, so someone who also has ping pong as their #1 sport outranks someone who has it lower.
-	const candidates: { profile: UserProfile; priority: number; candidatePriority: number }[] = [];
+	// A specific sport filter means we rank by `priority`, how high that sport sits in the
+	// candidate's own list (their #1 sport outranks someone who only has it 2nd/3rd); with no
+	// filter (all our sports) there's no single sport to rank by, so the feed is shuffled instead.
+	const isSpecificSport = activityFilter.length > 0;
+	const candidates: { profile: UserProfile; priority: number }[] = [];
 	for (const d of snap.docs) {
 		if (alreadySwiped.has(d.id)) continue;
 		const data = d.data() as Omit<UserProfile, 'uid'>;
@@ -124,28 +125,30 @@ export async function getDiscoverFeed(
 		}
 
 		// Candidate must share one of our own sports (or the specifically chosen one), matching format/level too;
-		// `priority` is the earliest matching sport in OUR OWN list; `candidatePriority` is where that
-		// same sport sits in THEIR list.
+		// `priority` is the earliest matching sport in the candidate's own list.
 		let priority = Infinity;
-		let candidatePriority = Infinity;
-		for (let index = 0; index < relevantActivityIds.length; index++) {
-			const activityId = relevantActivityIds[index];
-			const candidateIndex =
-				data.activities?.findIndex(
-					(a) =>
-						a.id === activityId &&
-						(!formatFilter || a.format === formatFilter || a.format === 'all') &&
-						(!levelFilter || a.level === levelFilter)
-				) ?? -1;
-			if (candidateIndex === -1) continue;
-			priority = index;
-			candidatePriority = candidateIndex;
-			break;
-		}
+		data.activities?.forEach((a, index) => {
+			if (
+				index < priority &&
+				relevantActivityIds.includes(a.id) &&
+				(!formatFilter || a.format === formatFilter || a.format === 'all') &&
+				(!levelFilter || a.level === levelFilter)
+			) {
+				priority = index;
+			}
+		});
 		if (priority === Infinity) continue;
-		candidates.push({ profile: { uid: d.id, ...data }, priority, candidatePriority });
+		candidates.push({ profile: { uid: d.id, ...data }, priority });
 	}
-	candidates.sort((a, b) => a.priority - b.priority || a.candidatePriority - b.candidatePriority);
+	if (isSpecificSport) {
+		candidates.sort((a, b) => a.priority - b.priority);
+	} else {
+		// Shuffle so the feed doesn't always surface the same candidates in the same order.
+		for (let i = candidates.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+		}
+	}
 	return candidates.map((c) => c.profile);
 }
 

@@ -36,6 +36,7 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import BirthdateField from "$lib/components/BirthdateField.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
@@ -129,12 +130,6 @@
   let bio = $state(draft.bio ?? "");
   let birthdate = $state(draft.birthdate ?? "");
   let age = $derived(birthdate ? calculateAge(birthdate) : 0);
-  // Native date input max — caps the picker at the most recent day someone could turn MIN_AGE
-  let maxBirthdate = (() => {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - MIN_AGE);
-    return d.toISOString().slice(0, 10);
-  })();
   let isUnderage = $derived(birthdate !== "" && age < MIN_AGE);
   let gender = $state<Gender>(draft.gender ?? "male");
   let sexualOrientation = $state<SexualOrientation>(
@@ -368,32 +363,11 @@
         <p class="-mt-3 text-right text-xs text-muted">
           {bio.length}/{BIO_MAX_LENGTH}
         </p>
-        <div>
-          <div
-            class="flex items-center justify-between rounded-2xl border-2 bg-surface px-4 py-4 {isUnderage
-              ? 'border-error'
-              : 'border-border'}"
-          >
-            <label
-              for="onboarding-birthdate"
-              class="text-sm font-semibold text-text"
-            >
-              {t.t("onboarding.birthdate")}
-            </label>
-            <input
-              id="onboarding-birthdate"
-              type="date"
-              bind:value={birthdate}
-              max={maxBirthdate}
-              class="bg-transparent text-right text-base text-text outline-none"
-            />
-          </div>
-          {#if isUnderage}
-            <p class="mt-2 text-xs font-semibold text-error">
-              {t.t("onboarding.underageError")}
-            </p>
-          {/if}
-        </div>
+        <BirthdateField
+          bind:value={birthdate}
+          label={t.t("onboarding.birthdate")}
+          underageMessage={t.t("onboarding.underageError")}
+        />
         <SegmentedControl
           options={genderOptions}
           value={gender}
