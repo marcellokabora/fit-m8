@@ -57,6 +57,8 @@ const activityPool = [
 	'martial-arts',
 	'frescobol',
 	'paddleboard',
+	'surf',
+	'yoga',
 	'rollerblade',
 	'skateboard',
 	'footvolley'
@@ -84,6 +86,8 @@ const activityLabels = {
 	'martial-arts': 'martial arts',
 	frescobol: 'frescobol',
 	paddleboard: 'paddleboarding',
+	surf: 'surfing',
+	yoga: 'yoga',
 	rollerblade: 'rollerblading',
 	skateboard: 'skateboarding',
 	footvolley: 'footvolley'
@@ -139,12 +143,13 @@ function randomAge(min = 18, max = 55) {
 
 // Builds 10 photo-less profiles per sport (that sport as their primary/first activity), so the
 // admin fake-profiles page has at least 10 candidates to attach a real photo to for every sport.
-// Names and ages are randomized so every sport's batch looks distinct.
-function generateSportProfiles(sportId, count = 10, { minAge = 18, maxAge = 55 } = {}) {
+// Names and ages are randomized so every sport's batch looks distinct. Pass `gender` to force
+// every profile in the batch to the same gender instead of alternating.
+function generateSportProfiles(sportId, count = 10, { minAge = 18, maxAge = 55, gender: forcedGender } = {}) {
 	const label = activityLabels[sportId] ?? sportId;
 	const profiles = [];
 	for (let i = 0; i < count; i++) {
-		const gender = i % 2 === 0 ? 'female' : 'male';
+		const gender = forcedGender ?? (i % 2 === 0 ? 'female' : 'male');
 		const displayName = gender === 'female' ? nextFemaleName() : nextMaleName();
 		const format = i % 3 === 0 ? '1v1' : i % 3 === 1 ? '2v2' : 'all';
 		const level = i % 2 === 0 ? 'basic' : 'expert';
@@ -199,13 +204,28 @@ function prepareProfile(profile, profileIndex) {
 async function seedDatabase() {
 	console.log('🌱 Seeding fake profiles...\n');
 
-	// Only the 20 photo-less footvolley profiles (real photos pending manual upload via /admin/fake-profiles).
-	const entries = generateSportProfiles('footvolley', 20, { minAge: 18, maxAge: 35 }).map(
-		(profile, i) => ({
-			profile,
-			userId: `fake_footvolley_${i + 1}`
-		})
-	);
+	// 20 photo-less female + 10 male surf profiles (real photos pending manual upload via /admin/fake-profiles).
+	const entries = [
+		...generateSportProfiles('surf', 20, { minAge: 18, maxAge: 35, gender: 'female' }).map(
+			(profile, i) => ({
+				profile,
+				userId: `fake_surf_${i + 1}`
+			})
+		),
+		...generateSportProfiles('surf', 10, { minAge: 18, maxAge: 35, gender: 'male' }).map(
+			(profile, i) => ({
+				profile,
+				userId: `fake_surf_${21 + i}`
+			})
+		),
+		// 20 photo-less mixed-gender yoga profiles (alternates female/male via default gender).
+		...generateSportProfiles('yoga', 20, { minAge: 18, maxAge: 35 }).map(
+			(profile, i) => ({
+				profile,
+				userId: `fake_yoga_${i + 1}`
+			})
+		)
+	];
 
 	for (const [profileIndex, { profile: sourceProfile, userId }] of entries.entries()) {
 		try {

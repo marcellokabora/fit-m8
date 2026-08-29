@@ -81,9 +81,9 @@
     return ACTIVITIES.find((a) => a.id === id)?.label ?? id ?? "—";
   }
 
-  // Counts by first sport, ordered alphabetically by sport name
+  // Counts by first sport for every known activity, so missing sports show 0
   let sportCounts = $derived.by(() => {
-    const counts = new Map<string, number>();
+    const counts = new Map<string, number>(ACTIVITIES.map((a) => [a.id, 0]));
     for (const p of profiles) {
       const id = p.activities?.[0]?.id;
       if (!id) continue;
