@@ -34,7 +34,7 @@
         stopPresence?.();
         stopPresence = null;
         userProfile.set(null);
-        if (!PUBLIC_ROUTES.includes(path)) goto("/auth");
+        if (!PUBLIC_ROUTES.includes(path)) goto("/");
       } else if (user) {
         const hasProfile = await userProfile.load(user.uid);
         if (!hasProfile && path !== "/onboarding") {

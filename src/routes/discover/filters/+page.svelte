@@ -335,7 +335,13 @@
     <div class="flex flex-1 items-center justify-between">
       <h1 class="text-lg font-black text-text">{t.t("discover.filters")}</h1>
       <div class="flex items-center gap-2">
-        <PresetHint />
+        <button
+          onclick={resetFilters}
+          class="flex size-9 items-center justify-center rounded-full bg-surface text-primary shadow-sm p-1"
+          aria-label={t.t("common.clear")}
+        >
+          <RotateCcw class="size-5" />
+        </button>
         <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
@@ -363,13 +369,7 @@
         >
           <UserShield class="size-5" />
         </button>
-        <button
-          onclick={resetFilters}
-          class="flex size-9 items-center justify-center rounded-full bg-surface text-primary shadow-sm p-1 mr-1"
-          aria-label={t.t("common.clear")}
-        >
-          <RotateCcw class="size-5" />
-        </button>
+        <PresetHint class="mr-1" />
       </div>
     </div>
   </BackHeader>

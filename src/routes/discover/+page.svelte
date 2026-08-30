@@ -539,7 +539,15 @@
     <div class="flex items-center justify-between px-5 pb-3 pt-5">
       <h1 class="text-2xl font-black text-text">{pageTitle}</h1>
       <div class="flex items-center gap-2">
-        <PresetHint />
+        <button
+          onclick={() => goto("/discover/filters")}
+          class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
+            ? 'bg-primary text-white'
+            : 'bg-surface text-text'}"
+          aria-label={t.t("discover.filters")}
+        >
+          <SlidersHorizontal class="size-5" />
+        </button>
         <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
@@ -567,15 +575,7 @@
         >
           <UserShield class="size-5" />
         </button>
-        <button
-          onclick={() => goto("/discover/filters")}
-          class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
-            ? 'bg-primary text-white'
-            : 'bg-surface text-text'}"
-          aria-label={t.t("discover.filters")}
-        >
-          <SlidersHorizontal class="size-5" />
-        </button>
+        <PresetHint />
       </div>
     </div>
 

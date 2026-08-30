@@ -156,13 +156,8 @@
   }
 
   async function logout() {
-    // Navigate explicitly instead of relying on the layout's auth-state
-    // redirect, which can lag (or never fire) on some mobile browsers.
-    try {
-      await authUser.signOut();
-    } finally {
-      goto("/", { replaceState: true });
-    }
+    authUser.signOut();
+    goto("/", { replaceState: true });
   }
 </script>
 
