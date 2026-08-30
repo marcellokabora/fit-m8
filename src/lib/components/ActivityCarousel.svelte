@@ -1,25 +1,44 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import type { Translator } from "$lib/stores/language";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  let {
-    activities,
-    t,
-    interval = 3000,
-  }: {
-    activities: { id: string }[];
-    t: Translator;
-    interval?: number;
-  } = $props();
+  let t = $derived(createTranslator($activeLanguage));
+
+  let { shuffle = true }: { shuffle?: boolean } = $props();
+
+  const ACTIVITIES = [
+    { id: "footvolley" },
+    { id: "jogging" },
+    { id: "beach-volley" },
+    { id: "padel" },
+    { id: "basketball" },
+    { id: "tennis" },
+    { id: "cycling" },
+  ];
 
   const ITEM_HEIGHT = 64;
   const PEEK_HEIGHT = 44; // how much of each neighbor is revealed above/below
+  const INTERVAL = 5000;
+
+  // shuffle once per mount so the carousel starts in a different order each visit
+  function shuffleArray<T>(items: T[]): T[] {
+    const result = [...items];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+  let shuffled = untrack(() =>
+    shuffle ? shuffleArray(ACTIVITIES) : ACTIVITIES,
+  );
+
   // pad with the last/first item so a peek is always visible on both sides, even at the loop seam
   let track = $derived([
-    activities[activities.length - 1],
-    ...activities,
-    activities[0],
+    shuffled[shuffled.length - 1],
+    ...shuffled,
+    shuffled[0],
   ]);
 
   let pos = $state(1);
@@ -29,6 +48,7 @@
 
   // background photo per activity, falling back to a cycling set when there's no dedicated image
   const IMAGE_MAP: Record<string, string> = {
+    footvolley: "/homepage/footvolley.jpg",
     jogging: "/homepage/jogging.jpg",
     padel: "/homepage/padel.jpg",
     tennis: "/homepage/tennis.jpg",
@@ -45,14 +65,14 @@
     "/homepage/cycling.jpg",
   ];
   let backgrounds = $derived(
-    activities.map(
+    shuffled.map(
       (activity, i) =>
         IMAGE_MAP[activity.id] ?? FALLBACK_IMAGES[i % FALLBACK_IMAGES.length],
     ),
   );
   // maps track position back to the real activity index, including the wrap-around duplicates
   let activeIndex = $derived(
-    (((pos - 1) % activities.length) + activities.length) % activities.length,
+    (((pos - 1) % shuffled.length) + shuffled.length) % shuffled.length,
   );
 
   onMount(() => {
@@ -68,7 +88,7 @@
           );
         }, 350);
       }
-    }, interval);
+    }, INTERVAL);
     return () => clearInterval(timer);
   });
 </script>
@@ -78,7 +98,7 @@
     {src}
     alt=""
     aria-hidden="true"
-    class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-50 transition-opacity duration-700 ease-in-out"
+    class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-xs"
     style={`opacity: ${i === activeIndex ? 0.5 : 0}`}
   />
 {/each}
@@ -104,7 +124,7 @@
       >
         <span
           class={i === pos
-            ? "flex scale-110 items-center gap-2 rounded-full bg-primary/10 px-5 py-3 text-base font-semibold text-primary transition-transform duration-350"
+            ? "flex scale-120 items-center gap-2 rounded-full bg-primary/10 px-5 py-3 text-base font-semibold text-primary transition-transform duration-350"
             : "flex scale-75 items-center gap-2 px-5 py-3 text-base font-semibold text-muted transition-transform duration-350"}
         >
           <ActivityIcon
@@ -120,7 +140,7 @@
 
 <style>
   /* hide on short viewports where the carousel would push other content off-screen */
-  @media (max-height: 800px) {
+  @media (max-height: 750px) {
     .activity-carousel {
       display: none;
     }

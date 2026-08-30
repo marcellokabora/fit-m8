@@ -10,6 +10,7 @@
   import AuthModal from "$lib/components/AuthModal.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
+  import MailIcon from "~icons/material-symbols/mail-outline";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -45,19 +46,10 @@
       loading = false;
     }
   }
-
-  const HERO_ACTIVITIES = [
-    { id: "jogging" },
-    { id: "padel" },
-    { id: "beach-volley" },
-    { id: "tennis" },
-    { id: "basketball" },
-    { id: "cycling" },
-  ];
 </script>
 
 <div
-  class="relative flex min-h-dvh flex-col items-center justify-between overflow-hidden bg-bg px-6 pb-12 pt-20"
+  class="relative flex min-h-dvh flex-col items-center justify-between overflow-hidden bg-bg px-6 py-8"
 >
   {#if !ready}
     <Loading />
@@ -65,19 +57,13 @@
 
   <!-- Logo / Hero -->
   <div class="relative z-10 flex flex-col items-center gap-4 text-text">
-    <!-- <div
-      class="flex size-24 items-center justify-center rounded-3xl bg-primary text-white shadow-xl overflow-auto"
-    >
-      <Logo class="h-full w-full" />
-    </div> -->
+    <!-- always in the DOM so bots/screen readers see the app name even before auth resolves -->
+    <h1 class="sr-only">FIT-M8</h1>
     {#if ready}
-      <!-- <h1 transition:fade class="font-display text-5xl tracking-wide">
-        FIT-M8
-      </h1> -->
-      <img src="fit-m8-text-v2.png" alt="" class="w-80 -mt-6" />
+      <img src="fit-m8-text-v3.png" alt="FIT-M8" class="w-75 mt-2" />
       <p
         transition:fade
-        class="text-center text-lg font-medium text-muted -mt-4"
+        class="text-center text-lg font-medium text-muted -mt-4 text-balance"
       >
         {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
       </p>
@@ -91,7 +77,7 @@
     <!-- Activity carousel -->
     <!-- no z-index here: it must not trap the carousel's fixed background image in a stacking context above the logo/CTA -->
     <div transition:fade class="relative flex w-full justify-center mt-6">
-      <ActivityCarousel activities={HERO_ACTIVITIES} {t} />
+      <ActivityCarousel />
     </div>
 
     <!-- CTA -->
@@ -115,8 +101,9 @@
           authMode = "register";
           authModalOpen = true;
         }}
-        class="block w-full rounded-2xl border-2 border-border py-4 text-center text-lg font-semibold text-text bg-surface/0 backdrop-blur-lg active:scale-95"
+        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-border py-4 text-center text-base font-semibold text-text bg-surface/0 backdrop-blur-lg active:scale-95"
       >
+        <MailIcon class="size-5" />
         {t.t("home.email")}
       </button>
 

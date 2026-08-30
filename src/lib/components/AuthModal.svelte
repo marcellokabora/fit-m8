@@ -107,7 +107,7 @@
     >
       <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-border"></div>
 
-      <div class="mb-6 flex items-start justify-between gap-2">
+      <!-- <div class="mb-6 flex items-start justify-between gap-2">
         <div>
           <h1 class="font-display text-2xl tracking-wide text-text">
             {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
@@ -126,7 +126,7 @@
         >
           <X class="size-5" />
         </button>
-      </div>
+      </div> -->
 
       <GoogleSignInButton
         onclick={handleGoogle}
