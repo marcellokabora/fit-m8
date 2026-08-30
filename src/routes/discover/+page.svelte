@@ -9,13 +9,14 @@
     User,
     Users,
     Heart,
-    GraduationCap,
+    UserShield,
     X,
     Moon,
     Check,
     PartyPopper,
     MessageCircle,
     MailCheck,
+    Info,
   } from "@lucide/svelte";
   import Loading from "$lib/components/Loading.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
@@ -92,6 +93,15 @@
       $filterSexualOrientation === "" &&
       $filterSingle === "" &&
       $filterTrainer === "yes",
+  );
+  let pageTitle = $derived(
+    isDatingPreset
+      ? t.t("discover.titleDating")
+      : isFriendsPreset
+        ? t.t("discover.titleFriends")
+        : isTrainerPreset
+          ? t.t("discover.titleTrainer")
+          : t.t("nav.discover"),
   );
   // Any filter set beyond the defaults, that isn't one of the quick presets above (those highlight themselves)
   let isCustomFilter = $derived(
@@ -390,15 +400,9 @@
   }
 
   function handleTap(e: PointerEvent) {
-    const top = users[0];
-    if (!photoEl || !top) return;
+    if (!photoEl) return;
     const rect = photoEl.getBoundingClientRect();
-    const withinPhoto = e.clientY >= rect.top && e.clientY <= rect.bottom;
-    if (withinPhoto) {
-      handlePhotoTap(e, rect);
-    } else {
-      goto(`/profile/${top.uid}`);
-    }
+    handlePhotoTap(e, rect);
   }
 
   function handlePhotoTap(e: PointerEvent, rect: DOMRect) {
@@ -533,7 +537,7 @@
     {/if}
     <!-- Header -->
     <div class="flex items-center justify-between px-5 pb-3 pt-5">
-      <h1 class="text-2xl font-black text-text">{t.t("nav.discover")}</h1>
+      <h1 class="text-2xl font-black text-text">{pageTitle}</h1>
       <div class="flex items-center gap-2">
         <PresetHint />
         <button
@@ -561,7 +565,7 @@
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.trainerPreset")}
         >
-          <GraduationCap class="size-5" />
+          <UserShield class="size-5" />
         </button>
         <button
           onclick={() => goto("/discover/filters")}
@@ -681,7 +685,7 @@
               <!-- Profile image area (fills remaining vertical space) -->
               <div
                 bind:this={photoEl}
-                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
+                class="relative flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
               >
                 {#if currentPhotos[photoIndex]}
                   <img
@@ -693,6 +697,19 @@
                 {:else}
                   <User class="size-24 text-primary/40" />
                 {/if}
+
+                <!-- View profile -->
+                <button
+                  onpointerdown={(e) => e.stopPropagation()}
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    goto(`/profile/${users[0].uid}`);
+                  }}
+                  aria-label={t.t("profile.viewProfile")}
+                  class="absolute bottom-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
+                >
+                  <Info class="size-5" />
+                </button>
               </div>
 
               <!-- Like / Pass overlays -->

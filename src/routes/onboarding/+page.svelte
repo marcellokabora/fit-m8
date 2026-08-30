@@ -27,7 +27,7 @@
   import {
     Bell,
     Check,
-    GraduationCap,
+    UserShield,
     Heart,
     MapPin,
     Users,
@@ -53,7 +53,7 @@
   const HOW_IT_WORKS = [
     { key: "dating", preset: "dating", icon: Heart },
     { key: "friends", preset: "friends", icon: Users },
-    { key: "experts", preset: "trainer", icon: GraduationCap },
+    { key: "experts", preset: "trainer", icon: UserShield },
   ] as const;
 
   type DiscoverPreset = (typeof HOW_IT_WORKS)[number]["preset"];

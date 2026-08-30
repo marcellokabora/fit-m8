@@ -2,7 +2,7 @@
   import {
     Heart,
     Users,
-    GraduationCap,
+    UserShield,
     CircleQuestionMark,
     Dumbbell,
     ListOrdered,
@@ -44,7 +44,7 @@
     },
     {
       key: "trainer",
-      icon: GraduationCap,
+      icon: UserShield,
       title: "discover.trainerPreset",
       body: "discover.presetHintTrainerBody",
     },

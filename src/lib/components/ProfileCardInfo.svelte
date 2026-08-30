@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { MapPin, GraduationCap, Crown } from "@lucide/svelte";
+  import { MapPin, UserShield, Crown } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import type { UserProfile } from "$lib/types";
   import type { Translator } from "$lib/stores/language";
   import { userProfile } from "$lib/stores/auth";
   import { distanceKm } from "$lib/location";
+  import { goto } from "$app/navigation";
 
   let { user, t }: { user: UserProfile; t: Translator } = $props();
 
@@ -26,7 +27,16 @@
 <div class="shrink-0 p-5">
   <div class="flex items-center gap-2">
     <h3 class="text-xl font-black text-text">
-      {user.displayName}
+      <button
+        onpointerdown={(e) => e.stopPropagation()}
+        onclick={(e) => {
+          e.stopPropagation();
+          goto(`/profile/${user.uid}`);
+        }}
+        class="underline-offset-2 active:underline"
+      >
+        {user.displayName}
+      </button>
     </h3>
     {#if user.isPremium}
       <Crown
@@ -59,7 +69,7 @@
       <span
         class="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
       >
-        <GraduationCap class="size-3.5" />
+        <UserShield class="size-3.5" />
         {t.t("profile.trainer")}
       </span>
     {/if}

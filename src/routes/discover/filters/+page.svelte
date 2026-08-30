@@ -20,13 +20,7 @@
     filterTrainer,
   } from "$lib/stores/auth";
   import { getDiscoverFeed } from "$lib/firebase/swipe";
-  import {
-    Loader2,
-    RotateCcw,
-    Users,
-    Heart,
-    GraduationCap,
-  } from "@lucide/svelte";
+  import { Loader2, RotateCcw, Users, Heart, UserShield } from "@lucide/svelte";
   import {
     ACTIVITIES,
     GENDER_OPTIONS,
@@ -367,7 +361,7 @@
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.trainerPreset")}
         >
-          <GraduationCap class="size-5" />
+          <UserShield class="size-5" />
         </button>
         <button
           onclick={resetFilters}

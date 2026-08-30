@@ -17,7 +17,7 @@
     LoaderCircle,
     PartyPopper,
     MessageCircle,
-    GraduationCap,
+    UserShield,
     Rainbow,
     Crown,
     X,
@@ -166,7 +166,7 @@
           />
         {/if}
         {#if profile.isTrainer}
-          <GraduationCap
+          <UserShield
             class="size-4 shrink-0 text-primary"
             aria-label={t.t("profile.trainer")}
           />
