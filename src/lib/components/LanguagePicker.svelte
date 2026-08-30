@@ -32,9 +32,7 @@
   aria-label={t.t("onboarding.chooseLanguage")}
   title={t.t("onboarding.chooseLanguage")}
 >
-  <div
-    class="flex flex-col rounded-2xl border-2 border-border bg-surface p-1.5"
-  >
+  <div class="flex flex-col rounded-2xl border-border bg-surface/20 p-1.5">
     {#each LANGUAGES as option}
       {#if option.code === $activeLanguage}
         <button
@@ -43,7 +41,7 @@
           aria-expanded={open}
           aria-label={t.t(`language.${option.code}` as any)}
           aria-pressed="true"
-          class="flex items-center gap-2 rounded-xl bg-primary/50 px-3.5 py-2 text-sm font-bold text-white transition-colors"
+          class="flex items-center gap-2 rounded-xl bg-primary/80 px-3.5 py-2 text-sm font-bold text-white transition-colors"
         >
           <Languages class="size-4.5" />
           {option.code.toUpperCase()}

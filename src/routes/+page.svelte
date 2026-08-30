@@ -59,13 +59,6 @@
 <div
   class="relative flex min-h-dvh flex-col items-center justify-between overflow-hidden bg-bg px-6 pb-12 pt-20"
 >
-  <img
-    src="/fit-m8-v2.jpg"
-    alt=""
-    aria-hidden="true"
-    class="pointer-events-none absolute left-1/2 top-1/2 z-0 h-full max-w-none -translate-x-1/2 -translate-y-1/2 opacity-20 rotate-20 blur-md grayscale-50"
-  />
-
   {#if !ready}
     <Loading />
   {/if}
@@ -96,7 +89,8 @@
 
   {#if ready}
     <!-- Activity carousel -->
-    <div transition:fade class="relative z-10 flex w-full justify-center mt-6">
+    <!-- no z-index here: it must not trap the carousel's fixed background image in a stacking context above the logo/CTA -->
+    <div transition:fade class="relative flex w-full justify-center mt-6">
       <ActivityCarousel activities={HERO_ACTIVITIES} {t} />
     </div>
 

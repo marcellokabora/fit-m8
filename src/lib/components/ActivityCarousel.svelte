@@ -6,7 +6,7 @@
   let {
     activities,
     t,
-    interval = 2200,
+    interval = 3000,
   }: {
     activities: { id: string }[];
     t: Translator;
@@ -27,6 +27,34 @@
   // center the current item, leaving PEEK_HEIGHT of room above/below for the neighbors
   let offset = $derived(PEEK_HEIGHT - pos * ITEM_HEIGHT);
 
+  // background photo per activity, falling back to a cycling set when there's no dedicated image
+  const IMAGE_MAP: Record<string, string> = {
+    jogging: "/homepage/jogging.jpg",
+    padel: "/homepage/padel.jpg",
+    tennis: "/homepage/tennis.jpg",
+    basketball: "/homepage/bascketball.jpg",
+    cycling: "/homepage/cycling.jpg",
+    "beach-volley": "/homepage/beachvolley.jpg",
+  };
+  const FALLBACK_IMAGES = [
+    "/homepage/jogging.jpg",
+    "/homepage/padel.jpg",
+    "/homepage/tennis.jpg",
+    "/homepage/bascketball.jpg",
+    "/homepage/beachvolley.jpg",
+    "/homepage/cycling.jpg",
+  ];
+  let backgrounds = $derived(
+    activities.map(
+      (activity, i) =>
+        IMAGE_MAP[activity.id] ?? FALLBACK_IMAGES[i % FALLBACK_IMAGES.length],
+    ),
+  );
+  // maps track position back to the real activity index, including the wrap-around duplicates
+  let activeIndex = $derived(
+    (((pos - 1) % activities.length) + activities.length) % activities.length,
+  );
+
   onMount(() => {
     const timer = setInterval(() => {
       pos += 1;
@@ -44,6 +72,16 @@
     return () => clearInterval(timer);
   });
 </script>
+
+{#each backgrounds as src, i}
+  <img
+    {src}
+    alt=""
+    aria-hidden="true"
+    class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-50 transition-opacity duration-700 ease-in-out"
+    style={`opacity: ${i === activeIndex ? 0.5 : 0}`}
+  />
+{/each}
 
 <div
   class="activity-carousel relative mx-auto w-full max-w-xs overflow-hidden"
