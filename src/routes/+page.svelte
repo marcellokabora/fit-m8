@@ -7,6 +7,7 @@
   import Logo from "$lib/components/Logo.svelte";
   import Loading from "$lib/components/Loading.svelte";
   import GoogleSignInButton from "$lib/components/GoogleSignInButton.svelte";
+  import AuthModal from "$lib/components/AuthModal.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
 
@@ -14,6 +15,9 @@
 
   // true once auth state resolves to "no user" and the rest of the page can reveal
   let ready = $state(false);
+
+  let authModalOpen = $state(false);
+  let authMode = $state<"login" | "register">("register");
 
   onMount(() => {
     return authUser.subscribe(async (user) => {
@@ -77,7 +81,7 @@
       <!-- <h1 transition:fade class="font-display text-5xl tracking-wide">
         FIT-M8
       </h1> -->
-      <img src="fit-m8-text.png" alt="" class="w-70 -mt-6" />
+      <img src="fit-m8-text-v2.png" alt="" class="w-80 -mt-6" />
       <p
         transition:fade
         class="text-center text-lg font-medium text-muted -mt-4"
@@ -111,12 +115,23 @@
         label={t.t("home.google")}
         loadingLabel={t.t("home.signingIn")}
       />
-      <a
-        href="/auth"
+      <button
+        type="button"
+        onclick={() => {
+          authMode = "register";
+          authModalOpen = true;
+        }}
         class="block w-full rounded-2xl border-2 border-border py-4 text-center text-lg font-semibold text-text bg-surface/0 backdrop-blur-lg active:scale-95"
       >
         {t.t("home.email")}
-      </a>
+      </button>
+
+      <p class="flex justify-center gap-4 pt-2 text-center text-xs text-muted">
+        <a href="/terms" class="font-semibold text-primary">Terms of Service</a>
+        <a href="/privacy" class="font-semibold text-primary">Privacy Policy</a>
+      </p>
     </div>
   {/if}
+
+  <AuthModal bind:open={authModalOpen} bind:mode={authMode} />
 </div>

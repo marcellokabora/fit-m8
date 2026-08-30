@@ -82,7 +82,7 @@
 
 <style>
   /* hide on short viewports where the carousel would push other content off-screen */
-  @media (max-height: 700px) {
+  @media (max-height: 800px) {
     .activity-carousel {
       display: none;
     }

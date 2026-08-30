@@ -15,7 +15,7 @@
   let { children } = $props();
   let t = $derived(createTranslator($activeLanguage));
 
-  const PUBLIC_ROUTES = ["/auth", "/"];
+  const PUBLIC_ROUTES = ["/"];
 
   onMount(() => {
     activeLanguage.init();
