@@ -12,7 +12,7 @@
 <button
   {onclick}
   disabled={loading}
-  class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-border bg-surface/0 py-4 text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-50 backdrop-blur-lg"
+  class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface/0 py-4 text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-50 backdrop-blur-lg"
 >
   <svg class="size-5" viewBox="0 0 24 24">
     <path

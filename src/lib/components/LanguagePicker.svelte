@@ -33,7 +33,7 @@
   title={t.t("onboarding.chooseLanguage")}
 >
   <div
-    class="flex flex-col rounded-2xl border-2 border-border bg-surface/00 backdrop-blur-2xl p-1.5"
+    class="flex flex-col rounded-2xl border-2 border-primary/50 bg-surface/20 p-1.5"
   >
     {#each LANGUAGES as option}
       {#if option.code === $activeLanguage}
