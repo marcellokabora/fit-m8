@@ -63,7 +63,7 @@
       <img src="fit-m8-text-v3.png" alt="FIT-M8" class="w-75 mt-2" />
       <p
         transition:fade
-        class="text-center text-lg font-medium text-muted -mt-4 text-balance"
+        class="text-center text-lg font-medium text-muted -mt-4 text-balance text-shadow-2xs"
       >
         {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
       </p>
@@ -101,7 +101,7 @@
           authMode = "register";
           authModalOpen = true;
         }}
-        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-border py-4 text-center text-base font-semibold text-text bg-surface/0 backdrop-blur-lg active:scale-95"
+        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-border py-4 text-center text-base font-semibold text-text bg-surface/0 backdrop-blur-sm active:scale-95"
       >
         <MailIcon class="size-5" />
         {t.t("home.email")}
