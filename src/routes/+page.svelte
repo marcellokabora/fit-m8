@@ -4,7 +4,6 @@
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
-  import Logo from "$lib/components/Logo.svelte";
   import Loading from "$lib/components/Loading.svelte";
   import GoogleSignInButton from "$lib/components/GoogleSignInButton.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
