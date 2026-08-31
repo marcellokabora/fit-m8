@@ -99,7 +99,7 @@
     alt=""
     aria-hidden="true"
     class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-[1px]"
-    style={`opacity: ${i === activeIndex ? 0.5 : 0}`}
+    style={`opacity: ${i === activeIndex ? 0.7 : 0}`}
   />
 {/each}
 

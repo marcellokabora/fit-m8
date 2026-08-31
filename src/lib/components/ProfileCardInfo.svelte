@@ -26,7 +26,7 @@
 
 <div class="shrink-0 p-5">
   <div class="flex items-center gap-2">
-    <h3 class="text-xl font-black text-text">
+    <h3 class="text-xl font-black text-text -mt-1.5">
       <button
         onpointerdown={(e) => e.stopPropagation()}
         onclick={(e) => {

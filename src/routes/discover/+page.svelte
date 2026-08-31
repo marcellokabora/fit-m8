@@ -706,7 +706,7 @@
                     goto(`/profile/${users[0].uid}`);
                   }}
                   aria-label={t.t("profile.viewProfile")}
-                  class="absolute bottom-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
+                  class="absolute bottom-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm"
                 >
                   <Info class="size-5" />
                 </button>

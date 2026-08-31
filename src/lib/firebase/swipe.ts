@@ -149,6 +149,11 @@ export async function getDiscoverFeed(
 			[candidates[i], candidates[j]] = [candidates[j], candidates[i]];
 		}
 	}
+	// Real users surface before fake seed accounts ("fake_<name>" doc ids, see scripts/seed.cjs),
+	// stable sort keeps the ordering above intact within each group.
+	candidates.sort(
+		(a, b) => Number(a.profile.uid.startsWith('fake_')) - Number(b.profile.uid.startsWith('fake_'))
+	);
 	return candidates.map((c) => c.profile);
 }
 
