@@ -2,7 +2,7 @@
 
 **Match people for sports activities — Tinder-style.**
 
-FIT-M8 is a mobile-first Progressive Web App built with SvelteKit, TailwindCSS, and Firebase. Find your perfect 1v1 or 2v2 partner for jogging, padel, tennis, beach volleyball, and more.
+Fit-M8 connects you with nearby sports partners tailored to your exact profile. Customize your feed by ranking your favorite sports and filtering by match format and skill level. Whether you are looking for a active date, a new workout buddy, or an expert trainer, you can quickly find the right match based on your intent.
 
 ## Tech Stack
 

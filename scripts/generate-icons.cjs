@@ -1,12 +1,12 @@
 // Regenerates static/icons/*.png, static/favicon.png and static/og-image.png from the
-// raster logo in static/fit-m8-v2.jpg. That source is already full-bleed/centered
+// raster logo in static/fit-m8-icon.jpg. That source is already full-bleed/centered
 // artwork, so this just resizes it as-is - no cropping, recoloring, or recentering.
 // Re-run this after replacing that source image. Requires `sharp` (devDependency).
 const path = require("path");
 const sharp = require("sharp");
 
 const ROOT = path.join(__dirname, "..");
-const SRC_JPG = path.join(ROOT, "static", "fit-m8-v2.jpg");
+const SRC_JPG = path.join(ROOT, "static", "fit-m8-icon.jpg");
 const BG = { r: 0x1a, g: 0x10, b: 0x06 }; // --color-bg
 
 async function render(size, outPath) {
