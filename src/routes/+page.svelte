@@ -72,7 +72,9 @@
     <!-- always in the DOM so bots/screen readers see the app name even before auth resolves -->
     <h1 class="sr-only">FIT-M8</h1>
     {#if ready}
-      <Logo class="w-75 mt-6 h-auto text-primary my-6 drop-shadow-md" />
+      <Logo
+        class="w-75 mt-8 h-auto text-primary my-6 drop-shadow-md max-w-[260px]"
+      />
       <p
         transition:fade
         class="text-center text-lg font-medium text-muted -mt-6 text-balance text-shadow-2xs"
@@ -148,7 +150,8 @@
 
   <AuthModal bind:open={authModalOpen} bind:mode={authMode} />
 
-  {#if import.meta.env.DEV}
+  <!-- {#if import.meta.env.DEV} -->
+  {#if false}
     <button
       type="button"
       onclick={() => (themePickerOpen = true)}

@@ -75,21 +75,79 @@
     (((pos - 1) % shuffled.length) + shuffled.length) % shuffled.length,
   );
 
+  // snaps the (invisible, non-animated) position back into the real range once a
+  // duplicate item at either end has finished scrolling into view
+  function snapIfAtEdge() {
+    if (pos === track.length - 1) {
+      setTimeout(() => {
+        animate = false;
+        pos = 1;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => (animate = true)),
+        );
+      }, 350);
+    } else if (pos === 0) {
+      setTimeout(() => {
+        animate = false;
+        pos = shuffled.length;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => (animate = true)),
+        );
+      }, 350);
+    }
+  }
+
+  function advance(delta: number) {
+    pos += delta;
+    snapIfAtEdge();
+  }
+
+  let timer: ReturnType<typeof setInterval> | undefined;
+  function startAutoplay() {
+    timer = setInterval(() => advance(1), INTERVAL);
+  }
+  function restartAutoplay() {
+    if (timer) clearInterval(timer);
+    startAutoplay();
+  }
+
+  // user-triggered navigation (click/scroll/swipe) also resets the autoplay clock
+  function userAdvance(delta: number) {
+    advance(delta);
+    restartAutoplay();
+  }
+  function userGoTo(i: number) {
+    if (i === pos) return;
+    pos = i;
+    snapIfAtEdge();
+    restartAutoplay();
+  }
+
+  let wheelLocked = false;
+  function handleWheel(e: WheelEvent) {
+    e.preventDefault();
+    if (wheelLocked) return;
+    wheelLocked = true;
+    userAdvance(e.deltaY > 0 ? 1 : -1);
+    setTimeout(() => (wheelLocked = false), 400);
+  }
+
+  let touchStartY = 0;
+  function handleTouchStart(e: TouchEvent) {
+    touchStartY = e.touches[0].clientY;
+  }
+  function handleTouchEnd(e: TouchEvent) {
+    const deltaY = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(deltaY) > 20) {
+      userAdvance(deltaY > 0 ? 1 : -1);
+    }
+  }
+
   onMount(() => {
-    const timer = setInterval(() => {
-      pos += 1;
-      if (pos === track.length - 1) {
-        // snap back to the real first item once the duplicate has scrolled in
-        setTimeout(() => {
-          animate = false;
-          pos = 1;
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => (animate = true)),
-          );
-        }, 350);
-      }
-    }, INTERVAL);
-    return () => clearInterval(timer);
+    startAutoplay();
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   });
 </script>
 
@@ -110,6 +168,11 @@
 <div
   class="activity-carousel relative mx-auto w-full max-w-xs overflow-hidden"
   style={`height: ${ITEM_HEIGHT + PEEK_HEIGHT * 2}px`}
+  role="group"
+  aria-label={t.activity(shuffled[activeIndex].id)}
+  onwheel={handleWheel}
+  ontouchstart={handleTouchStart}
+  ontouchend={handleTouchEnd}
 >
   <div
     class={animate
@@ -120,11 +183,20 @@
     {#each track as activity, i}
       <div
         class={i < pos
-          ? "flex items-end justify-center transition-opacity duration-350"
+          ? "flex cursor-pointer items-end justify-center transition-opacity duration-350"
           : i > pos
-            ? "flex items-start justify-center transition-opacity duration-350"
+            ? "flex cursor-pointer items-start justify-center transition-opacity duration-350"
             : "flex items-center justify-center transition-opacity duration-350"}
         style={`height: ${ITEM_HEIGHT}px; opacity: ${i === pos ? 1 : 0.75}`}
+        role="button"
+        tabindex={i === pos ? -1 : 0}
+        onclick={() => userGoTo(i)}
+        onkeydown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            userGoTo(i);
+          }
+        }}
       >
         <span
           class={i === pos
@@ -143,6 +215,10 @@
 </div>
 
 <style>
+  .activity-carousel {
+    touch-action: none;
+  }
+
   /* hide on short viewports where the carousel would push other content off-screen */
   @media (max-height: 750px) {
     .activity-carousel {
