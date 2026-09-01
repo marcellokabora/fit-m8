@@ -9,7 +9,6 @@
     Zap,
     Check,
   } from "@lucide/svelte";
-  import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -18,7 +17,9 @@
   let {
     class: className = "",
     preset = null,
-    hasDiscoverFilters = true,
+    // undefined = the profile hasn't finished loading yet, so we don't know if
+    // filters exist; only once it resolves to a real boolean do we decide whether to auto-open
+    hasDiscoverFilters,
     onSelectPreset,
   }: {
     class?: string;
@@ -39,8 +40,13 @@
   }
 
   // Auto-opens only for users with no saved discover filters yet - once one is picked and
-  // saved (see saveFilters/applyDatingPreset etc.), it won't show up again.
-  onMount(() => {
+  // saved (see saveFilters/applyDatingPreset etc.), it won't show up again. Waits for the
+  // profile to finish loading (hasDiscoverFilters undefined) so it doesn't flash open before
+  // the saved filters are known, then only ever decides once.
+  let autoOpenDecided = false;
+  $effect(() => {
+    if (autoOpenDecided || hasDiscoverFilters === undefined) return;
+    autoOpenDecided = true;
     if (!hasDiscoverFilters) openModal();
   });
 
