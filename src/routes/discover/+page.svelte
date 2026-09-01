@@ -14,9 +14,9 @@
     Moon,
     Check,
     PartyPopper,
-    MessageCircle,
     MailCheck,
     Info,
+    Crown,
   } from "@lucide/svelte";
   import Loading from "$lib/components/Loading.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
@@ -35,7 +35,12 @@
     filterSingle,
     filterTrainer,
   } from "$lib/stores/auth";
-  import { getDiscoverFeed, recordSwipe, undoSwipe } from "$lib/firebase/swipe";
+  import {
+    getDiscoverFeed,
+    recordSwipe,
+    undoSwipe,
+    startDirectMessage,
+  } from "$lib/firebase/swipe";
   import {
     ACTIVITIES,
     DEFAULT_DISTANCE_KM,
@@ -474,8 +479,29 @@
   }
 
   let showMessageModal = $state(false);
-  function handleMessage() {
-    showMessageModal = true;
+  let messaging = $state(false);
+
+  async function handleMessage() {
+    const uid = get(authUser)?.uid;
+    const top = users[0];
+    if (!uid || !top || messaging) return;
+
+    if (!$userProfile?.isPremium) {
+      showMessageModal = true;
+      return;
+    }
+
+    const activityFilter = get(filterActivities);
+    const activity =
+      top.activities.find((a) => activityFilter.includes(a.id))?.id ||
+      top.activities[0]?.id ||
+      "";
+    const format = get(filterFormat) || top.activities[0]?.format || "all";
+
+    messaging = true;
+    const matchId = await startDirectMessage(uid, top.uid, activity, format);
+    messaging = false;
+    goto(`/chat/${matchId}`);
   }
 
   let rotation = $derived(
@@ -819,16 +845,26 @@
       >
         <X class="size-4" />
       </button>
-      <MessageCircle class="size-12 text-primary" />
+      <span
+        class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
+      >
+        <Crown class="size-8" />
+      </span>
       <h2 class="text-lg font-black text-text">
-        {t.t("profile.messageLockedTitle")}
+        {t.t("premium.messageUpsellTitle")}
       </h2>
-      <p class="text-sm text-muted">{t.t("profile.messageLockedHint")}</p>
-      <button
-        onclick={() => (showMessageModal = false)}
+      <p class="text-sm text-muted">{t.t("premium.messageUpsellHint")}</p>
+      <a
+        href="/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
-        {t.t("common.gotIt")}
+        {t.t("profile.goPremium")}
+      </a>
+      <button
+        onclick={() => (showMessageModal = false)}
+        class="w-full rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
+      >
+        {t.t("common.maybeLater")}
       </button>
     </div>
   </div>

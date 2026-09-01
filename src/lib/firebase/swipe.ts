@@ -62,6 +62,30 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 	);
 }
 
+// Premium-only: lets a user contact someone directly without a mutual swipe match first.
+// Reuses the match doc if one already exists (e.g. they matched normally too), otherwise
+// creates one tagged `isDirectMessage` so it stands out in the matches list.
+export async function startDirectMessage(
+	fromUid: string,
+	toUid: string,
+	activity: string,
+	format: ActivityFormat
+): Promise<string> {
+	const matchId = [fromUid, toUid].sort().join('_');
+	const existing = await getDoc(doc(db, 'matches', matchId));
+	if (!existing.exists()) {
+		await setDoc(doc(db, 'matches', matchId), {
+			userIds: [fromUid, toUid],
+			activity,
+			format,
+			status: 'confirmed',
+			isDirectMessage: true,
+			createdAt: serverTimestamp()
+		});
+	}
+	return matchId;
+}
+
 // Removes a previously recorded swipe so the target profile can reappear in the discover feed.
 export async function undoSwipe(fromUid: string, toUid: string) {
 	await deleteDoc(doc(db, 'swipes', fromUid, 'sent', toUid));

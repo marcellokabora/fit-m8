@@ -78,27 +78,34 @@
         <div
           class="flex items-center gap-3 rounded-2xl bg-surface p-3 shadow-sm"
         >
-          {#if u.photoURL}
-            <img
-              src={u.photoURL}
-              alt={u.displayName}
-              class="size-12 shrink-0 rounded-full object-cover"
-            />
-          {:else}
-            <span
-              class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-            >
-              <User class="size-5" />
-            </span>
-          {/if}
-          <div class="min-w-0 flex-1">
-            <p class="truncate font-bold text-text">
-              {u.displayName || "(no name)"}
-            </p>
-            <p class="truncate text-sm text-muted">
-              {[u.city, u.age ? `${u.age}y` : null].filter(Boolean).join(" · ")}
-            </p>
-          </div>
+          <a
+            href={`/profile/${u.uid}`}
+            class="flex min-w-0 flex-1 items-center gap-3"
+          >
+            {#if u.photoURL}
+              <img
+                src={u.photoURL}
+                alt={u.displayName}
+                class="size-12 shrink-0 rounded-full object-cover"
+              />
+            {:else}
+              <span
+                class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+              >
+                <User class="size-5" />
+              </span>
+            {/if}
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-bold text-text">
+                {u.displayName || "(no name)"}
+              </p>
+              <p class="truncate text-sm text-muted">
+                {[u.city, u.age ? `${u.age}y` : null]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            </div>
+          </a>
           <button
             onclick={() => {
               deleteTarget = u;

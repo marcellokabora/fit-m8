@@ -171,6 +171,8 @@ export interface Match {
 	lastMessageSenderId?: string;
 	// per-uid timestamp of when that user last read the chat
 	readBy?: Record<string, Date>;
+	// true when created via a Premium user's "message directly" action instead of a mutual swipe like
+	isDirectMessage?: boolean;
 }
 
 export interface Message {

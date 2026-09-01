@@ -12,7 +12,7 @@
 
 <svelte:window onclick={() => (paletteOpen = false)} />
 
-<div>
+<div class="pb-50">
   <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
     {t.t("appearance.title")}
   </h3>

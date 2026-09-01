@@ -9,17 +9,19 @@
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
+  import ProfileEditSheet from "$lib/components/ProfileEditSheet.svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
-  import { recordSwipe } from "$lib/firebase/swipe";
+  import { isAdmin } from "$lib/stores/admin";
+  import { recordSwipe, startDirectMessage } from "$lib/firebase/swipe";
   import { distanceKm } from "$lib/location";
   import {
     MapPin,
     LoaderCircle,
     PartyPopper,
-    MessageCircle,
     UserShield,
     Rainbow,
     Crown,
+    Pencil,
     X,
   } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
@@ -35,6 +37,7 @@
   let swiping = $state(false);
   let matchBanner = $state(false);
   let showMessageModal = $state(false);
+  let showEditSheet = $state(false);
   let distanceAway = $derived.by(() => {
     if (
       !$userProfile ||
@@ -139,8 +142,30 @@
     }
   }
 
-  function handleMessage() {
-    showMessageModal = true;
+  let messaging = $state(false);
+
+  async function handleMessage() {
+    const currentUid = get(authUser)?.uid;
+    if (!currentUid || !profile || messaging) return;
+
+    if (!$userProfile?.isPremium) {
+      showMessageModal = true;
+      return;
+    }
+
+    const sharedActivity =
+      profile.activities?.find((a) => mySportIds.has(a.id)) ??
+      profile.activities?.[0];
+
+    messaging = true;
+    const matchId = await startDirectMessage(
+      currentUid,
+      profile.uid,
+      sharedActivity?.id ?? "",
+      sharedActivity?.format ?? "all",
+    );
+    messaging = false;
+    goto(`/chat/${matchId}`);
   }
 </script>
 
@@ -175,13 +200,24 @@
         <h1 class="text-lg font-black text-text">{t.t("nav.profile")}</h1>
       {/if}
     </div>
-    <button
-      onclick={() => history.back()}
-      aria-label={t.t("common.close")}
-      class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
-    >
-      <X class="size-5 text-text" />
-    </button>
+    <div class="flex items-center gap-1">
+      {#if $isAdmin && profile}
+        <button
+          onclick={() => (showEditSheet = true)}
+          aria-label="Edit profile"
+          class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
+        >
+          <Pencil class="size-4.5 text-text" />
+        </button>
+      {/if}
+      <button
+        onclick={() => history.back()}
+        aria-label={t.t("common.close")}
+        class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
+      >
+        <X class="size-5 text-text" />
+      </button>
+    </div>
   </div>
 
   {#if loading}
@@ -277,6 +313,17 @@
   {/if}
 </div>
 
+{#if showEditSheet && profile}
+  <ProfileEditSheet
+    {profile}
+    onClose={() => (showEditSheet = false)}
+    onSaved={(updated) => {
+      profile = updated;
+      showEditSheet = false;
+    }}
+  />
+{/if}
+
 {#if showActions}
   <div
     class="fixed inset-x-0 bottom-0 z-40 mx-auto w-full border-t border-border bg-surface p-4 pb-safe md:max-w-md"
@@ -309,16 +356,26 @@
       >
         <X class="size-4" />
       </button>
-      <MessageCircle class="size-12 text-primary" />
+      <span
+        class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
+      >
+        <Crown class="size-8" />
+      </span>
       <h2 class="text-lg font-black text-text">
-        {t.t("profile.messageLockedTitle")}
+        {t.t("premium.messageUpsellTitle")}
       </h2>
-      <p class="text-sm text-muted">{t.t("profile.messageLockedHint")}</p>
-      <button
-        onclick={() => (showMessageModal = false)}
+      <p class="text-sm text-muted">{t.t("premium.messageUpsellHint")}</p>
+      <a
+        href="/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
-        {t.t("common.gotIt")}
+        {t.t("profile.goPremium")}
+      </a>
+      <button
+        onclick={() => (showMessageModal = false)}
+        class="w-full rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
+      >
+        {t.t("common.maybeLater")}
       </button>
     </div>
   </div>

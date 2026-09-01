@@ -34,7 +34,7 @@
           <tab.icon class="size-6" />
           {#if tab.id === "matches" && $unreadMatchCount > 0}
             <span
-              class="absolute -right-1.5 -top-1 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
+              class="absolute -right-1.5 -top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white"
             >
               {$unreadMatchCount > 9 ? "9+" : $unreadMatchCount}
             </span>
