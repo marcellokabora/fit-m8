@@ -9,6 +9,7 @@ import {
 	createUserWithEmailAndPassword,
 	sendEmailVerification,
 	sendPasswordResetEmail,
+	signInAnonymously,
 	reload,
 	signOut,
 	type User
@@ -44,6 +45,8 @@ function createAuthStore() {
 			return credential;
 		},
 		resetPassword: (email: string) => sendPasswordResetEmail(auth, email),
+		// Dev-only fallback so onboarding/etc. can be tested without a real registered account
+		signInTestUser: () => signInAnonymously(auth),
 		resendVerificationEmail: () => {
 			if (!auth.currentUser) throw new Error('Not signed in');
 			return sendEmailVerification(auth.currentUser, verificationActionSettings());

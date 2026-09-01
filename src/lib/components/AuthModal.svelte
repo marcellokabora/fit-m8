@@ -98,12 +98,19 @@
   <div
     class="fixed inset-0 z-50 mx-auto flex w-full items-end bg-black/60 backdrop-blur-sm md:max-w-md"
     transition:fade={{ duration: 150 }}
+    role="button"
+    tabindex="0"
+    aria-label={t.t("common.close")}
     onclick={close}
+    onkeydown={(e) => (e.key === "Enter" || e.key === " ") && close()}
   >
     <div
       class="max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl bg-bg px-6 pb-8 pt-4"
       transition:fly={{ y: 400, duration: 250 }}
+      role="dialog"
+      tabindex="-1"
       onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.stopPropagation()}
     >
       <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-border"></div>
 

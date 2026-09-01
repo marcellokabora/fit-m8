@@ -6,10 +6,8 @@
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
     ACTIVITIES,
-    ACTIVITY_FORMAT_OPTIONS,
     GENDER_OPTIONS,
     ORIENTATIONS,
-    SKILL_LEVEL_OPTIONS,
     BIO_MAX_LENGTH,
     DEFAULT_DISTANCE_KM,
     MAX_SPORTS_FREE,
@@ -30,6 +28,7 @@
     UserShield,
     Heart,
     MapPin,
+    Search,
     Users,
     Zap,
   } from "@lucide/svelte";
@@ -47,13 +46,28 @@
   } from "$lib/firebase/notifications";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  const TOTAL_STEPS = 6;
+  const TOTAL_STEPS = 5;
   const DRAFT_KEY = "fit-m8-onboarding-draft";
 
   const HOW_IT_WORKS = [
-    { key: "dating", preset: "dating", icon: Heart },
-    { key: "friends", preset: "friends", icon: Users },
-    { key: "experts", preset: "trainer", icon: UserShield },
+    {
+      key: "dating",
+      preset: "dating",
+      icon: Heart,
+      body: "discover.presetHintDatingBody",
+    },
+    {
+      key: "friends",
+      preset: "friends",
+      icon: Users,
+      body: "discover.presetHintFriendsBody",
+    },
+    {
+      key: "experts",
+      preset: "trainer",
+      icon: UserShield,
+      body: "discover.presetHintTrainerBody",
+    },
   ] as const;
 
   type DiscoverPreset = (typeof HOW_IT_WORKS)[number]["preset"];
@@ -97,6 +111,7 @@
       ? urlStepParam
       : (draft.step ?? 1),
   );
+  let stepContainer = $state<HTMLDivElement>();
   let t = $derived(createTranslator($activeLanguage));
   let genderOptions = $derived(
     GENDER_OPTIONS.map((option) => ({
@@ -110,20 +125,8 @@
       label: t.orientation(option.value),
     })),
   );
-  let formatOptions = $derived(
-    ACTIVITY_FORMAT_OPTIONS.map((option) => ({
-      ...option,
-      label: t.format(option.value),
-    })),
-  );
-  let skillOptions = $derived(
-    SKILL_LEVEL_OPTIONS.map((option) => ({
-      ...option,
-      label: t.skill(option.value),
-    })),
-  );
 
-  // Step 1 — Basic info
+  // Step 2 — Basic info
   let displayName = $state(
     draft.displayName ?? googleAccount?.displayName ?? "",
   );
@@ -145,20 +148,29 @@
     gender === "male" ? "female" : gender === "female" ? "male" : "",
   );
 
-  // Step 2 — Activities
+  // Step 3 — Activities (format/level default to "all"/"basic"; configurable later from the profile page)
   let selectedActivities = $state<string[]>(draft.selectedActivities ?? []);
-
-  // Step 3 — For each selected activity: format + level
   let activitySettings = $state<
     Record<string, { format: ActivityFormat; level: SkillLevel }>
   >(draft.activitySettings ?? {});
+  let sportsQuery = $state("");
+  let filteredActivities = $derived(
+    sportsQuery.trim()
+      ? ACTIVITIES.filter((a) =>
+          t
+            .activity(a.id)
+            .toLowerCase()
+            .includes(sportsQuery.trim().toLowerCase()),
+        )
+      : ACTIVITIES,
+  );
 
-  // Step 4 — Which quick preset to land on Discover with
+  // Step 1 — Which quick preset to land on Discover with
   let discoverPreset = $state<DiscoverPreset | null>(
     draft.discoverPreset ?? null,
   );
 
-  // Step 5 — Photos (optional, up to 3) — default slot 1 to the Google account photo
+  // Step 4 — Photos (optional, up to 3) — default slot 1 to the Google account photo
   let photos = $state<string[]>(
     draft.photos ?? (googleAccount?.photoURL ? [googleAccount.photoURL] : []),
   );
@@ -166,7 +178,7 @@
   let error = $state("");
   let uid = $derived($authUser?.uid ?? "");
 
-  // Step 1 — Push notification permission (not persisted in the draft; re-requesting
+  // Step 2 — Push notification permission (not persisted in the draft; re-requesting
   // after a refresh is instant once the browser has already granted/denied it)
   let pushSupported = $state(false);
   let pushToken = $state<string | null>(null);
@@ -215,6 +227,13 @@
     }
   });
 
+  // The step content lives in an inner scroll container (not the window), so switching
+  // steps needs an explicit scroll reset or it keeps the previous step's scroll position.
+  $effect(() => {
+    step;
+    stepContainer?.scrollTo(0, 0);
+  });
+
   onMount(() => {
     if (page.url.searchParams.get("step") !== String(step)) {
       const url = new URL(page.url);
@@ -254,17 +273,32 @@
     if (step > 1) history.back();
   }
 
+  // Only allow jumping back to an already-completed step, not skipping ahead unvalidated ones.
+  // In dev mode, allow jumping to any step (forward included) to speed up manual testing.
+  function goToStep(target: number) {
+    if (target === step) return;
+    if (import.meta.env.DEV || target < step) {
+      step = target;
+      pushStepUrl();
+    }
+  }
+
   async function save() {
     error = "";
     // Belt-and-suspenders: the Continue button already blocks this, but step can be
     // reached directly via the ?step= URL param, so re-check before writing to Firestore.
-    if (!birthdate || age < MIN_AGE || !locationValid) {
-      step = 1;
+    if (!birthdate || age < MIN_AGE) {
+      step = 2;
+      pushStepUrl();
+      return;
+    }
+    if (!locationValid) {
+      step = 5;
       pushStepUrl();
       return;
     }
     if (selectedActivities.length === 0) {
-      step = 2;
+      step = 3;
       pushStepUrl();
       return;
     }
@@ -331,17 +365,27 @@
   <div class="shrink-0 px-6 pt-10">
     <div class="mb-8 flex items-center gap-2">
       {#each Array(TOTAL_STEPS) as _, i}
-        <div
-          class="h-1.5 flex-1 rounded-full transition-all {i + 1 <= step
+        <button
+          type="button"
+          onclick={() => goToStep(i + 1)}
+          disabled={!import.meta.env.DEV && i + 1 >= step}
+          aria-label={`Step ${i + 1}`}
+          aria-current={i + 1 === step ? "step" : undefined}
+          class="h-1.5 flex-1 rounded-full transition-all disabled:cursor-default {i +
+            1 <=
+          step
             ? 'bg-primary'
             : 'bg-gray-200'}"
-        ></div>
+        ></button>
       {/each}
     </div>
   </div>
 
-  <div class="min-h-0 flex-1 overflow-y-auto px-6 pb-28">
-    {#if step === 1}
+  <div
+    bind:this={stepContainer}
+    class="min-h-0 flex-1 overflow-y-auto px-6 pb-28"
+  >
+    {#if step === 2}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.aboutYou")}
       </h2>
@@ -394,6 +438,131 @@
             onchange={(value) => (isSingle = value)}
           />
         </div>
+      </div>
+    {:else if step === 3}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.yourSports")}
+      </h2>
+      <p class="mb-1 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
+      <p class="mb-4 text-xs font-semibold text-muted">
+        {t.t("sports.maxHint", { max: MAX_SPORTS_FREE })}
+      </p>
+      <div class="relative mb-4">
+        <Search
+          class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+        />
+        <input
+          type="search"
+          bind:value={sportsQuery}
+          placeholder={t.t("common.search")}
+          class="w-full rounded-2xl border-2 border-border bg-surface py-2.5 pl-9 pr-3 text-sm font-semibold text-text placeholder:text-muted focus:border-primary focus:outline-none"
+        />
+      </div>
+      {#if filteredActivities.length === 0}
+        <p class="mt-6 text-center text-sm text-muted">
+          {t.t("common.noResults")}
+        </p>
+      {:else}
+        <div class="grid grid-cols-2 gap-3">
+          {#each filteredActivities as activity}
+            {@const selected = selectedActivities.includes(activity.id)}
+            <button
+              onclick={() => toggleActivity(activity.id)}
+              disabled={!selected &&
+                selectedActivities.length >= MAX_SPORTS_FREE}
+              class="flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all active:scale-95 disabled:opacity-40 {selected
+                ? 'border-primary bg-primary/10'
+                : 'border-border bg-surface'}"
+            >
+              <ActivityIcon id={activity.id} class="size-7 text-primary" />
+              <span class="text-sm font-semibold text-text"
+                >{t.activity(activity.id)}</span
+              >
+            </button>
+          {/each}
+        </div>
+      {/if}
+      {#if selectedActivities.length === 0}
+        <p class="mt-4 text-xs font-semibold text-error">
+          {t.t("onboarding.selectAtLeastOneSport")}
+        </p>
+      {/if}
+    {:else if step === 1}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.howItWorks")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">
+        {t.t("onboarding.howItWorksHint")}
+      </p>
+      <div class="mb-6">
+        <p class="text-sm font-bold text-text">
+          {t.t("discover.presetHintIntroTitle")}
+        </p>
+        <p class="mt-0.5 text-xs text-muted">
+          {t.t("discover.presetHintIntroBody")}
+        </p>
+      </div>
+      <div
+        class="flex flex-col gap-4"
+        role="radiogroup"
+        aria-label={t.t("onboarding.howItWorks")}
+      >
+        {#each HOW_IT_WORKS as slide}
+          {@const selected = discoverPreset === slide.preset}
+          <button
+            type="button"
+            onclick={() => (discoverPreset = slide.preset)}
+            role="radio"
+            aria-checked={selected}
+            class="flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors {selected
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-surface'}"
+          >
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <slide.icon class="size-5" />
+            </span>
+            <div class="flex-1">
+              <p class="font-bold text-text">
+                {t.t(`intro.${slide.key}.title`)}
+              </p>
+              <p class="text-sm text-muted">
+                {t.t(slide.body)}
+              </p>
+            </div>
+            <!-- Radio indicator — makes clear only one of these can be picked, and it must be tapped to check it -->
+            <span
+              aria-hidden="true"
+              class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 {selected
+                ? 'border-primary bg-primary'
+                : 'border-border'}"
+            >
+              {#if selected}
+                <Check class="size-3.5 text-white" />
+              {/if}
+            </span>
+          </button>
+        {/each}
+      </div>
+    {:else if step === 4}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.profilePhotos")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">
+        {t.t("onboarding.photosHint")}
+      </p>
+      <div class="flex flex-1 flex-col items-center justify-center gap-4">
+        <div class="w-full">
+          <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
+        </div>
+      </div>
+    {:else if step === 5}
+      <h2 class="mb-1 text-2xl font-black text-text">
+        {t.t("onboarding.makeItYours")}
+      </h2>
+      <p class="mb-6 text-sm text-muted">{t.t("onboarding.appearanceHint")}</p>
+      <div class="mb-4 flex flex-col gap-4">
         <div class="rounded-2xl border-2 border-border bg-surface p-4">
           <div class="mb-3 flex items-center gap-3">
             <span
@@ -459,154 +628,6 @@
           </div>
         {/if}
       </div>
-    {:else if step === 2}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.yourSports")}
-      </h2>
-      <p class="mb-1 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
-      <p class="mb-6 text-xs font-semibold text-muted">
-        {t.t("sports.maxHint", { max: MAX_SPORTS_FREE })}
-      </p>
-      <div class="grid grid-cols-2 gap-3">
-        {#each ACTIVITIES as activity}
-          {@const selected = selectedActivities.includes(activity.id)}
-          <button
-            onclick={() => toggleActivity(activity.id)}
-            disabled={!selected && selectedActivities.length >= MAX_SPORTS_FREE}
-            class="flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all active:scale-95 disabled:opacity-40 {selected
-              ? 'border-primary bg-primary/10'
-              : 'border-border bg-surface'}"
-          >
-            <ActivityIcon id={activity.id} class="size-7 text-primary" />
-            <span class="text-sm font-semibold text-text"
-              >{t.activity(activity.id)}</span
-            >
-          </button>
-        {/each}
-      </div>
-      {#if selectedActivities.length === 0}
-        <p class="mt-4 text-xs font-semibold text-error">
-          {t.t("onboarding.selectAtLeastOneSport")}
-        </p>
-      {/if}
-    {:else if step === 3}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.yourSettings")}
-      </h2>
-      <p class="mb-6 text-sm text-muted">{t.t("onboarding.settingsHint")}</p>
-      <div class="flex flex-col gap-5">
-        {#each selectedActivities as id}
-          {@const activity = ACTIVITIES.find((a) => a.id === id)}
-          {@const settings = activitySettings[id]}
-          <div class="rounded-2xl border-2 border-border bg-surface p-4">
-            <p class="mb-3 flex items-center gap-2 font-bold text-text">
-              <ActivityIcon {id} class="size-4 text-primary" />
-              {activity ? t.activity(activity.id) : t.activity(id)}
-            </p>
-            <div class="mb-3">
-              <p
-                class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-              >
-                {t.t("common.format")}
-              </p>
-              <SegmentedControl
-                options={formatOptions}
-                value={settings.format}
-                ariaLabel={t.t("common.format")}
-                onchange={(value) => (activitySettings[id].format = value)}
-              />
-            </div>
-            <div>
-              <p
-                class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-              >
-                {t.t("common.level")}
-              </p>
-              <div class="flex gap-2">
-                {#each skillOptions as level}
-                  <button
-                    onclick={() =>
-                      (activitySettings[id].level = level.value as SkillLevel)}
-                    class="flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-colors {settings.level ===
-                    level.value
-                      ? 'border-primary-dark bg-primary text-white'
-                      : 'border-border text-muted'}"
-                  >
-                    {t.skill(level.value)}
-                  </button>
-                {/each}
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {:else if step === 4}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.howItWorks")}
-      </h2>
-      <p class="mb-6 text-sm text-muted">
-        {t.t("onboarding.howItWorksHint")}
-      </p>
-      <div
-        class="flex flex-col gap-4"
-        role="radiogroup"
-        aria-label={t.t("onboarding.howItWorks")}
-      >
-        {#each HOW_IT_WORKS as slide}
-          {@const selected = discoverPreset === slide.preset}
-          <button
-            type="button"
-            onclick={() => (discoverPreset = slide.preset)}
-            role="radio"
-            aria-checked={selected}
-            class="flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors {selected
-              ? 'border-primary bg-primary/10'
-              : 'border-border bg-surface'}"
-          >
-            <span
-              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-            >
-              <slide.icon class="size-5" />
-            </span>
-            <div class="flex-1">
-              <p class="font-bold text-text">
-                {t.t(`intro.${slide.key}.title`)}
-              </p>
-              <p class="text-sm text-muted">
-                {t.t(`intro.${slide.key}.body`)}
-              </p>
-            </div>
-            <!-- Radio indicator — makes clear only one of these can be picked, and it must be tapped to check it -->
-            <span
-              aria-hidden="true"
-              class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 {selected
-                ? 'border-primary bg-primary'
-                : 'border-border'}"
-            >
-              {#if selected}
-                <Check class="size-3.5 text-white" />
-              {/if}
-            </span>
-          </button>
-        {/each}
-      </div>
-    {:else if step === 5}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.profilePhotos")}
-      </h2>
-      <p class="mb-6 text-sm text-muted">
-        {t.t("onboarding.photosHint")}
-      </p>
-      <div class="flex flex-1 flex-col items-center justify-center gap-4">
-        <div class="w-full">
-          <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
-        </div>
-      </div>
-    {:else if step === 6}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.makeItYours")}
-      </h2>
-      <p class="mb-6 text-sm text-muted">{t.t("onboarding.appearanceHint")}</p>
       <AppearancePicker />
       {#if error}
         <p class="mt-4 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
@@ -631,10 +652,9 @@
     {#if step < TOTAL_STEPS}
       <button
         onclick={next}
-        disabled={(step === 1 &&
-          (!displayName || !birthdate || isUnderage || !locationValid)) ||
-          (step === 2 && selectedActivities.length === 0) ||
-          (step === 4 && !discoverPreset)}
+        disabled={(step === 1 && !discoverPreset) ||
+          (step === 2 && (!displayName || !birthdate || isUnderage)) ||
+          (step === 3 && selectedActivities.length === 0)}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {t.t("common.continue")}
@@ -642,7 +662,7 @@
     {:else}
       <button
         onclick={save}
-        disabled={saving}
+        disabled={saving || !locationValid}
         class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {saving ? t.t("common.saving") : t.t("common.letsGo")}

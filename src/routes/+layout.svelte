@@ -34,7 +34,13 @@
         stopPresence?.();
         stopPresence = null;
         userProfile.set(null);
-        if (!PUBLIC_ROUTES.includes(path)) goto("/");
+        // Dev-only escape hatch: ?testUser signs in anonymously so onboarding (and
+        // anything past it) can be tested without a real registered account.
+        if (import.meta.env.DEV && page.url.searchParams.has("testUser")) {
+          authUser.signInTestUser();
+        } else if (!PUBLIC_ROUTES.includes(path)) {
+          goto("/");
+        }
       } else if (user) {
         const hasProfile = await userProfile.load(user.uid);
         if (!hasProfile && path !== "/onboarding") {
