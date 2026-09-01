@@ -45,14 +45,14 @@ groups above. Entries with no `ActivityId` are not yet tracked as activities in 
 | Ball & Racquet Sports | Squash                  | `squash`            |
 | Ball & Racquet Sports | Football                | `soccer`            |
 | Ball & Racquet Sports | Basketball              | `basketball`        |
-| Ball & Racquet Sports | Table Tennis            | `ping-pong`         |
-| Combat & Martial Arts | Boxing                  | `martial-arts`      |
-| Combat & Martial Arts | Kickboxing              | `martial-arts`      |
-| Combat & Martial Arts | Muay Thai               | `martial-arts`      |
-| Combat & Martial Arts | Brazilian Jiu-Jitsu     | `martial-arts`      |
-| Combat & Martial Arts | Judo                    | `martial-arts`      |
-| Combat & Martial Arts | Karate                  | `martial-arts`      |
-| Combat & Martial Arts | Krav Maga               | `martial-arts`      |
+| Ball & Racquet Sports | Table Tennis            | `pingPong`          |
+| Combat & Martial Arts | Boxing                  | `martialArts`       |
+| Combat & Martial Arts | Kickboxing              | `martialArts`       |
+| Combat & Martial Arts | Muay Thai               | `martialArts`       |
+| Combat & Martial Arts | Brazilian Jiu-Jitsu     | `martialArts`       |
+| Combat & Martial Arts | Judo                    | `martialArts`       |
+| Combat & Martial Arts | Karate                  | `martialArts`       |
+| Combat & Martial Arts | Krav Maga               | `martialArts`       |
 | Cycling & Mobility    | Indoor Cycling/Spinning | `cycling`           |
 | Cycling & Mobility    | Outdoor Cycling         | `cycling`           |
 | Cycling & Mobility    | Mobility Workouts       | —                   |
@@ -72,10 +72,10 @@ groups above. Entries with no `ActivityId` are not yet tracked as activities in 
 | Mind & Body           | Pilates                 | —                   |
 | Mind & Body           | Meditation              | —                   |
 | Mind & Body           | Breathwork              | —                   |
-| Outdoor & Adventure   | Beach Volleyball        | `beach-volley`      |
+| Outdoor & Adventure   | Beach Volleyball        | `beachVolley`       |
 | Outdoor & Adventure   | Foot Volley             | `footvolley`        |
-| Outdoor & Adventure   | Bouldering              | `rock-climbing`     |
-| Outdoor & Adventure   | Rock Climbing           | `rock-climbing`     |
+| Outdoor & Adventure   | Bouldering              | `rockClimbing`      |
+| Outdoor & Adventure   | Rock Climbing           | `rockClimbing`      |
 | Outdoor & Adventure   | Running                 | `jogging`           |
 | Outdoor & Adventure   | Hiking                  | `hiking`            |
 | Outdoor & Adventure   | Skateboarding           | `skateboard`        |

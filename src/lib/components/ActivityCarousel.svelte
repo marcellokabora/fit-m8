@@ -12,7 +12,7 @@
     { id: "footvolley" },
     { id: "jogging" },
     { id: "padel" },
-    { id: "beach-volley" },
+    { id: "beachVolley" },
     { id: "basketball" },
     { id: "cycling" },
   ];
@@ -54,7 +54,7 @@
     tennis: "/homepage/tennis.jpg",
     basketball: "/homepage/bascketball.jpg",
     cycling: "/homepage/cycling.jpg",
-    "beach-volley": "/homepage/beachvolley.jpg",
+    beachVolley: "/homepage/beachvolley.jpg",
   };
   const FALLBACK_IMAGES = [
     "/homepage/jogging.jpg",

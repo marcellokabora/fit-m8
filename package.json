@@ -13,6 +13,7 @@
 		"verify-user": "node scripts/verify-user.cjs",
 		"seed": "node scripts/seed.cjs",
 		"set-admin": "node scripts/set-admin.cjs",
+		"migrate-activity-ids": "node scripts/migrate-activity-ids.cjs",
 		"deploy:functions": "firebase deploy --only functions"
 	},
 	"devDependencies": {

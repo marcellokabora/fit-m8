@@ -36,7 +36,7 @@ export const ACTIVITIES = [
 	{ id: 'jogging', label: 'Jogging', emoji: '🏃' },
 	{ id: 'padel', label: 'Padel', emoji: '🎾' },
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾' },
-	{ id: 'beach-volley', label: 'Beach Volley', emoji: '🏐' },
+	{ id: 'beachVolley', label: 'Beach Volley', emoji: '🏐' },
 	{ id: 'footvolley', label: 'Foot Volley', emoji: '🏐' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀' },
 	{ id: 'soccer', label: 'Football', emoji: '⚽' },
@@ -44,16 +44,16 @@ export const ACTIVITIES = [
 	{ id: 'swimming', label: 'Swimming', emoji: '🏊' },
 	{ id: 'hiking', label: 'Hiking', emoji: '🥾' },
 	{ id: 'badminton', label: 'Badminton', emoji: '🏸' },
-	{ id: 'ping-pong', label: 'Ping Pong', emoji: '🏓' },
+	{ id: 'pingPong', label: 'Ping Pong', emoji: '🏓' },
 	{ id: 'pickleball', label: 'Pickleball', emoji: '🥒' },
 	{ id: 'squash', label: 'Squash', emoji: '📦' },
 	{ id: 'frescobol', label: 'Frescobol', emoji: '🏖️' },
 	{ id: 'gym', label: 'Gym Training', emoji: '💪' },
 	{ id: 'calisthenics', label: 'Calisthenics', emoji: '🤸' },
 	{ id: 'yoga', label: 'Yoga', emoji: '🧘' },
-	{ id: 'rock-climbing', label: 'Rock Climbing', emoji: '🧗' },
+	{ id: 'rockClimbing', label: 'Rock Climbing', emoji: '🧗' },
 	{ id: 'golf', label: 'Golf', emoji: '⛳' },
-	{ id: 'martial-arts', label: 'Martial Arts', emoji: '🥋' },
+	{ id: 'martialArts', label: 'Martial Arts', emoji: '🥋' },
 	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶' }, { id: 'surf', label: 'Surfing', emoji: '🏄' }, { id: 'rollerblade', label: 'Rollerblading', emoji: '🛼' },
 	{ id: 'skateboard', label: 'Skateboarding', emoji: '🛹' }
 ] as const;
@@ -87,7 +87,7 @@ export interface DiscoverFilters {
 }
 
 // Default distance filter applied until the user picks their own value or explicitly clears it to "Any"
-export const DEFAULT_DISTANCE_KM = 10;
+export const DEFAULT_DISTANCE_KM = 30;
 
 export const BIO_MAX_LENGTH = 200;
 

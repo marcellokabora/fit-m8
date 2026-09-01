@@ -611,6 +611,7 @@
               : isTrainerPreset
                 ? "trainer"
                 : null}
+          hasDiscoverFilters={!!$userProfile?.discoverFilters}
           onSelectPreset={selectDiscoverPreset}
         />
       </div>

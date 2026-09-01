@@ -18,10 +18,12 @@
   let {
     class: className = "",
     preset = null,
+    hasDiscoverFilters = true,
     onSelectPreset,
   }: {
     class?: string;
     preset?: DiscoverPresetKind | null;
+    hasDiscoverFilters?: boolean;
     onSelectPreset: (preset: DiscoverPresetKind) => void;
   } = $props();
 
@@ -31,18 +33,15 @@
   // keeps the modal from being dismissed before the user actually picks one
   let selected = $state<DiscoverPresetKind | null>(null);
 
-  const SEEN_KEY = "fit-m8-discover-hint-seen";
-
   function openModal() {
     selected = preset;
     open = true;
   }
 
+  // Auto-opens only for users with no saved discover filters yet - once one is picked and
+  // saved (see saveFilters/applyDatingPreset etc.), it won't show up again.
   onMount(() => {
-    if (!localStorage.getItem(SEEN_KEY)) {
-      openModal();
-      localStorage.setItem(SEEN_KEY, "1");
-    }
+    if (!hasDiscoverFilters) openModal();
   });
 
   // No-op until a preset is picked, so backdrop taps and the confirm button can't close
