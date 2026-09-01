@@ -77,7 +77,7 @@ export interface ThemeState {
 
 const THEME_KEY = 'fit-m8-theme';
 const MODE_KEY = 'fit-m8-theme-mode';
-const DEFAULT_STATE: ThemeState = { themeId: 'sunset', mode: 'dark' };
+const DEFAULT_STATE: ThemeState = { themeId: 'forest', mode: 'dark' };
 
 function applyState(state: ThemeState) {
     if (typeof document === 'undefined') return;

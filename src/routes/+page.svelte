@@ -72,10 +72,10 @@
     <!-- always in the DOM so bots/screen readers see the app name even before auth resolves -->
     <h1 class="sr-only">FIT-M8</h1>
     {#if ready}
-      <Logo class="w-75 mt-2 h-auto text-primary my-6 drop-shadow-md" />
+      <Logo class="w-75 mt-6 h-auto text-primary my-6 drop-shadow-md" />
       <p
         transition:fade
-        class="text-center text-lg font-medium text-muted -mt-4 text-balance text-shadow-2xs"
+        class="text-center text-lg font-medium text-muted -mt-6 text-balance text-shadow-2xs"
       >
         {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
       </p>
@@ -153,7 +153,7 @@
       type="button"
       onclick={() => (themePickerOpen = true)}
       aria-label="Theme picker (dev only)"
-      class="fixed bottom-4 right-4 z-40 flex size-11 items-center justify-center rounded-full border border-border/50 text-primary shadow-lg active:scale-95"
+      class="fixed bottom-4 right-4 z-40 flex size-11 items-center justify-center rounded-full text-primary shadow-lg active:scale-95"
     >
       <Palette class="size-5" />
     </button>

@@ -5,15 +5,15 @@
 
   let t = $derived(createTranslator($activeLanguage));
 
-  let { shuffle = true }: { shuffle?: boolean } = $props();
+  let { shuffle = false }: { shuffle?: boolean } = $props();
 
   const ACTIVITIES = [
+    { id: "tennis" },
     { id: "footvolley" },
     { id: "jogging" },
-    { id: "beach-volley" },
     { id: "padel" },
+    { id: "beach-volley" },
     { id: "basketball" },
-    { id: "tennis" },
     { id: "cycling" },
   ];
 
@@ -48,9 +48,9 @@
 
   // background photo per activity, falling back to a cycling set when there's no dedicated image
   const IMAGE_MAP: Record<string, string> = {
+    padel: "/homepage/padel.jpg",
     footvolley: "/homepage/footvolley.jpg",
     jogging: "/homepage/jogging.jpg",
-    padel: "/homepage/padel.jpg",
     tennis: "/homepage/tennis.jpg",
     basketball: "/homepage/bascketball.jpg",
     cycling: "/homepage/cycling.jpg",
@@ -94,7 +94,7 @@
 </script>
 
 <div
-  class="pointer-events-none fixed inset-0 z-0 bg-black"
+  class="pointer-events-none fixed inset-0 z-0 bg-surface"
   aria-hidden="true"
 ></div>
 {#each backgrounds as src, i}
@@ -102,7 +102,7 @@
     {src}
     alt=""
     aria-hidden="true"
-    class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-[2px]"
+    class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-xs"
     style={`opacity: ${i === activeIndex ? 0.5 : 0}`}
   />
 {/each}

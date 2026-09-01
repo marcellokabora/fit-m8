@@ -259,7 +259,7 @@ const MESSAGES = {
         'activity.padel': 'Padel',
         'activity.tennis': 'Tennis',
         'activity.beach-volley': 'Beach Volley',
-        'activity.footvolley': 'Footvolley',
+        'activity.footvolley': 'Foot Volley',
         'activity.basketball': 'Basketball',
         'activity.soccer': 'Football',
         'activity.cycling': 'Cycling',

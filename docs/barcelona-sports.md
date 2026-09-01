@@ -73,7 +73,7 @@ groups above. Entries with no `ActivityId` are not yet tracked as activities in 
 | Mind & Body           | Meditation              | —                   |
 | Mind & Body           | Breathwork              | —                   |
 | Outdoor & Adventure   | Beach Volleyball        | `beach-volley`      |
-| Outdoor & Adventure   | Footvolley              | `footvolley`        |
+| Outdoor & Adventure   | Foot Volley             | `footvolley`        |
 | Outdoor & Adventure   | Bouldering              | `rock-climbing`     |
 | Outdoor & Adventure   | Rock Climbing           | `rock-climbing`     |
 | Outdoor & Adventure   | Running                 | `jogging`           |

@@ -90,7 +90,7 @@ const activityLabels = {
 	yoga: 'yoga',
 	rollerblade: 'rollerblading',
 	skateboard: 'skateboarding',
-	footvolley: 'footvolley'
+	footvolley: 'foot volley'
 };
 
 const FEMALE_NAMES = [

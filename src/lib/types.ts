@@ -37,7 +37,7 @@ export const ACTIVITIES = [
 	{ id: 'padel', label: 'Padel', emoji: '🎾' },
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾' },
 	{ id: 'beach-volley', label: 'Beach Volley', emoji: '🏐' },
-	{ id: 'footvolley', label: 'Footvolley', emoji: '🏐' },
+	{ id: 'footvolley', label: 'Foot Volley', emoji: '🏐' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀' },
 	{ id: 'soccer', label: 'Football', emoji: '⚽' },
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },
