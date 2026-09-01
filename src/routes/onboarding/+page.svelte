@@ -39,6 +39,7 @@
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
+  import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import {
     requestPushToken,
     savePushToken,
@@ -103,8 +104,6 @@
   }
 
   const draft = loadDraft();
-  // Google sign-in already carries a name + profile photo — reuse them as defaults below
-  const googleAccount = get(authUser);
   const urlStepParam = Number(page.url.searchParams.get("step"));
   let step = $state(
     urlStepParam >= 1 && urlStepParam <= TOTAL_STEPS
@@ -127,9 +126,9 @@
   );
 
   // Step 2 — Basic info
-  let displayName = $state(
-    draft.displayName ?? googleAccount?.displayName ?? "",
-  );
+  // Never prefill from the Google account's display name — it's a full name, not just a first name
+  let displayName = $state(draft.displayName ?? "");
+  let nameHasSurname = $derived(/\s/.test(displayName.trim()));
   let bio = $state(draft.bio ?? "");
   let birthdate = $state(draft.birthdate ?? "");
   let age = $derived(birthdate ? calculateAge(birthdate) : 0);
@@ -170,10 +169,8 @@
     draft.discoverPreset ?? null,
   );
 
-  // Step 4 — Photos (optional, up to 3) — default slot 1 to the Google account photo
-  let photos = $state<string[]>(
-    draft.photos ?? (googleAccount?.photoURL ? [googleAccount.photoURL] : []),
-  );
+  // Step 4 — Photos (required, up to 3) — never defaulted from the Google account photo
+  let photos = $state<string[]>(draft.photos ?? []);
   let saving = $state(false);
   let error = $state("");
   let uid = $derived($authUser?.uid ?? "");
@@ -343,7 +340,7 @@
         lat,
         lng,
         photos,
-        photoURL: photos[0] || user.photoURL || "",
+        photoURL: photos[0] || "",
         activities,
         emailVerified: user.emailVerified,
         discoverFilters,
@@ -360,7 +357,10 @@
   }
 </script>
 
-<div class="flex h-dvh flex-col overflow-hidden bg-bg">
+<div class="relative flex h-dvh flex-col overflow-hidden bg-bg">
+  {#if step === 1}
+    <LanguagePicker class="right-4 top-20" />
+  {/if}
   <!-- Progress -->
   <div class="shrink-0 px-6 pt-10">
     <div class="mb-8 flex items-center gap-2">
@@ -391,12 +391,21 @@
       </h2>
       <p class="mb-6 text-sm text-muted">{t.t("onboarding.aboutYouHint")}</p>
       <div class="flex flex-col gap-4">
-        <input
-          type="text"
-          bind:value={displayName}
-          placeholder={t.t("onboarding.name")}
-          class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-        />
+        <div>
+          <input
+            type="text"
+            bind:value={displayName}
+            placeholder={t.t("onboarding.name")}
+            class="w-full rounded-2xl border-2 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary {nameHasSurname
+              ? 'border-error'
+              : 'border-border'}"
+          />
+          {#if nameHasSurname}
+            <p class="mt-2 text-xs font-semibold text-error">
+              {t.t("onboarding.nameError")}
+            </p>
+          {/if}
+        </div>
         <textarea
           bind:value={bio}
           placeholder={t.t("onboarding.bioOptional")}
@@ -491,7 +500,7 @@
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.howItWorks")}
       </h2>
-      <p class="mb-6 text-sm text-muted">
+      <p class="mb-6 text-sm text-muted mr-20">
         {t.t("onboarding.howItWorksHint")}
       </p>
       <div class="mb-6">
@@ -556,6 +565,11 @@
         <div class="w-full">
           <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
         </div>
+        {#if photos.length === 0}
+          <p class="text-xs font-semibold text-error">
+            {t.t("onboarding.photosRequired")}
+          </p>
+        {/if}
       </div>
     {:else if step === 5}
       <h2 class="mb-1 text-2xl font-black text-text">
@@ -653,8 +667,10 @@
       <button
         onclick={next}
         disabled={(step === 1 && !discoverPreset) ||
-          (step === 2 && (!displayName || !birthdate || isUnderage)) ||
-          (step === 3 && selectedActivities.length === 0)}
+          (step === 2 &&
+            (!displayName || !birthdate || isUnderage || nameHasSurname)) ||
+          (step === 3 && selectedActivities.length === 0) ||
+          (step === 4 && photos.length === 0)}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {t.t("common.continue")}

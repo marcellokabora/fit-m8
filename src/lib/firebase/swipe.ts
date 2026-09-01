@@ -62,6 +62,11 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 	);
 }
 
+// Removes a previously recorded swipe so the target profile can reappear in the discover feed.
+export async function undoSwipe(fromUid: string, toUid: string) {
+	await deleteDoc(doc(db, 'swipes', fromUid, 'sent', toUid));
+}
+
 export async function getDiscoverFeed(
 	currentUid: string,
 	myActivityIds: string[],

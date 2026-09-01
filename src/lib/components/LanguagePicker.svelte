@@ -7,6 +7,12 @@
     LANGUAGES,
   } from "$lib/stores/language";
 
+  let {
+    class: positionClass = "left-1/2 -translate-x-1/2",
+  }: {
+    class?: string;
+  } = $props();
+
   let t = $derived(createTranslator($activeLanguage));
   let open = $state(false);
   let containerEl: HTMLDivElement | undefined = $state();
@@ -27,7 +33,7 @@
 
 <div
   bind:this={containerEl}
-  class="absolute left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-5"
+  class="absolute z-20 flex flex-col items-center gap-5 {positionClass}"
   role="group"
   aria-label={t.t("onboarding.chooseLanguage")}
   title={t.t("onboarding.chooseLanguage")}

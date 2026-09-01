@@ -35,7 +35,7 @@
     filterSingle,
     filterTrainer,
   } from "$lib/stores/auth";
-  import { getDiscoverFeed, recordSwipe } from "$lib/firebase/swipe";
+  import { getDiscoverFeed, recordSwipe, undoSwipe } from "$lib/firebase/swipe";
   import {
     ACTIVITIES,
     DEFAULT_DISTANCE_KM,
@@ -55,6 +55,8 @@
   let lastLoadedKey = $state<string | null>(null);
 
   let matchBanner = $state(false);
+  // The most recently dismissed "pass" profile, restorable via the undo button; cleared on undo or on any "like" swipe
+  let lastPass = $state<UserProfile | null>(null);
   let profileActivities = $derived(
     ACTIVITIES.filter((activity) =>
       $userProfile?.activities?.some(
@@ -442,6 +444,7 @@
       new Promise((resolve) => setTimeout(resolve, EXIT_DURATION)),
     ]);
 
+    lastPass = direction === "pass" ? top : null;
     users = users.slice(1);
     currentX = 0;
     exiting = false;
@@ -452,23 +455,13 @@
     }
   }
 
-  async function handleShare() {
-    const top = users[0];
-    if (!top || typeof navigator === "undefined") return;
-    const url = `${location.origin}/profile/${top.uid}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: top.displayName, url });
-      } catch {
-        // user cancelled the share sheet, nothing to do
-      }
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      // clipboard unavailable, nothing more we can do
-    }
+  async function undoLastPass() {
+    const uid = get(authUser)?.uid;
+    if (!uid || !lastPass) return;
+    const profile = lastPass;
+    lastPass = null;
+    await undoSwipe(uid, profile.uid);
+    users = [profile, ...users];
   }
 
   let showMessageModal = $state(false);
@@ -748,8 +741,9 @@
           disabled={exiting}
           passLabel={t.t("common.pass")}
           likeLabel={t.t("common.like")}
-          onShare={handleShare}
-          shareLabel={t.t("profile.share")}
+          onUndo={undoLastPass}
+          canUndo={!!lastPass}
+          undoLabel={t.t("common.undo")}
           onMessage={handleMessage}
           messageLabel={t.t("common.message")}
         />

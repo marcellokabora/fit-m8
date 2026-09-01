@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { X, Zap, Share2, MessageCircle } from "@lucide/svelte";
+  import { X, Zap, Share2, Undo2, MessageCircle } from "@lucide/svelte";
 
   let {
     onPass,
@@ -8,8 +8,11 @@
     passLabel,
     likeLabel,
     onShare,
+    onUndo,
     onMessage,
     shareLabel,
+    undoLabel,
+    canUndo = true,
     messageLabel,
     class: className = "",
   }: {
@@ -18,22 +21,36 @@
     disabled?: boolean;
     passLabel: string;
     likeLabel: string;
-    onShare: () => void;
+    onShare?: () => void;
+    onUndo?: () => void;
     onMessage: () => void;
-    shareLabel: string;
+    shareLabel?: string;
+    undoLabel?: string;
+    canUndo?: boolean;
     messageLabel: string;
     class?: string;
   } = $props();
 </script>
 
 <div class="flex shrink-0 items-center justify-center gap-5 {className}">
-  <button
-    onclick={onShare}
-    aria-label={shareLabel}
-    class="flex size-12 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90"
-  >
-    <Share2 class="size-5" />
-  </button>
+  {#if onUndo}
+    <button
+      onclick={onUndo}
+      disabled={!canUndo}
+      aria-label={undoLabel}
+      class="flex size-12 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-50"
+    >
+      <Undo2 class="size-5" />
+    </button>
+  {:else if onShare}
+    <button
+      onclick={onShare}
+      aria-label={shareLabel}
+      class="flex size-12 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90"
+    >
+      <Share2 class="size-5" />
+    </button>
+  {/if}
   <button
     onclick={onPass}
     {disabled}

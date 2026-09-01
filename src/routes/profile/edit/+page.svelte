@@ -70,6 +70,7 @@
   let deleteAccountError = $state<string | null>(null);
 
   let displayName = $state($userProfile?.displayName ?? "");
+  let nameHasSurname = $derived(/\s/.test(displayName.trim()));
   let bio = $state($userProfile?.bio ?? "");
   // Only `age` is persisted, not the exact date, so this starts blank rather than guessing a birthdate
   let birthdate = $state("");
@@ -160,7 +161,7 @@
   }
 
   async function save() {
-    if (isUnderage) return;
+    if (isUnderage || nameHasSurname) return;
     saving = true;
     const uid = get(authUser)?.uid;
     if (uid) {
@@ -215,7 +216,7 @@
       <h1 class="text-lg font-black text-text">{t.t("profile.editTitle")}</h1>
       <button
         onclick={save}
-        disabled={saving || isUnderage}
+        disabled={saving || isUnderage || nameHasSurname}
         class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95 disabled:opacity-50"
       >
         {#if saving}
@@ -240,8 +241,15 @@
       <input
         type="text"
         bind:value={displayName}
-        class="rounded-2xl border-2 border-border bg-surface px-4 py-3 text-base font-bold text-text w-full outline-none focus:border-primary"
+        class="rounded-2xl border-2 bg-surface px-4 py-3 text-base font-bold text-text w-full outline-none focus:border-primary {nameHasSurname
+          ? 'border-error'
+          : 'border-border'}"
       />
+      {#if nameHasSurname}
+        <p class="mt-2 text-xs font-semibold text-error">
+          {t.t("onboarding.nameError")}
+        </p>
+      {/if}
     </div>
     <div class="w-full">
       <BirthdateField
