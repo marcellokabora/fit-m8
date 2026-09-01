@@ -2,6 +2,13 @@
   import { onMount, untrack } from "svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import padelImg from "$lib/assets/homepage/padel.jpg?enhanced";
+  import footvolleyImg from "$lib/assets/homepage/footvolley.jpg?enhanced";
+  import joggingImg from "$lib/assets/homepage/jogging.jpg?enhanced";
+  import tennisImg from "$lib/assets/homepage/tennis.jpg?enhanced";
+  import basketballImg from "$lib/assets/homepage/bascketball.jpg?enhanced";
+  import cyclingImg from "$lib/assets/homepage/cycling.jpg?enhanced";
+  import beachVolleyImg from "$lib/assets/homepage/beachvolley.jpg?enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -47,22 +54,22 @@
   let offset = $derived(PEEK_HEIGHT - pos * ITEM_HEIGHT);
 
   // background photo per activity, falling back to a cycling set when there's no dedicated image
-  const IMAGE_MAP: Record<string, string> = {
-    padel: "/homepage/padel.jpg",
-    footvolley: "/homepage/footvolley.jpg",
-    jogging: "/homepage/jogging.jpg",
-    tennis: "/homepage/tennis.jpg",
-    basketball: "/homepage/bascketball.jpg",
-    cycling: "/homepage/cycling.jpg",
-    beachVolley: "/homepage/beachvolley.jpg",
+  const IMAGE_MAP: Record<string, typeof padelImg> = {
+    padel: padelImg,
+    footvolley: footvolleyImg,
+    jogging: joggingImg,
+    tennis: tennisImg,
+    basketball: basketballImg,
+    cycling: cyclingImg,
+    beachVolley: beachVolleyImg,
   };
   const FALLBACK_IMAGES = [
-    "/homepage/jogging.jpg",
-    "/homepage/padel.jpg",
-    "/homepage/tennis.jpg",
-    "/homepage/bascketball.jpg",
-    "/homepage/beachvolley.jpg",
-    "/homepage/cycling.jpg",
+    joggingImg,
+    padelImg,
+    tennisImg,
+    basketballImg,
+    beachVolleyImg,
+    cyclingImg,
   ];
   let backgrounds = $derived(
     shuffled.map(
@@ -156,10 +163,12 @@
   aria-hidden="true"
 ></div>
 {#each backgrounds as src, i}
-  <img
+  <enhanced:img
     {src}
     alt=""
     aria-hidden="true"
+    sizes="100vw"
+    fetchpriority={i === 0 ? "high" : "low"}
     class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-xs"
     style={`opacity: ${i === activeIndex ? 0.5 : 0}`}
   />

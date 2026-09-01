@@ -4,11 +4,13 @@ import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import Icons from 'unplugin-icons/vite';
+import { enhancedImages } from '@sveltejs/enhanced-img';
 
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
 		Icons({ compiler: 'svelte' }),
+		enhancedImages(),
 		sveltekit({
 			compilerOptions: {
 				runes: ({ filename }) =>
