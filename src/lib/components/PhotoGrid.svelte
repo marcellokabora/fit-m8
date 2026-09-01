@@ -18,10 +18,12 @@
     photos = $bindable([]),
     uid,
     onchange,
+    firstRequired = false,
   }: {
     photos: string[];
     uid: string;
     onchange?: (photos: string[]) => void;
+    firstRequired?: boolean;
   } = $props();
 
   let uploadingIndex = $state<number | null>(null);
@@ -103,7 +105,10 @@
           </button>
         {:else}
           <label
-            class="flex h-full w-full items-center justify-center rounded-2xl border-2 border-dashed border-border bg-surface text-muted active:scale-95"
+            class="flex h-full w-full items-center justify-center rounded-2xl border-2 border-dashed bg-surface text-muted active:scale-95 {index ===
+              0 && firstRequired
+              ? 'border-primary'
+              : 'border-border'}"
           >
             {#if uploadingIndex === index}
               <Loader2 class="size-6 animate-spin" />

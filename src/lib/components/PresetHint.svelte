@@ -6,16 +6,60 @@
     CircleQuestionMark,
     Dumbbell,
     ListOrdered,
+    Zap,
+    Check,
   } from "@lucide/svelte";
+  import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  let { class: className = "" }: { class?: string } = $props();
+  export type DiscoverPresetKind = "dating" | "friends" | "trainer";
+
+  let {
+    class: className = "",
+    preset = null,
+    onSelectPreset,
+  }: {
+    class?: string;
+    preset?: DiscoverPresetKind | null;
+    onSelectPreset: (preset: DiscoverPresetKind) => void;
+  } = $props();
 
   let t = $derived(createTranslator($activeLanguage));
   let open = $state(false);
+  // Highlighted preset while the modal is open; stays null until tapped, which is what
+  // keeps the modal from being dismissed before the user actually picks one
+  let selected = $state<DiscoverPresetKind | null>(null);
+
+  const SEEN_KEY = "fit-m8-discover-hint-seen";
+
+  function openModal() {
+    selected = preset;
+    open = true;
+  }
+
+  onMount(() => {
+    if (!localStorage.getItem(SEEN_KEY)) {
+      openModal();
+      localStorage.setItem(SEEN_KEY, "1");
+    }
+  });
+
+  // No-op until a preset is picked, so backdrop taps and the confirm button can't close
+  // the modal without applying one of the three discover presets
+  function confirmAndClose() {
+    if (!selected) return;
+    onSelectPreset(selected);
+    open = false;
+  }
 
   const CONCEPT_ROWS = [
+    {
+      key: "swipe",
+      icon: Zap,
+      title: "discover.presetHintSwipeTitle",
+      body: "discover.presetHintSwipeBody",
+    },
     {
       key: "sports",
       icon: Dumbbell,
@@ -53,7 +97,7 @@
 </script>
 
 <button
-  onclick={() => (open = true)}
+  onclick={openModal}
   class="flex size-9 items-center justify-center rounded-full bg-surface text-text shadow-sm {className}"
   aria-label={t.t("discover.presetHintToggle")}
 >
@@ -65,7 +109,7 @@
   <div
     class="fixed inset-0 z-50 mx-auto flex w-full items-end bg-black/60 backdrop-blur-sm md:max-w-md"
     transition:fade={{ duration: 150 }}
-    onclick={() => (open = false)}
+    onclick={confirmAndClose}
   >
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
     <div
@@ -101,20 +145,49 @@
           {/each}
         </div>
 
-        <div class="border-t border-border pt-5">
-          <div class="flex flex-col gap-4">
+        <div class="">
+          <p class="mb-3 text-sm font-bold text-primary">
+            {t.t("discover.presetHintPickOne")}
+          </p>
+          <div
+            class="flex flex-col gap-3"
+            role="radiogroup"
+            aria-label={t.t("discover.presetHintPickOne")}
+          >
             {#each ROWS as row}
-              <div class="flex items-start gap-4">
-                <div
-                  class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+              {@const isSelected = selected === row.key}
+              <button
+                type="button"
+                onclick={() => (selected = row.key)}
+                role="radio"
+                aria-checked={isSelected}
+                class="flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors {isSelected
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border bg-bg'}"
+              >
+                <span
+                  class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
                 >
-                  <row.icon class="size-4" />
-                </div>
-                <div>
-                  <p class="text-sm font-bold text-text">{t.t(row.title)}</p>
-                  <p class="mt-0.5 text-xs text-muted">{t.t(row.body)}</p>
-                </div>
-              </div>
+                  <row.icon class="size-5" />
+                </span>
+                <span class="flex-1">
+                  <span class="block font-bold text-text">{t.t(row.title)}</span
+                  >
+                  <span class="mt-0.5 block text-sm text-muted"
+                    >{t.t(row.body)}</span
+                  >
+                </span>
+                <span
+                  aria-hidden="true"
+                  class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 {isSelected
+                    ? 'border-primary bg-primary'
+                    : 'border-border'}"
+                >
+                  {#if isSelected}
+                    <Check class="size-3.5 text-white" />
+                  {/if}
+                </span>
+              </button>
             {/each}
           </div>
         </div>
@@ -122,10 +195,11 @@
 
       <div class="border-t border-border px-7 py-4">
         <button
-          onclick={() => (open = false)}
-          class="w-full rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95"
+          onclick={confirmAndClose}
+          disabled={!selected}
+          class="w-full rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
         >
-          {t.t("common.close")}
+          {t.t("common.save")}
         </button>
       </div>
     </div>

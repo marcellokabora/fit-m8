@@ -22,16 +22,7 @@
   } from "$lib/types";
   import { get } from "svelte/store";
   import { isInBarcelona } from "$lib/location";
-  import {
-    Bell,
-    Check,
-    UserShield,
-    Heart,
-    MapPin,
-    Search,
-    Users,
-    Zap,
-  } from "@lucide/svelte";
+  import { Bell, Check, Loader2, MapPin, Search, Zap } from "@lucide/svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import LocationPicker from "$lib/components/LocationPicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
@@ -40,6 +31,7 @@
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
+  import type { DiscoverPreset } from "$lib/components/DiscoverPresetPicker.svelte";
   import {
     requestPushToken,
     savePushToken,
@@ -47,31 +39,8 @@
   } from "$lib/firebase/notifications";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  const TOTAL_STEPS = 5;
+  const TOTAL_STEPS = 3;
   const DRAFT_KEY = "fit-m8-onboarding-draft";
-
-  const HOW_IT_WORKS = [
-    {
-      key: "dating",
-      preset: "dating",
-      icon: Heart,
-      body: "discover.presetHintDatingBody",
-    },
-    {
-      key: "friends",
-      preset: "friends",
-      icon: Users,
-      body: "discover.presetHintFriendsBody",
-    },
-    {
-      key: "experts",
-      preset: "trainer",
-      icon: UserShield,
-      body: "discover.presetHintTrainerBody",
-    },
-  ] as const;
-
-  type DiscoverPreset = (typeof HOW_IT_WORKS)[number]["preset"];
 
   type OnboardingDraft = {
     step: number;
@@ -125,7 +94,7 @@
     })),
   );
 
-  // Step 2 — Basic info
+  // Step 1 — Basic info
   // Never prefill from the Google account's display name — it's a full name, not just a first name
   let displayName = $state(draft.displayName ?? "");
   let nameHasSurname = $derived(/\s/.test(displayName.trim()));
@@ -147,7 +116,7 @@
     gender === "male" ? "female" : gender === "female" ? "male" : "",
   );
 
-  // Step 3 — Activities (format/level default to "all"/"basic"; configurable later from the profile page)
+  // Step 2 — Activities (format/level default to "all"/"basic"; configurable later from the profile page)
   let selectedActivities = $state<string[]>(draft.selectedActivities ?? []);
   let activitySettings = $state<
     Record<string, { format: ActivityFormat; level: SkillLevel }>
@@ -164,18 +133,18 @@
       : ACTIVITIES,
   );
 
-  // Step 1 — Which quick preset to land on Discover with
+  // Which quick preset to land on Discover with (not currently set by any onboarding step)
   let discoverPreset = $state<DiscoverPreset | null>(
     draft.discoverPreset ?? null,
   );
 
-  // Step 4 — Photos (required, up to 3) — never defaulted from the Google account photo
+  // Step 1 — Photo (a single one is enough) — never defaulted from the Google account photo
   let photos = $state<string[]>(draft.photos ?? []);
   let saving = $state(false);
   let error = $state("");
   let uid = $derived($authUser?.uid ?? "");
 
-  // Step 2 — Push notification permission (not persisted in the draft; re-requesting
+  // Step 3 — Push notification permission (not persisted in the draft; re-requesting
   // after a refresh is instant once the browser has already granted/denied it)
   let pushSupported = $state(false);
   let pushToken = $state<string | null>(null);
@@ -285,17 +254,17 @@
     // Belt-and-suspenders: the Continue button already blocks this, but step can be
     // reached directly via the ?step= URL param, so re-check before writing to Firestore.
     if (!birthdate || age < MIN_AGE) {
-      step = 2;
+      step = 1;
       pushStepUrl();
       return;
     }
     if (!locationValid) {
-      step = 5;
+      step = 3;
       pushStepUrl();
       return;
     }
     if (selectedActivities.length === 0) {
-      step = 3;
+      step = 2;
       pushStepUrl();
       return;
     }
@@ -358,9 +327,7 @@
 </script>
 
 <div class="relative flex h-dvh flex-col overflow-hidden bg-bg">
-  {#if step === 1}
-    <LanguagePicker class="right-4 top-20" />
-  {/if}
+  <LanguagePicker class="right-6 top-20" />
   <!-- Progress -->
   <div class="shrink-0 px-6 pt-10">
     <div class="mb-8 flex items-center gap-2">
@@ -383,9 +350,9 @@
 
   <div
     bind:this={stepContainer}
-    class="min-h-0 flex-1 overflow-y-auto px-6 pb-28"
+    class="hide-scrollbar min-h-0 flex-1 overflow-y-auto px-6 pb-28"
   >
-    {#if step === 2}
+    {#if step === 1}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.aboutYou")}
       </h2>
@@ -447,8 +414,19 @@
             onchange={(value) => (isSingle = value)}
           />
         </div>
+        <div>
+          <p class="mb-2 text-sm font-bold text-text">
+            {t.t("onboarding.profilePhotos")}
+          </p>
+          <PhotoGrid
+            {photos}
+            {uid}
+            firstRequired
+            onchange={(next) => (photos = next)}
+          />
+        </div>
       </div>
-    {:else if step === 3}
+    {:else if step === 2}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.yourSports")}
       </h2>
@@ -491,91 +469,13 @@
           {/each}
         </div>
       {/if}
-      {#if selectedActivities.length === 0}
-        <p class="mt-4 text-xs font-semibold text-error">
-          {t.t("onboarding.selectAtLeastOneSport")}
-        </p>
-      {/if}
-    {:else if step === 1}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.howItWorks")}
-      </h2>
-      <p class="mb-6 text-sm text-muted mr-20">
-        {t.t("onboarding.howItWorksHint")}
-      </p>
-      <div class="mb-6">
-        <p class="text-sm font-bold text-text">
-          {t.t("discover.presetHintIntroTitle")}
-        </p>
-        <p class="mt-0.5 text-xs text-muted">
-          {t.t("discover.presetHintIntroBody")}
-        </p>
-      </div>
-      <div
-        class="flex flex-col gap-4"
-        role="radiogroup"
-        aria-label={t.t("onboarding.howItWorks")}
-      >
-        {#each HOW_IT_WORKS as slide}
-          {@const selected = discoverPreset === slide.preset}
-          <button
-            type="button"
-            onclick={() => (discoverPreset = slide.preset)}
-            role="radio"
-            aria-checked={selected}
-            class="flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-colors {selected
-              ? 'border-primary bg-primary/10'
-              : 'border-border bg-surface'}"
-          >
-            <span
-              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-            >
-              <slide.icon class="size-5" />
-            </span>
-            <div class="flex-1">
-              <p class="font-bold text-text">
-                {t.t(`intro.${slide.key}.title`)}
-              </p>
-              <p class="text-sm text-muted">
-                {t.t(slide.body)}
-              </p>
-            </div>
-            <!-- Radio indicator — makes clear only one of these can be picked, and it must be tapped to check it -->
-            <span
-              aria-hidden="true"
-              class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 {selected
-                ? 'border-primary bg-primary'
-                : 'border-border'}"
-            >
-              {#if selected}
-                <Check class="size-3.5 text-white" />
-              {/if}
-            </span>
-          </button>
-        {/each}
-      </div>
-    {:else if step === 4}
-      <h2 class="mb-1 text-2xl font-black text-text">
-        {t.t("onboarding.profilePhotos")}
-      </h2>
-      <p class="mb-6 text-sm text-muted">
-        {t.t("onboarding.photosHint")}
-      </p>
-      <div class="flex flex-1 flex-col items-center justify-center gap-4">
-        <div class="w-full">
-          <PhotoGrid {photos} {uid} onchange={(next) => (photos = next)} />
-        </div>
-        {#if photos.length === 0}
-          <p class="text-xs font-semibold text-error">
-            {t.t("onboarding.photosRequired")}
-          </p>
-        {/if}
-      </div>
-    {:else if step === 5}
+    {:else if step === 3}
       <h2 class="mb-1 text-2xl font-black text-text">
         {t.t("onboarding.makeItYours")}
       </h2>
-      <p class="mb-6 text-sm text-muted">{t.t("onboarding.appearanceHint")}</p>
+      <p class="mb-6 text-sm text-muted mr-30">
+        {t.t("onboarding.appearanceHint")}
+      </p>
       <div class="mb-4 flex flex-col gap-4">
         <div class="rounded-2xl border-2 border-border bg-surface p-4">
           <div class="mb-3 flex items-center gap-3">
@@ -618,20 +518,26 @@
               </div>
             </div>
             {#if pushToken}
-              <p class="flex items-center gap-1 text-xs font-bold text-primary">
-                <Check class="size-4" />
+              <div
+                class="flex items-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 px-4 py-4 text-sm font-semibold text-primary"
+              >
+                <Check class="size-5 shrink-0" />
                 {t.t("onboarding.notificationsEnabled")}
-              </p>
+              </div>
             {:else}
               <button
                 type="button"
                 onclick={enableNotifications}
                 disabled={pushRequesting}
-                class="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+                class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-surface px-4 py-4 text-sm font-semibold text-primary transition-colors active:scale-95 disabled:opacity-40"
               >
-                {pushRequesting
-                  ? t.t("common.loading")
-                  : t.t("onboarding.enableNotifications")}
+                {#if pushRequesting}
+                  <Loader2 class="size-5 animate-spin" />
+                  {t.t("common.loading")}
+                {:else}
+                  <Bell class="size-5" />
+                  {t.t("onboarding.enableNotifications")}
+                {/if}
               </button>
               {#if pushDenied}
                 <p class="mt-2 text-xs text-muted">
@@ -666,11 +572,13 @@
     {#if step < TOTAL_STEPS}
       <button
         onclick={next}
-        disabled={(step === 1 && !discoverPreset) ||
-          (step === 2 &&
-            (!displayName || !birthdate || isUnderage || nameHasSurname)) ||
-          (step === 3 && selectedActivities.length === 0) ||
-          (step === 4 && photos.length === 0)}
+        disabled={(step === 1 &&
+          (!displayName ||
+            !birthdate ||
+            isUnderage ||
+            nameHasSurname ||
+            photos.length === 0)) ||
+          (step === 2 && selectedActivities.length === 0)}
         class="flex-1 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {t.t("common.continue")}

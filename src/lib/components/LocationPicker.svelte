@@ -152,11 +152,11 @@
         disabled={locating}
         class="shrink-0 text-xs font-bold uppercase tracking-wide text-primary disabled:opacity-40"
       >
-        {#if locating}
+        <!-- {#if locating}
           <Loader2 class="size-4 animate-spin" />
         {:else}
           {t.t("common.refresh")}
-        {/if}
+        {/if} -->
       </button>
     </div>
   {:else}

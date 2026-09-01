@@ -44,7 +44,9 @@
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
-  import PresetHint from "$lib/components/PresetHint.svelte";
+  import PresetHint, {
+    type DiscoverPresetKind,
+  } from "$lib/components/PresetHint.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -284,6 +286,13 @@
     filterSingle.set("");
     filterTrainer.set("yes");
     saveFilters();
+  }
+
+  // Bridges PresetHint's toggle picker to the preset functions above
+  function selectDiscoverPreset(preset: DiscoverPresetKind) {
+    if (preset === "dating") applyDatingPreset();
+    else if (preset === "friends") applyFriendsPreset();
+    else applyTrainerPreset();
   }
 
   // Sync filter stores from the saved profile once per user; defaults are used until they save filters explicitly
@@ -568,7 +577,16 @@
         >
           <UserShield class="size-5" />
         </button>
-        <PresetHint />
+        <PresetHint
+          preset={isDatingPreset
+            ? "dating"
+            : isFriendsPreset
+              ? "friends"
+              : isTrainerPreset
+                ? "trainer"
+                : null}
+          onSelectPreset={selectDiscoverPreset}
+        />
       </div>
     </div>
 
@@ -739,6 +757,8 @@
           onPass={() => swipe("pass")}
           onLike={() => swipe("like")}
           disabled={exiting}
+          likeProgress={likeOpacity}
+          passProgress={passOpacity}
           passLabel={t.t("common.pass")}
           likeLabel={t.t("common.like")}
           onUndo={undoLastPass}

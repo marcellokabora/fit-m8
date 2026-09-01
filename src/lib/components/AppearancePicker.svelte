@@ -61,7 +61,9 @@
       {#if paletteOpen}
         <div
           role="menu"
+          tabindex="-1"
           onclick={(e) => e.stopPropagation()}
+          onkeydown={(e) => e.stopPropagation()}
           class="absolute right-0 top-full z-10 mt-2 flex gap-2 rounded-2xl border-2 border-border bg-surface p-3 shadow-lg"
         >
           {#each THEMES as theme}

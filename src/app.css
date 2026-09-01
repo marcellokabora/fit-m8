@@ -88,3 +88,15 @@ body::-webkit-scrollbar {
     background-color: var(--color-muted);
   }
 }
+
+/* Opt out of the reserved scrollbar gutter on a specific scroll container — otherwise its
+   available width shrinks whenever its content is tall enough to scroll, while steps/screens
+   that fit without scrolling stay full width, making the layout look inconsistently indented. */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

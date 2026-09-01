@@ -4,7 +4,9 @@
   import BackHeader from "$lib/components/BackHeader.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import PresetHint from "$lib/components/PresetHint.svelte";
+  import PresetHint, {
+    type DiscoverPresetKind,
+  } from "$lib/components/PresetHint.svelte";
   import {
     authUser,
     userProfile,
@@ -212,6 +214,13 @@
     draftTrainer = "yes";
   }
 
+  // Bridges PresetHint's toggle picker to the preset functions above
+  function selectDiscoverPreset(preset: DiscoverPresetKind) {
+    if (preset === "dating") applyDatingPreset();
+    else if (preset === "friends") applyFriendsPreset();
+    else applyTrainerPreset();
+  }
+
   function resetFilters() {
     draftActivities = [];
     draftFormat = "";
@@ -369,7 +378,17 @@
         >
           <UserShield class="size-5" />
         </button>
-        <PresetHint class="mr-1" />
+        <PresetHint
+          class="mr-1"
+          preset={isDatingPreset
+            ? "dating"
+            : isFriendsPreset
+              ? "friends"
+              : isTrainerPreset
+                ? "trainer"
+                : null}
+          onSelectPreset={selectDiscoverPreset}
+        />
       </div>
     </div>
   </BackHeader>
