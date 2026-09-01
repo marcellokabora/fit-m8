@@ -102,13 +102,6 @@
         <div class="flex-1">
           <p class="flex items-center gap-2 font-bold text-text">
             {t.t(feature.title)}
-            {#if feature.comingSoon}
-              <span
-                class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
-              >
-                {t.t("premium.comingSoon")}
-              </span>
-            {/if}
           </p>
           <p class="text-sm text-muted">{t.t(feature.hint, feature.params)}</p>
         </div>

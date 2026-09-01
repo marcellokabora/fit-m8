@@ -12,7 +12,7 @@
 
 <svelte:window onclick={() => (paletteOpen = false)} />
 
-<div class="pb-50">
+<div class="">
   <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
     {t.t("appearance.title")}
   </h3>
@@ -40,56 +40,58 @@
       </button>
     </div>
 
-    <div class="relative">
-      <button
-        type="button"
-        onclick={(e) => {
-          e.stopPropagation();
-          paletteOpen = !paletteOpen;
-        }}
-        aria-label={t.t("appearance.appTheme")}
-        aria-expanded={paletteOpen}
-        aria-haspopup="true"
-        class="flex h-full items-center rounded-xl border-2 border-border bg-bg px-3"
-      >
-        <span
-          class="size-6 rounded-full shadow-sm"
-          style="background: linear-gradient(135deg, {currentTheme.primary} 50%, {currentTheme.primaryDark} 50%);"
-        ></span>
-      </button>
-
-      {#if paletteOpen}
-        <div
-          role="menu"
-          tabindex="-1"
-          onclick={(e) => e.stopPropagation()}
-          onkeydown={(e) => e.stopPropagation()}
-          class="absolute right-0 top-full z-10 mt-2 flex gap-2 rounded-2xl border-2 border-border bg-surface p-3 shadow-lg"
+    {#if import.meta.env.DEV}
+      <div class="relative">
+        <button
+          type="button"
+          onclick={(e) => {
+            e.stopPropagation();
+            paletteOpen = !paletteOpen;
+          }}
+          aria-label={t.t("appearance.appTheme")}
+          aria-expanded={paletteOpen}
+          aria-haspopup="true"
+          class="flex h-full items-center rounded-xl border-2 border-border bg-bg px-3"
         >
-          {#each THEMES as theme}
-            <button
-              onclick={() => {
-                activeTheme.selectTheme(theme.id);
-                paletteOpen = false;
-              }}
-              aria-label={t.t(`appearance.${theme.id}` as any)}
-              class="relative flex size-10 items-center justify-center rounded-full shadow-sm transition-transform active:scale-95"
-              style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.primaryDark} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
-              'dark'
-                ? theme.dark.bg
-                : theme.light.bg}, 0 0 0 {$activeTheme.themeId === theme.id
-                ? '5px'
-                : '3px'} {$activeTheme.themeId === theme.id
-                ? theme.primary
-                : 'transparent'}"
-            >
-              {#if $activeTheme.themeId === theme.id}
-                <Check class="size-5 text-white drop-shadow" />
-              {/if}
-            </button>
-          {/each}
-        </div>
-      {/if}
-    </div>
+          <span
+            class="size-6 rounded-full shadow-sm"
+            style="background: linear-gradient(135deg, {currentTheme.primary} 50%, {currentTheme.primaryDark} 50%);"
+          ></span>
+        </button>
+
+        {#if paletteOpen}
+          <div
+            role="menu"
+            tabindex="-1"
+            onclick={(e) => e.stopPropagation()}
+            onkeydown={(e) => e.stopPropagation()}
+            class="absolute right-0 top-full z-10 mt-2 flex gap-2 rounded-2xl border-2 border-border bg-surface p-3 shadow-lg"
+          >
+            {#each THEMES as theme}
+              <button
+                onclick={() => {
+                  activeTheme.selectTheme(theme.id);
+                  paletteOpen = false;
+                }}
+                aria-label={t.t(`appearance.${theme.id}` as any)}
+                class="relative flex size-10 items-center justify-center rounded-full shadow-sm transition-transform active:scale-95"
+                style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.primaryDark} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
+                'dark'
+                  ? theme.dark.bg
+                  : theme.light.bg}, 0 0 0 {$activeTheme.themeId === theme.id
+                  ? '5px'
+                  : '3px'} {$activeTheme.themeId === theme.id
+                  ? theme.primary
+                  : 'transparent'}"
+              >
+                {#if $activeTheme.themeId === theme.id}
+                  <Check class="size-5 text-white drop-shadow" />
+                {/if}
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {/if}
   </div>
 </div>
