@@ -1,6 +1,10 @@
 <script lang="ts">
   import { get } from "svelte/store";
+  import { page } from "$app/state";
+  import { doc, getDoc } from "firebase/firestore";
+  import { db } from "$lib/firebase/client";
   import { authUser, userProfile } from "$lib/stores/auth";
+  import { isAdmin } from "$lib/stores/admin";
   import { MAX_SPORTS_FREE, MAX_SPORTS_PREMIUM } from "$lib/types";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import { Calendar, Crown, Dumbbell, MessageCircle } from "@lucide/svelte";
@@ -9,6 +13,8 @@
   let t = $derived(createTranslator($activeLanguage));
   let saving = $state(false);
   let error = $state("");
+  // Self-service signup is disabled for everyone except admins; a valid ?promo= code auto-grants instead.
+  let canRegisterMembership = $derived($isAdmin === true);
 
   const FEATURES = [
     {
@@ -52,6 +58,21 @@
       saving = false;
     }
   }
+
+  // Guards against re-checking the same ?promo= link on every reactive rerun once redemption has been attempted.
+  let promoChecked = $state(false);
+
+  // Reactive (not onMount-only) so a promo link still redeems once auth resolves, even if it
+  // resolves after this page has already mounted.
+  $effect(() => {
+    const promo = page.url.searchParams.get("promo");
+    const uid = $authUser?.uid;
+    if (!promo || !uid || promoChecked || $userProfile?.isPremium) return;
+    promoChecked = true;
+    getDoc(doc(db, "promoCodes", promo)).then((snap) => {
+      if (snap.exists() && snap.data().active !== false) setPremium(true);
+    });
+  });
 </script>
 
 <BackHeader title={t.t("premium.title")} />
@@ -114,10 +135,15 @@
   {:else}
     <button
       onclick={() => setPremium(true)}
-      disabled={saving}
+      disabled={saving || !canRegisterMembership}
       class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
     >
       {saving ? t.t("common.saving") : t.t("premium.subscribeButton")}
     </button>
+    {#if !canRegisterMembership}
+      <p class="text-center text-xs text-muted">
+        {t.t("premium.inviteOnlyHint")}
+      </p>
+    {/if}
   {/if}
 </div>

@@ -24,6 +24,7 @@
     GripVertical,
     Pencil,
     Plus,
+    QrCode,
     ShieldUser,
     Trash2,
     Users,
@@ -230,6 +231,13 @@
       >
         <Users class="size-4" />
         Users profiles
+      </a>
+      <a
+        href="/admin/promo-codes"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
+      >
+        <QrCode class="size-4" />
+        Promo codes
       </a>
     </div>
   {/if}
