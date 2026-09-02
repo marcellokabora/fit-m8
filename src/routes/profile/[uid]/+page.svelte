@@ -11,6 +11,7 @@
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import ProfileEditSheet from "$lib/components/ProfileEditSheet.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
+  import ActivityMatchPicker from "$lib/components/ActivityMatchPicker.svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import { recordSwipe, startDirectMessage } from "$lib/firebase/swipe";
@@ -102,20 +103,45 @@
     }
   });
 
+  let activityPickerOpen = $state(false);
+  let activityPickerOptions = $state<{ id: string }[]>([]);
+
+  function sharedActivities() {
+    return profile?.activities?.filter((a) => mySportIds.has(a.id)) ?? [];
+  }
+
   async function handleSwipe(direction: "like" | "pass") {
+    if (!profile || swiping) return;
+    if (direction === "pass") {
+      await completeSwipe("pass", []);
+      return;
+    }
+
+    // Picking which shared activity to connect on is mandatory whenever there's more than one
+    const shared = sharedActivities();
+    if (shared.length > 1) {
+      activityPickerOptions = shared;
+      activityPickerOpen = true;
+      return;
+    }
+    await completeSwipe(
+      "like",
+      shared.map((a) => a.id),
+    );
+  }
+
+  async function completeSwipe(
+    direction: "like" | "pass",
+    activities: string[],
+  ) {
     const currentUid = get(authUser)?.uid;
     if (!currentUid || !profile || swiping) return;
     swiping = true;
-    // Prefer an activity we share with them so the recorded swipe reflects what actually matched
-    const sharedActivity =
-      profile.activities?.find((a) => mySportIds.has(a.id)) ??
-      profile.activities?.[0];
     const isMatch = await recordSwipe(
       currentUid,
       profile.uid,
       direction,
-      sharedActivity?.id ?? "",
-      sharedActivity?.format ?? "all",
+      activities,
     );
     if (isMatch) {
       matchBanner = true;
@@ -123,6 +149,15 @@
     } else {
       goto("/discover");
     }
+  }
+
+  function confirmActivityPicker(selectedIds: string[]) {
+    activityPickerOpen = false;
+    completeSwipe("like", selectedIds);
+  }
+
+  function cancelActivityPicker() {
+    activityPickerOpen = false;
   }
 
   async function handleShare() {
@@ -162,16 +197,11 @@
     const currentUid = get(authUser)?.uid;
     if (!currentUid || !profile || messaging) return;
 
-    const sharedActivity =
-      profile.activities?.find((a) => mySportIds.has(a.id)) ??
-      profile.activities?.[0];
-
     messaging = true;
     const matchId = await startDirectMessage(
       currentUid,
       profile.uid,
-      sharedActivity?.id ?? "",
-      sharedActivity?.format ?? "all",
+      sharedActivities().map((a) => a.id),
       text,
     );
     messaging = false;
@@ -402,6 +432,13 @@
   sendLabel={t.t("common.send")}
   sendingLabel={t.t("common.sending")}
   closeLabel={t.t("common.close")}
+/>
+
+<ActivityMatchPicker
+  open={activityPickerOpen}
+  activities={activityPickerOptions}
+  onConfirm={confirmActivityPicker}
+  onCancel={cancelActivityPicker}
 />
 
 {#if matchBanner}

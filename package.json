@@ -14,6 +14,8 @@
 		"seed": "node scripts/seed.cjs",
 		"set-admin": "node scripts/set-admin.cjs",
 		"migrate-activity-ids": "node scripts/migrate-activity-ids.cjs",
+		"migrate-martial-arts": "node scripts/migrate-martial-arts-group.cjs",
+		"migrate-remove-badminton": "node scripts/migrate-remove-badminton.cjs",
 		"deploy:functions": "firebase deploy --only functions"
 	},
 	"devDependencies": {

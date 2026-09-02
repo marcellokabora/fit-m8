@@ -13,7 +13,7 @@
     getDoc,
   } from "firebase/firestore";
   import type { Match, UserProfile } from "$lib/types";
-  import { ACTIVITIES } from "$lib/types";
+  import { getMatchActivityIds } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { unreadMatches } from "$lib/stores/unread";
@@ -142,7 +142,7 @@
   {:else}
     <div class="flex flex-col gap-3 px-5">
       {#each sortedMatches as match}
-        {@const activity = ACTIVITIES.find((a) => a.id === match.activity)}
+        {@const matchActivityIds = getMatchActivityIds(match)}
         {@const otherUid = match.userIds.find((id) => id !== $authUser?.uid)}
         {@const other = otherUid ? otherUsers[otherUid] : undefined}
         {@const unread = $unreadMatches.has(match.id)}
@@ -173,11 +173,16 @@
                 />
               {/if}
             </p>
-            <p class="mt-1 flex items-center gap-1 text-sm text-muted truncate">
-              <ActivityIcon id={match.activity} class="size-3.5" />
-              {t.activity(match.activity)}{#if match.format !== "all"}
-                <span class="px-1">·</span>
-                {t.format(match.format)}{/if}
+            <p class="mt-1 flex items-center gap-1 text-sm text-muted min-w-0">
+              {#if matchActivityIds[0]}
+                <ActivityIcon
+                  id={matchActivityIds[0]}
+                  class="size-3.5 shrink-0"
+                />
+              {/if}
+              <span class="truncate"
+                >{matchActivityIds.map((id) => t.activity(id)).join(", ")}</span
+              >
             </p>
             {#if match.isDirectMessage}
               <span

@@ -16,7 +16,7 @@
     getDoc,
   } from "firebase/firestore";
   import type { Message, Match, ReportReason, UserProfile } from "$lib/types";
-  import { ACTIVITIES } from "$lib/types";
+  import { getMatchActivityIds } from "$lib/types";
   import { get } from "svelte/store";
   import { unmatch } from "$lib/firebase/swipe";
   import { submitReport } from "$lib/firebase/reports";
@@ -48,7 +48,7 @@
   let unsubscribeAuth: (() => void) | null = null;
   let otherUser = $state<UserProfile | null>(null);
   let match = $state<Match | null>(null);
-  let activity = $derived(ACTIVITIES.find((a) => a.id === match?.activity));
+  let matchActivityIds = $derived(match ? getMatchActivityIds(match) : []);
 
   let showMenu = $state(false);
   let confirmUnmatch = $state(false);
@@ -195,19 +195,28 @@
       {#if otherUser}
         <a
           href="/profile/{otherUser.uid}"
-          class="flex flex-1 items-center gap-3"
+          class="flex min-w-0 flex-1 items-center gap-3"
         >
           <img
             src={otherUser.photoURL}
             alt={otherUser.displayName}
             class="size-10 shrink-0 rounded-full object-cover"
           />
-          <div class="flex-1">
-            <p class="font-bold text-text">{otherUser.displayName}</p>
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-bold text-text">{otherUser.displayName}</p>
             {#if match}
-              <p class="flex items-center gap-1 text-xs text-muted">
-                <ActivityIcon id={match.activity} class="size-3" />
-                {t.activity(match.activity)} · {t.format(match.format)}
+              <p class="flex items-center gap-1 text-xs text-muted min-w-0">
+                {#if matchActivityIds[0]}
+                  <ActivityIcon
+                    id={matchActivityIds[0]}
+                    class="size-3 shrink-0"
+                  />
+                {/if}
+                <span class="truncate"
+                  >{matchActivityIds
+                    .map((id) => t.activity(id))
+                    .join(", ")}</span
+                >
               </p>
             {:else}
               <p class="text-xs text-muted">{matchId}</p>
@@ -215,12 +224,21 @@
           </div>
         </a>
       {:else}
-        <div class="flex-1">
-          <p class="font-bold text-text">{t.t("chat.fallbackTitle")}</p>
+        <div class="min-w-0 flex-1">
+          <p class="truncate font-bold text-text">
+            {t.t("chat.fallbackTitle")}
+          </p>
           {#if match}
-            <p class="flex items-center gap-1 text-xs text-muted">
-              <ActivityIcon id={match.activity} class="size-3" />
-              {t.activity(match.activity)} · {t.format(match.format)}
+            <p class="flex items-center gap-1 text-xs text-muted min-w-0">
+              {#if matchActivityIds[0]}
+                <ActivityIcon
+                  id={matchActivityIds[0]}
+                  class="size-3 shrink-0"
+                />
+              {/if}
+              <span class="truncate"
+                >{matchActivityIds.map((id) => t.activity(id)).join(", ")}</span
+              >
             </p>
           {/if}
         </div>

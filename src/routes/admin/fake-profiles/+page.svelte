@@ -53,6 +53,8 @@
   let saving = $state<Record<string, boolean>>({});
   let savedFlash = $state<Record<string, boolean>>({});
   let selectedSport = $state<string | null>(null);
+  let sportQuery = $state("");
+  let sportDropdownOpen = $state(false);
   let genderFilter = $state<Gender | "">("");
   let sortBy = $state<"name" | "age">("name");
   let selectedProfile = $state<UserProfile | null>(null);
@@ -106,6 +108,29 @@
         : a.displayName.localeCompare(b.displayName),
     );
   });
+
+  // Options shown in the sport autocomplete dropdown, narrowed by the typed query
+  let filteredSportOptions = $derived.by(() => {
+    const q = sportQuery.trim().toLowerCase();
+    if (!q) return sportCounts;
+    return sportCounts.filter(([id]) =>
+      activityLabel(id).toLowerCase().includes(q),
+    );
+  });
+
+  function pickSport(id: string | null) {
+    selectedSport = id;
+    sportQuery = id ? activityLabel(id) : "";
+    sportDropdownOpen = false;
+  }
+
+  // Delayed so a click on a dropdown option (onmousedown) registers before the input loses focus
+  function onSportInputBlur() {
+    setTimeout(() => {
+      sportDropdownOpen = false;
+      sportQuery = selectedSport ? activityLabel(selectedSport) : "";
+    }, 150);
+  }
 
   async function loadProfiles() {
     loading = true;
@@ -193,17 +218,45 @@
     </div>
   {:else}
     <div class="px-5 pb-4">
-      <select
-        bind:value={selectedSport}
-        class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text"
-      >
-        <option value={null}>All sports ({profiles.length})</option>
-        {#each sportCounts as [id, count]}
-          <option value={id}>
-            {count < 10 ? "⚠️ " : ""}{activityLabel(id)} · {count}
-          </option>
-        {/each}
-      </select>
+      <div class="relative">
+        <input
+          type="text"
+          bind:value={sportQuery}
+          oninput={() => (sportDropdownOpen = true)}
+          onfocus={() => (sportDropdownOpen = true)}
+          onblur={onSportInputBlur}
+          placeholder={`All activities (${profiles.length})`}
+          class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-muted"
+        />
+        {#if sportDropdownOpen}
+          <div
+            class="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-border bg-surface shadow-lg"
+          >
+            <button
+              type="button"
+              onmousedown={() => pickSport(null)}
+              class="block w-full px-3 py-2 text-left text-sm text-text hover:bg-bg"
+            >
+              All activities ({profiles.length})
+            </button>
+            {#each filteredSportOptions as [id, count]}
+              <button
+                type="button"
+                onmousedown={() => pickSport(id)}
+                class="block w-full px-3 py-2 text-left text-sm hover:bg-bg {selectedSport ===
+                id
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-text'}"
+              >
+                {count < 10 ? "⚠️ " : ""}{activityLabel(id)} · {count}
+              </button>
+            {/each}
+            {#if filteredSportOptions.length === 0}
+              <p class="px-3 py-2 text-sm text-muted">No matches</p>
+            {/if}
+          </div>
+        {/if}
+      </div>
       {#if selectedSport}
         <p class="mt-2 text-xs text-muted">
           Showing {filteredProfiles.length} of {profiles.length} profiles

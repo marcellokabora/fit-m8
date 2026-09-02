@@ -28,6 +28,7 @@
     GENDER_OPTIONS,
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
+    groupActivities,
     type ActivityFormat,
     type Gender,
     type SexualOrientation,
@@ -112,6 +113,7 @@
       )
       .filter((activity) => activity !== undefined),
   );
+  let groupedProfileActivities = $derived(groupActivities(profileActivities));
   let hasCoords = $derived(
     $userProfile?.lat !== undefined && $userProfile?.lng !== undefined,
   );
@@ -565,30 +567,37 @@
 
     <!-- Sport -->
     <p class="mb-2 text-sm font-bold text-muted">{t.t("common.sports")}</p>
-    <div class="grid grid-cols-2 gap-1">
-      <button
-        onclick={() => pickActivity("")}
-        class="col-span-2 flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.length ===
-        0
-          ? 'bg-primary text-white'
-          : 'text-text hover:bg-bg'}"
+    <button
+      onclick={() => pickActivity("")}
+      class="mb-2 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.length ===
+      0
+        ? 'bg-primary text-white'
+        : 'text-text hover:bg-bg'}"
+    >
+      {t.t("discover.allSports")}
+    </button>
+    {#each groupedProfileActivities as section}
+      <p
+        class="mb-1.5 mt-3 text-xs font-bold uppercase tracking-wide text-muted first:mt-0"
       >
-        {t.t("discover.allSports")}
-      </button>
-      {#each profileActivities as act}
-        <button
-          onclick={() => pickActivity(act.id)}
-          class="flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.includes(
-            act.id,
-          )
-            ? 'bg-primary text-white'
-            : 'text-text hover:bg-bg'}"
-        >
-          <ActivityIcon id={act.id} class="size-4 shrink-0" />
-          <span class="truncate">{t.activity(act.id)}</span>
-        </button>
-      {/each}
-    </div>
+        {section.group ? t.activityGroup(section.group) : t.t("common.other")}
+      </p>
+      <div class="grid grid-cols-2 gap-1">
+        {#each section.items as act}
+          <button
+            onclick={() => pickActivity(act.id)}
+            class="flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.includes(
+              act.id,
+            )
+              ? 'bg-primary text-white'
+              : 'text-text hover:bg-bg'}"
+          >
+            <ActivityIcon id={act.id} class="size-4 shrink-0" />
+            <span class="truncate">{t.activity(act.id)}</span>
+          </button>
+        {/each}
+      </div>
+    {/each}
   </div>
 
   <div class="border-t border-border bg-surface p-4">

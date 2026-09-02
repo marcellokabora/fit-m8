@@ -9,7 +9,6 @@
   import Cycling from "~icons/material-symbols/pedal-bike";
   import Swimming from "~icons/material-symbols/pool";
   import Hiking from "~icons/material-symbols/hiking";
-  import Badminton from "~icons/material-symbols/badminton";
   import PingPong from "~icons/mdi/table-tennis";
   import Pickleball from "~icons/material-symbols/pickleball";
   import Squash from "~icons/mdi/squash";
@@ -17,10 +16,22 @@
   import Gym from "~icons/material-symbols/sports-gymnastics";
   import Calisthenics from "~icons/mdi/arm-flex";
   import Yoga from "~icons/mdi/yoga";
+  import Pilates from "~icons/material-symbols/self-improvement";
+  import Meditation from "~icons/mdi/meditation";
+  import Breathwork from "~icons/mdi/lungs";
   import RockClimbing from "~icons/mdi/rock-climbing";
   import Golf from "~icons/material-symbols/sports-golf";
   import MartialArts from "~icons/material-symbols/sports-martial-arts";
+  import Boxing from "~icons/mdi/boxing-glove";
+  import Kickboxing from "~icons/mdi/kickboxing";
+  import Karate from "~icons/mdi/karate";
+  import Salsa from "~icons/mdi/human-female-dance";
+  import Bachata from "~icons/mdi/dance-ballroom";
+  import Barre from "~icons/mdi/ballet";
+  import PoleDance from "~icons/mdi/dance-pole";
+  import Trampoline from "~icons/mdi/gymnastics";
   import Paddleboard from "~icons/material-symbols/kayaking";
+  import Kayak from "~icons/mdi/kayaking";
   import Surf from "~icons/material-symbols/surfing";
   import Rollerblade from "~icons/material-symbols/roller-skating";
   import Skateboard from "~icons/material-symbols/skateboarding";
@@ -43,7 +54,6 @@
     cycling: Cycling,
     swimming: Swimming,
     hiking: Hiking,
-    badminton: Badminton,
     pingPong: PingPong,
     pickleball: Pickleball,
     squash: Squash,
@@ -51,10 +61,25 @@
     gym: Gym,
     calisthenics: Calisthenics,
     yoga: Yoga,
+    pilates: Pilates,
+    meditation: Meditation,
+    breathwork: Breathwork,
     rockClimbing: RockClimbing,
     golf: Golf,
-    martialArts: MartialArts,
+    boxing: Boxing,
+    kickboxing: Kickboxing,
+    muayThai: MartialArts,
+    karate: Karate,
+    jiuJitsu: MartialArts,
+    judo: MartialArts,
+    salsa: Salsa,
+    bachata: Bachata,
+    kizomba: Bachata,
+    barre: Barre,
+    poleDance: PoleDance,
+    trampoline: Trampoline,
     paddleboard: Paddleboard,
+    kayak: Kayak,
     surf: Surf,
     rollerblade: Rollerblade,
     skateboard: Skateboard,

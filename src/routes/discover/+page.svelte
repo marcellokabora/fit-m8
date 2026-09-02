@@ -22,6 +22,7 @@
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
+  import ActivityMatchPicker from "$lib/components/ActivityMatchPicker.svelte";
   import {
     authUser,
     userProfile,
@@ -434,8 +435,54 @@
 
   const EXIT_DURATION = 320;
 
+  // Activities the current user and the top candidate both practice, ranked so ones
+  // matching the active discover filter come first (mirrors the old auto-pick preference)
+  function sharedActivitiesWith(top: UserProfile) {
+    const myIds = new Set(($userProfile?.activities ?? []).map((a) => a.id));
+    const activityFilter = get(filterActivities);
+    const shared = top.activities.filter((a) => myIds.has(a.id));
+    if (activityFilter.length) {
+      shared.sort(
+        (a, b) =>
+          Number(!activityFilter.includes(a.id)) -
+          Number(!activityFilter.includes(b.id)),
+      );
+    }
+    return shared;
+  }
+
+  let activityPickerOpen = $state(false);
+  let activityPickerOptions = $state<{ id: string }[]>([]);
+
   async function swipe(direction: "like" | "pass") {
     if (exiting) return;
+    const top = users[0];
+    if (!top) return;
+
+    if (direction === "pass") {
+      await completeSwipe("pass", []);
+      return;
+    }
+
+    // Picking which shared activity to connect on is mandatory whenever there's more than one
+    const shared = sharedActivitiesWith(top);
+    if (shared.length > 1) {
+      activityPickerOptions = shared;
+      activityPickerOpen = true;
+      currentX = 0;
+      dragging = false;
+      return;
+    }
+    await completeSwipe(
+      "like",
+      shared.map((a) => a.id),
+    );
+  }
+
+  async function completeSwipe(
+    direction: "like" | "pass",
+    activities: string[],
+  ) {
     const uid = get(authUser)?.uid;
     const top = users[0];
     if (!uid || !top) return;
@@ -447,16 +494,8 @@
       (typeof window !== "undefined" ? window.innerWidth : 400) * 1.2;
     currentX = direction === "like" ? flyDistance : -flyDistance;
 
-    // Prefer a sport both users share that's actually in the active filter, falling back to their first shared sport
-    const activityFilter = get(filterActivities);
-    const activity =
-      top.activities.find((a) => activityFilter.includes(a.id))?.id ||
-      top.activities[0]?.id ||
-      "";
-    const format = get(filterFormat) || top.activities[0]?.format || "all";
-
     const [isMatch] = await Promise.all([
-      recordSwipe(uid, top.uid, direction, activity, format),
+      recordSwipe(uid, top.uid, direction, activities),
       new Promise((resolve) => setTimeout(resolve, EXIT_DURATION)),
     ]);
 
@@ -469,6 +508,16 @@
       matchBanner = true;
       setTimeout(() => (matchBanner = false), 3000);
     }
+  }
+
+  function confirmActivityPicker(selectedIds: string[]) {
+    activityPickerOpen = false;
+    completeSwipe("like", selectedIds);
+  }
+
+  function cancelActivityPicker() {
+    activityPickerOpen = false;
+    currentX = 0;
   }
 
   async function undoLastPass() {
@@ -485,8 +534,7 @@
   let messaging = $state(false);
   let messageTarget = $state<{
     uid: string;
-    activity: string;
-    format: ActivityFormat;
+    activities: string[];
   } | null>(null);
 
   async function handleMessage() {
@@ -499,14 +547,8 @@
       return;
     }
 
-    const activityFilter = get(filterActivities);
-    const activity =
-      top.activities.find((a) => activityFilter.includes(a.id))?.id ||
-      top.activities[0]?.id ||
-      "";
-    const format = get(filterFormat) || top.activities[0]?.format || "all";
-
-    messageTarget = { uid: top.uid, activity, format };
+    const shared = sharedActivitiesWith(top);
+    messageTarget = { uid: top.uid, activities: shared.map((a) => a.id) };
     showComposeSheet = true;
   }
 
@@ -518,8 +560,7 @@
     const matchId = await startDirectMessage(
       uid,
       messageTarget.uid,
-      messageTarget.activity,
-      messageTarget.format,
+      messageTarget.activities,
       text,
     );
     messaging = false;
@@ -908,4 +949,11 @@
   sendLabel={t.t("common.send")}
   sendingLabel={t.t("common.sending")}
   closeLabel={t.t("common.close")}
+/>
+
+<ActivityMatchPicker
+  open={activityPickerOpen}
+  activities={activityPickerOptions}
+  onConfirm={confirmActivityPicker}
+  onCancel={cancelActivityPicker}
 />

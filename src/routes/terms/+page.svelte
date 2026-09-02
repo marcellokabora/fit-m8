@@ -78,7 +78,7 @@
   <section class="flex flex-col gap-2">
     <h2 class="text-base font-bold text-text">5. Matching and no guarantee</h2>
     <p>
-      FIT-M8 helps you find potential sports partners based on the information
+      FIT-M8 helps you find potential activity partners based on the information
       you and other users provide. We do not guarantee that you will find a
       match, that matches will meet in person, or that other users' information
       is accurate. You are solely responsible for your interactions with other

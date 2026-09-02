@@ -27,13 +27,11 @@ export async function recordSwipe(
 	fromUid: string,
 	toUid: string,
 	direction: 'like' | 'pass',
-	activity: string,
-	format: ActivityFormat
+	activities: string[]
 ) {
 	await setDoc(doc(db, 'swipes', fromUid, 'sent', toUid), {
 		direction,
-		activity,
-		format,
+		activities,
 		timestamp: serverTimestamp()
 	});
 
@@ -41,21 +39,24 @@ export async function recordSwipe(
 		// Check if the other user already liked us back
 		const reverseSnap = await getDoc(doc(db, 'swipes', toUid, 'sent', fromUid));
 		if (reverseSnap.exists() && reverseSnap.data().direction === 'like') {
-			await createMatch(fromUid, toUid, activity, format);
+			// Prefer the activities both sides actually picked; fall back to this swipe's
+			// picks if the two selections don't overlap (or the other swipe predates this field)
+			const reverseActivities: string[] = reverseSnap.data().activities ?? [];
+			const shared = activities.filter((id) => reverseActivities.includes(id));
+			await createMatch(fromUid, toUid, shared.length ? shared : activities);
 			return true; // it's a match!
 		}
 	}
 	return false;
 }
 
-async function createMatch(uid1: string, uid2: string, activity: string, format: ActivityFormat) {
+async function createMatch(uid1: string, uid2: string, activities: string[]) {
 	const matchId = [uid1, uid2].sort().join('_');
 	await setDoc(
 		doc(db, 'matches', matchId),
 		{
 			userIds: [uid1, uid2],
-			activity,
-			format,
+			activities,
 			status: 'confirmed',
 			createdAt: serverTimestamp()
 		},
@@ -70,8 +71,7 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 export async function startDirectMessage(
 	fromUid: string,
 	toUid: string,
-	activity: string,
-	format: ActivityFormat,
+	activities: string[],
 	text: string
 ): Promise<string> {
 	const matchId = [fromUid, toUid].sort().join('_');
@@ -79,8 +79,7 @@ export async function startDirectMessage(
 	if (!existing.exists()) {
 		await setDoc(doc(db, 'matches', matchId), {
 			userIds: [fromUid, toUid],
-			activity,
-			format,
+			activities,
 			status: 'confirmed',
 			isDirectMessage: true,
 			createdAt: serverTimestamp()

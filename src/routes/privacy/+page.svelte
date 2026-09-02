@@ -31,7 +31,7 @@
       </li>
       <li>
         <strong>Profile information:</strong> display name, age, gender, sexual orientation,
-        bio, city, approximate location coordinates, profile photos, sports/activities,
+        bio, city, approximate location coordinates, profile photos, activities,
         skill level, and status (e.g. single, trainer).
       </li>
       <li>
@@ -58,7 +58,7 @@
       <li>To create and maintain your account and profile.</li>
       <li>
         To show your profile to other users and suggest potential matches based
-        on shared sports, preferences, and distance.
+        on shared activities, preferences, and distance.
       </li>
       <li>To enable matching and messaging between matched users.</li>
       <li>

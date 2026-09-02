@@ -32,33 +32,77 @@ export const GENDER_OPTIONS = [
 
 export type Gender = (typeof GENDER_OPTIONS)[number]['value'];
 
+// Groups of related activities, used to organize sport-picker UIs into labeled sections.
+// Only activities that opt in via `group` below are sectioned; the rest render ungrouped.
+export const ACTIVITY_GROUPS = [
+	{ id: 'racquet' },
+	{ id: 'fitness' },
+	{ id: 'beach' },
+	{ id: 'wheelSkate' },
+	{ id: 'mindBody' },
+	{ id: 'water' },
+	{ id: 'danceArts' },
+	{ id: 'combat' }
+] as const;
+
+export type ActivityGroupId = (typeof ACTIVITY_GROUPS)[number]['id'];
+
 export const ACTIVITIES = [
 	{ id: 'jogging', label: 'Jogging', emoji: '🏃' },
-	{ id: 'padel', label: 'Padel', emoji: '🎾' },
-	{ id: 'tennis', label: 'Tennis', emoji: '🎾' },
-	{ id: 'beachVolley', label: 'Beach Volley', emoji: '🏐' },
-	{ id: 'footvolley', label: 'Foot Volley', emoji: '🏐' },
+	{ id: 'padel', label: 'Padel', emoji: '🎾', group: 'racquet' },
+	{ id: 'tennis', label: 'Tennis', emoji: '🎾', group: 'racquet' },
+	{ id: 'beachVolley', label: 'Beach Volley', emoji: '🏐', group: 'beach' },
+	{ id: 'footvolley', label: 'Foot Volley', emoji: '🏐', group: 'beach' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀' },
 	{ id: 'soccer', label: 'Football', emoji: '⚽' },
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },
-	{ id: 'swimming', label: 'Swimming', emoji: '🏊' },
+	{ id: 'swimming', label: 'Swimming', emoji: '🏊', group: 'water' },
 	{ id: 'hiking', label: 'Hiking', emoji: '🥾' },
-	{ id: 'badminton', label: 'Badminton', emoji: '🏸' },
-	{ id: 'pingPong', label: 'Ping Pong', emoji: '🏓' },
-	{ id: 'pickleball', label: 'Pickleball', emoji: '🥒' },
-	{ id: 'squash', label: 'Squash', emoji: '📦' },
-	{ id: 'frescobol', label: 'Frescobol', emoji: '🏖️' },
-	{ id: 'gym', label: 'Gym Training', emoji: '💪' },
-	{ id: 'calisthenics', label: 'Calisthenics', emoji: '🤸' },
-	{ id: 'yoga', label: 'Yoga', emoji: '🧘' },
+	{ id: 'pingPong', label: 'Ping Pong', emoji: '🏓', group: 'racquet' },
+	{ id: 'pickleball', label: 'Pickleball', emoji: '🥒', group: 'racquet' },
+	{ id: 'squash', label: 'Squash', emoji: '📦', group: 'racquet' },
+	{ id: 'frescobol', label: 'Frescobol', emoji: '🏖️', group: 'racquet' },
+	{ id: 'gym', label: 'Gym Training', emoji: '💪', group: 'fitness' },
+	{ id: 'calisthenics', label: 'Calisthenics', emoji: '🤸', group: 'fitness' },
+	{ id: 'yoga', label: 'Yoga', emoji: '🧘', group: 'mindBody' },
+	{ id: 'pilates', label: 'Pilates', emoji: '🤍', group: 'mindBody' },
+	{ id: 'meditation', label: 'Meditation', emoji: '🧘‍♂️', group: 'mindBody' },
+	{ id: 'breathwork', label: 'Breathwork', emoji: '🫁', group: 'mindBody' },
 	{ id: 'rockClimbing', label: 'Rock Climbing', emoji: '🧗' },
 	{ id: 'golf', label: 'Golf', emoji: '⛳' },
-	{ id: 'martialArts', label: 'Martial Arts', emoji: '🥋' },
-	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶' }, { id: 'surf', label: 'Surfing', emoji: '🏄' }, { id: 'rollerblade', label: 'Rollerblading', emoji: '🛼' },
-	{ id: 'skateboard', label: 'Skateboarding', emoji: '🛹' }
+	{ id: 'boxing', label: 'Boxing', emoji: '🥊', group: 'combat' },
+	{ id: 'kickboxing', label: 'Kickboxing', emoji: '🥋', group: 'combat' },
+	{ id: 'muayThai', label: 'Muay Thai', emoji: '🥊', group: 'combat' },
+	{ id: 'karate', label: 'Karate', emoji: '🥋', group: 'combat' },
+	{ id: 'jiuJitsu', label: 'Jiu-Jitsu', emoji: '🤼', group: 'combat' },
+	{ id: 'judo', label: 'Judo', emoji: '🥋', group: 'combat' },
+	{ id: 'salsa', label: 'Salsa', emoji: '💃', group: 'danceArts' },
+	{ id: 'bachata', label: 'Bachata', emoji: '🕺', group: 'danceArts' },
+	{ id: 'kizomba', label: 'Kizomba', emoji: '💑', group: 'danceArts' },
+	{ id: 'barre', label: 'Barre', emoji: '🩰', group: 'danceArts' },
+	{ id: 'poleDance', label: 'Pole Dance', emoji: '💫', group: 'danceArts' },
+	{ id: 'trampoline', label: 'Trampolining', emoji: '🤸‍♀️', group: 'danceArts' },
+	{ id: 'paddleboard', label: 'Paddleboard', emoji: '🛶', group: 'water' }, { id: 'surf', label: 'Surfing', emoji: '🏄', group: 'water' }, { id: 'rollerblade', label: 'Rollerblading', emoji: '🛼', group: 'wheelSkate' },
+	{ id: 'kayak', label: 'Kayak', emoji: '🚣', group: 'water' },
+	{ id: 'skateboard', label: 'Skateboarding', emoji: '🛹', group: 'wheelSkate' }
 ] as const;
 
 export type ActivityId = (typeof ACTIVITIES)[number]['id'];
+
+// Buckets activities into their ACTIVITY_GROUPS section (in group order), followed by a
+// trailing null-group bucket for activities that don't belong to any group yet.
+export function groupActivities<T extends { id: string; group?: ActivityGroupId }>(
+	activities: readonly T[]
+): { group: ActivityGroupId | null; items: T[] }[] {
+	const sections: { group: ActivityGroupId | null; items: T[] }[] = [];
+	for (const { id } of ACTIVITY_GROUPS) {
+		const items = activities.filter((a) => a.group === id);
+		if (items.length) sections.push({ group: id, items });
+	}
+	const ungrouped = activities.filter((a) => !a.group);
+	if (ungrouped.length) sections.push({ group: null, items: ungrouped });
+	return sections;
+}
 
 export interface UserActivity {
 	id: ActivityId | string;
@@ -154,16 +198,16 @@ export interface UserProfile {
 
 export interface Swipe {
 	direction: SwipeDirection;
-	activity: string;
-	format: ActivityFormat;
+	// activities the swiper explicitly picked to connect on (mandatory when there's more than one shared)
+	activities: string[];
 	timestamp: Date;
 }
 
 export interface Match {
 	id: string;
 	userIds: string[];
-	activity: string;
-	format: ActivityFormat;
+	// activities both users share and chose to connect/chat about
+	activities: string[];
 	status: MatchStatus;
 	createdAt: Date;
 	lastMessage?: string;
@@ -173,6 +217,13 @@ export interface Match {
 	readBy?: Record<string, Date>;
 	// true when created via a Premium user's "message directly" action instead of a mutual swipe like
 	isDirectMessage?: boolean;
+}
+
+// Reads activity ids off a match/swipe doc, falling back to the legacy single `activity` field
+// for documents written before multi-activity selection existed.
+export function getMatchActivityIds(doc: { activities?: string[]; activity?: string }): string[] {
+	if (doc.activities?.length) return doc.activities;
+	return doc.activity ? [doc.activity] : [];
 }
 
 export interface Message {

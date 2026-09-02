@@ -7,6 +7,7 @@
   import {
     ACTIVITIES,
     getMaxSports,
+    groupActivities,
     type ActivityFormat,
     type SkillLevel,
   } from "$lib/types";
@@ -33,6 +34,7 @@
         )
       : availableActivities,
   );
+  let groupedFiltered = $derived(groupActivities(filtered));
 
   function toggle(id: string) {
     if (selectedIds.includes(id)) {
@@ -74,7 +76,7 @@
         class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
       />
       <input
-        type="text"
+        type="search"
         bind:value={query}
         placeholder={t.t("common.search")}
         class="w-full rounded-2xl border-2 border-border bg-surface py-2.5 pl-9 pr-3 text-sm font-semibold text-text placeholder:text-muted focus:border-primary focus:outline-none"
@@ -88,23 +90,30 @@
         {t.t("common.noResults")}
       </p>
     {:else}
-      <div class="grid grid-cols-2 gap-2 pt-1">
-        {#each filtered as activity}
-          {@const selected = selectedIds.includes(activity.id)}
-          <button
-            onclick={() => toggle(activity.id)}
-            disabled={!selected && selectedIds.length >= remainingSlots}
-            class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 disabled:opacity-40 {selected
-              ? 'border-primary bg-primary/10'
-              : 'border-border bg-surface'}"
-          >
-            <ActivityIcon id={activity.id} class="size-6 text-primary" />
-            <span class="text-xs font-semibold text-text"
-              >{t.activity(activity.id)}</span
+      {#each groupedFiltered as section}
+        <p
+          class="mb-2 mt-4 text-xs font-bold uppercase tracking-wide text-muted first:mt-1"
+        >
+          {section.group ? t.activityGroup(section.group) : t.t("common.other")}
+        </p>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          {#each section.items as activity}
+            {@const selected = selectedIds.includes(activity.id)}
+            <button
+              onclick={() => toggle(activity.id)}
+              disabled={!selected && selectedIds.length >= remainingSlots}
+              class="flex flex-col items-center gap-2 rounded-2xl border-2 py-4 transition-all active:scale-95 disabled:opacity-40 {selected
+                ? 'border-primary bg-primary/10'
+                : 'border-border bg-surface'}"
             >
-          </button>
-        {/each}
-      </div>
+              <ActivityIcon id={activity.id} class="size-6 text-primary" />
+              <span class="text-xs font-semibold text-text"
+                >{t.activity(activity.id)}</span
+              >
+            </button>
+          {/each}
+        </div>
+      {/each}
     {/if}
   </div>
 
