@@ -61,16 +61,12 @@
 </script>
 
 <svelte:head>
+  <!-- title/description: static English fallbacks already live in src/app.html for
+       crawlers (this app is ssr=false, so they never see these); these just localize
+       them for actual visitors once JS hydrates. og:/twitter: tags are intentionally NOT
+       duplicated here since link-preview bots can't see them anyway in a pure SPA. -->
   <title>FIT-M8</title>
   <meta name="description" content={t.t("meta.description")} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="FIT-M8" />
-  <meta property="og:title" content="FIT-M8" />
-  <meta property="og:description" content={t.t("meta.description")} />
-  <meta property="og:url" content={page.url.origin} />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="FIT-M8" />
-  <meta name="twitter:description" content={t.t("meta.description")} />
   {#if import.meta.env.PROD}
     <!-- manifest is only generated/served by vite-plugin-pwa in production builds -->
     <link rel="manifest" href="/manifest.webmanifest" />
