@@ -11,7 +11,6 @@
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import ProfileEditSheet from "$lib/components/ProfileEditSheet.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
-  import ActivityMatchPicker from "$lib/components/ActivityMatchPicker.svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import { recordSwipe, startDirectMessage } from "$lib/firebase/swipe";
@@ -103,9 +102,6 @@
     }
   });
 
-  let activityPickerOpen = $state(false);
-  let activityPickerOptions = $state<{ id: string }[]>([]);
-
   function sharedActivities() {
     return profile?.activities?.filter((a) => mySportIds.has(a.id)) ?? [];
   }
@@ -117,13 +113,7 @@
       return;
     }
 
-    // Picking which shared activity to connect on is mandatory whenever there's more than one
     const shared = sharedActivities();
-    if (shared.length > 1) {
-      activityPickerOptions = shared;
-      activityPickerOpen = true;
-      return;
-    }
     await completeSwipe(
       "like",
       shared.map((a) => a.id),
@@ -149,15 +139,6 @@
     } else {
       goto("/discover");
     }
-  }
-
-  function confirmActivityPicker(selectedIds: string[]) {
-    activityPickerOpen = false;
-    completeSwipe("like", selectedIds);
-  }
-
-  function cancelActivityPicker() {
-    activityPickerOpen = false;
   }
 
   async function handleShare() {
@@ -432,13 +413,6 @@
   sendLabel={t.t("common.send")}
   sendingLabel={t.t("common.sending")}
   closeLabel={t.t("common.close")}
-/>
-
-<ActivityMatchPicker
-  open={activityPickerOpen}
-  activities={activityPickerOptions}
-  onConfirm={confirmActivityPicker}
-  onCancel={cancelActivityPicker}
 />
 
 {#if matchBanner}

@@ -37,12 +37,12 @@ export type Gender = (typeof GENDER_OPTIONS)[number]['value'];
 export const ACTIVITY_GROUPS = [
 	{ id: 'racquet' },
 	{ id: 'fitness' },
-	{ id: 'beach' },
-	{ id: 'wheelSkate' },
+	{ id: 'ballSports' },
 	{ id: 'mindBody' },
 	{ id: 'water' },
 	{ id: 'danceArts' },
-	{ id: 'combat' }
+	{ id: 'combat' },
+	{ id: 'wheelSkate' },
 ] as const;
 
 export type ActivityGroupId = (typeof ACTIVITY_GROUPS)[number]['id'];
@@ -51,10 +51,10 @@ export const ACTIVITIES = [
 	{ id: 'jogging', label: 'Jogging', emoji: '🏃' },
 	{ id: 'padel', label: 'Padel', emoji: '🎾', group: 'racquet' },
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾', group: 'racquet' },
-	{ id: 'beachVolley', label: 'Beach Volley', emoji: '🏐', group: 'beach' },
-	{ id: 'footvolley', label: 'Foot Volley', emoji: '🏐', group: 'beach' },
-	{ id: 'basketball', label: 'Basketball', emoji: '🏀' },
-	{ id: 'soccer', label: 'Football', emoji: '⚽' },
+	{ id: 'beachVolley', label: 'Beach Volley', emoji: '🏐', group: 'ballSports' },
+	{ id: 'footvolley', label: 'Foot Volley', emoji: '🏐', group: 'ballSports' },
+	{ id: 'basketball', label: 'Basketball', emoji: '🏀', group: 'ballSports' },
+	{ id: 'soccer', label: 'Football', emoji: '⚽', group: 'ballSports' },
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },
 	{ id: 'swimming', label: 'Swimming', emoji: '🏊', group: 'water' },
 	{ id: 'hiking', label: 'Hiking', emoji: '🥾' },
@@ -64,6 +64,10 @@ export const ACTIVITIES = [
 	{ id: 'frescobol', label: 'Frescobol', emoji: '🏖️', group: 'racquet' },
 	{ id: 'gym', label: 'Gym Training', emoji: '💪', group: 'fitness' },
 	{ id: 'calisthenics', label: 'Calisthenics', emoji: '🤸', group: 'fitness' },
+	{ id: 'bodybuilding', label: 'Bodybuilding', emoji: '🏋️', group: 'fitness' },
+	{ id: 'crossTraining', label: 'Cross-training', emoji: '🔥', group: 'fitness' },
+	{ id: 'functionalFitness', label: 'Functional Fitness', emoji: '⚡', group: 'fitness' },
+	{ id: 'bootCamp', label: 'Bootcamp', emoji: '🏕️', group: 'fitness' },
 	{ id: 'yoga', label: 'Yoga', emoji: '🧘', group: 'mindBody' },
 	{ id: 'pilates', label: 'Pilates', emoji: '🤍', group: 'mindBody' },
 	{ id: 'meditation', label: 'Meditation', emoji: '🧘‍♂️', group: 'mindBody' },

@@ -22,6 +22,14 @@
       distanceKm($userProfile.lat, $userProfile.lng, user.lat, user.lng),
     );
   });
+
+  // Shared activities first, so they're not pushed out by the 4-badge cap
+  let sortedActivities = $derived.by(() => {
+    const myIds = new Set(($userProfile?.activities ?? []).map((a) => a.id));
+    return [...(user.activities ?? [])].sort(
+      (a, b) => Number(!myIds.has(a.id)) - Number(!myIds.has(b.id)),
+    );
+  });
 </script>
 
 <div class="shrink-0 p-5">
@@ -70,10 +78,10 @@
         class="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
       >
         <UserShield class="size-3.5" />
-        {t.t("profile.trainer")}
+        <!-- {t.t("profile.trainer")} -->
       </span>
     {/if}
-    {#each (user.activities ?? []).slice(0, 4) as act}
+    {#each sortedActivities.slice(0, 4) as act}
       <span
         class="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
       >

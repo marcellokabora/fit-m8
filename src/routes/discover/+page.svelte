@@ -22,7 +22,6 @@
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
-  import ActivityMatchPicker from "$lib/components/ActivityMatchPicker.svelte";
   import {
     authUser,
     userProfile,
@@ -451,9 +450,6 @@
     return shared;
   }
 
-  let activityPickerOpen = $state(false);
-  let activityPickerOptions = $state<{ id: string }[]>([]);
-
   async function swipe(direction: "like" | "pass") {
     if (exiting) return;
     const top = users[0];
@@ -464,15 +460,7 @@
       return;
     }
 
-    // Picking which shared activity to connect on is mandatory whenever there's more than one
     const shared = sharedActivitiesWith(top);
-    if (shared.length > 1) {
-      activityPickerOptions = shared;
-      activityPickerOpen = true;
-      currentX = 0;
-      dragging = false;
-      return;
-    }
     await completeSwipe(
       "like",
       shared.map((a) => a.id),
@@ -508,16 +496,6 @@
       matchBanner = true;
       setTimeout(() => (matchBanner = false), 3000);
     }
-  }
-
-  function confirmActivityPicker(selectedIds: string[]) {
-    activityPickerOpen = false;
-    completeSwipe("like", selectedIds);
-  }
-
-  function cancelActivityPicker() {
-    activityPickerOpen = false;
-    currentX = 0;
   }
 
   async function undoLastPass() {
@@ -949,11 +927,4 @@
   sendLabel={t.t("common.send")}
   sendingLabel={t.t("common.sending")}
   closeLabel={t.t("common.close")}
-/>
-
-<ActivityMatchPicker
-  open={activityPickerOpen}
-  activities={activityPickerOptions}
-  onConfirm={confirmActivityPicker}
-  onCancel={cancelActivityPicker}
 />

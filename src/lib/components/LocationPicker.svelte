@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MapPin, Loader2, Pencil } from "@lucide/svelte";
+  import { Check, MapPin, Loader2, Pencil } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import {
     BARCELONA_LAT,
@@ -125,9 +125,10 @@
         type="button"
         onclick={saveManualCity}
         disabled={!manualCity.trim()}
-        class="shrink-0 rounded-2xl bg-primary px-4 py-4 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+        aria-label={t.t("common.save")}
+        class="shrink-0 rounded-2xl bg-primary absolute right-11 p-4 text-white active:scale-95 disabled:opacity-40"
       >
-        {t.t("common.save")}
+        <Check class="size-5" />
       </button>
     </div>
   {:else if city}

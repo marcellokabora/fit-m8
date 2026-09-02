@@ -9,12 +9,18 @@
   import basketballImg from "$lib/assets/homepage/bascketball.jpg?enhanced";
   import cyclingImg from "$lib/assets/homepage/cycling.jpg?enhanced";
   import beachVolleyImg from "$lib/assets/homepage/beachvolley.jpg?enhanced";
+  import boxingImg from "$lib/assets/homepage/boxing.jpg?enhanced";
+  import surfImg from "$lib/assets/homepage/surf.jpg?enhanced";
+  import soccerImg from "$lib/assets/homepage/football.jpg?enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
 
   let { shuffle = false }: { shuffle?: boolean } = $props();
 
   const ACTIVITIES = [
+    { id: "soccer" },
+    { id: "surf" },
+    { id: "boxing" },
     { id: "tennis" },
     { id: "footvolley" },
     { id: "jogging" },
@@ -62,6 +68,9 @@
     basketball: basketballImg,
     cycling: cyclingImg,
     beachVolley: beachVolleyImg,
+    boxing: boxingImg,
+    surf: surfImg,
+    soccer: soccerImg,
   };
   const FALLBACK_IMAGES = [
     joggingImg,

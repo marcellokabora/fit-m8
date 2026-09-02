@@ -17,7 +17,7 @@ into categories:
   Karate, Krav Maga
 - **Cycling & Mobility** — Indoor Cycling/Spinning, Outdoor Cycling, Mobility Workouts
 - **Dance & Movement** — Salsa, Bachata, Hip Hop, Contemporary Dance, Barre, Trampolining
-- **Fitness & Strength** — Gym Open Training, Functional Training, Cross-training, Bootcamp,
+- **Fitness & Strength** — Gym Open Training, Functional Fitness, Cross-training, Bootcamp,
   Bodybuilding, Calisthenics
 - **Mind & Body** — Yoga, Pilates, Meditation, Breathwork
 - **Outdoor & Adventure** — Beach Volleyball, Bouldering, Rock Climbing, Running, Hiking,
@@ -63,10 +63,10 @@ groups above. Entries with no `ActivityId` are not yet tracked as activities in 
 | Dance & Movement      | Barre                   | —                   |
 | Dance & Movement      | Trampolining            | —                   |
 | Fitness & Strength    | Gym Open Training       | `gym`               |
-| Fitness & Strength    | Functional Training     | —                   |
-| Fitness & Strength    | Cross-training          | —                   |
-| Fitness & Strength    | Bootcamp                | —                   |
-| Fitness & Strength    | Bodybuilding            | —                   |
+| Fitness & Strength    | Functional Fitness      | `functionalFitness` |
+| Fitness & Strength    | Cross-training          | `crossTraining`     |
+| Fitness & Strength    | Bootcamp                | `bootCamp`          |
+| Fitness & Strength    | Bodybuilding            | `bodybuilding`      |
 | Fitness & Strength    | Calisthenics            | `calisthenics`      |
 | Mind & Body           | Yoga                    | `yoga`              |
 | Mind & Body           | Pilates                 | —                   |

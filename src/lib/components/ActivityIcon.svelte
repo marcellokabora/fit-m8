@@ -15,6 +15,10 @@
   import Frescobol from "~icons/mdi/racquetball";
   import Gym from "~icons/material-symbols/sports-gymnastics";
   import Calisthenics from "~icons/mdi/arm-flex";
+  import Bodybuilding from "~icons/mdi/dumbbell";
+  import CrossTraining from "~icons/material-symbols/fitness-center";
+  import FunctionalFitness from "~icons/material-symbols/exercise";
+  import BootCamp from "~icons/mdi/whistle";
   import Yoga from "~icons/mdi/yoga";
   import Pilates from "~icons/material-symbols/self-improvement";
   import Meditation from "~icons/mdi/meditation";
@@ -25,6 +29,7 @@
   import Boxing from "~icons/mdi/boxing-glove";
   import Kickboxing from "~icons/mdi/kickboxing";
   import Karate from "~icons/mdi/karate";
+  import Mma from "~icons/mdi/mma";
   import Salsa from "~icons/mdi/human-female-dance";
   import Bachata from "~icons/mdi/dance-ballroom";
   import Barre from "~icons/mdi/ballet";
@@ -60,6 +65,10 @@
     frescobol: Frescobol,
     gym: Gym,
     calisthenics: Calisthenics,
+    bodybuilding: Bodybuilding,
+    crossTraining: CrossTraining,
+    functionalFitness: FunctionalFitness,
+    bootCamp: BootCamp,
     yoga: Yoga,
     pilates: Pilates,
     meditation: Meditation,
@@ -72,6 +81,7 @@
     karate: Karate,
     jiuJitsu: MartialArts,
     judo: MartialArts,
+    mma: Mma,
     salsa: Salsa,
     bachata: Bachata,
     kizomba: Bachata,
