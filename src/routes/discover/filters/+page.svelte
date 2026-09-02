@@ -529,16 +529,16 @@
       ></div>
       <div
         class="absolute inset-y-0 left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary"
-        style="width: {((Math.min(distanceDraft ?? 30, 30) - 1) / (30 - 1)) *
+        style="width: {((Math.min(distanceDraft ?? 10, 10) - 1) / (10 - 1)) *
           100}%;"
       ></div>
       <input
         type="range"
         min="1"
-        max="30"
+        max="10"
         step="1"
         disabled={!hasCoords}
-        value={distanceDraft ?? 30}
+        value={distanceDraft ?? 10}
         oninput={(e) => {
           distanceDraft = Number((e.currentTarget as HTMLInputElement).value);
         }}

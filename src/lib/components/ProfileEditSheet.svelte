@@ -48,6 +48,8 @@
     };
   }
 
+  // one-time snapshot at mount; component is remounted via {#if} each time it opens
+  // svelte-ignore state_referenced_locally
   let draft = $state(draftOf(profile));
   let saving = $state(false);
   let saved = $state(false);

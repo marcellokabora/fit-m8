@@ -21,7 +21,7 @@ import type {
 	UserProfile,
 	YesNoFilter
 } from '$lib/types';
-import { distanceKm } from '$lib/location';
+import { distanceKm, nearbyFakeLocation } from '$lib/location';
 
 export async function recordSwipe(
 	fromUid: string,
@@ -162,6 +162,12 @@ export async function getDiscoverFeed(
 		if (singleFilter === 'no' && data.isSingle) continue;
 		if (trainerFilter === 'yes' && !data.isTrainer) continue;
 		if (trainerFilter === 'no' && data.isTrainer) continue;
+
+		// Fake seed accounts keep a fixed seeded location in Firestore, but every real user should
+		// see them nearby instead of all sharing that same fixed spot — override at read time.
+		if (hasOrigin && d.id.startsWith('fake_')) {
+			Object.assign(data, nearbyFakeLocation(currentCoords.lat!, currentCoords.lng!, d.id));
+		}
 
 		// Distance filter only applies when we know both locations; candidates without
 		// coordinates can't be verified as out of range, so they're kept rather than dropped.

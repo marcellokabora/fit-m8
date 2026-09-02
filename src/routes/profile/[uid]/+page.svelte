@@ -14,7 +14,7 @@
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import { recordSwipe, startDirectMessage } from "$lib/firebase/swipe";
-  import { distanceKm } from "$lib/location";
+  import { distanceKm, nearbyFakeLocation } from "$lib/location";
   import {
     MapPin,
     LoaderCircle,
@@ -89,6 +89,18 @@
     getDoc(doc(db, "users", uid)).then((snap) => {
       if (snap.exists()) {
         profile = { uid, ...(snap.data() as Omit<UserProfile, "uid">) };
+        // Fake seed accounts keep a fixed seeded location in Firestore; show it as nearby instead.
+        const viewer = get(userProfile);
+        if (
+          uid.startsWith("fake_") &&
+          viewer?.lat !== undefined &&
+          viewer?.lng !== undefined
+        ) {
+          Object.assign(
+            profile,
+            nearbyFakeLocation(viewer.lat, viewer.lng, uid),
+          );
+        }
       } else {
         notFound = true;
       }

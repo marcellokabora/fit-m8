@@ -15,7 +15,7 @@
 
   let t = $derived(createTranslator($activeLanguage));
 
-  let { shuffle = false }: { shuffle?: boolean } = $props();
+  let { shuffle = true }: { shuffle?: boolean } = $props();
 
   const ACTIVITIES = [
     { id: "soccer" },
