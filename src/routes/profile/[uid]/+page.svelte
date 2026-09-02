@@ -10,6 +10,7 @@
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import ProfileEditSheet from "$lib/components/ProfileEditSheet.svelte";
+  import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import { recordSwipe, startDirectMessage } from "$lib/firebase/swipe";
@@ -143,6 +144,7 @@
   }
 
   let messaging = $state(false);
+  let showComposeSheet = $state(false);
 
   async function handleMessage() {
     const currentUid = get(authUser)?.uid;
@@ -152,6 +154,13 @@
       showMessageModal = true;
       return;
     }
+
+    showComposeSheet = true;
+  }
+
+  async function handleSendDirectMessage(text: string) {
+    const currentUid = get(authUser)?.uid;
+    if (!currentUid || !profile || messaging) return;
 
     const sharedActivity =
       profile.activities?.find((a) => mySportIds.has(a.id)) ??
@@ -163,8 +172,10 @@
       profile.uid,
       sharedActivity?.id ?? "",
       sharedActivity?.format ?? "all",
+      text,
     );
     messaging = false;
+    showComposeSheet = false;
     goto(`/chat/${matchId}`);
   }
 </script>
@@ -380,6 +391,18 @@
     </div>
   </div>
 {/if}
+
+<MessageComposeSheet
+  bind:open={showComposeSheet}
+  sending={messaging}
+  onSubmit={handleSendDirectMessage}
+  title={t.t("premium.composeMessageTitle")}
+  hint={t.t("premium.composeMessageHint")}
+  placeholder={t.t("chat.placeholder")}
+  sendLabel={t.t("common.send")}
+  sendingLabel={t.t("common.sending")}
+  closeLabel={t.t("common.close")}
+/>
 
 {#if matchBanner}
   <div

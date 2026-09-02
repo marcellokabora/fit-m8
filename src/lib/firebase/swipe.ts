@@ -4,6 +4,7 @@ import {
 	deleteDoc,
 	setDoc,
 	getDoc,
+	addDoc,
 	query,
 	where,
 	getDocs,
@@ -64,12 +65,14 @@ async function createMatch(uid1: string, uid2: string, activity: string, format:
 
 // Premium-only: lets a user contact someone directly without a mutual swipe match first.
 // Reuses the match doc if one already exists (e.g. they matched normally too), otherwise
-// creates one tagged `isDirectMessage` so it stands out in the matches list.
+// creates one tagged `isDirectMessage` so it stands out in the matches list. The match is
+// only created once the composed message is actually sent, so browsing never creates a match.
 export async function startDirectMessage(
 	fromUid: string,
 	toUid: string,
 	activity: string,
-	format: ActivityFormat
+	format: ActivityFormat,
+	text: string
 ): Promise<string> {
 	const matchId = [fromUid, toUid].sort().join('_');
 	const existing = await getDoc(doc(db, 'matches', matchId));
@@ -83,6 +86,21 @@ export async function startDirectMessage(
 			createdAt: serverTimestamp()
 		});
 	}
+	await addDoc(collection(db, 'chats', matchId, 'messages'), {
+		senderId: fromUid,
+		text,
+		timestamp: serverTimestamp()
+	});
+	await setDoc(
+		doc(db, 'matches', matchId),
+		{
+			lastMessage: text,
+			lastMessageAt: serverTimestamp(),
+			lastMessageSenderId: fromUid,
+			[`readBy.${fromUid}`]: serverTimestamp()
+		},
+		{ merge: true }
+	);
 	return matchId;
 }
 

@@ -21,6 +21,7 @@
   import Loading from "$lib/components/Loading.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
+  import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
   import {
     authUser,
     userProfile,
@@ -44,6 +45,7 @@
   import {
     ACTIVITIES,
     DEFAULT_DISTANCE_KM,
+    type ActivityFormat,
     type DiscoverFilters,
     type Gender,
   } from "$lib/types";
@@ -479,7 +481,13 @@
   }
 
   let showMessageModal = $state(false);
+  let showComposeSheet = $state(false);
   let messaging = $state(false);
+  let messageTarget = $state<{
+    uid: string;
+    activity: string;
+    format: ActivityFormat;
+  } | null>(null);
 
   async function handleMessage() {
     const uid = get(authUser)?.uid;
@@ -498,9 +506,24 @@
       "";
     const format = get(filterFormat) || top.activities[0]?.format || "all";
 
+    messageTarget = { uid: top.uid, activity, format };
+    showComposeSheet = true;
+  }
+
+  async function handleSendDirectMessage(text: string) {
+    const uid = get(authUser)?.uid;
+    if (!uid || !messageTarget || messaging) return;
+
     messaging = true;
-    const matchId = await startDirectMessage(uid, top.uid, activity, format);
+    const matchId = await startDirectMessage(
+      uid,
+      messageTarget.uid,
+      messageTarget.activity,
+      messageTarget.format,
+      text,
+    );
     messaging = false;
+    showComposeSheet = false;
     goto(`/chat/${matchId}`);
   }
 
@@ -746,7 +769,7 @@
                     goto(`/profile/${users[0].uid}`);
                   }}
                   aria-label={t.t("profile.viewProfile")}
-                  class="absolute bottom-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm"
+                  class="absolute bottom-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-black/20 text-white/70 backdrop-blur-sm"
                 >
                   <Info class="size-5" />
                 </button>
@@ -856,7 +879,9 @@
       <h2 class="text-lg font-black text-text">
         {t.t("premium.messageUpsellTitle")}
       </h2>
-      <p class="text-sm text-muted">{t.t("premium.messageUpsellHint")}</p>
+      <p class="text-sm text-muted text-balance">
+        {t.t("premium.messageUpsellHint")}
+      </p>
       <a
         href="/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
@@ -872,3 +897,15 @@
     </div>
   </div>
 {/if}
+
+<MessageComposeSheet
+  bind:open={showComposeSheet}
+  sending={messaging}
+  onSubmit={handleSendDirectMessage}
+  title={t.t("premium.composeMessageTitle")}
+  hint={t.t("premium.composeMessageHint")}
+  placeholder={t.t("chat.placeholder")}
+  sendLabel={t.t("common.send")}
+  sendingLabel={t.t("common.sending")}
+  closeLabel={t.t("common.close")}
+/>
