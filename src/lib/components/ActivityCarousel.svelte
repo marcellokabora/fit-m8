@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, untrack } from "svelte";
+  import { page } from "$app/state";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import padelImg from "$lib/assets/homepage/padel.jpg?enhanced";
@@ -47,6 +48,12 @@
     shuffle ? shuffleArray(ACTIVITIES) : ACTIVITIES,
   );
 
+  // ?activity=tennis picks the starting slide and, when matched, pauses autoplay
+  const activityParam = page.url.searchParams.get("activity");
+  const initialIndex = activityParam
+    ? shuffled.findIndex((activity) => activity.id === activityParam)
+    : -1;
+
   // pad with the last/first item so a peek is always visible on both sides, even at the loop seam
   let track = $derived([
     shuffled[shuffled.length - 1],
@@ -54,7 +61,7 @@
     shuffled[0],
   ]);
 
-  let pos = $state(1);
+  let pos = $state(initialIndex >= 0 ? initialIndex + 1 : 1);
   let animate = $state(true);
   // center the current item, leaving PEEK_HEIGHT of room above/below for the neighbors
   let offset = $derived(PEEK_HEIGHT - pos * ITEM_HEIGHT);
@@ -90,6 +97,10 @@
   let activeIndex = $derived(
     (((pos - 1) % shuffled.length) + shuffled.length) % shuffled.length,
   );
+
+  // tracks which background photos have actually finished loading, so the fade-in
+  // reflects real readiness instead of popping in whenever the network happens to finish
+  let loaded = $state<boolean[]>(new Array(shuffled.length).fill(false));
 
   // snaps the (invisible, non-animated) position back into the real range once a
   // duplicate item at either end has finished scrolling into view
@@ -160,7 +171,7 @@
   }
 
   onMount(() => {
-    startAutoplay();
+    if (initialIndex < 0) startAutoplay();
     return () => {
       if (timer) clearInterval(timer);
     };
@@ -177,9 +188,11 @@
     alt=""
     aria-hidden="true"
     sizes="100vw"
-    fetchpriority={i === 0 ? "high" : "low"}
+    loading="eager"
+    fetchpriority={i === 0 ? "high" : "auto"}
+    onload={() => (loaded[i] = true)}
     class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-xs"
-    style={`opacity: ${i === activeIndex ? 0.5 : 0}`}
+    style={`opacity: ${i === activeIndex && loaded[i] ? 0.5 : 0}`}
   />
 {/each}
 
