@@ -17,10 +17,10 @@
     {t.t("appearance.title")}
   </h3>
   <div class="flex gap-2">
-    <div class="flex flex-1 rounded-xl border-2 border-border bg-bg p-0.5">
+    <div class="flex flex-1 rounded-full border-2 border-border bg-bg p-0.5">
       <button
         onclick={() => activeTheme.selectMode("light")}
-        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
+        class="flex flex-1 items-center justify-center gap-2 rounded-full py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
         'light'
           ? 'bg-primary text-white'
           : 'text-muted'}"
@@ -30,7 +30,7 @@
       </button>
       <button
         onclick={() => activeTheme.selectMode("dark")}
-        class="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
+        class="flex flex-1 items-center justify-center gap-2 rounded-full py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
         'dark'
           ? 'bg-primary text-white'
           : 'text-muted'}"

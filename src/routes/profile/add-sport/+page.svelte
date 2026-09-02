@@ -58,7 +58,7 @@
         })),
       ],
     });
-    goto("/profile");
+    goto("/profile#activities");
   }
 </script>
 

@@ -470,16 +470,18 @@
           <p class="mb-4 text-xs font-semibold text-muted">
             {t.t("sports.maxHint", { max: MAX_SPORTS_FREE })}
           </p>
-          <div class="relative mb-4">
-            <Search
-              class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-            />
-            <input
-              type="search"
-              bind:value={sportsQuery}
-              placeholder={t.t("common.search")}
-              class="w-full rounded-2xl border-2 border-border bg-surface py-2.5 pl-9 pr-3 text-sm font-semibold text-text placeholder:text-muted focus:border-primary focus:outline-none"
-            />
+          <div class="sticky top-0 z-10 -mx-6 bg-bg px-6 pb-4">
+            <div class="relative">
+              <Search
+                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
+              />
+              <input
+                type="search"
+                bind:value={sportsQuery}
+                placeholder={t.t("common.search")}
+                class="w-full rounded-2xl border-2 border-border bg-surface py-2.5 pl-9 pr-3 text-sm font-semibold text-text placeholder:text-muted focus:border-primary focus:outline-none"
+              />
+            </div>
           </div>
           {#if filteredActivities.length === 0}
             <p class="mt-6 text-center text-sm text-muted">

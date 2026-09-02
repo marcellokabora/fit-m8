@@ -249,7 +249,7 @@
         <div class="flex flex-col gap-1.5">
           {#each profile.activities ?? [] as act}
             <div
-              class="flex items-center justify-between rounded-lg bg-bg px-3 py-1.5 text-sm"
+              class="flex items-center justify-between rounded-lg bg-bg py-1.5 text-sm"
             >
               <span class="text-text">{activityLabel(act.id)}</span>
               <span class="text-muted">{act.format} · {act.level}</span>

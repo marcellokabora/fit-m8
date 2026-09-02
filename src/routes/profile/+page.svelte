@@ -21,6 +21,7 @@
   import {
     ChevronDown,
     Crown,
+    FlaskConical,
     GripVertical,
     Pencil,
     Plus,
@@ -243,7 +244,7 @@
   {/if}
 
   <!-- Activities -->
-  <div class="px-5">
+  <div id="activities" class="scroll-mt-20 px-5">
     <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
       {t.t("common.mySports")}
     </h3>
