@@ -92,7 +92,7 @@
     {:else}
       {#each groupedFiltered as section}
         <p
-          class="mb-2 mt-4 text-xs font-bold uppercase tracking-wide text-muted first:mt-1"
+          class="mb-2 mt-4 text-xs font-bold tracking-wide text-muted first:mt-1"
         >
           {section.group ? t.activityGroup(section.group) : t.t("common.other")}
         </p>

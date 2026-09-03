@@ -22,7 +22,14 @@
     filterTrainer,
   } from "$lib/stores/auth";
   import { getDiscoverFeed } from "$lib/firebase/swipe";
-  import { Loader2, RotateCcw, Users, Heart, UserShield } from "@lucide/svelte";
+  import {
+    Loader2,
+    RotateCcw,
+    Users,
+    Heart,
+    UserShield,
+    ArrowRight,
+  } from "@lucide/svelte";
   import {
     ACTIVITIES,
     GENDER_OPTIONS,
@@ -184,6 +191,19 @@
       draftSingle === "" &&
       draftTrainer === "yes",
   );
+  // Matches the state resetFilters() puts the draft in - no restrictions on anything
+  let isDefaultPreset = $derived(
+    draftActivities.length === 0 &&
+      draftFormat === "" &&
+      draftLevel === "" &&
+      draftGender === "" &&
+      draftOrientation === "" &&
+      ageMinDraft === AGE_MIN &&
+      ageMaxDraft === AGE_MAX &&
+      distanceDraft === null &&
+      draftSingle === "" &&
+      draftTrainer === "",
+  );
 
   // Quick presets shown as buttons in the header; each resets sport selection to "any"
   function applyDatingPreset() {
@@ -220,7 +240,8 @@
   function selectDiscoverPreset(preset: DiscoverPresetKind) {
     if (preset === "dating") applyDatingPreset();
     else if (preset === "friends") applyFriendsPreset();
-    else applyTrainerPreset();
+    else if (preset === "trainer") applyTrainerPreset();
+    else resetFilters();
   }
 
   function resetFilters() {
@@ -382,13 +403,15 @@
         </button>
         <PresetHint
           class="mr-1"
-          preset={isDatingPreset
-            ? "dating"
-            : isFriendsPreset
-              ? "friends"
-              : isTrainerPreset
-                ? "trainer"
-                : null}
+          preset={isDefaultPreset
+            ? "default"
+            : isDatingPreset
+              ? "dating"
+              : isFriendsPreset
+                ? "friends"
+                : isTrainerPreset
+                  ? "trainer"
+                  : null}
           hasDiscoverFilters={$userProfile
             ? !!$userProfile.discoverFilters
             : undefined}
@@ -578,7 +601,7 @@
     </button>
     {#each groupedProfileActivities as section}
       <p
-        class="mb-1.5 mt-3 text-xs font-bold uppercase tracking-wide text-muted first:mt-0"
+        class="mb-1.5 mt-3 text-xs font-bold tracking-wide text-muted first:mt-0"
       >
         {section.group ? t.activityGroup(section.group) : t.t("common.other")}
       </p>
@@ -598,6 +621,19 @@
         {/each}
       </div>
     {/each}
+
+    <div class="mt-5 flex flex-col gap-3 bg-bg">
+      <p class="text-sm text-muted">
+        The more activities you add, the more chances you have to find people.
+      </p>
+      <a
+        href="/profile#activities"
+        class="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white active:scale-95"
+      >
+        Add activities
+        <ArrowRight class="size-4" />
+      </a>
+    </div>
   </div>
 
   <div class="border-t border-border bg-surface p-4">

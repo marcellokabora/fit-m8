@@ -105,6 +105,19 @@
       $filterSingle === "" &&
       $filterTrainer === "yes",
   );
+  // Matches the state applyDefaultPreset() puts the filters in - no restrictions on anything
+  let isDefaultPreset = $derived(
+    $filterActivities.length === 0 &&
+      $filterFormat === "" &&
+      $filterLevel === "" &&
+      $filterGender === "" &&
+      $filterSexualOrientation === "" &&
+      $filterMinAge === null &&
+      $filterMaxAge === null &&
+      $filterMaxDistanceKm === null &&
+      $filterSingle === "" &&
+      $filterTrainer === "",
+  );
   let pageTitle = $derived(
     isDatingPreset
       ? t.t("discover.titleDating")
@@ -116,7 +129,8 @@
   );
   // Any filter set beyond the defaults, that isn't one of the quick presets above (those highlight themselves)
   let isCustomFilter = $derived(
-    !isDatingPreset &&
+    !isDefaultPreset &&
+      !isDatingPreset &&
       !isFriendsPreset &&
       !isTrainerPreset &&
       ($filterActivities.length > 0 ||
@@ -295,11 +309,26 @@
     saveFilters();
   }
 
+  function applyDefaultPreset() {
+    filterActivities.set([]);
+    filterFormat.set("");
+    filterLevel.set("");
+    filterGender.set("");
+    filterSexualOrientation.set("");
+    filterMinAge.set(null);
+    filterMaxAge.set(null);
+    filterMaxDistanceKm.set(null);
+    filterSingle.set("");
+    filterTrainer.set("");
+    saveFilters();
+  }
+
   // Bridges PresetHint's toggle picker to the preset functions above
   function selectDiscoverPreset(preset: DiscoverPresetKind) {
     if (preset === "dating") applyDatingPreset();
     else if (preset === "friends") applyFriendsPreset();
-    else applyTrainerPreset();
+    else if (preset === "trainer") applyTrainerPreset();
+    else applyDefaultPreset();
   }
 
   // Sync filter stores from the saved profile once per user; defaults are used until they save filters explicitly
@@ -646,13 +675,15 @@
           <UserShield class="size-5" />
         </button>
         <PresetHint
-          preset={isDatingPreset
-            ? "dating"
-            : isFriendsPreset
-              ? "friends"
-              : isTrainerPreset
-                ? "trainer"
-                : null}
+          preset={isDefaultPreset
+            ? "default"
+            : isDatingPreset
+              ? "dating"
+              : isFriendsPreset
+                ? "friends"
+                : isTrainerPreset
+                  ? "trainer"
+                  : null}
           hasDiscoverFilters={$userProfile
             ? !!$userProfile.discoverFilters
             : undefined}

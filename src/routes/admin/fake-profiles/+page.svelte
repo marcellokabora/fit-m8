@@ -18,6 +18,8 @@
     ACTIVITIES,
     GENDER_OPTIONS,
     ORIENTATIONS,
+    groupActivities,
+    type ActivityGroupId,
     type Gender,
     type SexualOrientation,
     type UserProfile,
@@ -80,11 +82,19 @@
     return info ? `${info.emoji} ${info.label}` : (id ?? "—");
   }
 
-  function activityName(id?: string) {
-    return ACTIVITIES.find((a) => a.id === id)?.label ?? id ?? "—";
-  }
+  // English-only labels are fine here: this admin tool isn't localized like the rest of the app.
+  const GROUP_LABELS: Record<ActivityGroupId, string> = {
+    racquet: "Racquet & Paddle Sports",
+    fitness: "Fitness, Strength & Calisthenics",
+    ballSports: "Ball & Team Sports",
+    wheelSkate: "Wheel Mobility & Skate",
+    mindBody: "Mind, Body & Recovery",
+    water: "Board & Water Sports",
+    danceArts: "Dance, Music & Performing Arts",
+    combat: "Combat & Martial Arts",
+  };
 
-  // Counts by first sport for every known activity, so missing sports show 0
+  // Count by first sport for every known activity, so missing sports show 0
   let sportCounts = $derived.by(() => {
     const counts = new Map<string, number>(ACTIVITIES.map((a) => [a.id, 0]));
     for (const p of profiles) {
@@ -92,9 +102,7 @@
       if (!id) continue;
       counts.set(id, (counts.get(id) ?? 0) + 1);
     }
-    return [...counts.entries()].sort((a, b) =>
-      activityName(a[0]).localeCompare(activityName(b[0])),
-    );
+    return counts;
   });
 
   let filteredProfiles = $derived.by(() => {
@@ -109,13 +117,18 @@
     );
   });
 
-  // Options shown in the sport autocomplete dropdown, narrowed by the typed query
-  let filteredSportOptions = $derived.by(() => {
+  // Options shown in the sport autocomplete dropdown, sectioned by activity group and
+  // narrowed by the typed query; empty sections are dropped.
+  let groupedSportOptions = $derived.by(() => {
     const q = sportQuery.trim().toLowerCase();
-    if (!q) return sportCounts;
-    return sportCounts.filter(([id]) =>
-      activityLabel(id).toLowerCase().includes(q),
-    );
+    return groupActivities(ACTIVITIES)
+      .map((section) => ({
+        group: section.group,
+        items: section.items
+          .map((a) => [a.id, sportCounts.get(a.id) ?? 0] as [string, number])
+          .filter(([id]) => !q || activityLabel(id).toLowerCase().includes(q)),
+      }))
+      .filter((section) => section.items.length > 0);
   });
 
   function pickSport(id: string | null) {
@@ -220,7 +233,7 @@
     <div class="px-5 pb-4">
       <div class="relative">
         <input
-          type="text"
+          type="search"
           bind:value={sportQuery}
           oninput={() => (sportDropdownOpen = true)}
           onfocus={() => (sportDropdownOpen = true)}
@@ -239,19 +252,26 @@
             >
               All activities ({profiles.length})
             </button>
-            {#each filteredSportOptions as [id, count]}
-              <button
-                type="button"
-                onmousedown={() => pickSport(id)}
-                class="block w-full px-3 py-2 text-left text-sm hover:bg-bg {selectedSport ===
-                id
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-text'}"
+            {#each groupedSportOptions as section}
+              <p
+                class="px-3 pt-2 text-xs font-bold uppercase tracking-wide text-muted"
               >
-                {count < 10 ? "⚠️ " : ""}{activityLabel(id)} · {count}
-              </button>
+                {section.group ? GROUP_LABELS[section.group] : "Other"}
+              </p>
+              {#each section.items as [id, count]}
+                <button
+                  type="button"
+                  onmousedown={() => pickSport(id)}
+                  class="block w-full px-3 py-2 text-left text-sm hover:bg-bg {selectedSport ===
+                  id
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-text'}"
+                >
+                  {count < 10 ? "⚠️ " : ""}{activityLabel(id)} · {count}
+                </button>
+              {/each}
             {/each}
-            {#if filteredSportOptions.length === 0}
+            {#if groupedSportOptions.length === 0}
               <p class="px-3 py-2 text-sm text-muted">No matches</p>
             {/if}
           </div>

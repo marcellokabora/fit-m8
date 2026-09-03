@@ -6,7 +6,6 @@ import {
 	getDoc,
 	addDoc,
 	query,
-	where,
 	getDocs,
 	serverTimestamp,
 	limit,
@@ -210,25 +209,13 @@ export async function getDiscoverFeed(
 }
 
 
-// Deletes every recorded swipe and match so previously liked/passed profiles reappear in the discover feed.
+// Deletes every recorded swipe so previously liked/passed profiles reappear in the discover feed.
+// Matches and their chats are intentionally left untouched so existing conversations aren't lost.
 export async function resetSwipes(uid: string) {
 	const sentSnap = await getDocs(collection(db, 'swipes', uid, 'sent'));
-	const matchesSnap = await getDocs(
-		query(collection(db, 'matches'), where('userIds', 'array-contains', uid))
-	);
-
-	// Chat messages live in a separate top-level collection, so clear each thread before the match doc is gone.
-	for (const matchDoc of matchesSnap.docs) {
-		const messagesSnap = await getDocs(collection(db, 'chats', matchDoc.id, 'messages'));
-		if (messagesSnap.empty) continue;
-		const messagesBatch = writeBatch(db);
-		messagesSnap.docs.forEach((m) => messagesBatch.delete(m.ref));
-		await messagesBatch.commit();
-	}
 
 	const batch = writeBatch(db);
 	sentSnap.docs.forEach((d) => batch.delete(d.ref));
-	matchesSnap.docs.forEach((d) => batch.delete(d.ref));
 	await batch.commit();
 }
 

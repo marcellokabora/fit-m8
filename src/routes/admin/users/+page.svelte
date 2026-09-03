@@ -15,6 +15,31 @@
   let deleting = $state(false);
   let deleteError = $state<string | null>(null);
 
+  // lastActiveAt comes back from Firestore as a Timestamp (toMillis), not a real Date
+  function lastActiveMillis(u: UserProfile): number {
+    const value = u.lastActiveAt as unknown as
+      | { toMillis?: () => number }
+      | Date
+      | undefined;
+    if (!value) return 0;
+    if (typeof (value as any).toMillis === "function")
+      return (value as any).toMillis();
+    return new Date(value as Date).getTime();
+  }
+
+  function lastActiveLabel(u: UserProfile): string | null {
+    const millis = lastActiveMillis(u);
+    if (!millis) return null;
+    const diffMs = Date.now() - millis;
+    const minutes = Math.floor(diffMs / 60_000);
+    if (minutes < 1) return "Active just now";
+    if (minutes < 60) return `Active ${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Active ${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `Active ${days}d ago`;
+  }
+
   async function loadUsers() {
     loading = true;
     const snap = await getDocs(collection(db, "users"));
@@ -23,7 +48,7 @@
       .map((d) => ({ uid: d.id, ...(d.data() as Omit<UserProfile, "uid">) }))
       // Fake seed accounts all use the "fake_<name>" doc id convention (see scripts/seed.cjs)
       .filter((u) => !u.uid.startsWith("fake_") && u.uid !== myUid)
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+      .sort((a, b) => lastActiveMillis(b) - lastActiveMillis(a));
     loading = false;
   }
 
@@ -100,9 +125,7 @@
                 {u.displayName || "(no name)"}
               </p>
               <p class="truncate text-sm text-muted">
-                {[u.city, u.age ? `${u.age}y` : null]
-                  .filter(Boolean)
-                  .join(" · ")}
+                {[u.city, lastActiveLabel(u)].filter(Boolean).join(" · ")}
               </p>
             </div>
           </a>

@@ -3,6 +3,7 @@
     Heart,
     Users,
     UserShield,
+    RotateCcw,
     CircleQuestionMark,
     Dumbbell,
     ListOrdered,
@@ -12,7 +13,7 @@
   import { fade, fly } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  export type DiscoverPresetKind = "dating" | "friends" | "trainer";
+  export type DiscoverPresetKind = "default" | "dating" | "friends" | "trainer";
 
   let {
     class: className = "",
@@ -80,6 +81,12 @@
   ] as const;
 
   const ROWS = [
+    {
+      key: "default",
+      icon: RotateCcw,
+      title: "discover.defaultPreset",
+      body: "discover.presetHintDefaultBody",
+    },
     {
       key: "dating",
       icon: Heart,
