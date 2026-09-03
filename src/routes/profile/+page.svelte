@@ -14,6 +14,8 @@
   } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import ActivityListSheet from "$lib/components/ActivityListSheet.svelte";
+  import { CAROUSEL_ACTIVITIES } from "$lib/components/ActivityCarousel.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
@@ -23,6 +25,7 @@
     Crown,
     FlaskConical,
     GripVertical,
+    List,
     Pencil,
     Plus,
     QrCode,
@@ -37,6 +40,7 @@
   let t = $derived(createTranslator($activeLanguage));
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let expandedActivityId = $state<string | null>(null);
+  let carouselActivitiesSheetOpen = $state(false);
 
   let formatOptions = $derived(
     ACTIVITY_FORMAT_OPTIONS.map((option) => ({
@@ -240,8 +244,22 @@
         <QrCode class="size-4" />
         Promo codes
       </a>
+      <button
+        type="button"
+        onclick={() => (carouselActivitiesSheetOpen = true)}
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
+      >
+        <List class="size-4" />
+        All activities
+      </button>
     </div>
   {/if}
+
+  <ActivityListSheet
+    bind:open={carouselActivitiesSheetOpen}
+    activities={CAROUSEL_ACTIVITIES}
+    title={t.t("home.allActivities")}
+  />
 
   <!-- Activities -->
   <div id="activities" class="scroll-mt-20 px-5">

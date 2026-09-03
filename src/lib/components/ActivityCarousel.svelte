@@ -1,3 +1,18 @@
+<script module lang="ts">
+  export const CAROUSEL_ACTIVITIES = [
+    { id: "soccer" },
+    { id: "surf" },
+    { id: "boxing" },
+    { id: "tennis" },
+    { id: "footVolley" },
+    { id: "jogging" },
+    { id: "padel" },
+    { id: "beachVolley" },
+    { id: "basketball" },
+    { id: "cycling" },
+  ];
+</script>
+
 <script lang="ts">
   import { onMount, untrack } from "svelte";
   import { page } from "$app/state";
@@ -18,19 +33,6 @@
 
   let { shuffle = true }: { shuffle?: boolean } = $props();
 
-  const ACTIVITIES = [
-    { id: "soccer" },
-    { id: "surf" },
-    { id: "boxing" },
-    { id: "tennis" },
-    { id: "footVolley" },
-    { id: "jogging" },
-    { id: "padel" },
-    { id: "beachVolley" },
-    { id: "basketball" },
-    { id: "cycling" },
-  ];
-
   const ITEM_HEIGHT = 64;
   const PEEK_HEIGHT = 44; // how much of each neighbor is revealed above/below
   const INTERVAL = 5000;
@@ -45,7 +47,7 @@
     return result;
   }
   let shuffled = untrack(() =>
-    shuffle ? shuffleArray(ACTIVITIES) : ACTIVITIES,
+    shuffle ? shuffleArray(CAROUSEL_ACTIVITIES) : CAROUSEL_ACTIVITIES,
   );
 
   // ?activity=tennis picks the starting slide and, when matched, pauses autoplay
@@ -175,6 +177,16 @@
     return () => {
       if (timer) clearInterval(timer);
     };
+  });
+
+  // jumps to the picked activity when a link from the "all activities" sheet changes
+  // the URL without remounting this component (same route, just a new ?activity=)
+  $effect(() => {
+    const id = page.url.searchParams.get("activity");
+    if (!id) return;
+    const index = shuffled.findIndex((activity) => activity.id === id);
+    if (index < 0) return;
+    userGoTo(index + 1);
   });
 </script>
 
