@@ -1,4 +1,4 @@
-// One-time data migration: renames the 4 multi-word activity ids to camelCase
+// One-time data migration: renames the 'footvolley' activity id to camelCase 'footVolley'
 // (mirrors the id rename in src/lib/types.ts ACTIVITIES) across every `users` doc's
 // `activities[].id` and `discoverFilters.activities[]` fields.
 // Usage: npm run migrate-activity-ids           (dry run, no writes)
@@ -35,10 +35,7 @@ admin.initializeApp({
 });
 
 const ID_MAP = {
-    'beach-volley': 'beachVolley',
-    'ping-pong': 'pingPong',
-    'rock-climbing': 'rockClimbing',
-    'martial-arts': 'martialArts'
+    'footvolley': 'footVolley'
 };
 
 const BATCH_LIMIT = 500;

@@ -23,7 +23,7 @@
     { id: "surf" },
     { id: "boxing" },
     { id: "tennis" },
-    { id: "footvolley" },
+    { id: "footVolley" },
     { id: "jogging" },
     { id: "padel" },
     { id: "beachVolley" },
@@ -69,7 +69,7 @@
   // background photo per activity, falling back to a cycling set when there's no dedicated image
   const IMAGE_MAP: Record<string, typeof padelImg> = {
     padel: padelImg,
-    footvolley: footvolleyImg,
+    footVolley: footvolleyImg,
     jogging: joggingImg,
     tennis: tennisImg,
     basketball: basketballImg,

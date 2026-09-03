@@ -56,7 +56,7 @@
   let savedFlash = $state<Record<string, boolean>>({});
   let selectedSport = $state<string | null>(null);
   let sportQuery = $state("");
-  let sportDropdownOpen = $state(false);
+  let sportPickerOpen = $state(false);
   let genderFilter = $state<Gender | "">("");
   let sortBy = $state<"name" | "age">("name");
   let selectedProfile = $state<UserProfile | null>(null);
@@ -94,20 +94,23 @@
     combat: "Combat & Martial Arts",
   };
 
-  // Count by first sport for every known activity, so missing sports show 0
+  // Count by any of a profile's sports for every known activity, so missing sports show 0
   let sportCounts = $derived.by(() => {
     const counts = new Map<string, number>(ACTIVITIES.map((a) => [a.id, 0]));
     for (const p of profiles) {
-      const id = p.activities?.[0]?.id;
-      if (!id) continue;
-      counts.set(id, (counts.get(id) ?? 0) + 1);
+      for (const act of p.activities ?? []) {
+        if (!counts.has(act.id)) continue;
+        counts.set(act.id, (counts.get(act.id) ?? 0) + 1);
+      }
     }
     return counts;
   });
 
   let filteredProfiles = $derived.by(() => {
     let list = selectedSport
-      ? profiles.filter((p) => p.activities?.[0]?.id === selectedSport)
+      ? profiles.filter((p) =>
+          p.activities?.some((act) => act.id === selectedSport),
+        )
       : profiles;
     if (genderFilter) list = list.filter((p) => p.gender === genderFilter);
     return [...list].sort((a, b) =>
@@ -116,6 +119,34 @@
         : a.displayName.localeCompare(b.displayName),
     );
   });
+
+  // Infinite scroll renders filteredProfiles incrementally instead of all at once (sportCounts
+  // above still needs every profile fetched for accurate totals; this only windows the DOM list).
+  const PROFILES_PAGE_SIZE = 30;
+  let visibleCount = $state(PROFILES_PAGE_SIZE);
+
+  $effect(() => {
+    selectedSport;
+    genderFilter;
+    sortBy;
+    visibleCount = PROFILES_PAGE_SIZE;
+  });
+
+  let visibleProfiles = $derived(filteredProfiles.slice(0, visibleCount));
+
+  // Reveals the next page once the window scrolls near the bottom of the page.
+  function handleWindowScroll() {
+    if (visibleCount >= filteredProfiles.length) return;
+    const nearBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 300;
+    if (nearBottom) {
+      visibleCount = Math.min(
+        visibleCount + PROFILES_PAGE_SIZE,
+        filteredProfiles.length,
+      );
+    }
+  }
 
   // Options shown in the sport autocomplete dropdown, sectioned by activity group and
   // narrowed by the typed query; empty sections are dropped.
@@ -131,18 +162,22 @@
       .filter((section) => section.items.length > 0);
   });
 
-  function pickSport(id: string | null) {
-    selectedSport = id;
-    sportQuery = id ? activityLabel(id) : "";
-    sportDropdownOpen = false;
+  function openSportPicker() {
+    sportQuery = "";
+    sportPickerOpen = true;
   }
 
-  // Delayed so a click on a dropdown option (onmousedown) registers before the input loses focus
-  function onSportInputBlur() {
-    setTimeout(() => {
-      sportDropdownOpen = false;
-      sportQuery = selectedSport ? activityLabel(selectedSport) : "";
-    }, 150);
+  function closeSportPicker() {
+    sportPickerOpen = false;
+  }
+
+  function focusOnMount(node: HTMLElement) {
+    node.focus();
+  }
+
+  function pickSport(id: string | null) {
+    selectedSport = id;
+    closeSportPicker();
   }
 
   async function loadProfiles() {
@@ -215,6 +250,8 @@
   }
 </script>
 
+<svelte:window onscroll={handleWindowScroll} />
+
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
   <BackHeader title="Fake profiles" href="/discover" class="bg-bg" />
 
@@ -231,52 +268,17 @@
     </div>
   {:else}
     <div class="px-5 pb-4">
-      <div class="relative">
-        <input
-          type="search"
-          bind:value={sportQuery}
-          oninput={() => (sportDropdownOpen = true)}
-          onfocus={() => (sportDropdownOpen = true)}
-          onblur={onSportInputBlur}
-          placeholder={`All activities (${profiles.length})`}
-          class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-muted"
-        />
-        {#if sportDropdownOpen}
-          <div
-            class="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-border bg-surface shadow-lg"
-          >
-            <button
-              type="button"
-              onmousedown={() => pickSport(null)}
-              class="block w-full px-3 py-2 text-left text-sm text-text hover:bg-bg"
-            >
-              All activities ({profiles.length})
-            </button>
-            {#each groupedSportOptions as section}
-              <p
-                class="px-3 pt-2 text-xs font-bold uppercase tracking-wide text-muted"
-              >
-                {section.group ? GROUP_LABELS[section.group] : "Other"}
-              </p>
-              {#each section.items as [id, count]}
-                <button
-                  type="button"
-                  onmousedown={() => pickSport(id)}
-                  class="block w-full px-3 py-2 text-left text-sm hover:bg-bg {selectedSport ===
-                  id
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-text'}"
-                >
-                  {count < 10 ? "⚠️ " : ""}{activityLabel(id)} · {count}
-                </button>
-              {/each}
-            {/each}
-            {#if groupedSportOptions.length === 0}
-              <p class="px-3 py-2 text-sm text-muted">No matches</p>
-            {/if}
-          </div>
-        {/if}
-      </div>
+      <button
+        type="button"
+        onclick={openSportPicker}
+        class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-left text-sm {selectedSport
+          ? 'text-text'
+          : 'text-muted'}"
+      >
+        {selectedSport
+          ? activityLabel(selectedSport)
+          : `All activities (${profiles.length})`}
+      </button>
       {#if selectedSport}
         <p class="mt-2 text-xs text-muted">
           Showing {filteredProfiles.length} of {profiles.length} profiles
@@ -309,7 +311,7 @@
       </div>
     {:else}
       <div class="flex flex-col gap-3 px-5">
-        {#each filteredProfiles as p (p.uid)}
+        {#each visibleProfiles as p (p.uid)}
           <button
             onclick={() => {
               selectedProfile = p;
@@ -331,13 +333,11 @@
               </div>
             {/if}
             <div class="min-w-0 flex-1">
-              <p class="truncate font-bold text-text">
-                {p.displayName}
-                <span class="font-normal text-muted"
-                  >· {p.age ?? "—"} · {p.gender || "—"} · {activityLabel(
-                    p.activities?.[0]?.id,
-                  )}</span
-                >
+              <p class="truncate font-bold text-text">{p.displayName}</p>
+              <p class="truncate text-sm text-muted capitalize">
+                {p.age ?? "—"} · {p.gender || "—"} · {activityLabel(
+                  p.activities?.[0]?.id,
+                )}
               </p>
             </div>
             {#if p.isSingle}
@@ -354,10 +354,76 @@
             {/if}
           </button>
         {/each}
+        {#if visibleCount < filteredProfiles.length}
+          <div class="flex justify-center py-4">
+            <LoaderCircle class="size-6 animate-spin text-muted" />
+          </div>
+        {/if}
       </div>
     {/if}
   {/if}
 </div>
+
+{#if sportPickerOpen}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full flex-col bg-bg md:max-w-md"
+    transition:fade={{ duration: 150 }}
+  >
+    <div
+      class="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-bg px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-3"
+    >
+      <button
+        type="button"
+        onclick={closeSportPicker}
+        aria-label="Close"
+        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface text-muted active:scale-95"
+      >
+        <X class="size-4" />
+      </button>
+      <input
+        type="search"
+        use:focusOnMount
+        bind:value={sportQuery}
+        placeholder={`All activities (${profiles.length})`}
+        class="w-full min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted"
+      />
+    </div>
+    <div class="flex-1 overflow-y-auto px-5 py-3">
+      <button
+        type="button"
+        onclick={() => pickSport(null)}
+        class="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-surface {selectedSport ===
+        null
+          ? 'bg-primary/10 text-primary'
+          : 'text-text'}"
+      >
+        All activities ({profiles.length})
+      </button>
+      {#each groupedSportOptions as section}
+        <p
+          class="px-3 pt-3 text-xs font-bold uppercase tracking-wide text-muted"
+        >
+          {section.group ? GROUP_LABELS[section.group] : "Other"}
+        </p>
+        {#each section.items as [id, count]}
+          <button
+            type="button"
+            onclick={() => pickSport(id)}
+            class="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-surface {selectedSport ===
+            id
+              ? 'bg-primary/10 text-primary'
+              : 'text-text'}"
+          >
+            {count < 10 ? "⚠️ " : ""}{activityLabel(id)} · {count}
+          </button>
+        {/each}
+      {/each}
+      {#if groupedSportOptions.length === 0}
+        <p class="px-3 py-2 text-sm text-muted">No matches</p>
+      {/if}
+    </div>
+  </div>
+{/if}
 
 {#if selectedProfile}
   {@const p = selectedProfile}

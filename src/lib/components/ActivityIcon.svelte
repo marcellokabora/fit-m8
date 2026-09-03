@@ -53,7 +53,7 @@
     padel: Padel,
     tennis: Tennis,
     beachVolley: BeachVolley,
-    footvolley: Footvolley,
+    footVolley: Footvolley,
     basketball: Basketball,
     soccer: Soccer,
     cycling: Cycling,

@@ -699,9 +699,9 @@ export function createTranslator(language: LanguageCode): Translator {
         const translated = t(key);
         return translated === key ? humanize(normalizeEnumValue(value)) : translated;
     };
-    // activity ids are already lowercase and must not be re-cased before key lookup
+    // activity.* keys are always lowercase-concatenated regardless of the ActivityId's casing
     const activityLabel = (id: string) => {
-        const key = `activity.${String(id ?? '').trim()}` as TranslationKey;
+        const key = `activity.${String(id ?? '').trim().toLowerCase()}` as TranslationKey;
         const translated = t(key);
         return translated === key ? humanize(id) : translated;
     };

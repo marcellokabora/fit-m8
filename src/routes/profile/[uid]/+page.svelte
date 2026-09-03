@@ -5,6 +5,7 @@
   import { db } from "$lib/firebase/client";
   import { doc, getDoc } from "firebase/firestore";
   import { ACTIVITIES, type UserProfile } from "$lib/types";
+  import { getFallbackPhotoURL } from "$lib/image";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
@@ -57,8 +58,8 @@
   let photos = $derived(
     profile?.photos?.length
       ? profile.photos
-      : profile?.photoURL
-        ? [profile.photoURL]
+      : profile
+        ? [profile.photoURL || getFallbackPhotoURL(profile.uid, profile.gender)]
         : [],
   );
 

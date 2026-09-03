@@ -20,6 +20,7 @@
   } from "@lucide/svelte";
   import Loading from "$lib/components/Loading.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
+  import { getFallbackPhotoURL } from "$lib/image";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
   import {
@@ -229,7 +230,8 @@
   let currentPhotos = $derived.by(() => {
     const top = users[0];
     if (!top) return [] as string[];
-    return top.photos?.length ? top.photos : top.photoURL ? [top.photoURL] : [];
+    if (top.photos?.length) return top.photos;
+    return [top.photoURL || getFallbackPhotoURL(top.uid, top.gender)];
   });
 
   $effect(() => {
@@ -725,16 +727,13 @@
               <div
                 class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
               >
-                {#if users[2].photos?.[0] ?? users[2].photoURL}
-                  <img
-                    src={users[2].photos?.[0] ?? users[2].photoURL}
-                    alt={users[2].displayName}
-                    draggable="false"
-                    class="h-full w-full object-cover pointer-events-none"
-                  />
-                {:else}
-                  <User class="size-24 text-primary/40" />
-                {/if}
+                <img
+                  src={(users[2].photos?.[0] ?? users[2].photoURL) ||
+                    getFallbackPhotoURL(users[2].uid, users[2].gender)}
+                  alt={users[2].displayName}
+                  draggable="false"
+                  class="h-full w-full object-cover pointer-events-none"
+                />
               </div>
             </div>
           {/if}
@@ -745,16 +744,13 @@
               <div
                 class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
               >
-                {#if users[1].photos?.[0] ?? users[1].photoURL}
-                  <img
-                    src={users[1].photos?.[0] ?? users[1].photoURL}
-                    alt={users[1].displayName}
-                    draggable="false"
-                    class="h-full w-full object-cover pointer-events-none"
-                  />
-                {:else}
-                  <User class="size-24 text-primary/40" />
-                {/if}
+                <img
+                  src={(users[1].photos?.[0] ?? users[1].photoURL) ||
+                    getFallbackPhotoURL(users[1].uid, users[1].gender)}
+                  alt={users[1].displayName}
+                  draggable="false"
+                  class="h-full w-full object-cover pointer-events-none"
+                />
               </div>
               <ProfileCardInfo user={users[1]} {t} />
             </div>

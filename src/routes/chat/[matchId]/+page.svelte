@@ -17,6 +17,7 @@
   } from "firebase/firestore";
   import type { Message, Match, ReportReason, UserProfile } from "$lib/types";
   import { getMatchActivityIds } from "$lib/types";
+  import { getFallbackPhotoURL } from "$lib/image";
   import { get } from "svelte/store";
   import { unmatch } from "$lib/firebase/swipe";
   import { submitReport } from "$lib/firebase/reports";
@@ -198,7 +199,8 @@
           class="flex min-w-0 flex-1 items-center gap-3"
         >
           <img
-            src={otherUser.photoURL}
+            src={otherUser.photoURL ||
+              getFallbackPhotoURL(otherUser.uid, otherUser.gender)}
             alt={otherUser.displayName}
             class="size-10 shrink-0 rounded-full object-cover"
           />

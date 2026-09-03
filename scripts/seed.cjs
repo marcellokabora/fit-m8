@@ -65,7 +65,20 @@ const activityPool = [
 	'yoga',
 	'rollerblade',
 	'skateboard',
-	'footvolley'
+	'footVolley',
+	'bodybuilding',
+	'crossTraining',
+	'functionalFitness',
+	'bootCamp',
+	'pilates',
+	'meditation',
+	'breathwork',
+	'salsa',
+	'bachata',
+	'kizomba',
+	'barre',
+	'poleDance',
+	'trampoline'
 ];
 
 // Human-readable labels for the generated profiles' bios (mirrors src/lib/types.ts ACTIVITIES)
@@ -98,7 +111,20 @@ const activityLabels = {
 	yoga: 'yoga',
 	rollerblade: 'rollerblading',
 	skateboard: 'skateboarding',
-	footvolley: 'foot volley'
+	footVolley: 'foot volley',
+	bodybuilding: 'bodybuilding',
+	crossTraining: 'cross-training',
+	functionalFitness: 'functional fitness',
+	bootCamp: 'bootcamp',
+	pilates: 'pilates',
+	meditation: 'meditation',
+	breathwork: 'breathwork',
+	salsa: 'salsa',
+	bachata: 'bachata',
+	kizomba: 'kizomba',
+	barre: 'barre',
+	poleDance: 'pole dance',
+	trampoline: 'trampolining'
 };
 
 const FEMALE_NAMES = [
@@ -195,7 +221,8 @@ function prepareProfile(profile, profileIndex) {
 	const activities = [...profile.activities];
 	const existingIds = new Set(activities.map(activity => activity.id));
 
-	for (let offset = 0; activities.length < 5; offset++) {
+	// 10 = MAX_SPORTS_FREE (src/lib/types.ts) — fills every seeded profile up to the free-tier limit.
+	for (let offset = 0; activities.length < 10; offset++) {
 		const id = activityPool[(profileIndex * 3 + offset) % activityPool.length];
 		if (existingIds.has(id)) continue;
 		existingIds.add(id);
@@ -208,6 +235,24 @@ function prepareProfile(profile, profileIndex) {
 
 	return { ...profile, activities };
 }
+
+// Activities that had 0 fake profiles across the fitness/mindBody/danceArts groups (see
+// /admin/fake-profiles) — topped up separately below, 15 mixed-gender profiles each.
+const LOW_COUNT_ACTIVITIES = [
+	'bodybuilding',
+	'crossTraining',
+	'functionalFitness',
+	'bootCamp',
+	'pilates',
+	'meditation',
+	'breathwork',
+	'salsa',
+	'bachata',
+	'kizomba',
+	'barre',
+	'poleDance',
+	'trampoline'
+];
 
 async function seedDatabase() {
 	console.log('🌱 Seeding fake profiles...\n');
@@ -232,6 +277,13 @@ async function seedDatabase() {
 				profile,
 				userId: `fake_yoga_${i + 1}`
 			})
+		),
+		// 15 photo-less mixed-gender profiles per previously-0-count activity (default age range).
+		...LOW_COUNT_ACTIVITIES.flatMap(activityId =>
+			generateSportProfiles(activityId, 15).map((profile, i) => ({
+				profile,
+				userId: `fake_${activityId}_${i + 1}`
+			}))
 		)
 	];
 

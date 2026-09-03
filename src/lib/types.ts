@@ -52,7 +52,7 @@ export const ACTIVITIES = [
 	{ id: 'padel', label: 'Padel', emoji: '🎾', group: 'racquet' },
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾', group: 'racquet' },
 	{ id: 'beachVolley', label: 'Beach Volley', emoji: '🏐', group: 'ballSports' },
-	{ id: 'footvolley', label: 'Foot Volley', emoji: '🏐', group: 'ballSports' },
+	{ id: 'footVolley', label: 'Foot Volley', emoji: '🏐', group: 'ballSports' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀', group: 'ballSports' },
 	{ id: 'soccer', label: 'Football', emoji: '⚽', group: 'ballSports' },
 	{ id: 'cycling', label: 'Cycling', emoji: '🚴' },

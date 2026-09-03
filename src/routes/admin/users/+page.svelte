@@ -6,8 +6,9 @@
   import { isAdmin } from "$lib/stores/admin";
   import { adminDeleteUserData } from "$lib/firebase/account";
   import type { UserProfile } from "$lib/types";
+  import { getFallbackPhotoURL } from "$lib/image";
   import BackHeader from "$lib/components/BackHeader.svelte";
-  import { LoaderCircle, ShieldAlert, Trash2, User } from "@lucide/svelte";
+  import { LoaderCircle, ShieldAlert, Trash2 } from "@lucide/svelte";
 
   let loading = $state(true);
   let users = $state<UserProfile[]>([]);
@@ -114,11 +115,11 @@
                 class="size-12 shrink-0 rounded-full object-cover"
               />
             {:else}
-              <span
-                class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-              >
-                <User class="size-5" />
-              </span>
+              <img
+                src={getFallbackPhotoURL(u.uid, u.gender)}
+                alt={u.displayName}
+                class="size-12 shrink-0 rounded-full object-cover"
+              />
             {/if}
             <div class="min-w-0 flex-1">
               <p class="truncate font-bold text-text">
