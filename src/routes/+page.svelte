@@ -4,9 +4,8 @@
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
   import { fly } from "svelte/transition";
-  import ActivityCarousel, {
-    CAROUSEL_ACTIVITIES,
-  } from "$lib/components/ActivityCarousel.svelte";
+  import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
+  import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Logo from "$lib/components/Logo.svelte";
   import Loading from "$lib/components/Loading.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
@@ -16,19 +15,23 @@
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import MailIcon from "~icons/material-symbols/mail-outline";
+  import { ACTIVITIES } from "$lib/types";
   import {
     Palette,
     UserRoundPlus,
+    SlidersHorizontal,
     Compass,
     MessagesSquare,
-    Dumbbell,
-    ListOrdered,
   } from "@lucide/svelte";
   import footballImg from "$lib/assets/homepage/football.jpg?enhanced";
   import tennisImg from "$lib/assets/homepage/tennis.jpg?enhanced";
   import boxingImg from "$lib/assets/homepage/boxing.jpg?enhanced";
   import surfImg from "$lib/assets/homepage/surf.jpg?enhanced";
   import cyclingImg from "$lib/assets/homepage/cycling.jpg?enhanced";
+  import activitiesScreen from "$lib/assets/screens/activities.png?enhanced";
+  import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
+  import discoverScreen from "$lib/assets/screens/discover.png?enhanced";
+  import matchesScreen from "$lib/assets/screens/matchs.png?enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -51,30 +54,104 @@
     { url: "https://www.youtube.com/", label: "YouTube" },
   ];
 
-  let popularActivities = $derived(
-    CAROUSEL_ACTIVITIES.map((activity) => t.activity(activity.id)).join(" · "),
-  );
-
-  // icon per step, styled after PresetHint's concept rows
+  // icon + in-app screenshot per step, so each step shows a peek of the real screen it describes
   const STEPS = [
-    { icon: UserRoundPlus, titleKey: "step1Title", descKey: "step1Desc" },
-    { icon: Compass, titleKey: "step2Title", descKey: "step2Desc" },
-    { icon: MessagesSquare, titleKey: "step3Title", descKey: "step3Desc" },
+    {
+      icon: UserRoundPlus,
+      titleKey: "step1Title",
+      descKey: "step1Desc",
+      screen: activitiesScreen,
+    },
+    {
+      icon: SlidersHorizontal,
+      titleKey: "stepFiltersTitle",
+      descKey: "stepFiltersDesc",
+      screen: filtersScreen,
+    },
+    {
+      icon: Compass,
+      titleKey: "step2Title",
+      descKey: "step2Desc",
+      screen: discoverScreen,
+    },
+    {
+      icon: MessagesSquare,
+      titleKey: "step3Title",
+      descKey: "step3Desc",
+      screen: matchesScreen,
+    },
   ] as const;
 
-  // explains how the activities list and its order drive matching, styled after PresetHint's concept rows
-  const ACTIVITY_INFO_ROWS = [
-    {
-      icon: Dumbbell,
-      titleKey: "activitiesIntroTitle",
-      descKey: "activitiesIntroBody",
-    },
-    {
-      icon: ListOrdered,
-      titleKey: "activitiesOrderTitle",
-      descKey: "activitiesOrderBody",
-    },
+  // reveals each step as it scrolls into view instead of all popping in at once with the section
+  function reveal(node: HTMLElement, { delay = 0 }: { delay?: number } = {}) {
+    node.style.transitionDelay = `${delay}ms`;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        node.classList.remove("opacity-0", "translate-y-8");
+        observer.disconnect();
+      },
+      { threshold: 0.2 },
+    );
+    observer.observe(node);
+    return { destroy: () => observer.disconnect() };
+  }
+
+  // curated, most-to-least popular in Barcelona today - kept separate from the id hash so
+  // e.g. pickleball can't outrank padel just because its string happens to hash higher
+  const FEATURED_ACTIVITY_IDS = [
+    "beachVolley",
+    "calisthenics",
+    "padel",
+    "footVolley",
+    "jogging",
+    "paddleboard",
+    "skateboard",
+    "tennis",
   ] as const;
+
+  // stable string hash reused below - same input always produces the same output, so
+  // server and client (and every reload) agree without needing real randomness
+  function hashString(input: string): number {
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+      hash = (hash * 31 + input.charCodeAt(i)) >>> 0;
+    }
+    return hash;
+  }
+
+  // deterministic "people interested" count per activity
+  function interestCount(id: string): number {
+    const hash = hashString(id);
+    const featuredIndex = FEATURED_ACTIVITY_IDS.indexOf(id as any);
+    if (featuredIndex !== -1) {
+      // featured sports lead the pack, tapering down the more niche they get
+      return 1400 - featuredIndex * 90 + (hash % 80);
+    }
+    // everything else stays in a lower, modest range so it never outranks the featured sports
+    return 60 + (hash % 420);
+  }
+
+  function formatCount(n: number): string {
+    return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : `${n}`;
+  }
+
+  // capped so the homepage doesn't dump the entire activity catalog on the visitor; featured
+  // sports are guaranteed a slot, then everything is shuffled (deterministically, via a hash
+  // salted differently from interestCount) so the big chips don't all clump at the top
+  const ACTIVITIES_DISPLAY_LIMIT = 22;
+  const DISPLAYED_ACTIVITIES = [
+    ...FEATURED_ACTIVITY_IDS.map((id) =>
+      ACTIVITIES.find((activity) => activity.id === id),
+    ).filter((activity) => activity !== undefined),
+    ...ACTIVITIES.filter(
+      (activity) => !FEATURED_ACTIVITY_IDS.includes(activity.id as any),
+    ),
+  ]
+    .slice(0, ACTIVITIES_DISPLAY_LIMIT)
+    .sort(
+      (a, b) => hashString(`shuffle:${a.id}`) - hashString(`shuffle:${b.id}`),
+    );
 
   // this page always looks best against its own dark palette (photo backgrounds need
   // the extra contrast), regardless of the user's light/dark preference elsewhere
@@ -119,7 +196,7 @@
 </script>
 
 <div
-  class="relative flex min-h-dvh w-full flex-col bg-bg"
+  class="relative flex min-h-dvh w-full flex-col overflow-x-hidden bg-bg"
   style="--color-bg: {darkColors.bg}; --color-surface: {darkColors.surface}; --color-text: {darkColors.text}; --color-muted: {darkColors.muted}; --color-border: {darkColors.border};"
 >
   <div
@@ -227,21 +304,44 @@
         <h2 class="text-center text-xl font-bold text-primary">
           {t.t("home.howItWorksTitle")}
         </h2>
-        <ol class="flex flex-col gap-4">
-          {#each STEPS as step}
-            <li class="flex items-start gap-4">
-              <span
-                class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+        <ol class="flex flex-col gap-8">
+          {#each STEPS as step, i}
+            <li
+              use:reveal={{ delay: i * 120 }}
+              class="flex translate-y-8 flex-col gap-4 opacity-0 transition-all duration-700 ease-out"
+            >
+              <!-- info sits above the screenshot, plain like the original rows -->
+              <div class="mx-auto flex w-full max-w-60 items-start gap-4">
+                <span
+                  class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+                >
+                  <step.icon class="size-5" />
+                </span>
+                <div>
+                  <p class="font-semibold text-text">
+                    {t.t(`home.${step.titleKey}` as any)}
+                  </p>
+                  <p class="text-sm text-muted">
+                    {t.t(`home.${step.descKey}` as any)}
+                  </p>
+                </div>
+              </div>
+
+              <!-- tilted and bled off the page edge on purpose - just a glimpse of the screen, not the full UI -->
+              <div
+                class="w-72 overflow-hidden rounded-3xl shadow-xl ring-1 ring-white/10 {i %
+                  2 ===
+                0
+                  ? '-ml-16 rotate-6'
+                  : '-mr-16 ml-auto -rotate-6'}"
               >
-                <step.icon class="size-5" />
-              </span>
-              <div>
-                <p class="font-semibold text-text">
-                  {t.t(`home.${step.titleKey}` as any)}
-                </p>
-                <p class="text-sm text-muted">
-                  {t.t(`home.${step.descKey}` as any)}
-                </p>
+                <enhanced:img
+                  src={step.screen}
+                  alt=""
+                  aria-hidden="true"
+                  sizes="288px"
+                  class="aspect-431/886 w-full object-cover object-top"
+                />
               </div>
             </li>
           {/each}
@@ -249,38 +349,49 @@
       </section>
 
       <section class="flex flex-col gap-6">
-        <div class="flex flex-col gap-4">
-          {#each ACTIVITY_INFO_ROWS as row}
-            <div class="flex items-start gap-4">
-              <span
-                class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-              >
-                <row.icon class="size-5" />
-              </span>
-              <div>
-                <p class="font-semibold text-text">
-                  {t.t(`home.${row.titleKey}` as any)}
-                </p>
-                <p class="text-sm text-muted">
-                  {t.t(`home.${row.descKey}` as any)}
-                </p>
-              </div>
-            </div>
-          {/each}
-        </div>
-
-        <div class="flex flex-col gap-2 text-center">
-          <h2 class="text-xl font-bold text-primary">
+        <div class="flex flex-col gap-5">
+          <h2 class="text-center text-xl font-bold text-primary -rotate-3 mt-4">
             {t.t("home.activitiesTitle")}
           </h2>
-          <p class="text-sm text-muted text-balance">{popularActivities}</p>
+          <!-- natural order, but chip size scales with the interest count to highlight the popular ones -->
+          <!-- one big tilted "card" that bleeds off both page edges, matching the step screenshots above -->
+          <div
+            class="-mx-24 flex -rotate-3 flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10"
+          >
+            {#each DISPLAYED_ACTIVITIES as activity}
+              {@const count = interestCount(activity.id)}
+              {@const big = count >= 1000}
+              {@const medium = !big && count >= 500}
+              <span
+                class="flex items-center gap-1.5 rounded-full font-semibold {big
+                  ? 'bg-primary px-4 py-2 text-sm text-white shadow-md'
+                  : medium
+                    ? 'bg-surface px-3.5 py-1.5 text-sm text-text ring-1 ring-border'
+                    : 'bg-surface px-3 py-1 text-xs text-text ring-1 ring-border'}"
+              >
+                <ActivityIcon
+                  id={activity.id}
+                  class={big ? "size-4" : "size-3.5 text-primary"}
+                />
+                {t.activity(activity.id)}
+                <span
+                  class="rounded-full px-1.5 py-0.5 text-[0.65rem] font-bold {big
+                    ? 'bg-white/20'
+                    : 'bg-primary/10 text-primary'}"
+                >
+                  {formatCount(count)}
+                  <span class="sr-only">{t.t("home.peopleInterested")}</span>
+                </span>
+              </span>
+            {/each}
+          </div>
         </div>
       </section>
     </main>
 
     <footer
       transition:fade
-      class="relative z-10 flex w-full flex-col items-center gap-5 border-t border-border px-6 py-8 text-center"
+      class="relative z-10 flex w-full flex-col items-center gap-5 px-6 py-8 text-center"
     >
       <Logo class="h-auto w-14 text-primary opacity-80" />
 

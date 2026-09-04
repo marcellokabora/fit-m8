@@ -179,7 +179,7 @@
     loading="eager"
     fetchpriority={i === 0 ? "high" : "auto"}
     onload={() => (loaded[i] = true)}
-    class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-xs"
+    class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-[2px]"
     style={`opacity: ${i === activeIndex && loaded[i] ? 0.5 : 0}`}
   />
 {/each}
