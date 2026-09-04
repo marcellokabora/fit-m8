@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "@fontsource/poppins/latin-500.css";
+@import "@fontsource/poppins/latin-600.css";
+@import "@fontsource/poppins/latin-700.css";
 
 @theme {
   --color-primary: #16a34a;
@@ -12,6 +15,13 @@
   --color-success: #34c759;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* bold geometric display font, used for headline text */
+  --font-heading: "Poppins", var(--font-sans);
+}
+
+/* font-black doubles as the app's "headline" marker (page/section/modal titles) - give it the display font */
+.font-black {
+  font-family: var(--font-heading);
 }
 
 /* Tells the browser to render native controls (date picker icon, etc.) in the matching

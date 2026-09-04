@@ -301,14 +301,14 @@
       class="relative z-10 flex w-full flex-col gap-10 px-6 py-12 text-text"
     >
       <section class="flex flex-col gap-6">
-        <h2 class="text-center text-xl font-bold text-primary">
+        <h2 class="font-heading text-center text-xl font-bold text-primary">
           {t.t("home.howItWorksTitle")}
         </h2>
         <ol class="flex flex-col gap-8">
           {#each STEPS as step, i}
             <li
               use:reveal={{ delay: i * 120 }}
-              class="flex translate-y-8 flex-col gap-4 opacity-0 transition-all duration-700 ease-out"
+              class="flex translate-y-8 flex-col gap-8 opacity-0 transition-all duration-700 ease-out"
             >
               <!-- info sits above the screenshot, plain like the original rows -->
               <div class="mx-auto flex w-full max-w-60 items-start gap-4">
@@ -329,11 +329,11 @@
 
               <!-- tilted and bled off the page edge on purpose - just a glimpse of the screen, not the full UI -->
               <div
-                class="w-72 overflow-hidden rounded-3xl shadow-xl ring-1 ring-white/10 {i %
+                class="w-102 overflow-hidden shadow-xl mt-4 max-h-full mb-8 {i %
                   2 ===
                 0
-                  ? '-ml-16 rotate-6'
-                  : '-mr-16 ml-auto -rotate-6'}"
+                  ? '-ml-6 rotate-6'
+                  : '-mr-12 ml-auto -rotate-6'}"
               >
                 <enhanced:img
                   src={step.screen}
@@ -348,15 +348,17 @@
         </ol>
       </section>
 
-      <section class="flex flex-col gap-6">
+      <section class="flex flex-col gap-6 -rotate-3">
         <div class="flex flex-col gap-5">
-          <h2 class="text-center text-xl font-bold text-primary -rotate-3 mt-4">
+          <h2
+            class="font-heading text-center text-xl font-bold text-primary mt-4"
+          >
             {t.t("home.activitiesTitle")}
           </h2>
           <!-- natural order, but chip size scales with the interest count to highlight the popular ones -->
           <!-- one big tilted "card" that bleeds off both page edges, matching the step screenshots above -->
           <div
-            class="-mx-24 flex -rotate-3 flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10"
+            class="-mx-24 flex flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10"
           >
             {#each DISPLAYED_ACTIVITIES as activity}
               {@const count = interestCount(activity.id)}
