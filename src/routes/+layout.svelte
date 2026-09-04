@@ -61,12 +61,14 @@
 </script>
 
 <svelte:head>
-  <!-- title/description: static English fallbacks already live in src/app.html for
-       crawlers (this app is ssr=false, so they never see these); these just localize
-       them for actual visitors once JS hydrates. og:/twitter: tags are intentionally NOT
-       duplicated here since link-preview bots can't see them anyway in a pure SPA. -->
+  <!-- title: static English fallback already lives in src/app.html for crawlers (this app
+       is ssr=false, so they never see this); this just keeps document.title in sync for
+       real visitors once JS hydrates - the browser reuses the existing <title> node rather
+       than duplicating it. meta description/og/twitter are intentionally NOT duplicated
+       here: unlike <title>, <meta> tags aren't deduped by the browser, and link-preview/SEO
+       bots can't see this dynamic head anyway in a pure SPA - so adding one here would just
+       leave two conflicting <meta name="description"> tags in the DOM for real visitors. -->
   <title>FIT-M8</title>
-  <meta name="description" content={t.t("meta.description")} />
   {#if import.meta.env.PROD}
     <!-- manifest is only generated/served by vite-plugin-pwa in production builds -->
     <link rel="manifest" href="/manifest.webmanifest" />

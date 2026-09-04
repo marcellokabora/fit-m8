@@ -116,7 +116,7 @@
 
       <!-- <div class="mb-6 flex items-start justify-between gap-2">
         <div>
-          <h1 class="font-display text-2xl tracking-wide text-text">
+          <h1 class="text-2xl font-bold tracking-wide text-text">
             {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
           </h1>
           <p class="text-sm text-muted">

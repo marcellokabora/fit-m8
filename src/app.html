@@ -12,9 +12,6 @@
 	<meta name="apple-mobile-web-app-title" content="FIT-M8" />
 	<link rel="icon" href="/favicon.png" type="image/png" />
 	<link rel="apple-touch-icon" href="/icons/icon-192.png" />
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-	<link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet" />
 	<!--
 		Static fallback SEO/OG tags: this app runs with ssr=false (SPA), so social/link-preview
 		crawlers (Facebook, Twitter, WhatsApp, etc.) never execute JS and never see the dynamic
@@ -22,6 +19,7 @@
 	-->
 	<title>FIT-M8</title>
 	<meta name="description" content="Match people for sports activities near you" />
+	<link rel="canonical" href="https://fit-m8.app/" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="FIT-M8" />
 	<meta property="og:title" content="FIT-M8" />
@@ -34,8 +32,33 @@
 	<meta name="twitter:title" content="FIT-M8" />
 	<meta name="twitter:description" content="Match people for sports activities near you" />
 	<meta name="twitter:image" content="https://fit-m8.app/icons/icon-512.png" />
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Organization",
+			"name": "FIT-M8",
+			"url": "https://fit-m8.app/",
+			"logo": "https://fit-m8.app/icons/icon-512.png",
+			"email": "info@fit-m8.app",
+			"sameAs": [
+				"https://www.facebook.com/profile.php?id=61594034218256",
+				"https://www.instagram.com/",
+				"https://www.youtube.com/"
+			]
+		}
+	</script>
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebSite",
+			"name": "FIT-M8",
+			"url": "https://fit-m8.app/",
+			"description": "Match people for sports activities near you"
+		}
+	</script>
 	%sveltekit.head%
 </head>
+
 
 <body data-sveltekit-preload-data="hover" class="h-full">
 	<div class="h-full" style="display: contents">%sveltekit.body%</div>

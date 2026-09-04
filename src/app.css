@@ -12,7 +12,6 @@
   --color-success: #34c759;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Righteous", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Tells the browser to render native controls (date picker icon, etc.) in the matching

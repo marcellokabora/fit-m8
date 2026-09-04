@@ -140,36 +140,12 @@
     startAutoplay();
   }
 
-  // user-triggered navigation (click/scroll/swipe) also resets the autoplay clock
-  function userAdvance(delta: number) {
-    advance(delta);
-    restartAutoplay();
-  }
+  // click-triggered navigation also resets the autoplay clock
   function userGoTo(i: number) {
     if (i === pos) return;
     pos = i;
     snapIfAtEdge();
     restartAutoplay();
-  }
-
-  let wheelLocked = false;
-  function handleWheel(e: WheelEvent) {
-    e.preventDefault();
-    if (wheelLocked) return;
-    wheelLocked = true;
-    userAdvance(e.deltaY > 0 ? 1 : -1);
-    setTimeout(() => (wheelLocked = false), 400);
-  }
-
-  let touchStartY = 0;
-  function handleTouchStart(e: TouchEvent) {
-    touchStartY = e.touches[0].clientY;
-  }
-  function handleTouchEnd(e: TouchEvent) {
-    const deltaY = touchStartY - e.changedTouches[0].clientY;
-    if (Math.abs(deltaY) > 20) {
-      userAdvance(deltaY > 0 ? 1 : -1);
-    }
   }
 
   onMount(() => {
@@ -213,9 +189,6 @@
   style={`height: ${ITEM_HEIGHT + PEEK_HEIGHT * 2}px`}
   role="group"
   aria-label={t.activity(shuffled[activeIndex].id)}
-  onwheel={handleWheel}
-  ontouchstart={handleTouchStart}
-  ontouchend={handleTouchEnd}
 >
   <div
     class={animate
@@ -258,10 +231,6 @@
 </div>
 
 <style>
-  .activity-carousel {
-    touch-action: none;
-  }
-
   /* hide on short viewports where the carousel would push other content off-screen */
   @media (max-height: 750px) {
     .activity-carousel {

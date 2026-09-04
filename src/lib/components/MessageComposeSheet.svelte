@@ -64,7 +64,7 @@
       <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-border"></div>
       <div class="mb-4 flex items-start justify-between gap-2">
         <div>
-          <h2 class="font-display text-lg text-text">{title}</h2>
+          <h2 class="text-lg font-bold text-text">{title}</h2>
           {#if hint}
             <p class="text-sm text-muted">{hint}</p>
           {/if}
