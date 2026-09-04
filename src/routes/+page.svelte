@@ -82,21 +82,6 @@
     },
   ] as const;
 
-  // reveals each step as it scrolls into view instead of all popping in at once with the section
-  function reveal(node: HTMLElement, { delay = 0 }: { delay?: number } = {}) {
-    node.style.transitionDelay = `${delay}ms`;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        node.classList.remove("opacity-0", "translate-y-8");
-        observer.disconnect();
-      },
-      { threshold: 0.2 },
-    );
-    observer.observe(node);
-    return { destroy: () => observer.disconnect() };
-  }
-
   // curated, most-to-least popular in Barcelona today - kept separate from the id hash so
   // e.g. pickleball can't outrank padel just because its string happens to hash higher
   const FEATURED_ACTIVITY_IDS = [
@@ -297,7 +282,6 @@
   {#if ready}
     <!-- SEO content: real, crawlable copy below the hero fold -->
     <main
-      transition:fade
       class="relative z-10 flex w-full flex-col gap-10 px-6 py-12 text-text"
     >
       <section class="flex flex-col gap-6">
@@ -306,10 +290,7 @@
         </h2>
         <ol class="flex flex-col gap-8">
           {#each STEPS as step, i}
-            <li
-              use:reveal={{ delay: i * 120 }}
-              class="flex translate-y-8 flex-col gap-8 opacity-0 transition-all duration-700 ease-out"
-            >
+            <li class="flex flex-col gap-8">
               <!-- info sits above the screenshot, plain like the original rows -->
               <div class="mx-auto flex w-full max-w-60 items-start gap-4">
                 <span
