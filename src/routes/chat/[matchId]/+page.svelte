@@ -21,6 +21,7 @@
   import { get } from "svelte/store";
   import { unmatch } from "$lib/firebase/swipe";
   import { submitReport } from "$lib/firebase/reports";
+  import { linkifyText } from "$lib/linkify";
   import {
     LoaderCircle,
     Sparkles,
@@ -309,12 +310,23 @@
             : 'justify-start'}"
         >
           <div
-            class="max-w-[75%] rounded-2xl px-4 py-3 text-sm {msg.senderId ===
+            class="max-w-[75%] whitespace-pre-wrap wrap-break-word rounded-2xl px-4 py-3 text-sm {msg.senderId ===
             currentUid
               ? 'rounded-br-sm bg-primary text-white'
               : 'rounded-bl-sm bg-surface text-text shadow-sm'}"
           >
-            {msg.text}
+            {#each linkifyText(msg.text) as seg}
+              {#if seg.type === "link"}
+                <a
+                  href={seg.href}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  class="underline break-all">{seg.value}</a
+                >
+              {:else}
+                {seg.value}
+              {/if}
+            {/each}
           </div>
         </div>
       {/each}

@@ -4,7 +4,7 @@
   import { get } from "svelte/store";
   import { db } from "$lib/firebase/client";
   import { doc, getDoc } from "firebase/firestore";
-  import { ACTIVITIES, type UserProfile } from "$lib/types";
+  import { ACTIVITIES, type ReportReason, type UserProfile } from "$lib/types";
   import { getFallbackPhotoURL } from "$lib/image";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
@@ -15,6 +15,7 @@
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import { recordSwipe, startDirectMessage } from "$lib/firebase/swipe";
+  import { submitReport } from "$lib/firebase/reports";
   import { distanceKm, nearbyFakeLocation } from "$lib/location";
   import {
     MapPin,
@@ -24,9 +25,14 @@
     Rainbow,
     Crown,
     Pencil,
+    Flag,
     X,
   } from "@lucide/svelte";
-  import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import {
+    activeLanguage,
+    createTranslator,
+    type TranslationKey,
+  } from "$lib/stores/language";
   import { detectSocialPlatform } from "$lib/social";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -80,6 +86,54 @@
       $authUser.uid !== profile.uid &&
       !alreadyMatched,
   );
+
+  // Reporting makes sense for any other user's profile, matched or not
+  let canReport = $derived(
+    !!profile && !!$authUser && $authUser.uid !== profile.uid,
+  );
+
+  let showReportModal = $state(false);
+  let reportReason = $state<ReportReason>("harassment");
+  let reportDetails = $state("");
+  let reporting = $state(false);
+  let reportSubmitted = $state(false);
+  const REPORT_REASONS: ReportReason[] = [
+    "harassment",
+    "inappropriate",
+    "fake_profile",
+    "spam",
+    "other",
+  ];
+  const REPORT_REASON_KEYS: Record<ReportReason, TranslationKey> = {
+    harassment: "chat.reportReasonHarassment",
+    inappropriate: "chat.reportReasonInappropriate",
+    fake_profile: "chat.reportReasonFakeProfile",
+    spam: "chat.reportReasonSpam",
+    other: "chat.reportReasonOther",
+  };
+
+  function openReportModal() {
+    reportReason = "harassment";
+    reportDetails = "";
+    reportSubmitted = false;
+    showReportModal = true;
+  }
+
+  async function handleReport() {
+    const currentUid = get(authUser)?.uid;
+    if (!currentUid || !profile) return;
+    reporting = true;
+    const matchId = [currentUid, profile.uid].sort().join("_");
+    await submitReport(
+      currentUid,
+      profile.uid,
+      matchId,
+      reportReason,
+      reportDetails,
+    );
+    reporting = false;
+    reportSubmitted = true;
+  }
 
   $effect(() => {
     loading = true;
@@ -243,6 +297,15 @@
           class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
         >
           <Pencil class="size-4.5 text-text" />
+        </button>
+      {/if}
+      {#if canReport}
+        <button
+          onclick={openReportModal}
+          aria-label={t.t("chat.report")}
+          class="flex size-9 items-center justify-center rounded-full hover:bg-text/10"
+        >
+          <Flag class="size-4.5 text-error" />
         </button>
       {/if}
       <button
@@ -427,6 +490,60 @@
   sendingLabel={t.t("common.sending")}
   closeLabel={t.t("common.close")}
 />
+
+{#if showReportModal}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="flex w-full flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+    >
+      <Flag class="size-12 text-error" />
+      <h2 class="text-lg font-black text-text">{t.t("chat.reportTitle")}</h2>
+      {#if reportSubmitted}
+        <p class="text-sm text-muted">{t.t("chat.reportSuccess")}</p>
+        <button
+          onclick={() => (showReportModal = false)}
+          class="w-full rounded-2xl bg-primary py-3 text-xs font-bold text-white active:scale-95"
+        >
+          {t.t("common.close")}
+        </button>
+      {:else}
+        <p class="text-sm text-muted">{t.t("chat.reportHint")}</p>
+        <select
+          bind:value={reportReason}
+          class="w-full rounded-2xl border-2 border-border bg-bg px-4 py-3 text-sm text-text outline-none focus:border-primary"
+        >
+          {#each REPORT_REASONS as reason}
+            <option value={reason}>{t.t(REPORT_REASON_KEYS[reason])}</option>
+          {/each}
+        </select>
+        <textarea
+          bind:value={reportDetails}
+          placeholder={t.t("chat.reportDetailsPlaceholder")}
+          rows={3}
+          class="w-full resize-none rounded-2xl border-2 border-border bg-bg px-4 py-3 text-sm text-text outline-none focus:border-primary"
+        ></textarea>
+        <div class="flex w-full gap-3">
+          <button
+            onclick={() => (showReportModal = false)}
+            disabled={reporting}
+            class="flex-1 rounded-2xl border-2 border-border py-3 text-xs font-semibold text-text active:scale-95 disabled:opacity-50"
+          >
+            {t.t("common.cancel")}
+          </button>
+          <button
+            onclick={handleReport}
+            disabled={reporting}
+            class="flex-1 rounded-2xl bg-error py-3 text-xs font-bold text-white active:scale-95 disabled:opacity-50"
+          >
+            {reporting ? t.t("chat.reporting") : t.t("chat.reportSubmit")}
+          </button>
+        </div>
+      {/if}
+    </div>
+  </div>
+{/if}
 
 {#if matchBanner}
   <div
