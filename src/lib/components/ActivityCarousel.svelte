@@ -1,20 +1,20 @@
 <script module lang="ts">
   export const CAROUSEL_ACTIVITIES = [
-    { id: "soccer" },
-    { id: "surf" },
+    { id: "beachVolley" },
+    { id: "padel" },
     { id: "boxing" },
-    { id: "tennis" },
     { id: "footVolley" },
     { id: "jogging" },
-    { id: "padel" },
-    { id: "beachVolley" },
     { id: "basketball" },
+    { id: "surf" },
+    { id: "tennis" },
+    { id: "soccer" },
     { id: "cycling" },
   ];
 </script>
 
 <script lang="ts">
-  import { onMount, untrack } from "svelte";
+  import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import { page } from "$app/state";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
@@ -34,30 +34,17 @@
 
   let t = $derived(createTranslator($activeLanguage));
 
-  let { shuffle = true }: { shuffle?: boolean } = $props();
-
   const ITEM_HEIGHT = 64;
   const PEEK_HEIGHT = 44; // how much of each neighbor is revealed above/below
   const INTERVAL = 5000;
 
-  // shuffle once per mount so the carousel starts in a different order each visit
-  function shuffleArray<T>(items: T[]): T[] {
-    const result = [...items];
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
-  }
-  let shuffled = untrack(() =>
-    shuffle ? shuffleArray(CAROUSEL_ACTIVITIES) : CAROUSEL_ACTIVITIES,
-  );
+  const shuffled = CAROUSEL_ACTIVITIES;
 
   // ?activity=tennis picks the starting slide and, when matched, pauses autoplay
   // (reading searchParams is forbidden during prerendering, so skip it there)
   const activityParam = browser ? page.url.searchParams.get("activity") : null;
   const initialIndex = activityParam
-    ? shuffled.findIndex((activity) => activity.id === activityParam)
+    ? CAROUSEL_ACTIVITIES.findIndex((activity) => activity.id === activityParam)
     : -1;
 
   // pad with the last/first item so a peek is always visible on both sides, even at the loop seam
@@ -106,7 +93,9 @@
 
   // tracks which background photos have actually finished loading, so the fade-in
   // reflects real readiness instead of popping in whenever the network happens to finish
-  let loaded = $state<boolean[]>(new Array(shuffled.length).fill(false));
+  let loaded = $state<boolean[]>(
+    new Array(CAROUSEL_ACTIVITIES.length).fill(false),
+  );
 
   // snaps the (invisible, non-animated) position back into the real range once a
   // duplicate item at either end has finished scrolling into view
