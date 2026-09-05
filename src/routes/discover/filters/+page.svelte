@@ -35,7 +35,6 @@
     GENDER_OPTIONS,
     ORIENTATIONS,
     SKILL_LEVEL_OPTIONS,
-    groupActivities,
     type ActivityFormat,
     type Gender,
     type SexualOrientation,
@@ -120,7 +119,6 @@
       )
       .filter((activity) => activity !== undefined),
   );
-  let groupedProfileActivities = $derived(groupActivities(profileActivities));
   let hasCoords = $derived(
     $userProfile?.lat !== undefined && $userProfile?.lng !== undefined,
   );
@@ -599,28 +597,21 @@
     >
       {t.t("discover.allSports")}
     </button>
-    {#each groupedProfileActivities as section}
-      <p
-        class="mb-1.5 mt-3 text-xs font-bold tracking-wide text-muted first:mt-0"
-      >
-        {section.group ? t.activityGroup(section.group) : t.t("common.other")}
-      </p>
-      <div class="grid grid-cols-2 gap-1">
-        {#each section.items as act}
-          <button
-            onclick={() => pickActivity(act.id)}
-            class="flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.includes(
-              act.id,
-            )
-              ? 'bg-primary text-white'
-              : 'text-text hover:bg-bg'}"
-          >
-            <ActivityIcon id={act.id} class="size-4 shrink-0" />
-            <span class="truncate">{t.activity(act.id)}</span>
-          </button>
-        {/each}
-      </div>
-    {/each}
+    <div class="grid grid-cols-2 gap-1">
+      {#each profileActivities as act}
+        <button
+          onclick={() => pickActivity(act.id)}
+          class="flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.includes(
+            act.id,
+          )
+            ? 'bg-primary text-white'
+            : 'text-text hover:bg-bg'}"
+        >
+          <ActivityIcon id={act.id} class="size-4 shrink-0" />
+          <span class="truncate">{t.activity(act.id)}</span>
+        </button>
+      {/each}
+    </div>
 
     <div class="mt-5 flex flex-col gap-3 bg-bg">
       <p class="text-sm text-muted">

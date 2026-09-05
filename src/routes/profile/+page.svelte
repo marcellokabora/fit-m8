@@ -15,6 +15,7 @@
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import ActivityListSheet from "$lib/components/ActivityListSheet.svelte";
+  import BottomSheet from "$lib/components/BottomSheet.svelte";
   import { CAROUSEL_ACTIVITIES } from "$lib/components/ActivityCarousel.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
@@ -22,14 +23,17 @@
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import {
     ChevronDown,
+    CircleQuestionMark,
     Crown,
     FlaskConical,
     GripVertical,
     List,
+    ListOrdered,
     Pencil,
     Plus,
     QrCode,
     ShieldUser,
+    SlidersHorizontal,
     Trash2,
     Users,
   } from "@lucide/svelte";
@@ -41,6 +45,7 @@
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let expandedActivityId = $state<string | null>(null);
   let carouselActivitiesSheetOpen = $state(false);
+  let orderInfoOpen = $state(false);
 
   let formatOptions = $derived(
     ACTIVITY_FORMAT_OPTIONS.map((option) => ({
@@ -261,19 +266,85 @@
     title={t.t("home.allActivities")}
   />
 
+  <BottomSheet
+    bind:open={orderInfoOpen}
+    onClose={() => (orderInfoOpen = false)}
+    closeLabel={t.t("common.close")}
+  >
+    <div class="px-6 pb-6 pt-2">
+      <h2 class="mb-4 text-lg font-black text-text">
+        {t.t("sports.orderInfoLabel")}
+      </h2>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-start gap-4">
+          <div
+            class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+          >
+            <ListOrdered class="size-5" />
+          </div>
+          <div>
+            <p class="text-base font-bold text-text">
+              {t.t("discover.presetHintOrderTitle")}
+            </p>
+            <p class="mt-0.5 text-sm text-muted">
+              {t.t("discover.presetHintOrderBody")}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div
+            class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+          >
+            <GripVertical class="size-5" />
+          </div>
+          <div>
+            <p class="text-base font-bold text-text">
+              {t.t("common.dragToReorder")}
+            </p>
+            <p class="mt-0.5 text-sm text-muted">
+              {t.t("sports.reorderHint")}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div
+            class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+          >
+            <SlidersHorizontal class="size-5" />
+          </div>
+          <div>
+            <p class="text-base font-bold text-text">
+              {t.t("sports.formatLevelInfoTitle")}
+            </p>
+            <p class="mt-0.5 text-sm text-muted">
+              {t.t("sports.formatLevelInfoBody")}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </BottomSheet>
+
   <!-- Activities -->
   <div id="activities" class="scroll-mt-20 px-5">
-    <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-      {t.t("common.mySports")}
-    </h3>
+    <div class="mb-3 flex items-center justify-between">
+      <h3 class="text-sm font-bold uppercase tracking-wide text-muted">
+        {t.t("common.mySports")}
+      </h3>
+      <button
+        type="button"
+        onclick={() => (orderInfoOpen = true)}
+        aria-label={t.t("sports.orderInfoLabel")}
+        class="flex size-7 items-center justify-center rounded-full bg-surface text-muted shadow-sm active:scale-95"
+      >
+        <CircleQuestionMark class="size-4" />
+      </button>
+    </div>
     {#if activities.length === 0}
       <p class="mb-3 text-sm text-muted">
         {t.t("common.noActivities")}
       </p>
     {:else}
-      <p class="mb-3 text-xs font-semibold text-muted text-balance">
-        {t.t("sports.reorderHint")}
-      </p>
       <div class="mb-3 flex flex-col gap-3">
         {#each activities as act, i (act.id)}
           {@const expanded = expandedActivityId === act.id}

@@ -6,7 +6,6 @@
     RotateCcw,
     CircleQuestionMark,
     Dumbbell,
-    ListOrdered,
     Zap,
     Check,
   } from "@lucide/svelte";
@@ -71,12 +70,6 @@
       icon: Dumbbell,
       title: "discover.presetHintIntroTitle",
       body: "discover.presetHintIntroBody",
-    },
-    {
-      key: "order",
-      icon: ListOrdered,
-      title: "discover.presetHintOrderTitle",
-      body: "discover.presetHintOrderBody",
     },
   ] as const;
 
