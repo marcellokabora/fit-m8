@@ -69,7 +69,7 @@
     onclick={onPass}
     {disabled}
     aria-label={passLabel}
-    style="transition: transform 150ms ease, background-color 150ms ease, color 150ms ease; background-color: color-mix(in srgb, var(--color-error) {passPct}%, var(--color-surface)); color: color-mix(in srgb, white {passPct}%, var(--color-error));"
+    style="transition: transform 150ms ease; background-color: color-mix(in srgb, var(--color-error) {passPct}%, var(--color-surface)); color: color-mix(in srgb, white {passPct}%, var(--color-error));"
     class="flex size-16 items-center justify-center rounded-full text-3xl shadow-lg active:scale-90 disabled:opacity-50"
   >
     <X class="size-7" />
@@ -78,7 +78,7 @@
     onclick={onLike}
     {disabled}
     aria-label={likeLabel}
-    style="transition: transform 150ms ease, background-color 150ms ease, color 150ms ease; background-color: color-mix(in srgb, var(--color-success) {likePct}%, var(--color-surface)); color: color-mix(in srgb, white {likePct}%, var(--color-primary));"
+    style="transition: transform 150ms ease; background-color: color-mix(in srgb, var(--color-success) {likePct}%, var(--color-surface)); color: color-mix(in srgb, white {likePct}%, var(--color-primary));"
     class="flex size-16 items-center justify-center rounded-full text-3xl shadow-lg active:scale-90 disabled:opacity-50"
   >
     <Zap class="size-7" />

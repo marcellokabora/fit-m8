@@ -1,0 +1,19 @@
+# Fit-M8
+
+> Fit-M8 matches people for sports activities, Tinder-style. Users build a profile with
+> favorite sports, skill level, and location, then swipe to find nearby workout partners,
+> training buddies, or teammates, and chat once matched.
+
+Fit-M8 is a Progressive Web App (SvelteKit + Firebase). Most in-app screens (discover feed,
+matches, chat, profile) require an authenticated user session and are not meaningful to crawl
+or index as standalone content; the pages below are the public, crawlable surface of the site.
+
+## Pages
+
+- [Home](https://fit-m8.app/): Landing page introducing Fit-M8 and its sign-up/login entry point.
+- [Terms of Service](https://fit-m8.app/terms): Terms governing use of the Fit-M8 app.
+- [Privacy Policy](https://fit-m8.app/privacy): How Fit-M8 collects, uses, and stores user data.
+
+## Optional
+
+- [Sitemap](https://fit-m8.app/sitemap.xml): Full list of indexable URLs.
