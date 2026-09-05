@@ -1,5 +1,12 @@
-# allow crawling everything by default
+# public marketing/legal pages are crawlable; everything else is private, per-user app content
 User-agent: *
-Disallow:
+Disallow: /discover
+Disallow: /matches
+Disallow: /chat/
+Disallow: /profile
+Disallow: /premium
+Disallow: /onboarding
+Disallow: /admin/
+Disallow: /auth/
 
 Sitemap: https://fit-m8.app/sitemap.xml

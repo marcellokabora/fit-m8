@@ -20,6 +20,7 @@
     ],
     "hosting": {
         "public": "build",
+        "cleanUrls": true,
         "ignore": [
             "firebase.json",
             "**/.*",
@@ -76,7 +77,7 @@
         "rewrites": [
             {
                 "source": "**",
-                "destination": "/index.html"
+                "destination": "/200.html"
             }
         ]
     }

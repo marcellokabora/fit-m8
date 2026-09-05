@@ -16,7 +16,9 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter({ fallback: 'index.html' }),
+			// 'index.html' is now the real prerendered homepage, so the SPA fallback (used for
+			// every other, client-only route) needs its own filename to avoid overwriting it
+			adapter: adapter({ fallback: '200.html' }),
 			inspector: true
 		}),
 		VitePWA({
@@ -28,6 +30,11 @@ export default defineConfig({
 				// dev server has no static index.html to precache, so keep the SW
 				// disabled in dev and only register it in production builds
 				enabled: false
+			},
+			// offline hard-navigations to client-only routes must fall back to the SPA shell,
+			// not the prerendered homepage's markup
+			workbox: {
+				navigateFallback: '/200.html'
 			},
 			manifest: {
 				id: '/',

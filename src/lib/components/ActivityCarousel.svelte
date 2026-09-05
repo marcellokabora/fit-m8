@@ -15,19 +15,22 @@
 
 <script lang="ts">
   import { onMount, untrack } from "svelte";
+  import { browser } from "$app/environment";
   import { page } from "$app/state";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
-  import padelImg from "$lib/assets/homepage/padel.jpg?enhanced";
-  import footvolleyImg from "$lib/assets/homepage/footvolley.jpg?enhanced";
-  import joggingImg from "$lib/assets/homepage/jogging.jpg?enhanced";
-  import tennisImg from "$lib/assets/homepage/tennis.jpg?enhanced";
-  import basketballImg from "$lib/assets/homepage/bascketball.jpg?enhanced";
-  import cyclingImg from "$lib/assets/homepage/cycling.jpg?enhanced";
-  import beachVolleyImg from "$lib/assets/homepage/beachvolley.jpg?enhanced";
-  import boxingImg from "$lib/assets/homepage/boxing.jpg?enhanced";
-  import surfImg from "$lib/assets/homepage/surf.jpg?enhanced";
-  import soccerImg from "$lib/assets/homepage/football.jpg?enhanced";
+  // lower quality is fine here - these render blurred at 50% opacity as fixed full-screen backgrounds
+  // ("enhanced" must be last in the query string to match the "*?enhanced" ambient module type)
+  import padelImg from "$lib/assets/homepage/padel.jpg?quality=45&enhanced";
+  import footvolleyImg from "$lib/assets/homepage/footvolley.jpg?quality=45&enhanced";
+  import joggingImg from "$lib/assets/homepage/jogging.jpg?quality=45&enhanced";
+  import tennisImg from "$lib/assets/homepage/tennis.jpg?quality=45&enhanced";
+  import basketballImg from "$lib/assets/homepage/bascketball.jpg?quality=45&enhanced";
+  import cyclingImg from "$lib/assets/homepage/cycling.jpg?quality=45&enhanced";
+  import beachVolleyImg from "$lib/assets/homepage/beachvolley.jpg?quality=45&enhanced";
+  import boxingImg from "$lib/assets/homepage/boxing.jpg?quality=45&enhanced";
+  import surfImg from "$lib/assets/homepage/surf.jpg?quality=45&enhanced";
+  import soccerImg from "$lib/assets/homepage/football.jpg?quality=45&enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -51,7 +54,8 @@
   );
 
   // ?activity=tennis picks the starting slide and, when matched, pauses autoplay
-  const activityParam = page.url.searchParams.get("activity");
+  // (reading searchParams is forbidden during prerendering, so skip it there)
+  const activityParam = browser ? page.url.searchParams.get("activity") : null;
   const initialIndex = activityParam
     ? shuffled.findIndex((activity) => activity.id === activityParam)
     : -1;
