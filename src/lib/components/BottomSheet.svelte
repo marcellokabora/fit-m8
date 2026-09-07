@@ -94,10 +94,19 @@
     >
       <div
         class="mx-auto mt-3 h-1.5 w-10 shrink-0 touch-none rounded-full bg-border active:cursor-grabbing"
+        role="button"
+        tabindex="0"
+        aria-label="Drag handle"
         onpointerdown={onHandleDragStart}
         onpointermove={onHandleDragMove}
         onpointerup={onHandleDragEnd}
         onpointercancel={onHandleDragEnd}
+        onkeydown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onClose();
+          }
+        }}
       ></div>
       {@render children()}
     </div>

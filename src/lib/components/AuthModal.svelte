@@ -1,10 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { fade, fly } from "svelte/transition";
   import { authUser } from "$lib/stores/auth";
   import GoogleSignInButton from "$lib/components/GoogleSignInButton.svelte";
+  import BottomSheet from "$lib/components/BottomSheet.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
-  import { Eye, EyeOff, LogIn, UserRoundPlus, X } from "@lucide/svelte";
+  import { Eye, EyeOff, LogIn, UserRoundPlus } from "@lucide/svelte";
 
   let {
     open = $bindable(false),
@@ -94,47 +94,15 @@
   }
 </script>
 
-{#if open}
-  <div
-    class="fixed inset-0 z-50 mx-auto flex w-full items-end bg-black/60 backdrop-blur-sm md:max-w-md"
-    transition:fade={{ duration: 150 }}
-    role="button"
-    tabindex="0"
-    aria-label={t.t("common.close")}
-    onclick={close}
-    onkeydown={(e) => (e.key === "Enter" || e.key === " ") && close()}
-  >
-    <div
-      class="max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl bg-bg px-6 pb-8 pt-4"
-      transition:fly={{ y: 400, duration: 250 }}
-      role="dialog"
-      tabindex="-1"
-      onclick={(e) => e.stopPropagation()}
-      onkeydown={(e) => e.stopPropagation()}
-    >
-      <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-border"></div>
-
-      <!-- <div class="mb-6 flex items-start justify-between gap-2">
-        <div>
-          <h1 class="text-2xl font-bold tracking-wide text-text">
-            {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
-          </h1>
-          <p class="text-sm text-muted">
-            {mode === "login"
-              ? t.t("auth.loginSubtitle")
-              : t.t("auth.registerSubtitle")}
-          </p>
-        </div>
-        <button
-          type="button"
-          onclick={close}
-          aria-label={t.t("common.close")}
-          class="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface text-muted active:scale-95"
-        >
-          <X class="size-5" />
-        </button>
-      </div> -->
-
+<BottomSheet
+  bind:open
+  onClose={close}
+  closeLabel={t.t("common.close")}
+  bgClass="bg-bg"
+  maxHeightClass="max-h-[90dvh]"
+>
+  {#snippet children()}
+    <div class="px-6 pb-8 pt-4">
       <GoogleSignInButton
         onclick={handleGoogle}
         {loading}
@@ -229,5 +197,5 @@
         </button>
       </p>
     </div>
-  </div>
-{/if}
+  {/snippet}
+</BottomSheet>

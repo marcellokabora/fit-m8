@@ -3,19 +3,16 @@
   import { authUser } from "$lib/stores/auth";
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  import { fly } from "svelte/transition";
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Logo from "$lib/components/Logo.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
-  import AppearancePicker from "$lib/components/AppearancePicker.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import { activeTheme, THEMES } from "$lib/stores/theme";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import { ACTIVITIES } from "$lib/types";
   import {
-    Palette,
     UserRoundPlus,
     SlidersHorizontal,
     Compass,
@@ -146,7 +143,6 @@
 
   let authModalOpen = $state(false);
   let authMode = $state<"login" | "register">("register");
-  let themePickerOpen = $state(false);
 
   // content renders immediately (prerendered for crawlers/first paint); this only
   // redirects away once auth resolves, if the visitor turns out to already be logged in
@@ -344,40 +340,4 @@
   </footer>
 
   <AuthModal bind:open={authModalOpen} bind:mode={authMode} />
-
-  <!-- {#if import.meta.env.DEV} -->
-  {#if false}
-    <button
-      type="button"
-      onclick={() => (themePickerOpen = true)}
-      aria-label="Theme picker (dev only)"
-      class="fixed bottom-4 right-4 z-40 flex size-11 items-center justify-center rounded-full text-primary shadow-lg active:scale-95"
-    >
-      <Palette class="size-5" />
-    </button>
-  {/if}
 </div>
-
-{#if themePickerOpen}
-  <div
-    class="fixed inset-0 z-50 mx-auto flex w-full items-end bg-black/60 backdrop-blur-sm md:max-w-md"
-    role="button"
-    tabindex="0"
-    aria-label="Close"
-    onclick={() => (themePickerOpen = false)}
-    onkeydown={(e) =>
-      (e.key === "Enter" || e.key === " ") && (themePickerOpen = false)}
-  >
-    <div
-      class="w-full rounded-t-3xl bg-bg p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
-      transition:fly={{ y: 400, duration: 250 }}
-      role="dialog"
-      tabindex="-1"
-      onclick={(e) => e.stopPropagation()}
-      onkeydown={(e) => e.stopPropagation()}
-    >
-      <div class="mx-auto mb-4 h-1.5 w-10 rounded-full bg-border"></div>
-      <AppearancePicker />
-    </div>
-  </div>
-{/if}
