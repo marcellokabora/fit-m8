@@ -43,7 +43,10 @@
   import Toggle from "$lib/components/Toggle.svelte";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import AppearancePicker from "$lib/components/AppearancePicker.svelte";
-  import type { DiscoverPreset } from "$lib/components/DiscoverPresetPicker.svelte";
+  import {
+    getDiscoverPresetValues,
+    type DiscoverPresetKind,
+  } from "$lib/discoverPresets";
   import {
     requestPushToken,
     savePushToken,
@@ -70,7 +73,7 @@
       string,
       { format: ActivityFormat; level: SkillLevel }
     >;
-    discoverPreset: DiscoverPreset | null;
+    discoverPreset: DiscoverPresetKind | null;
     photos: string[];
   };
 
@@ -147,7 +150,7 @@
   let groupedFilteredActivities = $derived(groupActivities(filteredActivities));
 
   // Which quick preset to land on Discover with (not currently set by any onboarding step)
-  let discoverPreset = $state<DiscoverPreset | null>(
+  let discoverPreset = $state<DiscoverPresetKind | null>(
     draft.discoverPreset ?? null,
   );
 
@@ -306,25 +309,19 @@
       ...activitySettings[id],
     }));
 
-    const discoverFilters: DiscoverFilters | undefined = discoverPreset
-      ? {
-          activities: [],
-          format: discoverPreset === "dating" ? "1v1" : "",
-          level: discoverPreset === "trainer" ? "expert" : "",
-          gender:
-            discoverPreset === "dating"
-              ? oppositeGender
-              : discoverPreset === "friends"
-                ? gender
-                : "",
-          orientation: discoverPreset === "trainer" ? "" : sexualOrientation,
-          minAge: null,
-          maxAge: null,
-          maxDistanceKm: DEFAULT_DISTANCE_KM,
-          single: discoverPreset === "dating" ? "yes" : "",
-          trainer: discoverPreset === "trainer" ? "yes" : "",
-        }
-      : undefined;
+    // Always writes a discoverFilters object, even with no preset picked, so Discover
+    // starts from an explicit default instead of prompting the PresetHint modal on first visit.
+    const discoverFilters: DiscoverFilters = {
+      activities: [],
+      ...getDiscoverPresetValues(discoverPreset ?? "default", {
+        myGender: gender,
+        oppositeGender,
+        myOrientation: sexualOrientation,
+      }),
+      minAge: null,
+      maxAge: null,
+      maxDistanceKm: DEFAULT_DISTANCE_KM,
+    };
 
     try {
       await userProfile.save(user.uid, {

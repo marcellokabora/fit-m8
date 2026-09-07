@@ -203,22 +203,25 @@
           {$userProfile.bio}
         </p>
       {/if}
-      {#if $userProfile?.socialLinks?.length}
-        <div class="flex flex-wrap gap-2">
-          {#each $userProfile.socialLinks as link}
-            <a
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={detectSocialPlatform(link).label}
-              class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
-            >
-              <SocialIcon url={link} class="size-4.5" />
-            </a>
-          {/each}
-        </div>
-      {/if}
     </div>
+    {#if $userProfile?.socialLinks?.length}
+      <div
+        class="flex flex-wrap items-center gap-2 rounded-2xl bg-surface p-4 shadow-sm"
+      >
+        <span class="flex-1 text-muted">Socials</span>
+        {#each $userProfile.socialLinks as link}
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={detectSocialPlatform(link).label}
+            class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
+          >
+            <SocialIcon url={link} class="size-4.5" />
+          </a>
+        {/each}
+      </div>
+    {/if}
   </div>
 
   {#if $isAdmin}
@@ -270,6 +273,7 @@
     bind:open={orderInfoOpen}
     onClose={() => (orderInfoOpen = false)}
     closeLabel={t.t("common.close")}
+    bgClass="bg-surface"
   >
     <div class="px-6 pb-6 pt-2">
       <h2 class="mb-4 text-lg font-black text-text">

@@ -213,6 +213,11 @@
                       <User class="size-6" />
                     </div>
                   {/if}
+                  {#if $unreadMatches.has(match.id)}
+                    <span
+                      class="absolute right-1.5 top-1.5 size-2.5 rounded-full bg-primary ring-2 ring-surface"
+                    ></span>
+                  {/if}
                   <div
                     class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent px-1.5 pb-1.5 pt-4"
                   >

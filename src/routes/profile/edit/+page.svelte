@@ -366,7 +366,7 @@
     <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
       {t.t("profile.socialLinks")}
     </h3>
-    <p class="mb-3 text-sm text-muted">{t.t("profile.socialLinksHint")}</p>
+    <!-- <p class="mb-3 text-sm text-muted">{t.t("profile.socialLinksHint")}</p> -->
     {#if socialLinks.length > 0}
       <div class="mb-3 flex flex-col gap-2">
         {#each socialLinks as link, index}

@@ -38,7 +38,14 @@
   import Paddleboard from "~icons/material-symbols/kayaking";
   import Kayak from "~icons/mdi/kayaking";
   import Surf from "~icons/material-symbols/surfing";
+  import Windsurf from "~icons/mdi/sail-boat";
+  import Kitesurf from "~icons/material-symbols/kitesurfing";
+  import WingFoil from "~icons/mdi/kite-outline";
+  import ParaWing from "~icons/mdi/paragliding";
   import Rollerblade from "~icons/material-symbols/roller-skating";
+  import Bmx from "~icons/mdi/bike-fast";
+  import Scooter from "~icons/material-symbols/scooter";
+  import Unicycle from "~icons/mdi/unicycle";
   import Skateboard from "~icons/material-symbols/skateboarding";
   import Generic from "~icons/material-symbols/sports-outline";
   import type { ActivityId } from "$lib/types";
@@ -91,7 +98,14 @@
     paddleboard: Paddleboard,
     kayak: Kayak,
     surf: Surf,
+    windsurf: Windsurf,
+    kitesurf: Kitesurf,
+    wingFoil: WingFoil,
+    paraWing: ParaWing,
     rollerblade: Rollerblade,
+    bmx: Bmx,
+    scooter: Scooter,
+    unicycle: Unicycle,
     skateboard: Skateboard,
   };
 

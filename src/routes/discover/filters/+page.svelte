@@ -4,9 +4,12 @@
   import BackHeader from "$lib/components/BackHeader.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import PresetHint, {
+  import PresetHint from "$lib/components/PresetHint.svelte";
+  import {
+    getDiscoverPresetValues,
+    matchesDiscoverPreset,
     type DiscoverPresetKind,
-  } from "$lib/components/PresetHint.svelte";
+  } from "$lib/discoverPresets";
   import {
     authUser,
     userProfile,
@@ -28,7 +31,7 @@
     Users,
     Heart,
     UserShield,
-    ArrowRight,
+    Plus,
   } from "@lucide/svelte";
   import {
     ACTIVITIES,
@@ -129,6 +132,7 @@
     myGender === "male" ? "female" : myGender === "female" ? "male" : "",
   );
   let myOrientation = $derived($userProfile?.orientation ?? "hetero");
+  let presetContext = $derived({ myGender, oppositeGender, myOrientation });
 
   // This page edits its own drafts only; the shared filter stores (which drive the
   // discover feed) are updated in one shot when "Save" is pressed, not while editing.
@@ -146,6 +150,15 @@
   let draftActivities = $state<string[]>(get(filterActivities));
   let draftSingle = $state<YesNoFilter>(get(filterSingle));
   let draftTrainer = $state<YesNoFilter>(get(filterTrainer));
+
+  let currentFilterValues = $derived({
+    format: draftFormat,
+    level: draftLevel,
+    gender: draftGender,
+    orientation: draftOrientation,
+    single: draftSingle,
+    trainer: draftTrainer,
+  });
 
   function updateAgeMinDraft(value: number) {
     ageMinDraft = Math.min(value, ageMaxDraft);
@@ -166,72 +179,45 @@
   }
 
   let isDatingPreset = $derived(
-    draftFormat === "1v1" &&
-      draftLevel === "" &&
-      draftGender === oppositeGender &&
-      draftOrientation === myOrientation &&
-      draftSingle === "yes" &&
-      draftTrainer === "",
+    matchesDiscoverPreset("dating", currentFilterValues, presetContext),
   );
   let isFriendsPreset = $derived(
-    draftFormat === "" &&
-      draftLevel === "" &&
-      draftGender === myGender &&
-      draftOrientation === myOrientation &&
-      draftSingle === "" &&
-      draftTrainer === "",
+    matchesDiscoverPreset("friends", currentFilterValues, presetContext),
   );
   let isTrainerPreset = $derived(
-    draftFormat === "" &&
-      draftLevel === "expert" &&
-      draftGender === "" &&
-      draftOrientation === "" &&
-      draftSingle === "" &&
-      draftTrainer === "yes",
+    matchesDiscoverPreset("trainer", currentFilterValues, presetContext),
   );
   // Matches the state resetFilters() puts the draft in - no restrictions on anything
   let isDefaultPreset = $derived(
     draftActivities.length === 0 &&
-      draftFormat === "" &&
-      draftLevel === "" &&
-      draftGender === "" &&
-      draftOrientation === "" &&
       ageMinDraft === AGE_MIN &&
       ageMaxDraft === AGE_MAX &&
       distanceDraft === null &&
-      draftSingle === "" &&
-      draftTrainer === "",
+      matchesDiscoverPreset("default", currentFilterValues, presetContext),
   );
 
   // Quick presets shown as buttons in the header; each resets sport selection to "any"
-  function applyDatingPreset() {
+  function setPresetFilters(preset: DiscoverPresetKind) {
+    const values = getDiscoverPresetValues(preset, presetContext);
     draftActivities = [];
-    draftFormat = "1v1";
-    draftLevel = "";
-    draftGender = oppositeGender;
-    draftOrientation = myOrientation;
-    draftSingle = "yes";
-    draftTrainer = "";
+    draftFormat = values.format;
+    draftLevel = values.level;
+    draftGender = values.gender;
+    draftOrientation = values.orientation;
+    draftSingle = values.single;
+    draftTrainer = values.trainer;
+  }
+
+  function applyDatingPreset() {
+    setPresetFilters("dating");
   }
 
   function applyFriendsPreset() {
-    draftActivities = [];
-    draftFormat = "";
-    draftLevel = "";
-    draftGender = myGender;
-    draftOrientation = myOrientation;
-    draftSingle = "";
-    draftTrainer = "";
+    setPresetFilters("friends");
   }
 
   function applyTrainerPreset() {
-    draftActivities = [];
-    draftFormat = "";
-    draftLevel = "expert";
-    draftGender = "";
-    draftOrientation = "";
-    draftSingle = "";
-    draftTrainer = "yes";
+    setPresetFilters("trainer");
   }
 
   // Bridges PresetHint's toggle picker to the preset functions above
@@ -410,9 +396,6 @@
                 : isTrainerPreset
                   ? "trainer"
                   : null}
-          hasDiscoverFilters={$userProfile
-            ? !!$userProfile.discoverFilters
-            : undefined}
           onSelectPreset={selectDiscoverPreset}
         />
       </div>
@@ -619,10 +602,10 @@
       </p>
       <a
         href="/profile#activities"
-        class="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white active:scale-95"
+        class="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
+        <Plus class="size-4" />
         Add activities
-        <ArrowRight class="size-4" />
       </a>
     </div>
   </div>

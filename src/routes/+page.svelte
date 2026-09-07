@@ -162,7 +162,7 @@
   style="--color-bg: {darkColors.bg}; --color-surface: {darkColors.surface}; --color-text: {darkColors.text}; --color-muted: {darkColors.muted}; --color-border: {darkColors.border};"
 >
   <div
-    class="relative flex min-h-[83dvh] shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)]"
+    class="relative flex min-h-dvh shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)]"
   >
     <!-- Logo / Hero -->
     <div class="relative z-10 flex flex-col items-center gap-4 text-text">
@@ -208,6 +208,12 @@
           >
         </p> -->
     </div>
+
+    <!-- fades the hero photo into the solid page bg instead of cutting off hard at the fold -->
+    <div
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-bg"
+      aria-hidden="true"
+    ></div>
   </div>
 
   <!-- SEO content: real, crawlable copy below the hero fold -->

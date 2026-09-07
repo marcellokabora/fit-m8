@@ -26,6 +26,7 @@
     Crown,
     Pencil,
     Flag,
+    Bot,
     X,
   } from "@lucide/svelte";
   import {
@@ -283,6 +284,12 @@
           <UserShield
             class="size-4 shrink-0 text-primary"
             aria-label={t.t("profile.trainer")}
+          />
+        {/if}
+        {#if $isAdmin && profile.uid.startsWith("fake_")}
+          <Bot
+            class="size-4 shrink-0 text-primary"
+            aria-label={t.t("profile.fakeProfile")}
           />
         {/if}
       {:else}

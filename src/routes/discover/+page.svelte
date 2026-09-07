@@ -52,9 +52,12 @@
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
-  import PresetHint, {
+  import PresetHint from "$lib/components/PresetHint.svelte";
+  import {
+    getDiscoverPresetValues,
+    matchesDiscoverPreset,
     type DiscoverPresetKind,
-  } from "$lib/components/PresetHint.svelte";
+  } from "$lib/discoverPresets";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -81,43 +84,32 @@
     myGender === "male" ? "female" : myGender === "female" ? "male" : "",
   );
   let myOrientation = $derived($userProfile?.orientation ?? "hetero");
+  let presetContext = $derived({ myGender, oppositeGender, myOrientation });
+  let currentFilterValues = $derived({
+    format: $filterFormat,
+    level: $filterLevel,
+    gender: $filterGender,
+    orientation: $filterSexualOrientation,
+    single: $filterSingle,
+    trainer: $filterTrainer,
+  });
 
   let isDatingPreset = $derived(
-    $filterFormat === "1v1" &&
-      $filterLevel === "" &&
-      $filterGender === oppositeGender &&
-      $filterSexualOrientation === myOrientation &&
-      $filterSingle === "yes" &&
-      $filterTrainer === "",
+    matchesDiscoverPreset("dating", currentFilterValues, presetContext),
   );
   let isFriendsPreset = $derived(
-    $filterFormat === "" &&
-      $filterLevel === "" &&
-      $filterGender === myGender &&
-      $filterSexualOrientation === myOrientation &&
-      $filterSingle === "" &&
-      $filterTrainer === "",
+    matchesDiscoverPreset("friends", currentFilterValues, presetContext),
   );
   let isTrainerPreset = $derived(
-    $filterFormat === "" &&
-      $filterLevel === "expert" &&
-      $filterGender === "" &&
-      $filterSexualOrientation === "" &&
-      $filterSingle === "" &&
-      $filterTrainer === "yes",
+    matchesDiscoverPreset("trainer", currentFilterValues, presetContext),
   );
   // Matches the state applyDefaultPreset() puts the filters in - no restrictions on anything
   let isDefaultPreset = $derived(
     $filterActivities.length === 0 &&
-      $filterFormat === "" &&
-      $filterLevel === "" &&
-      $filterGender === "" &&
-      $filterSexualOrientation === "" &&
       $filterMinAge === null &&
       $filterMaxAge === null &&
       $filterMaxDistanceKm === null &&
-      $filterSingle === "" &&
-      $filterTrainer === "",
+      matchesDiscoverPreset("default", currentFilterValues, presetContext),
   );
   let pageTitle = $derived(
     isDatingPreset
@@ -278,50 +270,37 @@
   }
 
   // Quick presets shown as buttons next to the filters icon; each resets sport selection to "any" and saves immediately
-  function applyDatingPreset() {
+  function setPresetFilters(preset: DiscoverPresetKind) {
+    const values = getDiscoverPresetValues(preset, presetContext);
     filterActivities.set([]);
-    filterFormat.set("1v1");
-    filterLevel.set("");
-    filterGender.set(oppositeGender);
-    filterSexualOrientation.set(myOrientation);
-    filterSingle.set("yes");
-    filterTrainer.set("");
+    filterFormat.set(values.format);
+    filterLevel.set(values.level);
+    filterGender.set(values.gender);
+    filterSexualOrientation.set(values.orientation);
+    filterSingle.set(values.single);
+    filterTrainer.set(values.trainer);
+  }
+
+  function applyDatingPreset() {
+    setPresetFilters("dating");
     saveFilters();
   }
 
   function applyFriendsPreset() {
-    filterActivities.set([]);
-    filterFormat.set("");
-    filterLevel.set("");
-    filterGender.set(myGender);
-    filterSexualOrientation.set(myOrientation);
-    filterSingle.set("");
-    filterTrainer.set("");
+    setPresetFilters("friends");
     saveFilters();
   }
 
   function applyTrainerPreset() {
-    filterActivities.set([]);
-    filterFormat.set("");
-    filterLevel.set("expert");
-    filterGender.set("");
-    filterSexualOrientation.set("");
-    filterSingle.set("");
-    filterTrainer.set("yes");
+    setPresetFilters("trainer");
     saveFilters();
   }
 
   function applyDefaultPreset() {
-    filterActivities.set([]);
-    filterFormat.set("");
-    filterLevel.set("");
-    filterGender.set("");
-    filterSexualOrientation.set("");
+    setPresetFilters("default");
     filterMinAge.set(null);
     filterMaxAge.set(null);
     filterMaxDistanceKm.set(null);
-    filterSingle.set("");
-    filterTrainer.set("");
     saveFilters();
   }
 
@@ -686,9 +665,6 @@
                 : isTrainerPreset
                   ? "trainer"
                   : null}
-          hasDiscoverFilters={$userProfile
-            ? !!$userProfile.discoverFilters
-            : undefined}
           onSelectPreset={selectDiscoverPreset}
         />
       </div>
