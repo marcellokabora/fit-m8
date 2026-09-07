@@ -95,8 +95,10 @@ export const ACTIVITIES = [
 	{ id: 'rollerblade', label: 'Rollerblading', emoji: '🛼', group: 'wheelSkate' },
 	{ id: 'bmx', label: 'BMX', emoji: '🚲', group: 'wheelSkate' },
 	{ id: 'scooter', label: 'Scooter', emoji: '🛴', group: 'wheelSkate' },
+	{ id: 'electricScooter', label: 'Electric Scooter', emoji: '🛴', group: 'wheelSkate' },
 	{ id: 'unicycle', label: 'Unicycle', emoji: '🛞', group: 'wheelSkate' },
 	{ id: 'kayak', label: 'Kayak', emoji: '🚣', group: 'water' },
+	{ id: 'surfskate', label: 'Surfskate', emoji: '🛹', group: 'wheelSkate' },
 	{ id: 'skateboard', label: 'Skateboarding', emoji: '🛹', group: 'wheelSkate' }
 ] as const;
 

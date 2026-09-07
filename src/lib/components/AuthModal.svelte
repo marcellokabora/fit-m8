@@ -4,7 +4,7 @@
   import { authUser } from "$lib/stores/auth";
   import GoogleSignInButton from "$lib/components/GoogleSignInButton.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
-  import { Eye, EyeOff, X } from "@lucide/svelte";
+  import { Eye, EyeOff, LogIn, UserRoundPlus, X } from "@lucide/svelte";
 
   let {
     open = $bindable(false),
@@ -201,8 +201,15 @@
         <button
           type="submit"
           disabled={loading}
-          class="w-full rounded-2xl bg-primary py-4 text-lg font-bold text-white shadow-md active:scale-95 disabled:opacity-50"
+          class="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary py-4 text-lg font-bold text-white shadow-md active:scale-95 disabled:opacity-50"
         >
+          {#if !loading}
+            {#if mode === "login"}
+              <LogIn class="size-5" />
+            {:else}
+              <UserRoundPlus class="size-5" />
+            {/if}
+          {/if}
           {loading
             ? t.t("auth.loading")
             : mode === "login"

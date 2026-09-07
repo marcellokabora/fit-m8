@@ -138,9 +138,12 @@
 
   // click-triggered navigation also resets the autoplay clock
   function userGoTo(i: number) {
-    if (i === pos) return;
-    pos = i;
-    snapIfAtEdge();
+    if (i === pos) {
+      advance(1);
+    } else {
+      pos = i;
+      snapIfAtEdge();
+    }
     restartAutoplay();
   }
 
@@ -198,10 +201,10 @@
           ? "flex cursor-pointer items-end justify-center transition-opacity duration-350"
           : i > pos
             ? "flex cursor-pointer items-start justify-center transition-opacity duration-350"
-            : "flex items-center justify-center transition-opacity duration-350"}
+            : "flex cursor-pointer items-center justify-center transition-opacity duration-350"}
         style={`height: ${ITEM_HEIGHT}px; opacity: ${i === pos ? 1 : 0.75}`}
         role="button"
-        tabindex={i === pos ? -1 : 0}
+        tabindex="0"
         onclick={() => userGoTo(i)}
         onkeydown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -228,7 +231,7 @@
 
 <style>
   /* hide on short viewports where the carousel would push other content off-screen */
-  @media (max-height: 750px) {
+  @media (max-height: 500px) {
     .activity-carousel {
       display: none;
     }
