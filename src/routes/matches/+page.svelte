@@ -151,7 +151,7 @@
   <!-- Header -->
   <div class="sticky top-0 z-10 bg-bg px-5 pb-3 pt-5">
     <h1 class="text-2xl font-black text-text">{t.t("nav.matches")}</h1>
-    <p class="text-sm text-muted">{t.t("matches.subtitle")}</p>
+    <!-- <p class="text-sm text-muted">{t.t("matches.subtitle")}</p> -->
   </div>
 
   {#if loading}

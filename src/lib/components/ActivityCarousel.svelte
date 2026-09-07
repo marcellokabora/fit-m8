@@ -2,6 +2,7 @@
   export const CAROUSEL_ACTIVITIES = [
     { id: "beachVolley" },
     { id: "padel" },
+    { id: "skateboard" },
     { id: "boxing" },
     { id: "footVolley" },
     { id: "jogging" },
@@ -31,6 +32,7 @@
   import boxingImg from "$lib/assets/homepage/boxing.jpg?quality=45&enhanced";
   import surfImg from "$lib/assets/homepage/surf.jpg?quality=45&enhanced";
   import soccerImg from "$lib/assets/homepage/football.jpg?quality=45&enhanced";
+  import skateImg from "$lib/assets/homepage/skate.jpg?quality=45&enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -61,6 +63,7 @@
 
   // background photo per activity, falling back to a cycling set when there's no dedicated image
   const IMAGE_MAP: Record<string, typeof padelImg> = {
+    skateboard: skateImg,
     padel: padelImg,
     footVolley: footvolleyImg,
     jogging: joggingImg,

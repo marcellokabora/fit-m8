@@ -179,7 +179,7 @@
 
     <!-- Activity carousel -->
     <!-- no z-index here: it must not trap the carousel's fixed background image in a stacking context above the logo/CTA -->
-    <div transition:fade class="relative flex w-full justify-center">
+    <div transition:fade class="relative flex w-full justify-center -mt-4">
       <ActivityCarousel />
     </div>
 
@@ -191,7 +191,7 @@
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary/50 bg-surface/20 py-4 text-center text-base font-semibold text-text shadow-sm backdrop-blur-sm active:scale-95"
+        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary/50 bg-surface/80 py-4 text-center text-base font-semibold text-text shadow-sm backdrop-blur-sm active:scale-95"
       >
         <LogIn class="size-5" />
         {t.t("auth.signIn")}
@@ -211,7 +211,7 @@
 
     <!-- fades the hero photo into the solid page bg instead of cutting off hard at the fold -->
     <div
-      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-bg"
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-bg"
       aria-hidden="true"
     ></div>
   </div>
