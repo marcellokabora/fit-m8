@@ -360,31 +360,42 @@
       <p>{t.t("profile.notFound")}</p>
     </div>
   {:else}
-    <PhotoGallery {photos} alt={profile.displayName} />
-
-    <div class="flex flex-col gap-3 px-5 pb-6 pt-4">
-      {#if profile.city || distanceAway !== null}
-        <div
-          class="flex flex-wrap items-center gap-2 rounded-2xl bg-surface p-4 text-sm text-muted shadow-sm"
-        >
-          {#if profile.city}
-            <span class="flex items-center gap-0.5">
-              <MapPin class="size-3.5" />
-              {profile.city}
-            </span>
-          {/if}
-          {#if distanceAway !== null}
-            <span>{t.t("profile.distanceAway", { count: distanceAway })}</span>
-          {/if}
-        </div>
-      {/if}
-      <div
-        class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
-      >
-        {#if profile.bio}
-          <p class="text-left text-sm text-muted text-balance">{profile.bio}</p>
+    <PhotoGallery {photos} alt={profile.displayName}>
+      {#snippet children()}
+        {#if profile}
+          <div class="flex flex-col gap-2 text-white">
+            {#if profile.city || distanceAway !== null}
+              <div
+                class="flex flex-wrap items-center gap-2 text-sm font-medium"
+              >
+                {#if profile.city}
+                  <span class="flex items-center gap-0.5">
+                    <MapPin class="size-3.5" />
+                    {profile.city}
+                  </span>
+                {/if}
+                {#if distanceAway !== null}
+                  <span
+                    >{t.t("profile.distanceAway", {
+                      count: distanceAway,
+                    })}</span
+                  >
+                {/if}
+              </div>
+            {/if}
+            {#if profile.bio}
+              <p class="text-left text-sm text-balance">{profile.bio}</p>
+            {/if}
+          </div>
         {/if}
-        {#if profile.socialLinks?.length}
+      {/snippet}
+    </PhotoGallery>
+
+    {#if profile.socialLinks?.length}
+      <div class="flex flex-col gap-3 px-5 pb-6 pt-4">
+        <div
+          class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
+        >
           <div class="flex flex-wrap gap-2">
             {#each profile.socialLinks as link}
               <a
@@ -398,11 +409,11 @@
               </a>
             {/each}
           </div>
-        {/if}
+        </div>
       </div>
-    </div>
+    {/if}
 
-    <div class="px-5">
+    <div class="px-5 {profile.socialLinks?.length ? '' : 'pt-4'}">
       <!-- <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
         {t.t("common.sports")}
       </h3> -->

@@ -1,10 +1,15 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { User } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
 
-  let { photos, alt }: { photos: string[]; alt: string } = $props();
+  let {
+    photos,
+    alt,
+    children,
+  }: { photos: string[]; alt: string; children?: Snippet } = $props();
 
   let photoIndex = $state(0);
 
@@ -55,5 +60,12 @@
       aria-label={t.t("common.nextPhoto")}
       class="absolute inset-y-0 right-0 w-1/2"
     ></button>
+  {/if}
+  {#if children}
+    <div
+      class="pointer-events-none absolute inset-x-0 bottom-0 z-1 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-5 pb-4 pt-16"
+    >
+      {@render children()}
+    </div>
   {/if}
 </div>
