@@ -193,40 +193,34 @@
   <PhotoGallery
     {photos}
     alt={$userProfile?.displayName ?? t.t("common.profilePhoto")}
-  />
-  <div class="flex flex-col gap-3 px-5 pb-6 pt-6">
-    <div
-      class="flex flex-col items-start gap-3 rounded-2xl bg-surface p-4 shadow-sm"
-    >
+  >
+    {#snippet children()}
       {#if $userProfile?.bio}
-        <p class="text-left text-sm text-muted text-balance">
+        <p class="text-left text-sm text-white text-balance">
           {$userProfile.bio}
         </p>
       {/if}
-    </div>
-    {#if $userProfile?.socialLinks?.length}
-      <div
-        class="flex flex-wrap items-center gap-2 rounded-2xl bg-surface p-4 shadow-sm"
-      >
-        <span class="flex-1 text-muted">Socials</span>
-        {#each $userProfile.socialLinks as link}
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={detectSocialPlatform(link).label}
-            class="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary active:scale-95"
-          >
-            <SocialIcon url={link} class="size-4.5" />
-          </a>
-        {/each}
-      </div>
-    {/if}
-  </div>
+      {#if $userProfile?.socialLinks?.length}
+        <div class="pointer-events-auto mt-3 flex flex-wrap items-center gap-2">
+          {#each $userProfile.socialLinks as link}
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={detectSocialPlatform(link).label}
+              class="flex size-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm active:scale-95"
+            >
+              <SocialIcon url={link} class="size-4.5" />
+            </a>
+          {/each}
+        </div>
+      {/if}
+    {/snippet}
+  </PhotoGallery>
 
   {#if $isAdmin}
     <div
-      class="mx-5 mb-6 flex flex-col gap-2 rounded-2xl bg-surface p-3 shadow-sm"
+      class="mx-5 mb-6 mt-6 flex flex-col gap-2 rounded-2xl bg-surface p-3 shadow-sm"
     >
       <!-- <p class="px-1 text-xs font-bold uppercase tracking-wide text-muted">
         Admin
@@ -330,7 +324,7 @@
   </BottomSheet>
 
   <!-- Activities -->
-  <div id="activities" class="scroll-mt-20 px-5">
+  <div id="activities" class="scroll-mt-20 px-5 {$isAdmin ? '' : 'pt-6'}">
     <div class="mb-3 flex items-center justify-between">
       <h3 class="text-sm font-bold uppercase tracking-wide text-muted">
         {t.t("common.mySports")}
