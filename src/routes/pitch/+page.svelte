@@ -18,7 +18,6 @@
     Globe,
     ShieldCheck,
     MapPin,
-    CircleHelp,
   } from "@lucide/svelte";
   import Logo from "$lib/components/Logo.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
@@ -201,24 +200,6 @@
     }
   });
 
-  // Swipe-to-navigate, same pointer drag-threshold pattern as the Discover card swipe
-  let dragging = false;
-  let startX = 0;
-  const SWIPE_THRESHOLD = 60;
-
-  function onPointerDown(e: PointerEvent) {
-    dragging = true;
-    startX = e.clientX;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  }
-  function onPointerUp(e: PointerEvent) {
-    if (!dragging) return;
-    dragging = false;
-    const delta = e.clientX - startX;
-    if (delta <= -SWIPE_THRESHOLD) next();
-    else if (delta >= SWIPE_THRESHOLD) prev();
-  }
-
   function onKeydown(e: KeyboardEvent) {
     if (e.key === "ArrowRight") next();
     else if (e.key === "ArrowLeft") prev();
@@ -231,13 +212,7 @@
   class="relative flex h-dvh flex-col overflow-hidden bg-bg text-text"
   style="--color-primary: {theme.primary}; --color-primary-dark: {theme.primaryDark}; --color-bg: {colors.bg}; --color-surface: {colors.surface}; --color-text: {colors.text}; --color-muted: {colors.muted}; --color-border: {colors.border};"
 >
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    class="relative min-h-0 flex-1 overflow-hidden"
-    onpointerdown={onPointerDown}
-    onpointerup={onPointerUp}
-    onpointercancel={onPointerUp}
-  >
+  <div class="relative min-h-0 flex-1 overflow-hidden">
     {#key current}
       <div
         class="hide-scrollbar absolute inset-0 flex flex-col overflow-y-auto px-6 py-10 md:px-20 md:py-16"
@@ -301,7 +276,9 @@
                 </div>
               </div>
             </div>
-            <div class="relative w-36 shrink-0 md:w-56">
+            <div
+              class="relative hidden w-36 shrink-0 -rotate-3 md:block md:w-90"
+            >
               <img
                 src={phoneImg}
                 alt=""
@@ -311,7 +288,11 @@
               <div
                 class="absolute inset-x-[4%] top-[3.5%] bottom-[3.5%] flex items-center justify-center"
               >
-                <CircleHelp class="size-12 text-primary/70 md:size-20" />
+                <img
+                  src="/logo/fit-m8-logo-green.png"
+                  alt="FIT-M8"
+                  class="size-12 rounded-full object-cover md:size-40"
+                />
               </div>
             </div>
           </div>
@@ -474,7 +455,7 @@
       onclick={prev}
       disabled={current === 0}
       aria-label="Previous slide"
-      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 md:size-12"
+      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 md:size-10"
     >
       <ChevronLeft class="size-5" />
     </button>
@@ -496,7 +477,7 @@
       onclick={next}
       disabled={current === SLIDE_COUNT - 1}
       aria-label="Next slide"
-      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 md:size-12"
+      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 md:size-10"
     >
       <ChevronRight class="size-5" />
     </button>
