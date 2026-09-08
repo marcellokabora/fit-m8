@@ -15,7 +15,9 @@
   let { children } = $props();
   let t = $derived(createTranslator($activeLanguage));
 
-  const PUBLIC_ROUTES = ["/"];
+  const PUBLIC_ROUTES = ["/", "/pitch"];
+  // The pitch deck is presented full-screen on a laptop, not inside the phone-width app shell
+  let isFullBleedRoute = $derived(page.url.pathname === "/pitch");
 
   onMount(() => {
     activeLanguage.init();
@@ -75,9 +77,15 @@
   {/if}
 </svelte:head>
 
-<div class="min-h-dvh bg-black font-sans md:flex md:justify-center">
+<div
+  class="min-h-dvh bg-black font-sans {isFullBleedRoute
+    ? ''
+    : 'md:flex md:justify-center'}"
+>
   <div
-    class="relative flex min-h-dvh w-full flex-col bg-bg md:max-w-md md:border-x md:border-border md:shadow-2xl"
+    class="relative flex min-h-dvh w-full flex-col bg-bg {isFullBleedRoute
+      ? ''
+      : 'md:max-w-md md:border-x md:border-border md:shadow-2xl'}"
   >
     {@render children()}
   </div>
