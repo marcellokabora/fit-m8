@@ -4,7 +4,12 @@
   import { get } from "svelte/store";
   import { db } from "$lib/firebase/client";
   import { doc, getDoc } from "firebase/firestore";
-  import { ACTIVITIES, type ReportReason, type UserProfile } from "$lib/types";
+  import {
+    ACTIVITIES,
+    getRemainingLikes,
+    type ReportReason,
+    type UserProfile,
+  } from "$lib/types";
   import { getFallbackPhotoURL } from "$lib/image";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
@@ -14,7 +19,11 @@
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
-  import { recordSwipe, startDirectMessage } from "$lib/firebase/swipe";
+  import {
+    recordSwipe,
+    startDirectMessage,
+    LikeLimitReachedError,
+  } from "$lib/firebase/swipe";
   import { submitReport } from "$lib/firebase/reports";
   import { distanceKm, nearbyFakeLocation } from "$lib/location";
   import {
@@ -46,6 +55,7 @@
   let swiping = $state(false);
   let matchBanner = $state(false);
   let showMessageModal = $state(false);
+  let showLikeLimitModal = $state(false);
   let showEditSheet = $state(false);
   let distanceAway = $derived.by(() => {
     if (
@@ -194,13 +204,29 @@
   ) {
     const currentUid = get(authUser)?.uid;
     if (!currentUid || !profile || swiping) return;
+
+    if (direction === "like" && getRemainingLikes($userProfile) <= 0) {
+      showLikeLimitModal = true;
+      return;
+    }
+
     swiping = true;
-    const isMatch = await recordSwipe(
-      currentUid,
-      profile.uid,
-      direction,
-      activities,
-    );
+    let isMatch = false;
+    try {
+      isMatch = await recordSwipe(
+        currentUid,
+        profile.uid,
+        direction,
+        activities,
+      );
+    } catch (e) {
+      swiping = false;
+      if (e instanceof LikeLimitReachedError) {
+        showLikeLimitModal = true;
+        return;
+      }
+      throw e;
+    }
     if (isMatch) {
       matchBanner = true;
       setTimeout(() => goto("/matches"), 1800);
@@ -478,6 +504,45 @@
       </a>
       <button
         onclick={() => (showMessageModal = false)}
+        class="w-full rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
+      >
+        {t.t("common.maybeLater")}
+      </button>
+    </div>
+  </div>
+{/if}
+
+{#if showLikeLimitModal}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="relative flex flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+    >
+      <button
+        onclick={() => (showLikeLimitModal = false)}
+        aria-label={t.t("common.close")}
+        class="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
+      >
+        <X class="size-4" />
+      </button>
+      <span
+        class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
+      >
+        <Crown class="size-8" />
+      </span>
+      <h2 class="text-lg font-black text-text">
+        {t.t("premium.likeLimitTitle")}
+      </h2>
+      <p class="text-sm text-muted">{t.t("premium.likeLimitHint")}</p>
+      <a
+        href="/premium"
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+      >
+        {t.t("profile.goPremium")}
+      </a>
+      <button
+        onclick={() => (showLikeLimitModal = false)}
         class="w-full rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
       >
         {t.t("common.maybeLater")}

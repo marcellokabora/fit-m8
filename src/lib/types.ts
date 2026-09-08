@@ -151,12 +151,31 @@ export const DEFAULT_DISTANCE_KM = 10;
 export const BIO_MAX_LENGTH = 200;
 
 // Maximum number of sports/activities a user profile can have at once
-export const MAX_SPORTS_FREE = 10;
+export const MAX_SPORTS_FREE = 5;
 export const MAX_SPORTS_PREMIUM = 100;
 export const PREMIUM_PRICE_USD = 9.99;
 
 export function getMaxSports(isPremium?: boolean) {
 	return isPremium ? MAX_SPORTS_PREMIUM : MAX_SPORTS_FREE;
+}
+
+// Free accounts can send this many likes per day; Premium members are unlimited.
+export const MAX_LIKES_FREE_PER_DAY = 20;
+
+// UTC 'YYYY-MM-DD' string used to key the daily like counter, so it resets at a consistent
+// point regardless of the user's local timezone.
+export function todayUtcDateString(): string {
+	return new Date().toISOString().slice(0, 10);
+}
+
+// Likes remaining today for this profile; Premium members have no cap (Infinity).
+export function getRemainingLikes(
+	profile: Pick<UserProfile, 'isPremium' | 'likesCount' | 'likesCountDate'> | null | undefined
+): number {
+	if (profile?.isPremium) return Infinity;
+	const usedToday =
+		profile?.likesCountDate === todayUtcDateString() ? (profile?.likesCount ?? 0) : 0;
+	return Math.max(0, MAX_LIKES_FREE_PER_DAY - usedToday);
 }
 
 // Minimum age to use the app (see Terms of Service) — enforced both at onboarding and in firestore.rules
@@ -198,6 +217,10 @@ export interface UserProfile {
 	socialLinks?: string[];
 	// true once the user has subscribed to FIT-M8 Premium
 	isPremium?: boolean;
+	// number of likes sent on likesCountDate; reset once a new UTC day starts (see getRemainingLikes). Ignored for Premium members.
+	likesCount?: number;
+	// UTC 'YYYY-MM-DD' date that likesCount applies to
+	likesCountDate?: string;
 	// true for Google accounts (auto-verified) or once an email/password user confirms their inbox link
 	emailVerified?: boolean;
 	// undefined until the user has confirmed filters at least once from the Discover screen

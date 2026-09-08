@@ -5,9 +5,13 @@
   import { db } from "$lib/firebase/client";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
-  import { MAX_SPORTS_FREE, MAX_SPORTS_PREMIUM } from "$lib/types";
+  import {
+    MAX_LIKES_FREE_PER_DAY,
+    MAX_SPORTS_FREE,
+    MAX_SPORTS_PREMIUM,
+  } from "$lib/types";
   import BackHeader from "$lib/components/BackHeader.svelte";
-  import { Calendar, Crown, Dumbbell, MessageCircle } from "@lucide/svelte";
+  import { Crown, Dumbbell, Heart, MessageCircle } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -32,11 +36,11 @@
       comingSoon: false,
     },
     {
-      icon: Calendar,
-      title: "premium.featureTrainerEventsTitle",
-      hint: "premium.featureTrainerEventsHint",
-      params: {},
-      comingSoon: true,
+      icon: Heart,
+      title: "premium.featureUnlimitedLikesTitle",
+      hint: "premium.featureUnlimitedLikesHint",
+      params: { free: MAX_LIKES_FREE_PER_DAY },
+      comingSoon: false,
     },
   ] as const;
 

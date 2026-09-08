@@ -42,10 +42,12 @@
     recordSwipe,
     undoSwipe,
     startDirectMessage,
+    LikeLimitReachedError,
   } from "$lib/firebase/swipe";
   import {
     ACTIVITIES,
     DEFAULT_DISTANCE_KM,
+    getRemainingLikes,
     type ActivityFormat,
     type DiscoverFilters,
     type Gender,
@@ -485,6 +487,11 @@
     const top = users[0];
     if (!uid || !top) return;
 
+    if (direction === "like" && getRemainingLikes($userProfile) <= 0) {
+      showLikeLimitModal = true;
+      return;
+    }
+
     // Fly the top card off-screen, then swap in the next one once it's clear
     exiting = true;
     dragging = false;
@@ -492,10 +499,21 @@
       (typeof window !== "undefined" ? window.innerWidth : 400) * 1.2;
     currentX = direction === "like" ? flyDistance : -flyDistance;
 
-    const [isMatch] = await Promise.all([
-      recordSwipe(uid, top.uid, direction, activities),
-      new Promise((resolve) => setTimeout(resolve, EXIT_DURATION)),
-    ]);
+    let isMatch = false;
+    try {
+      [isMatch] = await Promise.all([
+        recordSwipe(uid, top.uid, direction, activities),
+        new Promise((resolve) => setTimeout(resolve, EXIT_DURATION)),
+      ]);
+    } catch (e) {
+      currentX = 0;
+      exiting = false;
+      if (e instanceof LikeLimitReachedError) {
+        showLikeLimitModal = true;
+        return;
+      }
+      throw e;
+    }
 
     lastPass = direction === "pass" ? top : null;
     users = users.slice(1);
@@ -518,6 +536,7 @@
   }
 
   let showMessageModal = $state(false);
+  let showLikeLimitModal = $state(false);
   let showComposeSheet = $state(false);
   let messaging = $state(false);
   let messageTarget = $state<{
@@ -912,6 +931,47 @@
       </a>
       <button
         onclick={() => (showMessageModal = false)}
+        class="w-full rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
+      >
+        {t.t("common.maybeLater")}
+      </button>
+    </div>
+  </div>
+{/if}
+
+{#if showLikeLimitModal}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="relative flex flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+    >
+      <button
+        onclick={() => (showLikeLimitModal = false)}
+        aria-label={t.t("common.close")}
+        class="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
+      >
+        <X class="size-4" />
+      </button>
+      <span
+        class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
+      >
+        <Crown class="size-8" />
+      </span>
+      <h2 class="text-lg font-black text-text">
+        {t.t("premium.likeLimitTitle")}
+      </h2>
+      <p class="text-sm text-muted text-balance">
+        {t.t("premium.likeLimitHint")}
+      </p>
+      <a
+        href="/premium"
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+      >
+        {t.t("profile.goPremium")}
+      </a>
+      <button
+        onclick={() => (showLikeLimitModal = false)}
         class="w-full rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
       >
         {t.t("common.maybeLater")}

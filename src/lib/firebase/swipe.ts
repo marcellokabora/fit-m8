@@ -9,58 +9,92 @@ import {
 	getDocs,
 	serverTimestamp,
 	limit,
-	writeBatch
+	writeBatch,
+	runTransaction
 } from 'firebase/firestore';
 import { db } from '$lib/firebase/client';
-import type {
-	ActivityFormat,
-	Gender,
-	SexualOrientation,
-	SkillLevel,
-	UserProfile,
-	YesNoFilter
+import { userProfile } from '$lib/stores/auth';
+import {
+	MAX_LIKES_FREE_PER_DAY,
+	todayUtcDateString,
+	type ActivityFormat,
+	type Gender,
+	type SexualOrientation,
+	type SkillLevel,
+	type UserProfile,
+	type YesNoFilter
 } from '$lib/types';
 import { distanceKm, nearbyFakeLocation } from '$lib/location';
+
+// Thrown by recordSwipe when a non-Premium user has already used up today's likes.
+export class LikeLimitReachedError extends Error {
+	constructor() {
+		super('Daily like limit reached');
+		this.name = 'LikeLimitReachedError';
+	}
+}
 
 export async function recordSwipe(
 	fromUid: string,
 	toUid: string,
 	direction: 'like' | 'pass',
 	activities: string[]
-) {
-	await setDoc(doc(db, 'swipes', fromUid, 'sent', toUid), {
-		direction,
-		activities,
-		timestamp: serverTimestamp()
-	});
+): Promise<boolean> {
+	const swipeRef = doc(db, 'swipes', fromUid, 'sent', toUid);
+	const reverseRef = doc(db, 'swipes', toUid, 'sent', fromUid);
+	const userRef = doc(db, 'users', fromUid);
+	const matchId = [fromUid, toUid].sort().join('_');
 
-	if (direction === 'like') {
-		// Check if the other user already liked us back
-		const reverseSnap = await getDoc(doc(db, 'swipes', toUid, 'sent', fromUid));
-		if (reverseSnap.exists() && reverseSnap.data().direction === 'like') {
+	// A transaction ties the daily-limit check/increment, the swipe write, and the possible
+	// match creation together atomically, so concurrent likes (e.g. two tabs) can't both slip
+	// past the limit or double-count a like.
+	const result = await runTransaction(db, async (tx) => {
+		// Firestore transactions require every read before any write, so reads for a 'pass' are skipped entirely.
+		const userSnap = direction === 'like' ? await tx.get(userRef) : null;
+		const reverseSnap = direction === 'like' ? await tx.get(reverseRef) : null;
+
+		let likeUsage: { count: number; date: string } | null = null;
+		if (direction === 'like' && !userSnap?.data()?.isPremium) {
+			const today = todayUtcDateString();
+			const userData = userSnap?.data();
+			const usedToday = userData?.likesCountDate === today ? (userData?.likesCount ?? 0) : 0;
+			if (usedToday >= MAX_LIKES_FREE_PER_DAY) throw new LikeLimitReachedError();
+			likeUsage = { count: usedToday + 1, date: today };
+			tx.set(userRef, { likesCount: likeUsage.count, likesCountDate: likeUsage.date }, { merge: true });
+		}
+
+		tx.set(swipeRef, { direction, activities, timestamp: serverTimestamp() });
+
+		let isMatch = false;
+		if (direction === 'like' && reverseSnap?.exists() && reverseSnap.data()?.direction === 'like') {
 			// Prefer the activities both sides actually picked; fall back to this swipe's
 			// picks if the two selections don't overlap (or the other swipe predates this field)
-			const reverseActivities: string[] = reverseSnap.data().activities ?? [];
+			const reverseActivities: string[] = reverseSnap.data()?.activities ?? [];
 			const shared = activities.filter((id) => reverseActivities.includes(id));
-			await createMatch(fromUid, toUid, shared.length ? shared : activities);
-			return true; // it's a match!
+			tx.set(
+				doc(db, 'matches', matchId),
+				{
+					userIds: [fromUid, toUid],
+					activities: shared.length ? shared : activities,
+					status: 'confirmed',
+					createdAt: serverTimestamp()
+				},
+				{ merge: true }
+			);
+			isMatch = true;
 		}
-	}
-	return false;
-}
+		return { isMatch, likeUsage };
+	});
 
-async function createMatch(uid1: string, uid2: string, activities: string[]) {
-	const matchId = [uid1, uid2].sort().join('_');
-	await setDoc(
-		doc(db, 'matches', matchId),
-		{
-			userIds: [uid1, uid2],
-			activities,
-			status: 'confirmed',
-			createdAt: serverTimestamp()
-		},
-		{ merge: true }
-	);
+	// Keep the local profile cache in sync so subsequent swipes this session see the
+	// updated count immediately, without waiting for a full profile reload.
+	if (result.likeUsage) {
+		const usage = result.likeUsage;
+		userProfile.update((p) =>
+			p && p.uid === fromUid ? { ...p, likesCount: usage.count, likesCountDate: usage.date } : p
+		);
+	}
+	return result.isMatch;
 }
 
 // Premium-only: lets a user contact someone directly without a mutual swipe match first.
