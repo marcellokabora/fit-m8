@@ -259,17 +259,20 @@
       </ol>
     </section>
 
-    <section class="flex flex-col gap-6 -rotate-3">
+    <section class="flex flex-col gap-6">
       <div class="flex flex-col gap-5">
         <h2
-          class="font-heading text-center text-xl font-bold text-primary mt-4"
+          class="font-heading text-center text-xl font-bold text-primary mt-4 -mb-2"
         >
           {t.t("home.activitiesTitle")}
         </h2>
+        <p class="text-center text-sm text-muted text-balance">
+          {t.t("home.activitiesSubtitle")}
+        </p>
         <!-- natural order, but chip size scales with the interest count to highlight the popular ones -->
         <!-- one big tilted "card" that bleeds off both page edges, matching the step screenshots above -->
         <div
-          class="-mx-24 flex flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10"
+          class="-mx-34 flex flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10 rotate-0"
         >
           {#each DISPLAYED_ACTIVITIES as activity}
             {@const count = interestCount(activity.id)}
