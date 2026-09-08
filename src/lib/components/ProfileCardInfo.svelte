@@ -33,7 +33,7 @@
 </script>
 
 <div
-  class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-5 pb-5 pt-16"
+  class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-5 pb-24 pt-28"
 >
   <div class="pointer-events-auto flex items-center gap-2">
     <h3 class="text-xl font-black text-white -mt-1.5">

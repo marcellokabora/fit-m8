@@ -77,12 +77,18 @@
 >
   {#if checkin}
     <div class="flex flex-col items-center gap-3 px-7 pb-8 pt-2 text-center">
-      <img
-        src={checkin.photoURL ||
-          getFallbackPhotoURL(checkin.uid, checkin.gender ?? "")}
-        alt={checkin.displayName}
-        class="size-20 rounded-full object-cover"
-      />
+      <a
+        href={`/profile/${checkin.uid}`}
+        aria-label={checkin.displayName}
+        class="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <img
+          src={checkin.photoURL ||
+            getFallbackPhotoURL(checkin.uid, checkin.gender ?? "")}
+          alt={checkin.displayName}
+          class="size-20 rounded-full object-cover"
+        />
+      </a>
       <h2 class="text-xl font-black text-text">{checkin.displayName}</h2>
       <span
         class="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-bold text-primary"

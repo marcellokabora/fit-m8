@@ -35,6 +35,7 @@
   import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
   import discoverScreen from "$lib/assets/screens/discover.png?enhanced";
   import matchesScreen from "$lib/assets/screens/matchs.png?enhanced";
+  import exploreScreen from "$lib/assets/screens/explore.png?enhanced";
 
   // Same forced-dark-mode technique as the homepage hero: keeps the visitor's own chosen
   // accent color (theme.ts), just always renders the dark variant of it - English copy only.
@@ -67,6 +68,12 @@
       title: "Match & play",
       desc: "Chat with your matches and plan your next session.",
       screen: matchesScreen,
+    },
+    {
+      icon: MapPin,
+      title: "Explore & check in",
+      desc: "See who's playing nearby on the map and check in to your spot.",
+      screen: exploreScreen,
     },
   ] as const;
 

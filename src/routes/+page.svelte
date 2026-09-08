@@ -17,6 +17,7 @@
     SlidersHorizontal,
     Compass,
     MessagesSquare,
+    MapPin,
     LogIn,
   } from "@lucide/svelte";
   import footballImg from "$lib/assets/homepage/football.jpg?enhanced";
@@ -28,6 +29,7 @@
   import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
   import discoverScreen from "$lib/assets/screens/discover.png?enhanced";
   import matchesScreen from "$lib/assets/screens/matchs.png?enhanced";
+  import exploreScreen from "$lib/assets/screens/explore.png?enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -75,6 +77,12 @@
       titleKey: "step3Title",
       descKey: "step3Desc",
       screen: matchesScreen,
+    },
+    {
+      icon: MapPin,
+      titleKey: "stepExploreTitle",
+      descKey: "stepExploreDesc",
+      screen: exploreScreen,
     },
   ] as const;
 

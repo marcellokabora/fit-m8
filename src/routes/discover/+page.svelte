@@ -3,7 +3,6 @@
   import type { UserProfile } from "$lib/types";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import { scale } from "svelte/transition";
   import {
     SlidersHorizontal,
     User,
@@ -582,7 +581,7 @@
   let passOpacity = $derived(Math.max(0, Math.min(1, -currentX / 100)));
 </script>
 
-<div class="flex h-dvh flex-col overflow-hidden bg-bg pb-22">
+<div class="flex h-dvh flex-col overflow-hidden bg-bg pb-18">
   {#if needsVerification}
     <!-- Email verification gate: keeps unverified email/password accounts out of Discover -->
     <div
@@ -691,7 +690,7 @@
 
     <!-- Card stack -->
     <div
-      class="relative flex min-h-0 flex-1 flex-col items-center justify-center px-5"
+      class="relative flex min-h-0 flex-1 flex-col items-center justify-center"
     >
       {#if loading}
         <Loading fullscreen={false} class="absolute inset-0" />
@@ -713,11 +712,11 @@
         </div>
       {:else}
         <!-- Card stack wrapper: keeps all layers anchored to the same box -->
-        <div class="relative min-h-0 w-full max-w-md flex-1">
+        <div class="relative min-h-0 w-full flex-1">
           <!-- Background cards (stacked look) -->
           {#if users[2]}
             <div
-              class="absolute inset-0 flex flex-col scale-[0.94] overflow-hidden rounded-3xl bg-surface shadow-md"
+              class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-md"
             >
               <div
                 class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
@@ -734,7 +733,7 @@
           {/if}
           {#if users[1]}
             <div
-              class="absolute inset-0 flex flex-col scale-[0.97] overflow-hidden rounded-3xl bg-surface shadow-md"
+              class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-md"
             >
               <div
                 class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
@@ -747,7 +746,6 @@
                   class="h-full w-full object-cover pointer-events-none"
                 />
               </div>
-              <ProfileCardInfo user={users[1]} {t} />
             </div>
           {/if}
 
@@ -760,13 +758,15 @@
               onpointermove={onPointerMove}
               onpointerup={onPointerUp}
               onpointercancel={onPointerUp}
-              in:scale={{ start: 0.95, duration: 220, opacity: 1 }}
               style="transform: translateX({currentX}px) rotate({rotation}deg); transition: {dragging
                 ? 'none'
                 : exiting
                   ? 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)'
-                  : 'transform 0.3s'}; touch-action: none;"
-              class="absolute inset-0 flex flex-col overflow-hidden rounded-3xl bg-surface shadow-xl select-none cursor-grab active:cursor-grabbing"
+                  : 'transform 0.3s'}, border-radius 0.2s; touch-action: none;"
+              class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-xl select-none cursor-grab active:cursor-grabbing {dragging ||
+              exiting
+                ? 'rounded-3xl'
+                : ''}"
             >
               <!-- Photo progress segments (Tinder-style tap navigation) -->
               {#if currentPhotos.length > 1}
@@ -801,19 +801,6 @@
                 {:else}
                   <User class="size-24 text-primary/40" />
                 {/if}
-
-                <!-- View profile -->
-                <button
-                  onpointerdown={(e) => e.stopPropagation()}
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    goto(`/profile/${users[0].uid}`);
-                  }}
-                  aria-label={t.t("profile.viewProfile")}
-                  class="absolute bottom-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-black/20 text-white/70 backdrop-blur-sm"
-                >
-                  <Info class="size-5" />
-                </button>
               </div>
 
               <!-- Like / Pass overlays -->
@@ -842,24 +829,24 @@
               <ProfileCardInfo user={users[0]} {t} />
             </div>
           {/key}
-        </div>
 
-        <!-- Action buttons -->
-        <ActionButtons
-          class="mt-4"
-          onPass={() => swipe("pass")}
-          onLike={() => swipe("like")}
-          disabled={exiting}
-          likeProgress={likeOpacity}
-          passProgress={passOpacity}
-          passLabel={t.t("common.pass")}
-          likeLabel={t.t("common.like")}
-          onUndo={undoLastPass}
-          canUndo={!!lastPass}
-          undoLabel={t.t("common.undo")}
-          onMessage={handleMessage}
-          messageLabel={t.t("common.message")}
-        />
+          <!-- Action buttons: overlaid on the card's bottom shadow, not in flex flow -->
+          <ActionButtons
+            class="absolute inset-x-0 bottom-4 z-20"
+            onPass={() => swipe("pass")}
+            onLike={() => swipe("like")}
+            disabled={exiting}
+            likeProgress={likeOpacity}
+            passProgress={passOpacity}
+            passLabel={t.t("common.pass")}
+            likeLabel={t.t("common.like")}
+            onUndo={undoLastPass}
+            canUndo={!!lastPass}
+            undoLabel={t.t("common.undo")}
+            onMessage={handleMessage}
+            messageLabel={t.t("common.message")}
+          />
+        </div>
       {/if}
     </div>
 
