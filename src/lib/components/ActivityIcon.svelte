@@ -60,6 +60,7 @@
     jogging: Jogging,
     padel: Padel,
     tennis: Tennis,
+    beachTennis: Tennis,
     beachVolley: BeachVolley,
     footVolley: Footvolley,
     basketball: Basketball,

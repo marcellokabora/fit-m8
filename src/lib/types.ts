@@ -51,6 +51,7 @@ export const ACTIVITIES = [
 	{ id: 'jogging', label: 'Jogging', emoji: '🏃' },
 	{ id: 'padel', label: 'Padel', emoji: '🎾', group: 'racquet' },
 	{ id: 'tennis', label: 'Tennis', emoji: '🎾', group: 'racquet' },
+	{ id: 'beachTennis', label: 'Beach Tennis', emoji: '🎾', group: 'racquet' },
 	{ id: 'beachVolley', label: 'Beach Volley', emoji: '🏐', group: 'ballSports' },
 	{ id: 'footVolley', label: 'Foot Volley', emoji: '🏐', group: 'ballSports' },
 	{ id: 'basketball', label: 'Basketball', emoji: '🏀', group: 'ballSports' },
