@@ -258,6 +258,37 @@ export interface Match {
 	isDirectMessage?: boolean;
 }
 
+// A live "I'm playing X here right now" pin on the /map screen. One doc per user (doc id = uid),
+// overwritten on each new check-in. A one-time location snapshot, not continuously-tracked GPS.
+export interface Checkin {
+	uid: string;
+	activityId: ActivityId | string;
+	lat: number;
+	lng: number;
+	// optional short note shown alongside the activity, e.g. "friendly match, all welcome"
+	message?: string;
+	// denormalized from the user's profile at check-in time so map markers render without extra reads
+	displayName: string;
+	photoURL: string;
+	gender?: Gender | '';
+	createdAt: Date;
+	// createdAt + CHECKIN_DURATION_MS; the map only shows check-ins where this is still in the future
+	expiresAt: Date;
+}
+
+// How long a check-in stays visible to others before auto-expiring, unless ended manually first.
+export const CHECKIN_DURATION_MS = 2 * 60 * 60 * 1000;
+
+// A pin rendered on the /map screen's GoogleMap component.
+export interface MapMarker {
+	id: string;
+	lat: number;
+	lng: number;
+	activityId: ActivityId | string;
+	// rendered with a highlighted ring/color (used for the current user's own check-in)
+	isSelf?: boolean;
+}
+
 // Reads activity ids off a match/swipe doc, falling back to the legacy single `activity` field
 // for documents written before multi-activity selection existed.
 export function getMatchActivityIds(doc: { activities?: string[]; activity?: string }): string[] {

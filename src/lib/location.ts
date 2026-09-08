@@ -53,3 +53,20 @@ export function isBarcelonaCityName(name: string) {
         .toLowerCase();
     return normalized.includes("barcelona");
 }
+
+// Raw geolocation fix (no reverse-geocoding) used by the map check-in flow — unlike
+// LocationPicker's detect(), it doesn't need a human-readable city name, just coordinates.
+export function getCurrentCoords(): Promise<{ lat: number; lng: number }> {
+    return new Promise((resolve, reject) => {
+        if (!("geolocation" in navigator)) {
+            reject(new Error("unsupported"));
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (position) =>
+                resolve({ lat: position.coords.latitude, lng: position.coords.longitude }),
+            reject,
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+        );
+    });
+}

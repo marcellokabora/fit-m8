@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { Zap, MessageCircle, User } from "@lucide/svelte";
+  import { Zap, MapPin, MessageCircle, User } from "@lucide/svelte";
   import { unreadMatchCount } from "$lib/stores/unread";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  let { active }: { active: "discover" | "matches" | "profile" } = $props();
+  let { active }: { active: "discover" | "map" | "matches" | "profile" } =
+    $props();
 
   let t = $derived(createTranslator($activeLanguage));
   const tabs = [
     { id: "discover", href: "/discover", icon: Zap, key: "nav.discover" },
+    { id: "map", href: "/map", icon: MapPin, key: "nav.map" },
     {
       id: "matches",
       href: "/matches",

@@ -397,7 +397,19 @@ const MESSAGES = {
         'profile.socialLinkPlaceholder': 'instagram.com/you',
         'profile.invalidSocialLink': 'Enter a valid link',
         'common.add': 'Add',
-        'common.remove': 'Remove'
+        'common.remove': 'Remove',
+        'nav.map': 'Map',
+        'map.title': 'Live Map',
+        'map.sheetTitle': 'Check in',
+        'map.pickSport': 'What are you playing?',
+        'map.messagePlaceholder': 'Add a short note (optional)',
+        'map.checkInCta': 'Check in',
+        'map.checkedInAs': 'Checked in: {activity}',
+        'map.endCheckin': 'End check-in',
+        'map.expiresIn': 'Ends in',
+        'map.noActiveCheckins': 'No one has checked in nearby yet',
+        'map.messageButton': 'Message',
+        'map.recenter': 'Center on my location'
     },
     es: {
         'meta.description': 'Conecta con personas para hacer actividades cerca de ti', 'language.en': 'Inglés', 'language.es': 'Español', 'language.it': 'Italiano',
@@ -595,7 +607,19 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'profile.socialLinkPlaceholder': 'instagram.com/tu_usuario',
         'profile.invalidSocialLink': 'Introduce un enlace válido',
         'common.add': 'Añadir',
-        'common.remove': 'Eliminar'
+        'common.remove': 'Eliminar',
+        'nav.map': 'Mapa',
+        'map.title': 'Mapa en vivo',
+        'map.sheetTitle': 'Registrar check-in',
+        'map.pickSport': '¿A qué vas a jugar?',
+        'map.messagePlaceholder': 'Añade una nota breve (opcional)',
+        'map.checkInCta': 'Registrar check-in',
+        'map.checkedInAs': 'Check-in activo: {activity}',
+        'map.endCheckin': 'Terminar check-in',
+        'map.expiresIn': 'Termina en',
+        'map.noActiveCheckins': 'Todavía nadie ha hecho check-in cerca',
+        'map.messageButton': 'Mensaje',
+        'map.recenter': 'Centrar en mi ubicación'
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
@@ -772,7 +796,19 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'activity.karate': 'Karate',
         'activity.jiujitsu': 'Jiu-Jitsu',
         'activity.judo': 'Judo',
-        'activity.mma': 'MMA'
+        'activity.mma': 'MMA',
+        'nav.map': 'Mappa',
+        'map.title': 'Mappa dal vivo',
+        'map.sheetTitle': 'Fai check-in',
+        'map.pickSport': 'A cosa giochi?',
+        'map.messagePlaceholder': 'Aggiungi una breve nota (facoltativo)',
+        'map.checkInCta': 'Fai check-in',
+        'map.checkedInAs': 'Check-in attivo: {activity}',
+        'map.endCheckin': 'Termina check-in',
+        'map.expiresIn': 'Termina tra',
+        'map.noActiveCheckins': 'Nessuno ha ancora fatto check-in nelle vicinanze',
+        'map.messageButton': 'Messaggio',
+        'map.recenter': 'Centra sulla mia posizione'
     }
 };
 
