@@ -6,7 +6,7 @@ const path = require("path");
 const sharp = require("sharp");
 
 const ROOT = path.join(__dirname, "..");
-const SRC_JPG = path.join(ROOT, "static", "logo", "fit-m8-logo-green.jpg");
+const SRC_JPG = path.join(ROOT, "static", "logo", "fit-m8-logo-green.png");
 
 async function render(size, outPath) {
     await sharp(SRC_JPG).resize(size, size).png().toFile(outPath);
