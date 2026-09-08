@@ -17,10 +17,13 @@
     Crown,
     Globe,
     ShieldCheck,
+    MapPin,
+    CircleHelp,
   } from "@lucide/svelte";
   import Logo from "$lib/components/Logo.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
+  import phoneImg from "$lib/assets/phone.png";
   import { activeTheme, THEMES } from "$lib/stores/theme";
   import {
     MAX_LIKES_FREE_PER_DAY,
@@ -93,6 +96,11 @@
       title: "Safety tools",
       desc: "Report and block keep the community safe.",
     },
+    {
+      icon: MapPin,
+      title: "Location-aware",
+      desc: "Filter by distance to find people practicing nearby.",
+    },
   ] as const;
 
   const PREMIUM_FEATURES = [
@@ -103,7 +111,7 @@
     },
     {
       icon: MessageCircle,
-      title: "Message anyone directly",
+      title: "Message directly",
       desc: "Skip the match — reach out to any profile.",
     },
     {
@@ -119,27 +127,19 @@
     { url: "https://www.youtube.com/", label: "YouTube" },
   ];
 
-  // One slide per how-it-works step, and features paired up two-per-slide instead
-  // of cramming all five into one slide or splitting them one at a time
-  function chunkPairs<T>(items: readonly T[]): T[][] {
-    const pairs: T[][] = [];
-    for (let i = 0; i < items.length; i += 2) pairs.push(items.slice(i, i + 2));
-    return pairs;
-  }
-
   type Slide =
     | { kind: "cover" }
     | { kind: "problem" }
-    | { kind: "how"; step: (typeof HOW_IT_WORKS)[number] }
-    | { kind: "features"; pair: (typeof FEATURES)[number][] }
+    | { kind: "how"; step: (typeof HOW_IT_WORKS)[number]; index: number }
+    | { kind: "features"; group: (typeof FEATURES)[number][] }
     | { kind: "monetization" }
     | { kind: "closing" };
 
   const SLIDES: Slide[] = [
     { kind: "cover" },
     { kind: "problem" },
-    ...HOW_IT_WORKS.map((step): Slide => ({ kind: "how", step })),
-    ...chunkPairs(FEATURES).map((pair): Slide => ({ kind: "features", pair })),
+    ...HOW_IT_WORKS.map((step, index): Slide => ({ kind: "how", step, index })),
+    { kind: "features", group: [...FEATURES] },
     { kind: "monetization" },
     { kind: "closing" },
   ];
@@ -240,21 +240,14 @@
         {#if slide.kind === "cover"}
           <!-- Cover -->
           <div
-            class="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-10 text-center md:flex-row md:gap-16 md:text-left"
+            class="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-20 text-center"
           >
-            <div
-              class="relative z-10 flex flex-col items-center gap-4 md:items-start"
-            >
+            <div class="relative z-10 flex flex-col items-center gap-4">
               <Logo class="h-auto w-56 text-primary drop-shadow-md md:w-72" />
               <p
                 class="text-lg font-medium text-muted text-balance md:text-2xl"
               >
                 Match people for sports activities — Tinder-style.
-              </p>
-              <p
-                class="text-xs font-semibold uppercase tracking-widest text-muted"
-              >
-                Use ← → or swipe to explore
               </p>
             </div>
             <div class="relative flex w-full justify-center">
@@ -264,46 +257,61 @@
         {:else if slide.kind === "problem"}
           <!-- Problem -->
           <div
-            class="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center gap-8"
+            class="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-10 md:flex-row md:gap-16"
           >
-            <h2 class="text-2xl font-black text-text md:text-4xl">
-              Sports partners are hard to find
-            </h2>
-            <p class="text-base text-muted md:max-w-3xl md:text-lg">
-              Dating apps aren't built for finding a padel partner. Community
-              boards and group chats are noisy and unreliable. Most people who
-              want to train, play, or compete with someone nearby simply don't
-              know where to look.
-            </p>
-            <div class="flex flex-col gap-3 md:grid md:grid-cols-3 md:gap-5">
-              <div class="rounded-2xl bg-surface p-4 shadow-sm md:p-6">
-                <p class="font-bold text-text md:text-lg">
-                  No dedicated platform
-                </p>
-                <p class="text-sm text-muted md:text-base">
-                  for matching by sport, skill level, and intent.
-                </p>
+            <div class="flex flex-1 flex-col gap-6 text-center md:text-left">
+              <h2 class="text-2xl font-black text-text md:text-4xl">
+                Sports partners are hard to find
+              </h2>
+              <p class="text-base text-muted md:text-lg">
+                Dating apps aren't built for finding a sport partner. Community
+                boards and group chats are noisy and unreliable. Most people who
+                want to train, play, or compete with someone nearby simply don't
+                know where to look.
+              </p>
+              <div class="flex flex-col gap-3 md:gap-4">
+                <div class="rounded-2xl bg-surface p-4 shadow-sm md:p-5">
+                  <p class="font-bold text-text md:text-lg">
+                    No dedicated platform
+                  </p>
+                  <p class="text-sm text-muted md:text-base">
+                    for matching by sport, skill level, and intent.
+                  </p>
+                </div>
+                <div class="rounded-2xl bg-surface p-4 shadow-sm md:p-5">
+                  <p class="font-bold text-text md:text-lg">
+                    Fragmented discovery
+                  </p>
+                  <p class="text-sm text-muted md:text-base">
+                    scattered across chat groups, forums, and word of mouth.
+                  </p>
+                </div>
+                <div class="rounded-2xl bg-surface p-4 shadow-sm md:p-5">
+                  <p class="font-bold text-text md:text-lg">Growing demand</p>
+                  <p class="text-sm text-muted md:text-base">
+                    for social fitness and workout accountability partners.
+                  </p>
+                </div>
               </div>
-              <div class="rounded-2xl bg-surface p-4 shadow-sm md:p-6">
-                <p class="font-bold text-text md:text-lg">
-                  Fragmented discovery
-                </p>
-                <p class="text-sm text-muted md:text-base">
-                  scattered across chat groups, forums, and word of mouth.
-                </p>
-              </div>
-              <div class="rounded-2xl bg-surface p-4 shadow-sm md:p-6">
-                <p class="font-bold text-text md:text-lg">Growing demand</p>
-                <p class="text-sm text-muted md:text-base">
-                  for social fitness and workout accountability partners.
-                </p>
+            </div>
+            <div class="relative w-36 shrink-0 md:w-56">
+              <img
+                src={phoneImg}
+                alt=""
+                aria-hidden="true"
+                class="h-auto w-full drop-shadow-2xl"
+              />
+              <div
+                class="absolute inset-x-[4%] top-[3.5%] bottom-[3.5%] flex items-center justify-center"
+              >
+                <CircleHelp class="size-12 text-primary/70 md:size-20" />
               </div>
             </div>
           </div>
         {:else if slide.kind === "how"}
           <!-- How it works - one slide per step, horizontal on desktop -->
           <div
-            class="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8 text-center md:flex-row md:gap-16 md:text-left"
+            class="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8 text-center md:flex-row md:gap-24 md:text-left"
           >
             <div class="flex flex-col items-center gap-4 md:items-start">
               <p
@@ -322,21 +330,25 @@
               <p class="text-base text-muted md:text-lg">{slide.step.desc}</p>
             </div>
             <div
-              class="w-56 shrink-0 overflow-hidden rounded-2xl shadow-xl md:w-72"
+              class="w-64 shrink-0 overflow-hidden rounded-2xl shadow-2xl md:w-96 {slide.index %
+                2 ===
+              0
+                ? 'rotate-3'
+                : '-rotate-3'}"
             >
               <enhanced:img
                 src={slide.step.screen}
                 alt=""
                 aria-hidden="true"
-                sizes="(min-width: 768px) 288px, 224px"
+                sizes="(min-width: 768px) 384px, 256px"
                 class="aspect-431/886 w-full object-cover object-top"
               />
             </div>
           </div>
         {:else if slide.kind === "features"}
-          <!-- Feature showcase - two features per slide, side by side -->
+          <!-- Feature showcase - all features together in one grid -->
           <div
-            class="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8"
+            class="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-8"
           >
             <p
               class="text-xs font-semibold uppercase tracking-widest text-primary"
@@ -344,18 +356,22 @@
               Built for real training partners
             </p>
             <div
-              class="flex w-full flex-col gap-8 md:flex-row md:items-stretch md:divide-y-0 md:divide-x md:divide-border"
+              class="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6"
             >
-              {#each slide.pair as feature}
+              {#each slide.group as feature, i}
+                {@const isLastOdd =
+                  slide.group.length % 3 === 1 && i === slide.group.length - 1}
                 <div
-                  class="flex flex-1 flex-col items-center gap-4 text-center md:px-8"
+                  class="flex flex-col items-center gap-3 rounded-2xl bg-surface p-6 text-center shadow-sm {isLastOdd
+                    ? 'sm:col-span-2 md:col-span-3 md:mx-auto md:w-full md:max-w-xs'
+                    : ''}"
                 >
                   <span
                     class="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary md:size-16"
                   >
                     <feature.icon class="size-7 md:size-8" />
                   </span>
-                  <h2 class="text-xl font-black text-text md:text-2xl">
+                  <h2 class="text-lg font-black text-text md:text-xl">
                     {feature.title}
                   </h2>
                   <p class="text-sm text-muted md:text-base">{feature.desc}</p>
@@ -413,7 +429,7 @@
             class="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6 text-center"
           >
             <Logo class="h-auto w-40 text-primary opacity-90 md:w-52" />
-            <h2 class="text-xl font-bold text-text md:text-3xl">
+            <h2 class="text-xl font-bold text-text md:text-3xl text-balance">
               Let's build the home for sports partners together.
             </h2>
             <div class="flex justify-center gap-5">
