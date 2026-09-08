@@ -93,3 +93,41 @@ exports.sendPendingNotifications = onSchedule({ schedule: 'every 5 minutes', reg
         })
     ]);
 });
+
+// A real "pass" swipe older than this reappears in Discover automatically - gives profiles a
+// second chance over time instead of being hidden forever, without wiping recent passes.
+const DISLIKE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+
+// Runs daily across every user's swipes/{uid}/sent subcollection (collectionGroup reaches all
+// of them at once, since a client can only ever write its own via firestore.rules, and no
+// parent doc needs to exist at swipes/{uid} for this to see the subcollection). No `where`
+// filter is used, so this never needs a composite/collection-group index - filtering happens
+// in memory instead, which is cheap at this app's current swipe volume.
+exports.resetStaleDislikes = onSchedule(
+    { schedule: '0 3 * * *', timeZone: 'Europe/Madrid', region: 'europe-west1' },
+    async () => {
+        const passCutoff = Date.now() - DISLIKE_COOLDOWN_MS;
+        const allSnap = await db.collectionGroup('sent').get();
+
+        const toDelete = allSnap.docs.filter((d) => {
+            const data = d.data();
+            // Real 'pass' swipes only clear once stale, so recent passes and existing likes/matches
+            // are never touched.
+            if (data.direction === 'pass') return (data.timestamp?.toMillis?.() ?? 0) <= passCutoff;
+            // Fake seed profiles ("fake_<name>", see scripts/seed.cjs) never like back, so liking one
+            // only ever hides it from the swiper's own feed - there's no match/conversation to lose,
+            // so these clear immediately instead of waiting out the cooldown.
+            if (data.direction === 'like') return d.id.startsWith('fake_');
+            return false;
+        });
+
+        // Firestore batches cap at 500 writes, so large result sets are chunked across multiple batches.
+        for (let i = 0; i < toDelete.length; i += 500) {
+            const batch = db.batch();
+            toDelete.slice(i, i + 500).forEach((d) => batch.delete(d.ref));
+            await batch.commit();
+        }
+        console.log(`resetStaleDislikes: cleared ${toDelete.length} swipe(s) (stale real passes + liked fake profiles)`);
+    }
+);
+
