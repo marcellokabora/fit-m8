@@ -115,7 +115,7 @@
     <button
       type="button"
       onclick={locateMe}
-      aria-label={t.t("map.recenter")}
+      aria-label={t.t("explore.recenter")}
       class="absolute bottom-24 left-4 z-10 flex size-11 items-center justify-center rounded-full bg-surface text-primary shadow-lg active:scale-95"
     >
       <LocateFixed class="size-5" />
@@ -131,7 +131,7 @@
           <ActivityIcon id={myCheckin.activityId} class="size-5" />
         </span>
         <span class="flex-1 truncate text-sm font-bold text-text">
-          {t.t("map.checkedInAs", {
+          {t.t("explore.checkedInAs", {
             activity: t.activity(myCheckin.activityId),
           })}
         </span>
@@ -141,7 +141,7 @@
           disabled={ending}
           class="shrink-0 rounded-xl border-2 border-border px-3 py-2 text-xs font-bold text-text active:scale-95 disabled:opacity-40"
         >
-          {t.t("map.endCheckin")}
+          {t.t("explore.endCheckin")}
         </button>
       </div>
     {:else}
@@ -151,12 +151,12 @@
         class="absolute bottom-24 right-4 z-10 flex items-center gap-2 rounded-full bg-primary px-5 py-3 font-bold text-white shadow-lg active:scale-95"
       >
         <Plus class="size-5" />
-        {t.t("map.checkInCta")}
+        {t.t("explore.checkInCta")}
       </button>
     {/if}
   </div>
 
-  <BottomNav active="map" />
+  <BottomNav active="explore" />
 </div>
 
 <CheckinSheet

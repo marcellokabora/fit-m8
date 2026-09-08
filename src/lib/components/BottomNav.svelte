@@ -3,13 +3,13 @@
   import { unreadMatchCount } from "$lib/stores/unread";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  let { active }: { active: "discover" | "map" | "matches" | "profile" } =
+  let { active }: { active: "discover" | "explore" | "matches" | "profile" } =
     $props();
 
   let t = $derived(createTranslator($activeLanguage));
   const tabs = [
     { id: "discover", href: "/discover", icon: Zap, key: "nav.discover" },
-    { id: "map", href: "/map", icon: Compass, key: "nav.explore" },
+    { id: "explore", href: "/explore", icon: Compass, key: "nav.explore" },
     {
       id: "matches",
       href: "/matches",

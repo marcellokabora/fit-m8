@@ -1,5 +1,5 @@
 // Seeds fake "checked in right now" pins near Nova Icaria / Platja del Bogatell beach in
-// Barcelona, for demoing the /map live check-in feature. Standalone (creates its own
+// Barcelona, for demoing the /explore live check-in feature. Standalone (creates its own
 // fake_beach_* users) so it doesn't depend on scripts/seed.cjs having been run first.
 // Usage: npm run seed:checkins
 const admin = require('firebase-admin');
@@ -52,7 +52,7 @@ const NAMES = [
 ];
 
 // Nova Icaria and Platja del Bogatell, Barcelona — the two beach spots shown clustered
-// together on the /map screen.
+// together on the /explore screen.
 const BEACH_SPOTS = [
     { lat: 41.3855, lng: 2.1975 },
     { lat: 41.3919, lng: 2.205 }
@@ -134,7 +134,7 @@ async function seedCheckins() {
         }
     }
 
-    console.log('\n✨ Done! Open /map to see the fake check-ins.');
+    console.log('\n✨ Done! Open /explore to see the fake check-ins.');
     process.exit(0);
 }
 

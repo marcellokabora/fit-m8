@@ -719,7 +719,7 @@
               class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-md"
             >
               <div
-                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
+                class="flex-1 min-h-0 w-full flex items-center justify-center"
               >
                 <img
                   src={(users[2].photos?.[0] ?? users[2].photoURL) ||
@@ -736,7 +736,7 @@
               class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-md"
             >
               <div
-                class="flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
+                class="flex-1 min-h-0 w-full flex items-center justify-center"
               >
                 <img
                   src={(users[1].photos?.[0] ?? users[1].photoURL) ||
@@ -789,7 +789,7 @@
               <!-- Profile image area (fills remaining vertical space) -->
               <div
                 bind:this={photoEl}
-                class="relative flex-1 min-h-0 w-full bg-gradient-to-br from-primary/20 to-primary-dark/20 flex items-center justify-center"
+                class="relative flex-1 min-h-0 w-full flex items-center justify-center"
               >
                 {#if currentPhotos[photoIndex]}
                   <img

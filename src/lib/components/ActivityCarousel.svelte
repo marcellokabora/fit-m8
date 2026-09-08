@@ -179,7 +179,7 @@
     fetchpriority={i === 0 ? "high" : "auto"}
     onload={() => (loaded[i] = true)}
     class="carousel-bg pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-[2px]"
-    style={`opacity: ${i === activeIndex && loaded[i] ? 0.5 : 0}`}
+    style={`opacity: ${i === activeIndex && loaded[i] ? 0.6 : 0}`}
   />
 {/each}
 
@@ -202,7 +202,7 @@
           : i > pos
             ? "flex cursor-pointer items-start justify-center transition-opacity duration-350"
             : "flex cursor-pointer items-center justify-center transition-opacity duration-350"}
-        style={`height: ${ITEM_HEIGHT}px; opacity: ${i === pos ? 1 : 0.75}`}
+        style={`height: ${ITEM_HEIGHT}px; opacity: ${i === pos ? 1 : 0.76}`}
         role="button"
         tabindex="0"
         onclick={() => userGoTo(i)}

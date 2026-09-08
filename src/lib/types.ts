@@ -258,7 +258,7 @@ export interface Match {
 	isDirectMessage?: boolean;
 }
 
-// A live "I'm playing X here right now" pin on the /map screen. One doc per user (doc id = uid),
+// A live "I'm playing X here right now" pin on the /explore screen. One doc per user (doc id = uid),
 // overwritten on each new check-in. A one-time location snapshot, not continuously-tracked GPS.
 export interface Checkin {
 	uid: string;
@@ -279,7 +279,7 @@ export interface Checkin {
 // How long a check-in stays visible to others before auto-expiring, unless ended manually first.
 export const CHECKIN_DURATION_MS = 2 * 60 * 60 * 1000;
 
-// A pin rendered on the /map screen's GoogleMap component.
+// A pin rendered on the /explore screen's GoogleMap component.
 export interface MapMarker {
 	id: string;
 	lat: number;

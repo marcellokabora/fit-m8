@@ -100,7 +100,7 @@
         <p class="text-sm text-muted">"{checkin.message}"</p>
       {/if}
       <p class="text-xs font-semibold uppercase tracking-wide text-muted">
-        {t.t("map.expiresIn")}
+        {t.t("explore.expiresIn")}
         {expiresInLabel}
       </p>
       <button
@@ -109,7 +109,7 @@
         class="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
         <MessageCircle class="size-5" />
-        {t.t("map.messageButton")}
+        {t.t("explore.messageButton")}
       </button>
     </div>
   {/if}

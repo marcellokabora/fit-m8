@@ -76,8 +76,8 @@
   maxHeightClass="max-h-[85dvh]"
 >
   <div class="flex flex-col gap-1 px-7 pb-4 pt-2">
-    <h2 class="text-xl font-black text-text">{t.t("map.sheetTitle")}</h2>
-    <p class="text-sm text-muted">{t.t("map.pickSport")}</p>
+    <h2 class="text-xl font-black text-text">{t.t("explore.sheetTitle")}</h2>
+    <p class="text-sm text-muted">{t.t("explore.pickSport")}</p>
   </div>
 
   <div class="grid grid-cols-4 gap-3 overflow-y-auto px-7 pb-4">
@@ -107,7 +107,7 @@
       type="text"
       bind:value={message}
       maxlength="80"
-      placeholder={t.t("map.messagePlaceholder")}
+      placeholder={t.t("explore.messagePlaceholder")}
       class="rounded-2xl border-2 border-border bg-bg px-4 py-3 text-sm font-medium text-text placeholder:text-text/40 focus:border-primary focus:outline-none"
     />
     {#if error}
@@ -133,7 +133,7 @@
         {t.t("location.detecting")}
       {:else}
         <MapPin class="size-4" />
-        {t.t("map.checkInCta")}
+        {t.t("explore.checkInCta")}
       {/if}
     </button>
   </div>
