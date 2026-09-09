@@ -639,7 +639,7 @@
     {:else}
       <button
         onclick={save}
-        disabled={saving || !locationValid || (pushSupported && !pushToken)}
+        disabled={saving || !locationValid}
         class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {saving ? t.t("common.saving") : t.t("common.letsGo")}
