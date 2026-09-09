@@ -297,7 +297,6 @@
       pushStepUrl();
       return;
     }
-    if (pushSupported && !pushToken) return;
     saving = true;
     const user = get(authUser);
     if (!user) return;
