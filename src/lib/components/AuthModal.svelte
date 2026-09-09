@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { authUser } from "$lib/stores/auth";
   import GoogleSignInButton from "$lib/components/GoogleSignInButton.svelte";
+  import FacebookSignInButton from "$lib/components/FacebookSignInButton.svelte";
   import BottomSheet from "$lib/components/BottomSheet.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import { Eye, EyeOff, LogIn, UserRoundPlus } from "@lucide/svelte";
@@ -39,6 +40,8 @@
         return t.t("auth.errorInvalidCredential");
       case "auth/too-many-requests":
         return t.t("auth.errorTooManyRequests");
+      case "auth/account-exists-with-different-credential":
+        return t.t("auth.errorAccountExistsDifferentCredential");
       default:
         return e?.message ?? t.t("errors.generic");
     }
@@ -49,6 +52,19 @@
     loading = true;
     try {
       await authUser.signInGoogle();
+      goto("/discover");
+    } catch (e: any) {
+      error = authErrorMessage(e);
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function handleFacebook() {
+    error = "";
+    loading = true;
+    try {
+      await authUser.signInFacebook();
       goto("/discover");
     } catch (e: any) {
       error = authErrorMessage(e);
@@ -109,6 +125,15 @@
         label={t.t("home.google")}
         loadingLabel={t.t("home.signingIn")}
       />
+
+      <div class="mt-3">
+        <FacebookSignInButton
+          onclick={handleFacebook}
+          {loading}
+          label={t.t("home.facebook")}
+          loadingLabel={t.t("home.signingIn")}
+        />
+      </div>
 
       <div class="my-6 flex items-center gap-3">
         <hr class="flex-1 border-border" />
