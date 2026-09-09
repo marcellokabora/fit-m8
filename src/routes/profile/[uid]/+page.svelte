@@ -166,6 +166,8 @@
             profile,
             nearbyFakeLocation(viewer.lat, viewer.lng, uid),
           );
+          // The seeded city name no longer matches those randomized coordinates
+          if (viewer.city) profile.city = viewer.city;
         }
       } else {
         notFound = true;

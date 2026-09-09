@@ -2,11 +2,15 @@
   import { Compass, Zap, MessageCircle, User } from "@lucide/svelte";
   import { unreadMatchCount } from "$lib/stores/unread";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
+  import { authUser } from "$lib/stores/auth";
 
   let { active }: { active: "discover" | "explore" | "matches" | "profile" } =
     $props();
 
   let t = $derived(createTranslator($activeLanguage));
+  // Unverified email/password accounts are stuck on the Discover verification gate;
+  // block navigation elsewhere until they confirm their inbox link.
+  let needsVerification = $derived($authUser?.emailVerified === false);
   const tabs = [
     { id: "discover", href: "/discover", icon: Zap, key: "nav.discover" },
     { id: "explore", href: "/explore", icon: Compass, key: "nav.explore" },
@@ -27,10 +31,17 @@
     {#each tabs as tab}
       <a
         href={tab.href}
+        aria-disabled={needsVerification}
+        tabindex={needsVerification ? -1 : 0}
+        onclick={(e) => {
+          if (needsVerification) e.preventDefault();
+        }}
         class="relative flex flex-1 flex-col items-center gap-1 py-3 text-xs font-semibold transition-colors {tab.id ===
         active
           ? 'text-primary'
-          : 'text-muted'}"
+          : 'text-muted'} {needsVerification
+          ? 'pointer-events-none opacity-40'
+          : ''}"
       >
         <span class="relative">
           <tab.icon class="size-6" />

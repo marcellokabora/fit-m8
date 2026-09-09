@@ -154,7 +154,8 @@ export async function getDiscoverFeed(
 	maxDistanceKm: number | null = null,
 	currentCoords: { lat?: number; lng?: number } = {},
 	singleFilter: YesNoFilter = '',
-	trainerFilter: YesNoFilter = ''
+	trainerFilter: YesNoFilter = '',
+	currentCity = ''
 ): Promise<UserProfile[]> {
 	// Get users who we already swiped
 	const sentSnap = await getDocs(collection(db, 'swipes', currentUid, 'sent'));
@@ -200,6 +201,9 @@ export async function getDiscoverFeed(
 		// see them nearby instead of all sharing that same fixed spot — override at read time.
 		if (hasOrigin && d.id.startsWith('fake_')) {
 			Object.assign(data, nearbyFakeLocation(currentCoords.lat!, currentCoords.lng!, d.id));
+			// The seeded city name (e.g. "Barcelona") no longer matches those randomized coordinates,
+			// so borrow the viewer's own city instead of showing a stale/wrong one.
+			if (currentCity) data.city = currentCity;
 		}
 
 		// Distance filter only applies when we know both locations; candidates without

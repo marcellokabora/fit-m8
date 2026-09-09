@@ -344,6 +344,7 @@
       { lat: profile?.lat, lng: profile?.lng },
       get(filterSingle),
       get(filterTrainer),
+      profile?.city ?? "",
     );
     loading = false;
   }

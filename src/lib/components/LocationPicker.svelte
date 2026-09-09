@@ -1,11 +1,6 @@
 <script lang="ts">
-  import { Check, MapPin, Loader2, Pencil } from "@lucide/svelte";
+  import { MapPin, Loader2, Pencil } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
-  import {
-    BARCELONA_LAT,
-    BARCELONA_LNG,
-    isBarcelonaCityName,
-  } from "$lib/location";
 
   let t = $derived(createTranslator($activeLanguage));
 
@@ -23,27 +18,35 @@
   let error = $state("");
   let manualEntry = $state(false);
   let manualCity = $state("");
+  let suggestions = $state<{ display: string; lat: number; lng: number }[]>([]);
+  let searching = $state(false);
+  // guards against a slower, stale request overwriting a faster, newer one
+  let searchId = 0;
 
-  // Primary provider, no API key required.
-  async function reverseGeocodeBigDataCloud(lat: number, lon: number) {
+  // Single provider, no API key required.
+  async function reverseGeocode(lat: number, lon: number) {
     const res = await fetch(
       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
     );
-    if (!res.ok) throw new Error("bigdatacloud lookup failed");
+    if (!res.ok) throw new Error("reverse geocode lookup failed");
     const data = await res.json();
     return data.city || data.locality || data.principalSubdivision || "";
   }
 
-  // Fallback provider used if the primary API is down or unreachable.
-  async function reverseGeocodeNominatim(lat: number, lon: number) {
+  // Forward geocode: looks up candidate locations for a manually-typed query so the user
+  // can pick the exact match (city names alone are often ambiguous - many cities share a name).
+  async function forwardGeocode(query: string) {
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=jsonv2`,
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=jsonv2&limit=5`,
       { headers: { Accept: "application/json" } },
     );
-    if (!res.ok) throw new Error("nominatim lookup failed");
-    const data = await res.json();
-    const addr = data.address ?? {};
-    return addr.city || addr.town || addr.village || addr.county || "";
+    if (!res.ok) return [];
+    const results = await res.json();
+    return (results ?? []).map((result: any) => ({
+      display: result.display_name as string,
+      lat: parseFloat(result.lat),
+      lng: parseFloat(result.lon),
+    }));
   }
 
   async function detect() {
@@ -51,6 +54,8 @@
     manualEntry = false;
     if (!("geolocation" in navigator)) {
       error = t.t("location.unsupported");
+      manualCity = city;
+      manualEntry = true;
       return;
     }
 
@@ -64,22 +69,17 @@
             maximumAge: 300000,
           }),
       );
-
       const { latitude, longitude } = position.coords;
-      let detected = "";
-      try {
-        detected = await reverseGeocodeBigDataCloud(latitude, longitude);
-      } catch {
-        detected = await reverseGeocodeNominatim(latitude, longitude);
-      }
+      const detected = await reverseGeocode(latitude, longitude);
       if (!detected) throw new Error(t.t("location.resolveFailed"));
       city = detected;
       lat = latitude;
       lng = longitude;
     } catch (err: any) {
+      // any failure here - permission denied, timeout, or a reverse-geocode error -
+      // falls back to asking the user to type their city in themselves
       error =
         err.code === 1 ? t.t("location.denied") : t.t("location.detectFailed");
-      // geolocation unavailable/denied — ask the user to confirm their city instead of guessing it
       manualCity = city;
       manualEntry = true;
     } finally {
@@ -91,65 +91,113 @@
     error = "";
     manualCity = city;
     manualEntry = true;
+    suggestions = [];
   }
 
-  function saveManualCity() {
-    const trimmed = manualCity.trim();
-    if (!trimmed) return;
-    city = trimmed;
-    // No real coordinates for manual entry — only give it a location fix when it's Barcelona,
-    // so the app's Barcelona-only restriction can't be bypassed by typing any city name.
-    if (isBarcelonaCityName(trimmed)) {
-      lat = BARCELONA_LAT;
-      lng = BARCELONA_LNG;
-    } else {
-      lat = undefined;
-      lng = undefined;
+  // debounced search: waits for a pause in typing, then looks up matching places
+  let searchTimer: ReturnType<typeof setTimeout> | undefined;
+  function queueSearch() {
+    clearTimeout(searchTimer);
+    const query = manualCity.trim();
+    if (query.length < 3) {
+      suggestions = [];
+      searching = false;
+      return;
     }
+    searching = true;
+    searchTimer = setTimeout(async () => {
+      const id = ++searchId;
+      const results = await forwardGeocode(query);
+      if (id !== searchId) return; // a newer search superseded this one
+      suggestions = results;
+      searching = false;
+    }, 400);
+  }
+
+  function selectSuggestion(suggestion: {
+    display: string;
+    lat: number;
+    lng: number;
+  }) {
+    // the dropdown shows the full display name to disambiguate; only the leading
+    // place name (e.g. "Rome" out of "Rome, Roma Capitale, Lazio, Italy") is saved
+    city = suggestion.display.split(",")[0].trim();
+    lat = suggestion.lat;
+    lng = suggestion.lng;
     manualEntry = false;
+    suggestions = [];
   }
 </script>
 
 <div class="flex flex-1 flex-col gap-2">
   {#if manualEntry}
-    <div class="flex items-center gap-2">
+    <div class="relative flex flex-col gap-2">
       <input
         type="text"
         bind:value={manualCity}
+        oninput={queueSearch}
         placeholder={t.t("location.enterCity")}
         maxlength="80"
-        onkeydown={(e) => e.key === "Enter" && saveManualCity()}
-        class="flex-1 rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base font-semibold text-text placeholder:text-text/40 focus:border-primary focus:outline-none"
+        class="w-full rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base font-semibold text-text placeholder:text-text/40 focus:border-primary focus:outline-none"
       />
-      <button
-        type="button"
-        onclick={saveManualCity}
-        disabled={!manualCity.trim()}
-        aria-label={t.t("common.save")}
-        class="shrink-0 rounded-2xl bg-primary absolute right-11 p-4 text-white active:scale-95 disabled:opacity-40"
-      >
-        <Check class="size-5" />
-      </button>
+      {#if searching}
+        <p class="flex items-center gap-2 px-1 text-xs font-medium text-muted">
+          <Loader2 class="size-3.5 animate-spin" />
+          {t.t("location.searching")}
+        </p>
+      {:else if suggestions.length > 0}
+        <ul
+          class="flex flex-col overflow-hidden rounded-2xl border-2 border-border bg-surface"
+        >
+          <li class="px-4 pt-3 text-xs font-semibold text-muted">
+            {t.t("location.selectMatch")}
+          </li>
+          {#each suggestions as suggestion}
+            <li>
+              <button
+                type="button"
+                onclick={() => selectSuggestion(suggestion)}
+                class="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-medium text-text hover:bg-primary/10"
+              >
+                <MapPin class="size-4 shrink-0 text-primary" />
+                <span class="truncate">{suggestion.display}</span>
+              </button>
+            </li>
+          {/each}
+        </ul>
+      {:else if manualCity.trim().length >= 3}
+        <p class="px-1 text-xs font-medium text-muted">
+          {t.t("location.noMatches")}
+        </p>
+      {/if}
     </div>
   {:else if city}
     <div
-      class="flex items-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 px-4 py-4"
+      role="button"
+      tabindex="0"
+      aria-label={t.t("location.editCity")}
+      onclick={startManualEntry}
+      onkeydown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          startManualEntry();
+        }
+      }}
+      class="flex cursor-pointer items-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 px-4 py-4"
     >
       <MapPin class="size-5 shrink-0 text-primary" />
       <span class="flex-1 truncate text-base font-semibold text-text"
         >{city}</span
       >
-      <button
-        type="button"
-        onclick={startManualEntry}
-        class="shrink-0 text-primary"
-        aria-label={t.t("location.editCity")}
-      >
+      <span class="shrink-0 text-primary" aria-hidden="true">
         <Pencil class="size-4" />
-      </button>
+      </span>
       <button
         type="button"
-        onclick={detect}
+        onclick={(e) => {
+          e.stopPropagation();
+          detect();
+        }}
         disabled={locating}
         class="shrink-0 text-xs font-bold uppercase tracking-wide text-primary disabled:opacity-40"
       >

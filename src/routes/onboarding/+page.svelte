@@ -24,7 +24,6 @@
     type Gender,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import { isInBarcelona } from "$lib/location";
   import {
     ArrowLeft,
     ArrowRight,
@@ -125,8 +124,7 @@
   let city = $state(draft.city ?? "");
   let lat = $state<number | undefined>(draft.lat);
   let lng = $state<number | undefined>(draft.lng);
-  // Launching in Barcelona only — blocks onboarding for anyone outside the metro area.
-  let locationValid = $derived(city !== "" && isInBarcelona(lat, lng));
+  let locationValid = $derived(city !== "");
   let oppositeGender = $derived<Gender | "">(
     gender === "male" ? "female" : gender === "female" ? "male" : "",
   );
@@ -431,6 +429,18 @@
               label={t.t("onboarding.birthdate")}
               underageMessage={t.t("onboarding.underageError")}
             />
+            <div
+              class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
+            >
+              <p class="text-sm font-semibold text-text">
+                {t.t("profile.single")}
+              </p>
+              <Toggle
+                checked={isSingle}
+                ariaLabel={t.t("profile.single")}
+                onchange={(value) => (isSingle = value)}
+              />
+            </div>
             <SegmentedControl
               options={genderOptions}
               value={gender}
@@ -445,18 +455,6 @@
                 ariaLabel={t.t("common.orientation")}
                 onchange={(value) => (sexualOrientation = value)}
                 size="lg"
-              />
-            </div>
-            <div
-              class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
-            >
-              <p class="text-sm font-semibold text-text">
-                {t.t("profile.single")}
-              </p>
-              <Toggle
-                checked={isSingle}
-                ariaLabel={t.t("profile.single")}
-                onchange={(value) => (isSingle = value)}
               />
             </div>
           </div>
@@ -542,11 +540,6 @@
                 </div>
               </div>
               <LocationPicker bind:city bind:lat bind:lng />
-              {#if city && !locationValid}
-                <p class="mt-2 text-xs font-medium text-red-500">
-                  {t.t("location.outsideBarcelona")}
-                </p>
-              {/if}
             </div>
             {#if pushSupported}
               <div class="rounded-2xl border-2 border-border bg-surface p-4">
@@ -646,9 +639,7 @@
     {:else}
       <button
         onclick={save}
-        disabled={saving ||
-          !locationValid ||
-          (pushSupported && !pushToken)}
+        disabled={saving || !locationValid || (pushSupported && !pushToken)}
         class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {saving ? t.t("common.saving") : t.t("common.letsGo")}

@@ -1,10 +1,11 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { authUser } from "$lib/stores/auth";
+  import { authUser, userProfile } from "$lib/stores/auth";
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
+  import Loading from "$lib/components/Loading.svelte";
   import Logo from "$lib/components/Logo.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
@@ -152,11 +153,22 @@
   let authModalOpen = $state(false);
   let authMode = $state<"login" | "register">("register");
 
+  // gates just the carousel slot: true while the persisted session is still resolving,
+  // and stays true for logged-in visitors since they're about to be redirected away anyway
+  let checkingAuth = $state(true);
+
   // content renders immediately (prerendered for crawlers/first paint); this only
   // redirects away once auth resolves, if the visitor turns out to already be logged in
+  // (and, if so, on to onboarding rather than discover when their profile isn't finished)
   onMount(() => {
     return authUser.subscribe(async (user) => {
-      if (user) goto("/discover");
+      if (user === undefined) return; // still resolving persisted session
+      if (!user) {
+        checkingAuth = false;
+        return;
+      }
+      const hasProfile = await userProfile.load(user.uid);
+      goto(hasProfile ? "/discover" : "/onboarding");
     });
   });
 </script>
@@ -183,8 +195,15 @@
 
     <!-- Activity carousel -->
     <!-- no z-index here: it must not trap the carousel's fixed background image in a stacking context above the logo/CTA -->
-    <div transition:fade class="relative flex w-full justify-center -mt-4">
-      <ActivityCarousel />
+    <div
+      transition:fade
+      class="relative flex h-38 w-full items-center justify-center -mt-4"
+    >
+      {#if checkingAuth}
+        <Loading fullscreen={false} />
+      {:else}
+        <ActivityCarousel />
+      {/if}
     </div>
 
     <!-- CTA -->

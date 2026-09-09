@@ -44,6 +44,7 @@
   let t = $derived(createTranslator($activeLanguage));
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let expandedActivityId = $state<string | null>(null);
+  let adminSheetOpen = $state(false);
   let carouselActivitiesSheetOpen = $state(false);
   let orderInfoOpen = $state(false);
 
@@ -219,43 +220,62 @@
   </PhotoGallery>
 
   {#if $isAdmin}
-    <div
-      class="mx-5 mb-6 mt-6 flex flex-col gap-2 rounded-2xl bg-surface p-3 shadow-sm"
-    >
-      <!-- <p class="px-1 text-xs font-bold uppercase tracking-wide text-muted">
-        Admin
-      </p> -->
-      <a
-        href="/admin/fake-profiles"
-        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
-      >
-        <ShieldUser class="size-4" />
-        Fake profiles
-      </a>
-      <a
-        href="/admin/users"
-        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
-      >
-        <Users class="size-4" />
-        Users profiles
-      </a>
-      <a
-        href="/admin/promo-codes"
-        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
-      >
-        <QrCode class="size-4" />
-        Promo codes
-      </a>
+    <div class="mx-5 mb-6 mt-6">
       <button
         type="button"
-        onclick={() => (carouselActivitiesSheetOpen = true)}
-        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-sm font-bold text-primary active:scale-95"
+        onclick={() => (adminSheetOpen = true)}
+        class="flex w-full items-center justify-center gap-2 rounded-2xl bg-surface py-3 text-sm font-bold text-primary shadow-sm active:scale-95"
       >
-        <List class="size-4" />
-        All activities
+        <ShieldUser class="size-4" />
+        Admin
       </button>
     </div>
   {/if}
+
+  <BottomSheet
+    bind:open={adminSheetOpen}
+    onClose={() => (adminSheetOpen = false)}
+    closeLabel={t.t("common.close")}
+    bgClass="bg-surface"
+  >
+    <div class="px-6 pb-6 pt-2">
+      <h2 class="mb-4 text-lg font-black text-text">Admin</h2>
+      <div class="flex flex-col gap-2">
+        <a
+          href="/admin/users"
+          class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary active:scale-95"
+        >
+          <Users class="size-4" />
+          Users profiles
+        </a>
+        <a
+          href="/admin/fake-profiles"
+          class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary active:scale-95"
+        >
+          <ShieldUser class="size-4" />
+          Fake profiles
+        </a>
+        <a
+          href="/admin/promo-codes"
+          class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary active:scale-95"
+        >
+          <QrCode class="size-4" />
+          Promo codes
+        </a>
+        <button
+          type="button"
+          onclick={() => {
+            adminSheetOpen = false;
+            carouselActivitiesSheetOpen = true;
+          }}
+          class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-left text-sm font-bold text-primary active:scale-95"
+        >
+          <List class="size-4" />
+          All activities
+        </button>
+      </div>
+    </div>
+  </BottomSheet>
 
   <ActivityListSheet
     bind:open={carouselActivitiesSheetOpen}

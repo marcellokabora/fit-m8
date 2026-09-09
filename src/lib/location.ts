@@ -16,16 +16,9 @@ export function distanceKm(
     return 2 * R * Math.asin(Math.sqrt(a));
 }
 
+// Used as a fallback map center when a user has no coordinates on file.
 export const BARCELONA_LAT = 41.3874;
 export const BARCELONA_LNG = 2.1686;
-// Covers the Barcelona metro area (e.g. Badalona, L'Hospitalet, Sant Cugat).
-const BARCELONA_RADIUS_KM = 30;
-
-// App is currently launching in Barcelona only — gate onboarding on this.
-export function isInBarcelona(lat?: number, lng?: number) {
-    if (lat === undefined || lng === undefined) return false;
-    return distanceKm(lat, lng, BARCELONA_LAT, BARCELONA_LNG) <= BARCELONA_RADIUS_KM;
-}
 
 // Deterministically places a fake profile within 1-5km of the viewer's own coordinates
 // (stable bearing/distance per viewer+uid) so every real user sees fake profiles clustered
@@ -42,16 +35,6 @@ export function nearbyFakeLocation(originLat: number, originLng: number, seed: s
         lat: originLat + (distance / 111) * Math.cos(bearingRad),
         lng: originLng + (distance / (111 * Math.cos(latRad))) * Math.sin(bearingRad),
     };
-}
-
-// Used for manually-entered cities, which have no real coordinates to distance-check.
-export function isBarcelonaCityName(name: string) {
-    const normalized = name
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .trim()
-        .toLowerCase();
-    return normalized.includes("barcelona");
 }
 
 // Raw geolocation fix (no reverse-geocoding) used by the map check-in flow — unlike
