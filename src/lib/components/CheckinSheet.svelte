@@ -12,7 +12,7 @@
     onCheckin,
   }: {
     open?: boolean;
-    // the user's own sports surface first in the picker, ahead of the rest
+    // only the user's own registered sports can be checked in on
     myActivityIds?: string[];
     onCheckin: (
       activityId: string,
@@ -30,11 +30,7 @@
   let error = $state("");
 
   let orderedActivities = $derived(
-    [...ACTIVITIES].sort(
-      (a, b) =>
-        Number(myActivityIds.includes(b.id)) -
-        Number(myActivityIds.includes(a.id)),
-    ),
+    ACTIVITIES.filter((activity) => myActivityIds.includes(activity.id)),
   );
 
   // Reset the form each time the sheet is opened for a fresh check-in
@@ -91,14 +87,15 @@
           ? 'border-primary bg-primary/10'
           : 'border-border bg-bg'}"
       >
-        <ActivityIcon
-          id={activity.id}
-          class="size-5 {isSelected ? 'text-primary' : 'text-text'}"
-        />
+        <ActivityIcon id={activity.id} class="size-5 text-primary" />
         <span class="truncate text-[10px] font-semibold text-text"
           >{t.activity(activity.id)}</span
         >
       </button>
+    {:else}
+      <p class="col-span-4 text-sm text-muted">
+        {t.t("explore.checkinNoSports")}
+      </p>
     {/each}
   </div>
 

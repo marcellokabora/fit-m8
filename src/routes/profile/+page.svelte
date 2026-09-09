@@ -14,9 +14,7 @@
   } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import ActivityListSheet from "$lib/components/ActivityListSheet.svelte";
   import BottomSheet from "$lib/components/BottomSheet.svelte";
-  import { CAROUSEL_ACTIVITIES } from "$lib/components/ActivityCarousel.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
@@ -45,7 +43,6 @@
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
   let expandedActivityId = $state<string | null>(null);
   let adminSheetOpen = $state(false);
-  let carouselActivitiesSheetOpen = $state(false);
   let orderInfoOpen = $state(false);
 
   let formatOptions = $derived(
@@ -262,26 +259,16 @@
           <QrCode class="size-4" />
           Promo codes
         </a>
-        <button
-          type="button"
-          onclick={() => {
-            adminSheetOpen = false;
-            carouselActivitiesSheetOpen = true;
-          }}
+        <a
+          href="/admin/activities"
           class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-left text-sm font-bold text-primary active:scale-95"
         >
           <List class="size-4" />
           All activities
-        </button>
+        </a>
       </div>
     </div>
   </BottomSheet>
-
-  <ActivityListSheet
-    bind:open={carouselActivitiesSheetOpen}
-    activities={CAROUSEL_ACTIVITIES}
-    title={t.t("home.allActivities")}
-  />
 
   <BottomSheet
     bind:open={orderInfoOpen}

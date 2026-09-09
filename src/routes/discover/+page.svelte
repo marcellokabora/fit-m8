@@ -40,6 +40,7 @@
     getDiscoverFeed,
     recordSwipe,
     undoSwipe,
+    unmatch,
     startDirectMessage,
     LikeLimitReachedError,
   } from "$lib/firebase/swipe";
@@ -69,8 +70,11 @@
   let lastLoadedKey = $state<string | null>(null);
 
   let matchBanner = $state(false);
-  // The most recently dismissed "pass" profile, restorable via the undo button; cleared on undo or on any "like" swipe
-  let lastPass = $state<UserProfile | null>(null);
+  // The most recently swiped profile (like or pass), restorable via the undo button; cleared on undo
+  let lastSwipe = $state<{
+    profile: UserProfile;
+    isMatch: boolean;
+  } | null>(null);
   let profileActivities = $derived(
     ACTIVITIES.filter((activity) =>
       $userProfile?.activities?.some(
@@ -515,7 +519,7 @@
       throw e;
     }
 
-    lastPass = direction === "pass" ? top : null;
+    lastSwipe = { profile: top, isMatch };
     users = users.slice(1);
     currentX = 0;
     exiting = false;
@@ -526,12 +530,14 @@
     }
   }
 
-  async function undoLastPass() {
+  async function undoLastSwipe() {
     const uid = get(authUser)?.uid;
-    if (!uid || !lastPass) return;
-    const profile = lastPass;
-    lastPass = null;
+    if (!uid || !lastSwipe) return;
+    const { profile, isMatch } = lastSwipe;
+    lastSwipe = null;
     await undoSwipe(uid, profile.uid);
+    // A mutual like created a match - undoing the like should undo that match too
+    if (isMatch) await unmatch([uid, profile.uid].sort().join("_"));
     users = [profile, ...users];
   }
 
@@ -841,8 +847,8 @@
             passProgress={passOpacity}
             passLabel={t.t("common.pass")}
             likeLabel={t.t("common.like")}
-            onUndo={undoLastPass}
-            canUndo={!!lastPass}
+            onUndo={undoLastSwipe}
+            canUndo={!!lastSwipe}
             undoLabel={t.t("common.undo")}
             onMessage={handleMessage}
             messageLabel={t.t("common.message")}

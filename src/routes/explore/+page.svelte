@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { LocateFixed, Plus } from "@lucide/svelte";
+  import { LocateFixed, Plus, SlidersHorizontal } from "@lucide/svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
     subscribeActiveCheckins,
@@ -16,6 +16,7 @@
   import BottomNav from "$lib/components/BottomNav.svelte";
   import GoogleMap from "$lib/components/GoogleMap.svelte";
   import CheckinSheet from "$lib/components/CheckinSheet.svelte";
+  import MapFilterSheet from "$lib/components/MapFilterSheet.svelte";
   import MarkerInfoSheet from "$lib/components/MarkerInfoSheet.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
@@ -25,10 +26,20 @@
   let checkins = $state<Checkin[]>([]);
   let showCheckinSheet = $state(false);
   let showMarkerSheet = $state(false);
+  let showFilterSheet = $state(false);
+  // empty means "show all" — otherwise only these of the user's own sports are shown on the map
+  let filterActivityIds = $state<string[]>([]);
   let selectedCheckin = $state<Checkin | null>(null);
   let ending = $state(false);
 
   let myUid = $derived($authUser?.uid ?? "");
+  let myActivityIds = $derived(
+    $userProfile?.activities?.map((a) => a.id) ?? [],
+  );
+  // only the sports someone is actually checked in on right now are offered as filter options
+  let availableActivityIds = $derived([
+    ...new Set(checkins.map((c) => c.activityId)),
+  ]);
   let myCheckin = $derived(checkins.find((c) => c.uid === myUid) ?? null);
   let myLocation = $state<{ lat: number; lng: number } | null>(null);
 
@@ -40,13 +51,19 @@
   );
 
   let markers = $derived<MapMarker[]>(
-    checkins.map((c) => ({
-      id: c.uid,
-      lat: c.lat,
-      lng: c.lng,
-      activityId: c.activityId,
-      isSelf: c.uid === myUid,
-    })),
+    checkins
+      .filter(
+        (c) =>
+          filterActivityIds.length === 0 ||
+          filterActivityIds.includes(c.activityId),
+      )
+      .map((c) => ({
+        id: c.uid,
+        lat: c.lat,
+        lng: c.lng,
+        activityId: c.activityId,
+        isSelf: c.uid === myUid,
+      })),
   );
 
   let unsubscribe: (() => void) | null = null;
@@ -121,6 +138,18 @@
       <LocateFixed class="size-5" />
     </button>
 
+    <button
+      type="button"
+      onclick={() => (showFilterSheet = true)}
+      aria-label={t.t("explore.filterButton")}
+      class="absolute bottom-24 left-20 z-10 flex size-11 items-center justify-center rounded-full shadow-lg active:scale-95 {filterActivityIds.length >
+      0
+        ? 'bg-primary text-white'
+        : 'bg-surface text-primary'}"
+    >
+      <SlidersHorizontal class="size-5" />
+    </button>
+
     {#if myCheckin}
       <div
         class="absolute inset-x-4 top-[calc(1rem+env(safe-area-inset-top))] z-10 flex items-center gap-3 rounded-2xl bg-surface/95 p-3 shadow-lg backdrop-blur"
@@ -161,8 +190,16 @@
 
 <CheckinSheet
   bind:open={showCheckinSheet}
-  myActivityIds={$userProfile?.activities?.map((a) => a.id) ?? []}
+  {myActivityIds}
   onCheckin={handleCheckin}
+/>
+
+<MapFilterSheet
+  bind:open={showFilterSheet}
+  {myActivityIds}
+  {availableActivityIds}
+  selectedIds={filterActivityIds}
+  onApply={(ids) => (filterActivityIds = ids)}
 />
 
 <MarkerInfoSheet bind:open={showMarkerSheet} checkin={selectedCheckin} />

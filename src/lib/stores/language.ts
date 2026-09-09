@@ -416,7 +416,14 @@ const MESSAGES = {
         'explore.expiresIn': 'Ends in',
         'explore.noActiveCheckins': 'No one has checked in nearby yet',
         'explore.messageButton': 'Message',
-        'explore.recenter': 'Center on my location'
+        'explore.recenter': 'Center on my location',
+        'explore.filterButton': 'Filter map',
+        'explore.filterTitle': 'Filter map',
+        'explore.filterHint': 'Show only your sports on the map',
+        'explore.filterNoSports': 'Add sports to your profile to filter the map',
+        'explore.filterShowAll': 'Show all',
+        'explore.filterApply': 'Apply',
+        'explore.checkinNoSports': 'Add sports to your profile to check in'
     },
     es: {
         'meta.description': 'Conecta con personas para hacer actividades cerca de ti', 'language.en': 'Inglés', 'language.es': 'Español', 'language.it': 'Italiano',
@@ -630,7 +637,14 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.expiresIn': 'Termina en',
         'explore.noActiveCheckins': 'Todavía nadie ha hecho check-in cerca',
         'explore.messageButton': 'Mensaje',
-        'explore.recenter': 'Centrar en mi ubicación'
+        'explore.recenter': 'Centrar en mi ubicación',
+        'explore.filterButton': 'Filtrar mapa',
+        'explore.filterTitle': 'Filtrar mapa',
+        'explore.filterHint': 'Muestra solo tus actividades en el mapa',
+        'explore.filterNoSports': 'Añade actividades a tu perfil para filtrar el mapa',
+        'explore.filterShowAll': 'Mostrar todo',
+        'explore.filterApply': 'Aplicar',
+        'explore.checkinNoSports': 'Añade actividades a tu perfil para hacer check-in'
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
@@ -823,7 +837,14 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.expiresIn': 'Termina tra',
         'explore.noActiveCheckins': 'Nessuno ha ancora fatto check-in nelle vicinanze',
         'explore.messageButton': 'Messaggio',
-        'explore.recenter': 'Centra sulla mia posizione'
+        'explore.recenter': 'Centra sulla mia posizione',
+        'explore.filterButton': 'Filtra mappa',
+        'explore.filterTitle': 'Filtra mappa',
+        'explore.filterHint': 'Mostra solo le tue attività sulla mappa',
+        'explore.filterNoSports': 'Aggiungi attività al tuo profilo per filtrare la mappa',
+        'explore.filterShowAll': 'Mostra tutto',
+        'explore.filterApply': 'Applica',
+        'explore.checkinNoSports': 'Aggiungi attività al tuo profilo per fare check-in'
     }
 };
 

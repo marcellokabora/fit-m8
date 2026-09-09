@@ -69,6 +69,16 @@
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   });
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === "Escape") onClose();
+  }
+
+  $effect(() => {
+    if (!open) return;
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
+  });
 </script>
 
 {#if open}
