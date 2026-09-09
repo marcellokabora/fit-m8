@@ -38,12 +38,12 @@
   }
 
   const CONCEPT_ROWS = [
-    {
-      key: "swipe",
-      icon: Zap,
-      title: "discover.presetHintSwipeTitle",
-      body: "discover.presetHintSwipeBody",
-    },
+    // {
+    //   key: "swipe",
+    //   icon: Zap,
+    //   title: "discover.presetHintSwipeTitle",
+    //   body: "discover.presetHintSwipeBody",
+    // },
     {
       key: "sports",
       icon: Dumbbell,

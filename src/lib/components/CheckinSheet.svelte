@@ -18,14 +18,16 @@
       activityId: string,
       lat: number,
       lng: number,
-      message: string,
+      durationHours: number,
     ) => Promise<void>;
   } = $props();
 
   let t = $derived(createTranslator($activeLanguage));
 
+  const DURATION_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
+
   let selectedId = $state<string | null>(null);
-  let message = $state("");
+  let durationHours = $state(2);
   let locating = $state(false);
   let error = $state("");
 
@@ -37,7 +39,7 @@
   $effect(() => {
     if (open) {
       selectedId = null;
-      message = "";
+      durationHours = 2;
       error = "";
     }
   });
@@ -53,7 +55,7 @@
     locating = true;
     try {
       const { lat, lng } = await getCurrentCoords();
-      await onCheckin(selectedId, lat, lng, message.trim());
+      await onCheckin(selectedId, lat, lng, durationHours);
       open = false;
     } catch (err: any) {
       error =
@@ -76,7 +78,7 @@
     <p class="text-sm text-muted">{t.t("explore.pickSport")}</p>
   </div>
 
-  <div class="grid grid-cols-4 gap-3 overflow-y-auto px-7 pb-4">
+  <div class="grid grid-cols-3 gap-3 overflow-y-auto px-7 pb-4">
     {#each orderedActivities as activity}
       {@const isSelected = selectedId === activity.id}
       <button
@@ -100,13 +102,21 @@
   </div>
 
   <div class="flex flex-col gap-2 px-7 pb-4">
-    <input
-      type="text"
-      bind:value={message}
-      maxlength="80"
-      placeholder={t.t("explore.messagePlaceholder")}
-      class="rounded-2xl border-2 border-border bg-bg px-4 py-3 text-sm font-medium text-text placeholder:text-text/40 focus:border-primary focus:outline-none"
-    />
+    <label
+      class="text-xs font-semibold uppercase tracking-wide text-muted"
+      for="checkin-duration"
+    >
+      {t.t("explore.durationLabel")}
+    </label>
+    <select
+      id="checkin-duration"
+      bind:value={durationHours}
+      class="rounded-2xl border-2 border-border bg-bg px-4 py-3 text-sm font-medium text-text focus:border-primary focus:outline-none"
+    >
+      {#each DURATION_OPTIONS as hours}
+        <option value={hours}>{t.t("explore.durationHours", { hours })}</option>
+      {/each}
+    </select>
     {#if error}
       <p class="text-xs font-medium text-red-500">{error}</p>
     {/if}

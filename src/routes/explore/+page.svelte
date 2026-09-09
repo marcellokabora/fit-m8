@@ -92,8 +92,6 @@
   onDestroy(() => unsubscribe?.());
 
   function handleMarkerClick(id: string) {
-    // own status is shown via the top pill instead of the tap-to-message sheet
-    if (id === myUid) return;
     const checkin = checkins.find((c) => c.uid === id);
     if (!checkin) return;
     selectedCheckin = checkin;
@@ -104,10 +102,10 @@
     activityId: string,
     lat: number,
     lng: number,
-    message: string,
+    durationHours: number,
   ) {
     if (!$userProfile) return;
-    await startCheckin($userProfile, activityId, lat, lng, message);
+    await startCheckin($userProfile, activityId, lat, lng, durationHours);
   }
 
   async function handleEndCheckin() {
@@ -142,7 +140,7 @@
       type="button"
       onclick={() => (showFilterSheet = true)}
       aria-label={t.t("explore.filterButton")}
-      class="absolute bottom-24 left-20 z-10 flex size-11 items-center justify-center rounded-full shadow-lg active:scale-95 {filterActivityIds.length >
+      class="absolute bottom-24 left-20 z-10 flex size-11 items-center justify-center rounded-full shadow-lg active:scale-95 text-primary {filterActivityIds.length >
       0
         ? 'bg-primary text-white'
         : 'bg-surface text-primary'}"
@@ -154,16 +152,25 @@
       <div
         class="absolute inset-x-4 top-[calc(1rem+env(safe-area-inset-top))] z-10 flex items-center gap-3 rounded-2xl bg-surface/95 p-3 shadow-lg backdrop-blur"
       >
-        <span
-          class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+        <button
+          type="button"
+          onclick={() => {
+            selectedCheckin = myCheckin;
+            showMarkerSheet = true;
+          }}
+          class="flex flex-1 items-center gap-3 text-left"
         >
-          <ActivityIcon id={myCheckin.activityId} class="size-5" />
-        </span>
-        <span class="flex-1 truncate text-sm font-bold text-text">
-          {t.t("explore.checkedInAs", {
-            activity: t.activity(myCheckin.activityId),
-          })}
-        </span>
+          <span
+            class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+          >
+            <ActivityIcon id={myCheckin.activityId} class="size-5" />
+          </span>
+          <span class="flex-1 truncate text-sm font-bold text-text">
+            {t.t("explore.checkedInAs", {
+              activity: t.activity(myCheckin.activityId),
+            })}
+          </span>
+        </button>
         <button
           type="button"
           onclick={handleEndCheckin}

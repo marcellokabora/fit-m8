@@ -24,6 +24,20 @@ service cloud.firestore {
     match /checkins/{userId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == userId;
+
+      // Join requests: public "wants to join" list on a check-in. Anyone signed in can read it.
+      // The requester (doc id == their own uid) can create/cancel their own pending request; only
+      // the check-in's owner (doc id of the parent checkin == their own uid) can accept/decline it.
+      match /joinRequests/{requesterId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && request.auth.uid == requesterId
+          && request.resource.data.uid == requesterId
+          && request.resource.data.status == 'pending';
+        allow update: if request.auth != null && request.auth.uid == userId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && request.resource.data.status in ['accepted', 'declined'];
+        allow delete: if request.auth != null && (request.auth.uid == requesterId || request.auth.uid == userId);
+      }
     }
 
     // Matches: readable by participants only

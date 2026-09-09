@@ -77,7 +77,7 @@
       {t.t("explore.noActiveCheckins")}
     </p>
   {:else}
-    <div class="grid grid-cols-4 gap-3 overflow-y-auto px-7 pb-4">
+    <div class="grid grid-cols-3 gap-3 overflow-y-auto px-7 pb-4">
       {#each orderedActivities as activity}
         {@const isSelected = draft.includes(activity.id)}
         <button

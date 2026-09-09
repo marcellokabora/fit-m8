@@ -207,7 +207,12 @@
     </div>
 
     <!-- CTA -->
-    <div transition:fade class="relative z-10 flex w-full flex-col gap-3">
+    <div
+      transition:fade
+      class="relative z-10 flex w-full flex-col gap-3 opacity-{checkingAuth
+        ? 0
+        : 1}"
+    >
       <button
         type="button"
         onclick={() => {
@@ -219,17 +224,6 @@
         <LogIn class="size-5" />
         {t.t("auth.signIn")}
       </button>
-
-      <!-- <p
-          class="flex justify-center gap-4 pt-2 text-center text-xs text-muted"
-        >
-          <a href="/terms" class="font-semibold text-primary"
-            >Terms of Service</a
-          >
-          <a href="/privacy" class="font-semibold text-primary"
-            >Privacy Policy</a
-          >
-        </p> -->
     </div>
 
     <!-- fades the hero photo into the solid page bg instead of cutting off hard at the fold -->

@@ -1,14 +1,20 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { get } from "svelte/store";
-  import { Crown, MessageCircle, X } from "@lucide/svelte";
+  import { Check, Crown, MessageCircle, UserPlus, X } from "@lucide/svelte";
   import BottomSheet from "$lib/components/BottomSheet.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { getFallbackPhotoURL } from "$lib/image";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { startDirectMessage } from "$lib/firebase/swipe";
-  import type { Checkin } from "$lib/types";
+  import {
+    requestToJoinCheckin,
+    respondToJoinRequest,
+    cancelJoinRequest,
+    subscribeJoinRequests,
+  } from "$lib/firebase/checkins";
+  import type { Checkin, CheckinJoinRequest } from "$lib/types";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let {
@@ -24,6 +30,22 @@
   let showMessageModal = $state(false);
   let showComposeSheet = $state(false);
   let messaging = $state(false);
+  let joinRequests = $state<CheckinJoinRequest[]>([]);
+  let joining = $state(false);
+
+  let myUid = $derived($authUser?.uid ?? "");
+  let isOwnCheckin = $derived(!!checkin && checkin.uid === myUid);
+  let hasRequestedToJoin = $derived(joinRequests.some((r) => r.uid === myUid));
+
+  // Public join-requests list is scoped to whichever check-in is currently shown, and stops
+  // listening automatically when the sheet is closed or a different check-in is selected.
+  $effect(() => {
+    if (!checkin) {
+      joinRequests = [];
+      return;
+    }
+    return subscribeJoinRequests(checkin.uid, (next) => (joinRequests = next));
+  });
 
   // Recomputed on every render while the sheet is open rather than a live ticking timer — good
   // enough for a "roughly how long is left" label.
@@ -49,6 +71,44 @@
       return;
     }
     showComposeSheet = true;
+  }
+
+  async function handleJoinRequest() {
+    const profile = get(userProfile);
+    if (!checkin || !profile || joining) return;
+    joining = true;
+    try {
+      if (hasRequestedToJoin) {
+        await cancelJoinRequest(checkin.uid, profile.uid);
+      } else {
+        await requestToJoinCheckin(checkin.uid, profile);
+      }
+    } catch (err) {
+      console.error("Failed to update join request:", err);
+    } finally {
+      joining = false;
+    }
+  }
+
+  async function handleRespond(
+    requesterUid: string,
+    status: "accepted" | "declined",
+  ) {
+    if (!checkin) return;
+    try {
+      await respondToJoinRequest(checkin.uid, requesterUid, status);
+    } catch (err) {
+      console.error("Failed to respond to join request:", err);
+    }
+  }
+
+  async function handleRemove(requesterUid: string) {
+    if (!checkin) return;
+    try {
+      await cancelJoinRequest(checkin.uid, requesterUid);
+    } catch (err) {
+      console.error("Failed to remove join request:", err);
+    }
   }
 
   async function handleSendDirectMessage(text: string) {
@@ -103,14 +163,110 @@
         {t.t("explore.expiresIn")}
         {expiresInLabel}
       </p>
-      <button
-        type="button"
-        onclick={handleMessage}
-        class="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
-      >
-        <MessageCircle class="size-5" />
-        {t.t("explore.messageButton")}
-      </button>
+      {#if !isOwnCheckin}
+        <button
+          type="button"
+          onclick={handleJoinRequest}
+          disabled={joining}
+          class="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary py-3 font-bold text-primary active:scale-95 disabled:opacity-40"
+        >
+          {#if hasRequestedToJoin}
+            <X class="size-5" />
+          {:else}
+            <UserPlus class="size-5" />
+          {/if}
+          {hasRequestedToJoin
+            ? t.t("explore.joinRequested")
+            : t.t("explore.askToJoin")}
+        </button>
+        <button
+          type="button"
+          onclick={handleMessage}
+          class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+        >
+          <MessageCircle class="size-5" />
+          {t.t("explore.messageButton")}
+        </button>
+      {/if}
+      {#if joinRequests.length > 0}
+        <div class="mt-2 flex w-full flex-col gap-2 text-left">
+          <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+            {t.t("explore.joinRequestsTitle")}
+          </p>
+          {#if isOwnCheckin}
+            <ul class="flex flex-col gap-2">
+              {#each joinRequests as request (request.uid)}
+                <li class="flex items-center gap-3 rounded-2xl bg-bg px-3 py-2">
+                  <img
+                    src={request.photoURL ||
+                      getFallbackPhotoURL(request.uid, request.gender ?? "")}
+                    alt={request.displayName}
+                    class="size-8 shrink-0 rounded-full object-cover"
+                  />
+                  <span class="flex-1 truncate text-sm font-semibold text-text"
+                    >{request.displayName}</span
+                  >
+                  {#if request.status === "pending"}
+                    <button
+                      type="button"
+                      onclick={() => handleRespond(request.uid, "declined")}
+                      aria-label={t.t("explore.declineJoin")}
+                      class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted active:scale-95"
+                    >
+                      <X class="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onclick={() => handleRespond(request.uid, "accepted")}
+                      aria-label={t.t("explore.acceptJoin")}
+                      class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-white active:scale-95"
+                    >
+                      <Check class="size-4" />
+                    </button>
+                  {:else}
+                    <span
+                      class="shrink-0 text-xs font-bold {request.status ===
+                      'accepted'
+                        ? 'text-primary'
+                        : 'text-muted'}"
+                    >
+                      {request.status === "accepted"
+                        ? t.t("explore.joinAccepted")
+                        : t.t("explore.joinDeclined")}
+                    </span>
+                    <button
+                      type="button"
+                      onclick={() => handleRemove(request.uid)}
+                      aria-label={t.t("explore.removeJoinRequest")}
+                      class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-border text-muted active:scale-95"
+                    >
+                      <X class="size-4" />
+                    </button>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <ul class="flex flex-wrap gap-2">
+              {#each joinRequests as request (request.uid)}
+                <li
+                  class="flex items-center gap-2 rounded-full bg-bg px-3 py-1.5"
+                >
+                  <img
+                    src={request.photoURL ||
+                      getFallbackPhotoURL(request.uid, request.gender ?? "")}
+                    alt={request.displayName}
+                    class="size-6 rounded-full object-cover"
+                  />
+                  <span class="text-xs font-semibold text-text"
+                    >{request.displayName}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </div>
+      {/if}
     </div>
   {/if}
 </BottomSheet>

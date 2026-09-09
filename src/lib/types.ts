@@ -152,7 +152,7 @@ export const DEFAULT_DISTANCE_KM = 10;
 export const BIO_MAX_LENGTH = 200;
 
 // Maximum number of sports/activities a user profile can have at once
-export const MAX_SPORTS_FREE = 5;
+export const MAX_SPORTS_FREE = 6;
 export const MAX_SPORTS_PREMIUM = 100;
 export const PREMIUM_PRICE_USD = 9.99;
 
@@ -278,6 +278,18 @@ export interface Checkin {
 
 // How long a check-in stays visible to others before auto-expiring, unless ended manually first.
 export const CHECKIN_DURATION_MS = 2 * 60 * 60 * 1000;
+
+// One doc per requester in a checkin's `joinRequests` subcollection (doc id == uid) — anyone
+// signed in can add themselves and anyone signed in can read the full list.
+export interface CheckinJoinRequest {
+	uid: string;
+	displayName: string;
+	photoURL: string;
+	gender?: Gender | '';
+	createdAt: Date;
+	// set by the requester on creation; only the checkin's owner can flip it to accepted/declined
+	status: 'pending' | 'accepted' | 'declined';
+}
 
 // A pin rendered on the /explore screen's GoogleMap component.
 export interface MapMarker {
