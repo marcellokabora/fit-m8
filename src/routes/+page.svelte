@@ -219,7 +219,7 @@
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary/50 bg-surface/80 py-4 text-center text-base font-semibold text-text shadow-sm backdrop-blur-sm active:scale-95"
+        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95"
       >
         <LogIn class="size-5" />
         {t.t("auth.signIn")}
