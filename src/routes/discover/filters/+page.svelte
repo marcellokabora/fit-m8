@@ -4,7 +4,7 @@
   import BackHeader from "$lib/components/BackHeader.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import PresetHint from "$lib/components/PresetHint.svelte";
+  import PresetSheet from "$lib/components/PresetSheet.svelte";
   import {
     getDiscoverPresetValues,
     matchesDiscoverPreset,
@@ -114,6 +114,8 @@
 
   const AGE_MIN = 18;
   const AGE_MAX = 60;
+  // Slider tops out one step past the largest real distance value; reaching it means "any".
+  const DISTANCE_MAX = 11;
 
   let profileActivities = $derived(
     ($userProfile?.activities ?? [])
@@ -220,7 +222,7 @@
     setPresetFilters("trainer");
   }
 
-  // Bridges PresetHint's toggle picker to the preset functions above
+  // Bridges PresetSheet's toggle picker to the preset functions above
   function selectDiscoverPreset(preset: DiscoverPresetKind) {
     if (preset === "dating") applyDatingPreset();
     else if (preset === "friends") applyFriendsPreset();
@@ -352,13 +354,6 @@
       <h1 class="text-lg font-black text-text">{t.t("discover.filters")}</h1>
       <div class="flex items-center gap-2">
         <button
-          onclick={resetFilters}
-          class="flex size-9 items-center justify-center rounded-full bg-surface text-primary shadow-sm p-1"
-          aria-label={t.t("common.clear")}
-        >
-          <RotateCcw class="size-5" />
-        </button>
-        <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
             ? 'bg-primary text-white'
@@ -385,7 +380,7 @@
         >
           <UserShield class="size-5" />
         </button>
-        <PresetHint
+        <PresetSheet
           class="mr-1"
           preset={isDefaultPreset
             ? "default"
@@ -398,6 +393,13 @@
                   : null}
           onSelectPreset={selectDiscoverPreset}
         />
+        <button
+          onclick={resetFilters}
+          class="flex size-9 items-center justify-center rounded-full bg-surface text-primary shadow-sm p-1"
+          aria-label={t.t("common.clear")}
+        >
+          <RotateCcw class="size-5" />
+        </button>
       </div>
     </div>
   </BackHeader>
@@ -533,18 +535,21 @@
       ></div>
       <div
         class="absolute inset-y-0 left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary"
-        style="width: {((Math.min(distanceDraft ?? 10, 10) - 1) / (10 - 1)) *
+        style="width: {((Math.min(distanceDraft ?? DISTANCE_MAX, DISTANCE_MAX) -
+          1) /
+          (DISTANCE_MAX - 1)) *
           100}%;"
       ></div>
       <input
         type="range"
         min="1"
-        max="10"
+        max={DISTANCE_MAX}
         step="1"
         disabled={!hasCoords}
-        value={distanceDraft ?? 10}
+        value={distanceDraft ?? DISTANCE_MAX}
         oninput={(e) => {
-          distanceDraft = Number((e.currentTarget as HTMLInputElement).value);
+          const value = Number((e.currentTarget as HTMLInputElement).value);
+          distanceDraft = value >= DISTANCE_MAX ? null : value;
         }}
         onchange={onSliderRelease}
         class="absolute inset-x-0 top-1/2 w-full -translate-y-1/2 appearance-none bg-transparent accent-primary disabled:opacity-40"
@@ -597,15 +602,12 @@
     </div>
 
     <div class="mt-5 flex flex-col gap-3 bg-bg">
-      <p class="text-sm text-muted">
-        The more activities you add, the more chances you have to find people.
-      </p>
       <a
         href="/profile#activities"
         class="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
         <Plus class="size-4" />
-        Add activities
+        {t.t("discover.addActivities")}
       </a>
     </div>
   </div>

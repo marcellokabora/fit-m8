@@ -86,13 +86,13 @@
   ] as const;
 </script>
 
-<button
+<!-- <button
   onclick={openModal}
   class="flex size-9 items-center justify-center rounded-full bg-surface text-text shadow-sm {className}"
   aria-label={t.t("discover.presetHintToggle")}
 >
   <CircleQuestionMark class="size-5" />
-</button>
+</button> -->
 
 <BottomSheet
   bind:open

@@ -54,7 +54,7 @@
   } from "$lib/types";
   import { get } from "svelte/store";
   import BottomNav from "$lib/components/BottomNav.svelte";
-  import PresetHint from "$lib/components/PresetHint.svelte";
+  import PresetSheet from "$lib/components/PresetSheet.svelte";
   import {
     getDiscoverPresetValues,
     matchesDiscoverPreset,
@@ -309,7 +309,7 @@
     saveFilters();
   }
 
-  // Bridges PresetHint's toggle picker to the preset functions above
+  // Bridges PresetSheet's toggle picker to the preset functions above
   function selectDiscoverPreset(preset: DiscoverPresetKind) {
     if (preset === "dating") applyDatingPreset();
     else if (preset === "friends") applyFriendsPreset();
@@ -645,15 +645,6 @@
       <h1 class="text-2xl font-black text-text">{pageTitle}</h1>
       <div class="flex items-center gap-2">
         <button
-          onclick={() => goto("/discover/filters")}
-          class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
-            ? 'bg-primary text-white'
-            : 'bg-surface text-text'}"
-          aria-label={t.t("discover.filters")}
-        >
-          <SlidersHorizontal class="size-5" />
-        </button>
-        <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
             ? 'bg-primary text-white'
@@ -673,14 +664,14 @@
         </button>
         <button
           onclick={applyTrainerPreset}
-          class="hidden size-9 items-center justify-center rounded-full shadow-sm min-[380px]:flex {isTrainerPreset
+          class="size-9 items-center justify-center rounded-full shadow-sm flex {isTrainerPreset
             ? 'bg-primary text-white'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.trainerPreset")}
         >
           <UserShield class="size-5" />
         </button>
-        <PresetHint
+        <PresetSheet
           preset={isDefaultPreset
             ? "default"
             : isDatingPreset
@@ -692,6 +683,15 @@
                   : null}
           onSelectPreset={selectDiscoverPreset}
         />
+        <button
+          onclick={() => goto("/discover/filters")}
+          class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
+            ? 'bg-primary text-white'
+            : 'bg-surface text-text'}"
+          aria-label={t.t("discover.filters")}
+        >
+          <SlidersHorizontal class="size-5" />
+        </button>
       </div>
     </div>
 

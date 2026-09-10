@@ -201,6 +201,7 @@
     try {
       await deleteAccount(user);
     } catch (err) {
+      console.error("handleDeleteAccount failed", err);
       deletingAccount = false;
       deleteAccountError =
         err instanceof Error && err.message.includes("requires-recent-login")

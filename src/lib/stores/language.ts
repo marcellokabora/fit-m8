@@ -202,6 +202,7 @@ const MESSAGES = {
         'discover.distance': 'Distance',
         'discover.locationHint': 'Enable location detection in your profile to filter by distance.',
         'discover.allSports': 'All activities',
+        'discover.addActivities': 'Add activities',
         'discover.refresh': 'Refresh',
         'discover.tryFilters': 'Try changing your filters or check back later',
         'discover.withinKm': 'Within {count} km',

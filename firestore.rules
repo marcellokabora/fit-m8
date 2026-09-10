@@ -6,11 +6,15 @@ service cloud.firestore {
     // The 18+ requirement (Terms of Service) is also enforced here so it can't be bypassed by
     // calling Firestore directly (e.g. after a Google sign-in, which doesn't verify age itself).
     // Admins (custom claim set via `npm run set-admin`) can also write any doc, used to manage fake profiles.
+    // create/update is split from delete because request.resource is null on delete, so
+    // referencing request.resource.data there would throw and get treated as permission-denied.
     match /users/{userId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.admin == true
+      allow create, update: if request.auth != null && request.auth.token.admin == true
         || (request.auth != null && request.auth.uid == userId
         && (!('age' in request.resource.data) || request.resource.data.age >= 18));
+      allow delete: if request.auth != null
+        && (request.auth.token.admin == true || request.auth.uid == userId);
     }
 
     // Swipes: sender can read/write their own; the target can read to check for a mutual match
