@@ -723,7 +723,7 @@
           <!-- Background cards (stacked look) -->
           {#if users[2]}
             <div
-              class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-md"
+              class="absolute inset-0 z-0 flex flex-col overflow-hidden bg-surface shadow-md"
             >
               <div
                 class="flex-1 min-h-0 w-full flex items-center justify-center"
@@ -740,7 +740,7 @@
           {/if}
           {#if users[1]}
             <div
-              class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-md"
+              class="absolute inset-0 z-10 flex flex-col overflow-hidden bg-surface shadow-md"
             >
               <div
                 class="flex-1 min-h-0 w-full flex items-center justify-center"
@@ -753,6 +753,7 @@
                   class="h-full w-full object-cover pointer-events-none"
                 />
               </div>
+              <ProfileCardInfo user={users[1]} {t} />
             </div>
           {/if}
 
@@ -770,7 +771,7 @@
                 : exiting
                   ? 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)'
                   : 'transform 0.3s'}, border-radius 0.2s; touch-action: none;"
-              class="absolute inset-0 flex flex-col overflow-hidden bg-surface shadow-xl select-none cursor-grab active:cursor-grabbing {dragging ||
+              class="absolute inset-0 z-20 flex flex-col overflow-hidden bg-surface shadow-xl select-none cursor-grab active:cursor-grabbing {dragging ||
               exiting
                 ? 'rounded-3xl'
                 : ''}"
@@ -839,7 +840,7 @@
 
           <!-- Action buttons: overlaid on the card's bottom shadow, not in flex flow -->
           <ActionButtons
-            class="absolute inset-x-0 bottom-4 z-20"
+            class="absolute inset-x-0 bottom-4 z-30"
             onPass={() => swipe("pass")}
             onLike={() => swipe("like")}
             disabled={exiting}

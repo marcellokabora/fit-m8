@@ -7,15 +7,9 @@
   import { browser } from "$app/environment";
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
-    ACTIVITIES,
-    GENDER_OPTIONS,
-    ORIENTATIONS,
-    BIO_MAX_LENGTH,
     DEFAULT_DISTANCE_KM,
-    MAX_SPORTS_FREE,
     MIN_AGE,
     calculateAge,
-    groupActivities,
     type DiscoverFilters,
     type UserActivity,
     type SkillLevel,
@@ -24,36 +18,19 @@
     type Gender,
   } from "$lib/types";
   import { get } from "svelte/store";
-  import {
-    ArrowLeft,
-    ArrowRight,
-    Bell,
-    Check,
-    Loader2,
-    LogOut,
-    MapPin,
-    Search,
-    Zap,
-  } from "@lucide/svelte";
-  import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import LocationPicker from "$lib/components/LocationPicker.svelte";
-  import SegmentedControl from "$lib/components/SegmentedControl.svelte";
-  import BirthdateField from "$lib/components/BirthdateField.svelte";
-  import Toggle from "$lib/components/Toggle.svelte";
-  import PhotoGrid from "$lib/components/PhotoGrid.svelte";
-  import AppearancePicker from "$lib/components/AppearancePicker.svelte";
+  import { ArrowLeft, ArrowRight, Loader2, LogOut, Zap } from "@lucide/svelte";
+  import AboutYouStep from "./AboutYouStep.svelte";
+  import SportsStep from "./SportsStep.svelte";
+  import FinishingTouchesStep from "./FinishingTouchesStep.svelte";
+  import PremiumStep from "./PremiumStep.svelte";
   import {
     getDiscoverPresetValues,
     type DiscoverPresetKind,
   } from "$lib/discoverPresets";
-  import {
-    requestPushToken,
-    savePushToken,
-    pushNotificationsSupported,
-  } from "$lib/firebase/notifications";
+  import { savePushToken } from "$lib/firebase/notifications";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
-  const TOTAL_STEPS = 3;
+  const TOTAL_STEPS = 4;
   const DRAFT_KEY = "fit-m8-onboarding-draft";
 
   type OnboardingDraft = {
@@ -95,18 +72,6 @@
   );
   let stepContainer = $state<HTMLDivElement>();
   let t = $derived(createTranslator($activeLanguage));
-  let genderOptions = $derived(
-    GENDER_OPTIONS.map((option) => ({
-      ...option,
-      label: t.gender(option.value),
-    })),
-  );
-  let orientationOptions = $derived(
-    ORIENTATIONS.map((option) => ({
-      ...option,
-      label: t.orientation(option.value),
-    })),
-  );
 
   // Step 1 — Basic info
   // Never prefill from the Google account's display name — it's a full name, not just a first name
@@ -134,18 +99,6 @@
   let activitySettings = $state<
     Record<string, { format: ActivityFormat; level: SkillLevel }>
   >(draft.activitySettings ?? {});
-  let sportsQuery = $state("");
-  let filteredActivities = $derived(
-    sportsQuery.trim()
-      ? ACTIVITIES.filter((a) =>
-          t
-            .activity(a.id)
-            .toLowerCase()
-            .includes(sportsQuery.trim().toLowerCase()),
-        )
-      : ACTIVITIES,
-  );
-  let groupedFilteredActivities = $derived(groupActivities(filteredActivities));
 
   // Which quick preset to land on Discover with (not currently set by any onboarding step)
   let discoverPreset = $state<DiscoverPresetKind | null>(
@@ -158,20 +111,9 @@
   let error = $state("");
   let uid = $derived($authUser?.uid ?? "");
 
-  // Step 3 — Push notification permission (not persisted in the draft; re-requesting
-  // after a refresh is instant once the browser has already granted/denied it)
-  let pushSupported = $state(false);
+  // Step 3 — Push notification token (not persisted in the draft; re-requesting after a
+  // refresh is instant once the browser has already granted/denied it)
   let pushToken = $state<string | null>(null);
-  let pushRequesting = $state(false);
-  let pushDenied = $state(false);
-
-  async function enableNotifications() {
-    if (pushRequesting || pushToken) return;
-    pushRequesting = true;
-    pushToken = await requestPushToken();
-    pushDenied = !pushToken;
-    pushRequesting = false;
-  }
 
   // Persist progress locally so leaving and coming back (or a refresh) restores it.
   $effect(() => {
@@ -224,25 +166,12 @@
       url.searchParams.set("step", String(step));
       goto(url, { replaceState: true, keepFocus: true, noScroll: true });
     }
-    pushNotificationsSupported().then(
-      (supported) => (pushSupported = supported),
-    );
   });
 
   function pushStepUrl() {
     const url = new URL(page.url);
     url.searchParams.set("step", String(step));
     goto(url, { keepFocus: true, noScroll: true });
-  }
-
-  function toggleActivity(id: string) {
-    if (selectedActivities.includes(id)) {
-      selectedActivities = selectedActivities.filter((a) => a !== id);
-      delete activitySettings[id];
-    } else if (selectedActivities.length < MAX_SPORTS_FREE) {
-      selectedActivities = [...selectedActivities, id];
-      activitySettings[id] = { format: "all", level: "basic" };
-    }
   }
 
   function next() {
@@ -380,215 +309,22 @@
         out:fly|local={{ x: direction * -32, duration: 150, easing: quintOut }}
       >
         {#if step === 1}
-          <h2 class="mb-1 text-2xl font-black text-text">
-            {t.t("onboarding.aboutYou")}
-          </h2>
-          <p class="mb-6 text-sm text-muted">
-            {t.t("onboarding.aboutYouHint")}
-          </p>
-          <div class="flex flex-col gap-4">
-            <div>
-              <!-- <p class="mb-2 text-sm font-bold text-text">
-            {t.t("onboarding.profilePhotos")}
-          </p> -->
-              <PhotoGrid
-                {photos}
-                {uid}
-                firstRequired
-                onchange={(next) => (photos = next)}
-              />
-            </div>
-            <div>
-              <input
-                type="text"
-                bind:value={displayName}
-                placeholder={t.t("onboarding.name")}
-                class="w-full rounded-2xl border-2 bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary {nameHasSurname
-                  ? 'border-error'
-                  : 'border-border'}"
-              />
-              {#if nameHasSurname}
-                <p class="mt-2 text-xs font-semibold text-error">
-                  {t.t("onboarding.nameError")}
-                </p>
-              {/if}
-            </div>
-            <textarea
-              bind:value={bio}
-              placeholder={t.t("onboarding.bioOptional")}
-              rows={3}
-              maxlength={BIO_MAX_LENGTH}
-              class="rounded-2xl border-2 border-border bg-surface px-4 py-4 text-base text-text outline-none focus:border-primary"
-            ></textarea>
-            <p class="-mt-3 text-right text-xs text-muted">
-              {bio.length}/{BIO_MAX_LENGTH}
-            </p>
-            <BirthdateField
-              bind:value={birthdate}
-              label={t.t("onboarding.birthdate")}
-              underageMessage={t.t("onboarding.underageError")}
-            />
-            <div
-              class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
-            >
-              <p class="text-sm font-semibold text-text">
-                {t.t("profile.single")}
-              </p>
-              <Toggle
-                checked={isSingle}
-                ariaLabel={t.t("profile.single")}
-                onchange={(value) => (isSingle = value)}
-              />
-            </div>
-            <SegmentedControl
-              options={genderOptions}
-              value={gender}
-              ariaLabel={t.t("common.gender")}
-              onchange={(value) => (gender = value)}
-              size="lg"
-            />
-            <div>
-              <SegmentedControl
-                options={orientationOptions}
-                value={sexualOrientation}
-                ariaLabel={t.t("common.orientation")}
-                onchange={(value) => (sexualOrientation = value)}
-                size="lg"
-              />
-            </div>
-          </div>
+          <AboutYouStep
+            {uid}
+            bind:photos
+            bind:displayName
+            bind:bio
+            bind:birthdate
+            bind:gender
+            bind:sexualOrientation
+            bind:isSingle
+          />
         {:else if step === 2}
-          <h2 class="mb-1 text-2xl font-black text-text">
-            {t.t("onboarding.yourSports")}
-          </h2>
-          <p class="mb-1 text-sm text-muted">{t.t("onboarding.sportsHint")}</p>
-          <p class="mb-4 text-xs font-semibold text-muted">
-            {t.t("sports.maxHint", { max: MAX_SPORTS_FREE })}
-          </p>
-          <div class="sticky top-0 z-10 -mx-6 bg-bg px-6 pb-4">
-            <div class="relative">
-              <Search
-                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-              />
-              <input
-                type="search"
-                bind:value={sportsQuery}
-                placeholder={t.t("common.search")}
-                class="w-full rounded-2xl border-2 border-border bg-surface py-2.5 pl-9 pr-3 text-sm font-semibold text-text placeholder:text-muted focus:border-primary focus:outline-none"
-              />
-            </div>
-          </div>
-          {#if filteredActivities.length === 0}
-            <p class="mt-6 text-center text-sm text-muted">
-              {t.t("common.noResults")}
-            </p>
-          {:else}
-            {#each groupedFilteredActivities as section}
-              <p
-                class="mb-2 mt-4 text-xs font-bold uppercase tracking-wide text-muted first:mt-1"
-              >
-                {section.group
-                  ? t.activityGroup(section.group)
-                  : t.t("common.other")}
-              </p>
-              <div class="grid grid-cols-2 gap-3 pt-1">
-                {#each section.items as activity}
-                  {@const selected = selectedActivities.includes(activity.id)}
-                  <button
-                    onclick={() => toggleActivity(activity.id)}
-                    disabled={!selected &&
-                      selectedActivities.length >= MAX_SPORTS_FREE}
-                    class="flex flex-col items-center gap-2 rounded-2xl border-2 py-5 transition-all active:scale-95 disabled:opacity-40 {selected
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border bg-surface'}"
-                  >
-                    <ActivityIcon
-                      id={activity.id}
-                      class="size-7 text-primary"
-                    />
-                    <span class="text-sm font-semibold text-text"
-                      >{t.activity(activity.id)}</span
-                    >
-                  </button>
-                {/each}
-              </div>
-            {/each}
-          {/if}
+          <SportsStep bind:selectedActivities bind:activitySettings />
         {:else if step === 3}
-          <h2 class="mb-1 text-2xl font-black text-text">
-            {t.t("onboarding.makeItYours")}
-          </h2>
-          <p class="mb-6 text-sm text-muted text-balance">
-            {t.t("onboarding.appearanceHint")}
-          </p>
-          <div class="mb-4 flex flex-col gap-4">
-            <div class="rounded-2xl border-2 border-border bg-surface p-4">
-              <div class="mb-3 flex items-center gap-3">
-                <span
-                  class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-                >
-                  <MapPin class="size-5" />
-                </span>
-                <div class="flex-1">
-                  <p class="font-bold text-text">
-                    {t.t("onboarding.locationTitle")}
-                  </p>
-                  <p class="text-sm text-muted">
-                    {t.t("onboarding.locationHint")}
-                  </p>
-                </div>
-              </div>
-              <LocationPicker bind:city bind:lat bind:lng />
-            </div>
-            {#if pushSupported}
-              <div class="rounded-2xl border-2 border-border bg-surface p-4">
-                <div class="mb-3 flex items-center gap-3">
-                  <span
-                    class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-                  >
-                    <Bell class="size-5" />
-                  </span>
-                  <div class="flex-1">
-                    <p class="font-bold text-text">
-                      {t.t("onboarding.notificationsTitle")}
-                    </p>
-                    <p class="text-sm text-muted">
-                      {t.t("onboarding.notificationsHint")}
-                    </p>
-                  </div>
-                </div>
-                {#if pushToken}
-                  <div
-                    class="flex items-center gap-2 rounded-2xl border-2 border-primary bg-primary/10 px-4 py-4 text-sm font-semibold text-primary"
-                  >
-                    <Check class="size-5 shrink-0" />
-                    {t.t("onboarding.notificationsEnabled")}
-                  </div>
-                {:else}
-                  <button
-                    type="button"
-                    onclick={enableNotifications}
-                    disabled={pushRequesting}
-                    class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-surface px-4 py-4 text-sm font-semibold text-primary transition-colors active:scale-95 disabled:opacity-40"
-                  >
-                    {#if pushRequesting}
-                      <Loader2 class="size-5 animate-spin" />
-                      {t.t("common.loading")}
-                    {:else}
-                      <Bell class="size-5" />
-                      {t.t("onboarding.enableNotifications")}
-                    {/if}
-                  </button>
-                  {#if pushDenied}
-                    <p class="mt-2 text-xs text-muted">
-                      {t.t("onboarding.notificationsBlocked")}
-                    </p>
-                  {/if}
-                {/if}
-              </div>
-            {/if}
-          </div>
-          <AppearancePicker />
+          <FinishingTouchesStep bind:city bind:lat bind:lng bind:pushToken />
+        {:else if step === 4}
+          <PremiumStep />
           {#if error}
             <p class="mt-4 rounded-xl bg-error/10 px-4 py-3 text-sm text-error">
               {error}
@@ -629,7 +365,8 @@
             isUnderage ||
             nameHasSurname ||
             photos.length === 0)) ||
-          (step === 2 && selectedActivities.length === 0)}
+          (step === 2 && selectedActivities.length === 0) ||
+          (step === 3 && !locationValid)}
         class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
       >
         {t.t("common.continue")}

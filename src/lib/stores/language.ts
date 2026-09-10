@@ -164,6 +164,9 @@ const MESSAGES = {
         'onboarding.photosRequired': 'Add a photo to continue',
         'onboarding.makeItYours': 'Finishing touches',
         'onboarding.appearanceHint': 'Set your location, notifications and app style',
+        'onboarding.premiumTitle': 'Premium',
+        'onboarding.premiumHint': 'Here\'s a peek at what you can unlock later',
+        'common.learnMore': 'Learn more',
         'intro.skip': 'Skip',
         'intro.next': 'Next',
         'intro.dating.title': 'Find a date',
@@ -666,7 +669,10 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.filterNoSports': 'Añade actividades a tu perfil para filtrar el mapa',
         'explore.filterShowAll': 'Mostrar todo',
         'explore.filterApply': 'Aplicar',
-        'explore.checkinNoSports': 'Añade actividades a tu perfil para hacer check-in'
+        'explore.checkinNoSports': 'Añade actividades a tu perfil para hacer check-in',
+        'onboarding.premiumTitle': 'Premium',
+        'onboarding.premiumHint': 'Un vistazo a lo que podrás desbloquear más adelante',
+        'common.learnMore': 'Saber más'
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
@@ -877,7 +883,10 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.filterNoSports': 'Aggiungi attività al tuo profilo per filtrare la mappa',
         'explore.filterShowAll': 'Mostra tutto',
         'explore.filterApply': 'Applica',
-        'explore.checkinNoSports': 'Aggiungi attività al tuo profilo per fare check-in'
+        'explore.checkinNoSports': 'Aggiungi attività al tuo profilo per fare check-in',
+        'onboarding.premiumTitle': 'Premium',
+        'onboarding.premiumHint': "Un'anteprima di ciò che potrai sbloccare in seguito",
+        'common.learnMore': 'Scopri di più'
     }
 };
 

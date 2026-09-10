@@ -65,8 +65,9 @@
        than duplicating it. meta description/og/twitter are intentionally NOT duplicated
        here: unlike <title>, <meta> tags aren't deduped by the browser, and link-preview/SEO
        bots can't see this dynamic head anyway in a pure SPA - so adding one here would just
-       leave two conflicting <meta name="description"> tags in the DOM for real visitors. -->
-  <title>FIT-M8</title>
+       leave two conflicting <meta name="description"> tags in the DOM for real visitors.
+       Must match app.html's title exactly, or the tab title visibly flips right after hydration. -->
+  <title>FIT-M8 - Find Your Sports Match</title>
   {#if import.meta.env.PROD}
     <!-- manifest is only generated/served by vite-plugin-pwa in production builds -->
     <link rel="manifest" href="/manifest.webmanifest" />

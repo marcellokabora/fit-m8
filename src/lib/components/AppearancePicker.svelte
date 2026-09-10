@@ -13,9 +13,9 @@
 <svelte:window onclick={() => (paletteOpen = false)} />
 
 <div class="">
-  <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+  <!-- <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
     {t.t("appearance.title")}
-  </h3>
+  </h3> -->
   <div class="flex gap-2">
     <div class="flex flex-1 rounded-full border-2 border-border bg-bg p-0.5">
       <button

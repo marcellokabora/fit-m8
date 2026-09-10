@@ -32,6 +32,7 @@
     city: string;
     isSingle: boolean;
     isTrainer: boolean;
+    isPremium: boolean;
   }
 
   function draftOf(p: UserProfile): ProfileDraft {
@@ -45,6 +46,7 @@
       city: p.city ?? "",
       isSingle: !!p.isSingle,
       isTrainer: !!p.isTrainer,
+      isPremium: !!p.isPremium,
     };
   }
 
@@ -78,6 +80,7 @@
       city: draft.city.trim(),
       isSingle: draft.isSingle,
       isTrainer: draft.isTrainer,
+      isPremium: draft.isPremium,
     };
     await setDoc(
       doc(db, "users", profile.uid),
@@ -227,6 +230,10 @@
           <label class="flex items-center gap-1.5 text-sm text-text">
             <input type="checkbox" bind:checked={draft.isTrainer} />
             Trainer
+          </label>
+          <label class="flex items-center gap-1.5 text-sm text-text">
+            <input type="checkbox" bind:checked={draft.isPremium} />
+            Premium
           </label>
         </div>
 
