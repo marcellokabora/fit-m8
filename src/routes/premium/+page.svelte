@@ -103,9 +103,9 @@
     </span>
     <h2 class="text-2xl font-black text-text">{t.t("premium.title")}</h2>
     <p class="text-sm text-muted">{t.t("premium.subtitle")}</p>
-    <p class="mt-2 text-3xl font-black text-primary">
+    <!-- <p class="mt-2 text-3xl font-black text-primary">
       {t.t("premium.priceLine")}
-    </p>
+    </p> -->
   </div>
 
   <div class="flex flex-col gap-3">
