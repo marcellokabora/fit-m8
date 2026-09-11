@@ -1,7 +1,7 @@
-// Seeds fake "checked in right now" pins near Nova Icaria / Platja del Bogatell beach in
-// Barcelona, for demoing the /explore live check-in feature. Standalone (creates its own
-// fake_beach_* users) so it doesn't depend on scripts/seed.cjs having been run first.
+// Seeds fake "checked in right now" pins for demoing the /explore live check-in feature.
+// Standalone (creates its own fake users) so it doesn't depend on scripts/seed.cjs.
 // Usage: npm run seed:checkins
+//        npm run seed:checkins:madrid
 const admin = require('firebase-admin');
 const { getFirestore, FieldValue, Timestamp } = require('firebase-admin/firestore');
 const fs = require('fs');
@@ -35,9 +35,6 @@ admin.initializeApp({
 
 const db = getFirestore();
 
-// Activities that fit the beach setting (all already exist in src/lib/types.ts ACTIVITIES).
-const BEACH_ACTIVITIES = ['beachVolley', 'footVolley', 'beachTennis', 'surf', 'skateboard', 'tennis'];
-
 const NAMES = [
     { name: 'Marc', gender: 'male' },
     { name: 'Laia', gender: 'female' },
@@ -51,18 +48,44 @@ const NAMES = [
     { name: 'Marta', gender: 'female' }
 ];
 
-// Nova Icaria and Platja del Bogatell, Barcelona — the two beach spots shown clustered
-// together on the /explore screen.
-const BEACH_SPOTS = [
-    { lat: 41.3855, lng: 2.1975 },
-    { lat: 41.3919, lng: 2.205 }
-];
+const SEED_LOCATIONS = {
+    barcelona: {
+        city: 'Barcelona',
+        uidPrefix: 'fake_beach',
+        label: 'Barcelona beach',
+        activities: ['beachVolley', 'footVolley', 'beachTennis', 'surf', 'skateboard', 'tennis'],
+        spots: [
+            { lat: 41.3855, lng: 2.1975 },
+            { lat: 41.3919, lng: 2.205 }
+        ]
+    },
+    madrid: {
+        city: 'Madrid',
+        uidPrefix: 'fake_madrid',
+        label: 'central Madrid',
+        activities: ['padel', 'soccer', 'tennis', 'jogging', 'basketball', 'cycling', 'gym', 'calisthenics', 'skateboard', 'yoga'],
+        spots: [
+            { lat: 40.4155, lng: -3.7074 },
+            { lat: 40.42, lng: -3.7058 },
+            { lat: 40.4089, lng: -3.7006 }
+        ]
+    }
+};
 
-// Jitters a point up to ~150m in a deterministic-per-index direction, so pins spread out
-// around each beach spot instead of stacking exactly on top of each other.
-function jitter(spot, index) {
-    const bearingRad = (((index * 67) % 360) * Math.PI) / 180;
-    const distanceKm = 0.05 + (index % 3) * 0.05;
+const cityArg = process.argv.find(arg => arg.startsWith('--city='));
+const cityKey = cityArg ? cityArg.slice('--city='.length).toLowerCase() : 'barcelona';
+const seedLocation = SEED_LOCATIONS[cityKey];
+
+if (!seedLocation) {
+    console.error(`Unknown city "${cityKey}". Choose: ${Object.keys(SEED_LOCATIONS).join(', ')}`);
+    process.exit(1);
+}
+
+// Picks a fresh point 50-500m from the selected spot on every run. Square-root sampling
+// spreads pins across the area instead of clustering most of them near the center.
+function jitter(spot) {
+    const bearingRad = Math.random() * Math.PI * 2;
+    const distanceKm = 0.05 + Math.sqrt(Math.random()) * 0.45;
     const latRad = (spot.lat * Math.PI) / 180;
     return {
         lat: spot.lat + (distanceKm / 111) * Math.cos(bearingRad),
@@ -76,14 +99,14 @@ function jitter(spot, index) {
 const SEED_EXPIRY_MS = 10 * 365 * 24 * 60 * 60 * 1000;
 
 async function seedCheckins() {
-    console.log('🏖️  Seeding fake beach check-ins...\n');
+    console.log(`Seeding fake check-ins around ${seedLocation.label}...\n`);
 
     for (let i = 0; i < NAMES.length; i++) {
         const { name, gender } = NAMES[i];
-        const uid = `fake_beach_${i + 1}`;
-        const activityId = BEACH_ACTIVITIES[i % BEACH_ACTIVITIES.length];
-        const spot = BEACH_SPOTS[i % BEACH_SPOTS.length];
-        const { lat, lng } = jitter(spot, i);
+        const uid = `${seedLocation.uidPrefix}_${i + 1}`;
+        const activityId = seedLocation.activities[i % seedLocation.activities.length];
+        const spot = seedLocation.spots[i % seedLocation.spots.length];
+        const { lat, lng } = jitter(spot);
 
         try {
             await db
@@ -95,11 +118,11 @@ async function seedCheckins() {
                         displayName: name,
                         photoURL: '',
                         photos: [],
-                        bio: `Down at the beach for ${activityId}, come join!`,
+                        bio: `Playing ${activityId} in ${seedLocation.city}, come join!`,
                         age: 22 + (i % 15),
                         gender,
                         orientation: 'hetero',
-                        city: 'Barcelona',
+                        city: seedLocation.city,
                         lat,
                         lng,
                         activities: [{ id: activityId, format: 'all', level: 'medium' }],
@@ -128,13 +151,13 @@ async function seedCheckins() {
                     expiresAt: Timestamp.fromMillis(now + SEED_EXPIRY_MS)
                 });
 
-            console.log(`✅ ${name} checked in for ${activityId} near ${spot.lat},${spot.lng}`);
+            console.log(`${name} checked in for ${activityId} near ${spot.lat},${spot.lng}`);
         } catch (error) {
             console.error(`❌ Error seeding ${name}:`, error.message);
         }
     }
 
-    console.log('\n✨ Done! Open /explore to see the fake check-ins.');
+    console.log(`\nDone! Open /explore to see the ${seedLocation.city} check-ins.`);
     process.exit(0);
 }
 

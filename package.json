@@ -13,6 +13,7 @@
 		"verify-user": "node scripts/verify-user.cjs",
 		"seed": "node scripts/seed.cjs",
 		"seed:checkins": "node scripts/seed-checkins.cjs",
+		"seed:checkins:madrid": "node scripts/seed-checkins.cjs --city=madrid",
 		"set-admin": "node scripts/set-admin.cjs",
 		"migrate-activity-ids": "node scripts/migrate-activity-ids.cjs",
 		"migrate-martial-arts": "node scripts/migrate-martial-arts-group.cjs",

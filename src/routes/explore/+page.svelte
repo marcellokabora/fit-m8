@@ -1,18 +1,34 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { LocateFixed, Plus, SlidersHorizontal } from "@lucide/svelte";
+  import { dev } from "$app/environment";
+  import { page } from "$app/state";
+  import {
+    AlertTriangle,
+    LocateFixed,
+    Plus,
+    SlidersHorizontal,
+    Users,
+    X,
+  } from "@lucide/svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
   import {
     subscribeActiveCheckins,
+    subscribeJoinRequests,
     startCheckin,
     endCheckin,
   } from "$lib/firebase/checkins";
   import {
     BARCELONA_LAT,
     BARCELONA_LNG,
+    distanceKm,
     getCurrentCoords,
   } from "$lib/location";
-  import type { Checkin, MapMarker } from "$lib/types";
+  import {
+    DEFAULT_DISTANCE_KM,
+    type Checkin,
+    type CheckinJoinRequest,
+    type MapMarker,
+  } from "$lib/types";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import GoogleMap from "$lib/components/GoogleMap.svelte";
   import CheckinSheet from "$lib/components/CheckinSheet.svelte";
@@ -30,18 +46,35 @@
   // empty means "show all" — otherwise only these of the user's own sports are shown on the map
   let filterActivityIds = $state<string[]>([]);
   let selectedCheckin = $state<Checkin | null>(null);
+  let myJoinRequests = $state<CheckinJoinRequest[]>([]);
+  let confirmEndCheckin = $state(false);
   let ending = $state(false);
 
   let myUid = $derived($authUser?.uid ?? "");
   let myActivityIds = $derived(
     $userProfile?.activities?.map((a) => a.id) ?? [],
   );
-  // only the sports someone is actually checked in on right now are offered as filter options
-  let availableActivityIds = $derived([
-    ...new Set(checkins.map((c) => c.activityId)),
-  ]);
   let myCheckin = $derived(checkins.find((c) => c.uid === myUid) ?? null);
+  let joinedCount = $derived(
+    myJoinRequests.filter((request) => request.status === "accepted").length,
+  );
+  let pendingCount = $derived(
+    myJoinRequests.filter((request) => request.status === "pending").length,
+  );
   let myLocation = $state<{ lat: number; lng: number } | null>(null);
+  let locationResolved = $state(false);
+  let isMadridTestLocation = $derived(
+    dev && page.url.searchParams.get("testLocation") === "madrid",
+  );
+
+  $effect(() => {
+    const checkinUid = myCheckin?.uid;
+    if (!checkinUid) {
+      myJoinRequests = [];
+      return;
+    }
+    return subscribeJoinRequests(checkinUid, (next) => (myJoinRequests = next));
+  });
 
   let mapCenter = $derived(
     myLocation ?? {
@@ -50,8 +83,26 @@
     },
   );
 
+  let nearbyCheckins = $derived(
+    locationResolved
+      ? checkins.filter(
+          (checkin) =>
+            distanceKm(
+              mapCenter.lat,
+              mapCenter.lng,
+              checkin.lat,
+              checkin.lng,
+            ) <= DEFAULT_DISTANCE_KM,
+        )
+      : [],
+  );
+  // Only sports with a nearby active check-in are offered as map filters.
+  let availableActivityIds = $derived([
+    ...new Set(nearbyCheckins.map((checkin) => checkin.activityId)),
+  ]);
+
   let markers = $derived<MapMarker[]>(
-    checkins
+    nearbyCheckins
       .filter(
         (c) =>
           filterActivityIds.length === 0 ||
@@ -71,23 +122,36 @@
     recenter: (coords: { lat: number; lng: number }) => void;
   }>();
 
-  // Also used by the recenter button — fetches a fresh fix each time rather than reusing a
-  // stale one, since the device (and the map's own pan position) may have moved since.
-  function locateMe() {
-    return getCurrentCoords()
+  function getMapCoords() {
+    if (isMadridTestLocation) {
+      return Promise.resolve({ lat: 40.4168, lng: -3.7038 });
+    }
+    return getCurrentCoords();
+  }
+
+  function updateMyLocation(recenterMap: boolean) {
+    return getMapCoords()
       .then((coords) => {
         myLocation = coords;
-        mapRef?.recenter(coords);
+        if (recenterMap) mapRef?.recenter(coords);
       })
       .catch((err) => {
         // permission denied/unsupported — map just falls back to the profile/Barcelona center
         console.error("Failed to get current location:", err);
+      })
+      .finally(() => {
+        locationResolved = true;
       });
+  }
+
+  // Fetch a fresh fix when tapped rather than reusing a potentially stale location.
+  function locateMe() {
+    return updateMyLocation(true);
   }
 
   onMount(() => {
     unsubscribe = subscribeActiveCheckins((next) => (checkins = next));
-    locateMe();
+    updateMyLocation(true);
   });
   onDestroy(() => unsubscribe?.());
 
@@ -111,8 +175,14 @@
   async function handleEndCheckin() {
     if (!myUid || ending) return;
     ending = true;
-    await endCheckin(myUid);
-    ending = false;
+    try {
+      await endCheckin(myUid);
+      confirmEndCheckin = false;
+    } catch (err) {
+      console.error("Failed to end check-in:", err);
+    } finally {
+      ending = false;
+    }
   }
 </script>
 
@@ -123,6 +193,7 @@
       center={mapCenter}
       {markers}
       userLocation={myLocation}
+      fitToMarkers
       onMarkerClick={handleMarkerClick}
       class="absolute inset-0"
     />
@@ -131,7 +202,7 @@
       type="button"
       onclick={locateMe}
       aria-label={t.t("explore.recenter")}
-      class="absolute bottom-24 left-4 z-10 flex size-11 items-center justify-center rounded-full bg-surface text-primary shadow-lg active:scale-95"
+      class="absolute bottom-24 left-4 z-10 flex size-11 items-center justify-center rounded-full border-2 border-text/40 bg-surface text-primary shadow-xl active:scale-95"
     >
       <LocateFixed class="size-5" />
     </button>
@@ -140,17 +211,17 @@
       type="button"
       onclick={() => (showFilterSheet = true)}
       aria-label={t.t("explore.filterButton")}
-      class="absolute bottom-24 left-20 z-10 flex size-11 items-center justify-center rounded-full shadow-lg active:scale-95 text-primary {filterActivityIds.length >
+      class="absolute bottom-24 left-20 z-10 flex size-11 items-center justify-center rounded-full border-2 shadow-xl active:scale-95 {filterActivityIds.length >
       0
-        ? 'bg-primary text-white'
-        : 'bg-surface text-primary'}"
+        ? 'border-text/60 bg-primary text-white'
+        : 'border-text/40 bg-surface text-primary'}"
     >
       <SlidersHorizontal class="size-5" />
     </button>
 
     {#if myCheckin}
       <div
-        class="absolute inset-x-4 top-[calc(1rem+env(safe-area-inset-top))] z-10 flex items-center gap-3 rounded-2xl bg-surface/95 p-3 shadow-lg backdrop-blur"
+        class="absolute inset-x-4 top-[calc(1rem+env(safe-area-inset-top))] z-10 flex items-center gap-3 rounded-2xl bg-surface/95 p-3 shadow-xl backdrop-blur"
       >
         <button
           type="button"
@@ -158,42 +229,92 @@
             selectedCheckin = myCheckin;
             showMarkerSheet = true;
           }}
-          class="flex flex-1 items-center gap-3 text-left"
+          class="flex min-w-0 flex-1 items-center gap-3 text-left"
         >
           <span
             class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
           >
             <ActivityIcon id={myCheckin.activityId} class="size-5" />
           </span>
-          <span class="flex-1 truncate text-sm font-bold text-text">
-            {t.t("explore.checkedInAs", {
-              activity: t.activity(myCheckin.activityId),
-            })}
+          <span class="flex min-w-0 flex-1 items-center gap-2">
+            <span class="min-w-0 flex-1 truncate text-sm font-bold text-text">
+              {t.activity(myCheckin.activityId)}
+            </span>
+            <span
+              class="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted"
+            >
+              <Users class="size-3.5" aria-hidden="true" />
+              <span aria-hidden="true">
+                {joinedCount}/{joinedCount + pendingCount}
+              </span>
+              <span class="sr-only">
+                {t.t("explore.joinedCount", { count: joinedCount })}.
+                {t.t("explore.pendingCount", { count: pendingCount })}.
+              </span>
+            </span>
           </span>
         </button>
         <button
           type="button"
-          onclick={handleEndCheckin}
+          onclick={() => (confirmEndCheckin = true)}
           disabled={ending}
-          class="shrink-0 rounded-xl border-2 border-border px-3 py-2 text-xs font-bold text-text active:scale-95 disabled:opacity-40"
+          aria-label={t.t("explore.endCheckin")}
+          class="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-border text-text active:scale-95 disabled:opacity-40"
         >
-          {t.t("explore.endCheckin")}
+          <X class="size-5" />
         </button>
       </div>
     {:else}
       <button
         type="button"
         onclick={() => (showCheckinSheet = true)}
-        class="absolute bottom-24 right-4 z-10 flex items-center gap-2 rounded-full bg-primary px-5 py-3 font-bold text-white shadow-lg active:scale-95"
+        aria-label={t.t("explore.checkInCta")}
+        class="absolute bottom-24 right-4 z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg active:scale-95"
       >
-        <Plus class="size-5" />
-        {t.t("explore.checkInCta")}
+        <Plus class="size-6" />
       </button>
     {/if}
   </div>
 
   <BottomNav active="explore" />
 </div>
+
+{#if confirmEndCheckin}
+  <div
+    class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 px-6 backdrop-blur-sm md:max-w-md"
+  >
+    <div
+      class="flex w-full flex-col items-center gap-4 rounded-3xl bg-surface p-8 text-center shadow-2xl"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="end-event-title"
+    >
+      <AlertTriangle class="size-12 text-error" />
+      <h2 id="end-event-title" class="text-lg font-black text-text">
+        {t.t("explore.endCheckinTitle")}
+      </h2>
+      <p class="text-sm text-muted">{t.t("explore.endCheckinHint")}</p>
+      <div class="flex w-full gap-3">
+        <button
+          type="button"
+          onclick={() => (confirmEndCheckin = false)}
+          disabled={ending}
+          class="flex-1 rounded-2xl border-2 border-border py-3 text-xs font-semibold text-text active:scale-95 disabled:opacity-50"
+        >
+          {t.t("common.cancel")}
+        </button>
+        <button
+          type="button"
+          onclick={handleEndCheckin}
+          disabled={ending}
+          class="flex-1 rounded-2xl bg-error py-3 text-xs font-bold text-white active:scale-95 disabled:opacity-50"
+        >
+          {ending ? t.t("common.loading") : t.t("explore.endCheckinConfirm")}
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <CheckinSheet
   bind:open={showCheckinSheet}

@@ -3,12 +3,14 @@
   import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
   import { PUBLIC_GOOGLE_MAPS_API_KEY } from "$env/static/public";
   import { ACTIVITIES, type MapMarker } from "$lib/types";
+  import { activeTheme, THEMES, type ModeColors } from "$lib/stores/theme";
 
   let {
     center,
     zoom = 15,
     markers = [],
     userLocation = null,
+    fitToMarkers = false,
     onMarkerClick,
     class: className = "",
   }: {
@@ -18,6 +20,7 @@
     // the device's actual current position — rendered as a distinct "you are here" dot,
     // separate from any check-in marker
     userLocation?: { lat: number; lng: number } | null;
+    fitToMarkers?: boolean;
     onMarkerClick?: (id: string) => void;
     class?: string;
   } = $props();
@@ -30,6 +33,84 @@
   let pendingRecenter: { lat: number; lng: number } | null = null;
   const gMarkers = new Map<string, google.maps.Marker>();
   const emojiById = Object.fromEntries(ACTIVITIES.map((a) => [a.id, a.emoji]));
+  let selectedTheme = $derived(
+    THEMES.find((theme) => theme.id === $activeTheme.themeId) ?? THEMES[0],
+  );
+  let mapColors = $derived(
+    $activeTheme.mode === "dark" ? selectedTheme.dark : selectedTheme.light,
+  );
+
+  function mapStyles(
+    colors: ModeColors,
+    accent: string,
+  ): google.maps.MapTypeStyle[] {
+    return [
+      { elementType: "geometry", stylers: [{ color: colors.bg }] },
+      {
+        elementType: "labels.text.fill",
+        stylers: [{ color: colors.muted }],
+      },
+      {
+        elementType: "labels.text.stroke",
+        stylers: [{ color: colors.bg }],
+      },
+      {
+        featureType: "administrative",
+        elementType: "geometry.stroke",
+        stylers: [{ color: colors.border }],
+      },
+      {
+        featureType: "poi",
+        elementType: "geometry",
+        stylers: [{ color: colors.surface }],
+      },
+      {
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "poi.park",
+        elementType: "geometry",
+        stylers: [{ color: colors.border }],
+      },
+      {
+        featureType: "road",
+        elementType: "geometry",
+        stylers: [{ color: colors.surface }],
+      },
+      {
+        featureType: "road.highway",
+        elementType: "geometry",
+        stylers: [{ color: accent }],
+      },
+      {
+        featureType: "road",
+        elementType: "geometry.stroke",
+        stylers: [{ color: colors.border }],
+      },
+      {
+        featureType: "transit",
+        elementType: "geometry",
+        stylers: [{ color: colors.surface }],
+      },
+      {
+        featureType: "transit",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "water",
+        elementType: "geometry",
+        stylers: [{ color: colors.border }],
+      },
+      {
+        featureType: "water",
+        elementType: "labels.text.fill",
+        stylers: [{ color: colors.text }],
+      },
+    ];
+  }
 
   // Imperatively pans the map to the given coordinates — exposed via bind:this so callers
   // (e.g. a "locate me" button) can recenter on demand without relying on prop reactivity.
@@ -109,6 +190,19 @@
     }
   }
 
+  function fitVisibleMarkers() {
+    if (!map || markers.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds();
+    for (const marker of markers)
+      bounds.extend({ lat: marker.lat, lng: marker.lng });
+
+    map.fitBounds(bounds, { top: 96, right: 48, bottom: 128, left: 48 });
+    google.maps.event.addListenerOnce(map, "idle", () => {
+      if ((map?.getZoom() ?? zoom) > zoom) map?.setZoom(zoom);
+    });
+  }
+
   onMount(() => {
     let cancelled = false;
     setOptions({ key: PUBLIC_GOOGLE_MAPS_API_KEY, v: "weekly" });
@@ -121,10 +215,14 @@
           zoom,
           disableDefaultUI: true,
           clickableIcons: false,
+          backgroundColor: mapColors.bg,
+          styles: mapStyles(mapColors, selectedTheme.primaryDark),
         });
         if (pendingRecenter) {
           map.panTo(pendingRecenter);
           pendingRecenter = null;
+        } else if (fitToMarkers) {
+          fitVisibleMarkers();
         }
         renderMarkers();
         renderUserLocation();
@@ -144,11 +242,19 @@
   $effect(() => {
     markers;
     renderMarkers();
+    if (fitToMarkers) fitVisibleMarkers();
   });
 
   $effect(() => {
     userLocation;
     renderUserLocation();
+  });
+
+  $effect(() => {
+    map?.setOptions({
+      backgroundColor: mapColors.bg,
+      styles: mapStyles(mapColors, selectedTheme.primaryDark),
+    });
   });
 </script>
 
