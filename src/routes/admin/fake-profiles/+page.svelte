@@ -39,7 +39,7 @@
   } from "@lucide/svelte";
 
   interface ProfileDraft {
-    photoURL: string;
+    photo: string;
     displayName: string;
     bio: string;
     age: string;
@@ -78,7 +78,7 @@
 
   function draftOf(p: UserProfile): ProfileDraft {
     return {
-      photoURL: p.photoURL ?? "",
+      photo: p.photos?.[0] ?? "",
       displayName: p.displayName ?? "",
       bio: p.bio ?? "",
       age: p.age ? String(p.age) : "",
@@ -129,7 +129,7 @@
     return [...list].sort((a, b) => {
       if (sortBy === "withoutPhoto") {
         return (
-          Number(Boolean(a.photoURL)) - Number(Boolean(b.photoURL)) ||
+          Number(Boolean(a.photos?.[0])) - Number(Boolean(b.photos?.[0])) ||
           a.displayName.localeCompare(b.displayName)
         );
       }
@@ -225,7 +225,7 @@
   async function saveProfile(uid: string) {
     const d = drafts[uid];
     if (!d) return;
-    const url = d.photoURL.trim();
+    const url = d.photo.trim();
     if (url && !/^https?:\/\//.test(url)) return;
     const name = d.displayName.trim();
     if (!name) return;
@@ -233,7 +233,6 @@
 
     saving = { ...saving, [uid]: true };
     const update: Partial<UserProfile> = {
-      photoURL: url,
       photos: url ? [url] : [],
       displayName: name,
       bio: d.bio.trim(),
@@ -339,9 +338,9 @@
             }}
             class="flex items-center gap-3 rounded-2xl bg-surface p-3 text-left shadow-sm active:scale-[0.99]"
           >
-            {#if p.photoURL}
+            {#if p.photos?.[0]}
               <img
-                src={p.photoURL}
+                src={p.photos[0]}
                 alt={p.displayName}
                 class="size-14 shrink-0 rounded-xl object-cover"
               />
@@ -466,9 +465,9 @@
         </button>
       </div>
 
-      {#if d.photoURL}
+      {#if d.photo}
         <img
-          src={d.photoURL}
+          src={d.photo}
           alt={p.displayName}
           class="mb-4 aspect-square w-full rounded-2xl object-cover"
         />
@@ -483,13 +482,13 @@
       <div class="mb-4 flex flex-col gap-2">
         <label
           class="text-xs font-semibold uppercase text-muted"
-          for="photoURL-{p.uid}">Photo URL</label
+          for="photo-{p.uid}">Photo URL</label
         >
         <input
-          id="photoURL-{p.uid}"
+          id="photo-{p.uid}"
           type="url"
           placeholder="https://images.unsplash.com/..."
-          bind:value={d.photoURL}
+          bind:value={d.photo}
           class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text placeholder:text-muted"
         />
 

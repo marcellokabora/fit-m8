@@ -28,7 +28,7 @@ async function clearJoinRequests(uid: string): Promise<void> {
 
 // Creates/overwrites the current user's check-in (one active check-in per user, doc id == uid).
 export async function startCheckin(
-    profile: Pick<UserProfile, 'uid' | 'displayName' | 'photoURL' | 'gender'>,
+    profile: Pick<UserProfile, 'uid' | 'displayName' | 'photos' | 'gender'>,
     activityId: string,
     lat: number,
     lng: number,
@@ -42,7 +42,7 @@ export async function startCheckin(
         lat,
         lng,
         displayName: profile.displayName,
-        photoURL: profile.photoURL,
+        photos: profile.photos ?? [],
         gender: profile.gender ?? '',
         createdAt: Timestamp.fromMillis(now),
         expiresAt: Timestamp.fromMillis(now + durationHours * 60 * 60 * 1000)
@@ -81,12 +81,12 @@ export function subscribeActiveCheckins(onChange: (checkins: Checkin[]) => void)
 // so a repeat tap just overwrites their own entry instead of creating duplicates).
 export async function requestToJoinCheckin(
     checkinUid: string,
-    profile: Pick<UserProfile, 'uid' | 'displayName' | 'photoURL' | 'gender'>
+    profile: Pick<UserProfile, 'uid' | 'displayName' | 'photos' | 'gender'>
 ): Promise<void> {
     await setDoc(doc(db, 'checkins', checkinUid, 'joinRequests', profile.uid), {
         uid: profile.uid,
         displayName: profile.displayName,
-        photoURL: profile.photoURL,
+        photos: profile.photos ?? [],
         gender: profile.gender ?? '',
         createdAt: Timestamp.now(),
         status: 'pending'

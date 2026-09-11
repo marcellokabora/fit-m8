@@ -19,6 +19,9 @@
 		"migrate-martial-arts": "node scripts/migrate-martial-arts-group.cjs",
 		"migrate-remove-badminton": "node scripts/migrate-remove-badminton.cjs",
 		"migrate-male-pole-dance": "node scripts/migrate-male-pole-dance.cjs",
+		"migrate-fill-fake-activities": "node scripts/migrate-fill-fake-activities.cjs",
+		"migrate-remove-unicycle": "node scripts/migrate-remove-unicycle.cjs",
+		"migrate-remove-photo-url": "node scripts/migrate-remove-photo-url.cjs",
 		"generate-fallback-photos": "node scripts/generate-fallback-photos.cjs",
 		"deploy:functions": "firebase deploy --only functions"
 	},

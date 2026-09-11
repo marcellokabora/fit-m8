@@ -17,7 +17,7 @@
   } from "firebase/firestore";
   import type { Match, UserProfile } from "$lib/types";
   import { getMatchActivityIds } from "$lib/types";
-  import { getFallbackPhotoURL } from "$lib/image";
+  import { getFallbackPhoto } from "$lib/image";
   import BottomNav from "$lib/components/BottomNav.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { unreadMatches } from "$lib/stores/unread";
@@ -201,8 +201,8 @@
                 >
                   {#if other}
                     <img
-                      src={other.photoURL ||
-                        getFallbackPhotoURL(other.uid, other.gender)}
+                      src={other.photos?.[0] ||
+                        getFallbackPhoto(other.uid, other.gender)}
                       alt={other.displayName}
                       class="h-full w-full object-cover"
                     />
@@ -266,8 +266,8 @@
               >
                 {#if other}
                   <img
-                    src={other.photoURL ||
-                      getFallbackPhotoURL(other.uid, other.gender)}
+                    src={other.photos?.[0] ||
+                      getFallbackPhoto(other.uid, other.gender)}
                     alt={other.displayName}
                     class="h-full w-full object-cover"
                   />

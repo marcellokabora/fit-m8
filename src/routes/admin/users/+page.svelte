@@ -6,7 +6,7 @@
   import { isAdmin } from "$lib/stores/admin";
   import { adminDeleteUserData } from "$lib/firebase/account";
   import type { UserProfile } from "$lib/types";
-  import { getFallbackPhotoURL } from "$lib/image";
+  import { getFallbackPhoto } from "$lib/image";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import { LoaderCircle, ShieldAlert, Trash2 } from "@lucide/svelte";
 
@@ -108,19 +108,11 @@
             href={`/profile/${u.uid}`}
             class="flex min-w-0 flex-1 items-center gap-3"
           >
-            {#if u.photoURL}
-              <img
-                src={u.photoURL}
-                alt={u.displayName}
-                class="size-12 shrink-0 rounded-full object-cover"
-              />
-            {:else}
-              <img
-                src={getFallbackPhotoURL(u.uid, u.gender)}
-                alt={u.displayName}
-                class="size-12 shrink-0 rounded-full object-cover"
-              />
-            {/if}
+            <img
+              src={u.photos?.[0] || getFallbackPhoto(u.uid, u.gender)}
+              alt={u.displayName}
+              class="size-12 shrink-0 rounded-full object-cover"
+            />
             <div class="min-w-0 flex-1">
               <p class="truncate font-bold text-text">
                 {u.displayName || "(no name)"}

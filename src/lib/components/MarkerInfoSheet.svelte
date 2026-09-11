@@ -5,7 +5,7 @@
   import BottomSheet from "$lib/components/BottomSheet.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import { getFallbackPhotoURL } from "$lib/image";
+  import { getFallbackPhoto } from "$lib/image";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { startDirectMessage } from "$lib/firebase/swipe";
   import {
@@ -143,8 +143,8 @@
         class="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <img
-          src={checkin.photoURL ||
-            getFallbackPhotoURL(checkin.uid, checkin.gender ?? "")}
+          src={checkin.photos?.[0] ||
+            getFallbackPhoto(checkin.uid, checkin.gender ?? "")}
           alt={checkin.displayName}
           class="size-20 rounded-full object-cover"
         />
@@ -198,8 +198,8 @@
               {#each joinRequests as request (request.uid)}
                 <li class="flex items-center gap-3 rounded-2xl bg-bg px-3 py-2">
                   <img
-                    src={request.photoURL ||
-                      getFallbackPhotoURL(request.uid, request.gender ?? "")}
+                    src={request.photos?.[0] ||
+                      getFallbackPhoto(request.uid, request.gender ?? "")}
                     alt={request.displayName}
                     class="size-8 shrink-0 rounded-full object-cover"
                   />
@@ -253,8 +253,8 @@
                   class="flex items-center gap-2 rounded-full bg-bg px-3 py-1.5"
                 >
                   <img
-                    src={request.photoURL ||
-                      getFallbackPhotoURL(request.uid, request.gender ?? "")}
+                    src={request.photos?.[0] ||
+                      getFallbackPhoto(request.uid, request.gender ?? "")}
                     alt={request.displayName}
                     class="size-6 rounded-full object-cover"
                   />

@@ -1,11 +1,5 @@
 <script lang="ts">
-  import {
-    BIO_MAX_LENGTH,
-    GENDER_OPTIONS,
-    ORIENTATIONS,
-    type Gender,
-    type SexualOrientation,
-  } from "$lib/types";
+  import { BIO_MAX_LENGTH, GENDER_OPTIONS, type Gender } from "$lib/types";
   import PhotoGrid from "$lib/components/PhotoGrid.svelte";
   import BirthdateField from "$lib/components/BirthdateField.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
@@ -19,7 +13,6 @@
     bio = $bindable(""),
     birthdate = $bindable(""),
     gender = $bindable<Gender>("male"),
-    sexualOrientation = $bindable<SexualOrientation>("hetero"),
     isSingle = $bindable(false),
   }: {
     uid: string;
@@ -28,7 +21,6 @@
     bio?: string;
     birthdate?: string;
     gender?: Gender;
-    sexualOrientation?: SexualOrientation;
     isSingle?: boolean;
   } = $props();
 
@@ -38,12 +30,6 @@
     GENDER_OPTIONS.map((option) => ({
       ...option,
       label: t.gender(option.value),
-    })),
-  );
-  let orientationOptions = $derived(
-    ORIENTATIONS.map((option) => ({
-      ...option,
-      label: t.orientation(option.value),
     })),
   );
 </script>
@@ -109,13 +95,4 @@
     onchange={(value) => (gender = value)}
     size="lg"
   />
-  <div>
-    <SegmentedControl
-      options={orientationOptions}
-      value={sexualOrientation}
-      ariaLabel={t.t("common.orientation")}
-      onchange={(value) => (sexualOrientation = value)}
-      size="lg"
-    />
-  </div>
 </div>

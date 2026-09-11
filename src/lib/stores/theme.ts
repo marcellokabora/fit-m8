@@ -21,6 +21,14 @@ export interface Theme {
 
 export const THEMES: Theme[] = [
     {
+        id: 'barcelona',
+        label: 'Barcelona',
+        primary: '#c80000',
+        primaryDark: '#990000',
+        light: { bg: '#fff5f5', surface: '#ffffff', text: '#1f0d0d', muted: '#806666', border: '#f3d6d6' },
+        dark: { bg: '#1a0606', surface: '#2b0d0d', text: '#fdecec', muted: '#c39a9a', border: '#4a1c1c' }
+    },
+    {
         id: 'sunset',
         label: 'Sunset',
         primary: '#f97316',
@@ -43,14 +51,6 @@ export const THEMES: Theme[] = [
         primaryDark: '#0047cc',
         light: { bg: '#f5f7fa', surface: '#ffffff', text: '#0d0d0d', muted: '#6b7280', border: '#e5e7eb' },
         dark: { bg: '#0b0f17', surface: '#161c27', text: '#f2f4f8', muted: '#97a1b3', border: '#2b3444' }
-    },
-    {
-        id: 'ocean',
-        label: 'Ocean',
-        primary: '#0d9488',
-        primaryDark: '#0f766e',
-        light: { bg: '#f0fdfa', surface: '#ffffff', text: '#0d0d0d', muted: '#6b7280', border: '#d9f2ee' },
-        dark: { bg: '#071a17', surface: '#0f2925', text: '#eafaf7', muted: '#8fb5af', border: '#1c3d37' }
     },
     {
         id: 'berry',
@@ -79,6 +79,16 @@ const THEME_KEY = 'fit-m8-theme';
 const MODE_KEY = 'fit-m8-theme-mode';
 const DEFAULT_STATE: ThemeState = { themeId: 'forest', mode: 'dark' };
 
+function resolveThemeId(...themeIds: Array<string | null | undefined>): string {
+    return themeIds.find((themeId) => themeId && THEMES.some((theme) => theme.id === themeId))
+        ?? DEFAULT_STATE.themeId;
+}
+
+function resolveMode(...modes: Array<string | null | undefined>): ThemeMode {
+    return modes.find((mode): mode is ThemeMode => mode === 'light' || mode === 'dark')
+        ?? DEFAULT_STATE.mode;
+}
+
 function applyState(state: ThemeState) {
     if (typeof document === 'undefined') return;
     const theme = THEMES.find((t) => t.id === state.themeId) ?? THEMES[0];
@@ -105,13 +115,13 @@ function createThemeStore() {
         subscribe,
         init: () => {
             if (typeof window === 'undefined') return;
-            const themeId = window.localStorage.getItem(THEME_KEY) ?? DEFAULT_STATE.themeId;
-            const savedMode = window.localStorage.getItem(MODE_KEY);
-            const mode: ThemeMode = savedMode === 'light' ? 'light' : 'dark';
-            const state: ThemeState = {
-                themeId: THEMES.some((t) => t.id === themeId) ? themeId : DEFAULT_STATE.themeId,
-                mode
-            };
+            const params = new URLSearchParams(window.location.search);
+            const themeId = resolveThemeId(
+                params.get('theme'),
+                window.localStorage.getItem(THEME_KEY)
+            );
+            const mode = resolveMode(params.get('mode'), window.localStorage.getItem(MODE_KEY));
+            const state: ThemeState = { themeId, mode };
             applyState(state);
             set(state);
         },

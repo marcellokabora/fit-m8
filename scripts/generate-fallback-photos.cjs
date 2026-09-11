@@ -33,7 +33,7 @@ function shuffled(values) {
     return result;
 }
 
-function normalizePhotoURL(value) {
+function normalizePhoto(value) {
     const url = new URL(value.trim());
     url.searchParams.delete('auto');
     url.searchParams.append('auto', 'format');
@@ -55,8 +55,9 @@ async function main() {
 
     for (const doc of snapshot.docs) {
         const data = doc.data();
-        if (!(data.gender in pools) || typeof data.photoURL !== 'string' || !data.photoURL.trim()) continue;
-        pools[data.gender].add(normalizePhotoURL(data.photoURL));
+        const photo = Array.isArray(data.photos) ? data.photos[0] : undefined;
+        if (!(data.gender in pools) || typeof photo !== 'string' || !photo.trim()) continue;
+        pools[data.gender].add(normalizePhoto(photo));
     }
 
     for (const [gender, urls] of Object.entries(pools)) {

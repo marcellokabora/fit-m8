@@ -6,6 +6,7 @@ const admin = require('firebase-admin');
 const { getFirestore, FieldValue, Timestamp } = require('firebase-admin/firestore');
 const fs = require('fs');
 const path = require('path');
+const { fillActivities } = require('./fake-profile-activities.cjs');
 
 const envPath = path.resolve(process.cwd(), '.env');
 const env = {};
@@ -116,7 +117,6 @@ async function seedCheckins() {
                     {
                         uid,
                         displayName: name,
-                        photoURL: '',
                         photos: [],
                         bio: `Playing ${activityId} in ${seedLocation.city}, come join!`,
                         age: 22 + (i % 15),
@@ -125,7 +125,10 @@ async function seedCheckins() {
                         city: seedLocation.city,
                         lat,
                         lng,
-                        activities: [{ id: activityId, format: 'all', level: 'medium' }],
+                        activities: fillActivities(
+                            [{ id: activityId, format: 'all', level: 'medium' }],
+                            gender
+                        ),
                         isSingle: i % 2 === 0,
                         isTrainer: false,
                         emailVerified: true,
@@ -145,7 +148,7 @@ async function seedCheckins() {
                     lat,
                     lng,
                     displayName: name,
-                    photoURL: '',
+                    photos: [],
                     gender,
                     createdAt: Timestamp.fromMillis(now),
                     expiresAt: Timestamp.fromMillis(now + SEED_EXPIRY_MS)

@@ -97,7 +97,6 @@ export const ACTIVITIES = [
 	{ id: 'bmx', label: 'BMX', emoji: '🚲', group: 'wheelSkate' },
 	{ id: 'scooter', label: 'Scooter', emoji: '🛴', group: 'wheelSkate' },
 	{ id: 'electricScooter', label: 'Electric Scooter', emoji: '🛴', group: 'wheelSkate' },
-	{ id: 'unicycle', label: 'Unicycle', emoji: '🛞', group: 'wheelSkate' },
 	{ id: 'kayak', label: 'Kayak', emoji: '🚣', group: 'water' },
 	{ id: 'surfskate', label: 'Surfskate', emoji: '🛹', group: 'wheelSkate' },
 	{ id: 'skateboard', label: 'Skateboarding', emoji: '🛹', group: 'wheelSkate' }
@@ -198,8 +197,7 @@ export function calculateAge(birthdate: string): number {
 export interface UserProfile {
 	uid: string;
 	displayName: string;
-	photoURL: string;
-	// up to 3 photo URLs, in display order — photos[0] is the default/main photo (mirrored in photoURL)
+	// up to 3 photo URLs, in display order — photos[0] is the default/main photo
 	photos?: string[];
 	bio: string;
 	age: number;
@@ -269,7 +267,7 @@ export interface Checkin {
 	message?: string;
 	// denormalized from the user's profile at check-in time so map markers render without extra reads
 	displayName: string;
-	photoURL: string;
+	photos?: string[];
 	gender?: Gender | '';
 	createdAt: Date;
 	// createdAt + CHECKIN_DURATION_MS; the map only shows check-ins where this is still in the future
@@ -284,7 +282,7 @@ export const CHECKIN_DURATION_MS = 2 * 60 * 60 * 1000;
 export interface CheckinJoinRequest {
 	uid: string;
 	displayName: string;
-	photoURL: string;
+	photos?: string[];
 	gender?: Gender | '';
 	createdAt: Date;
 	// set by the requester on creation; only the checkin's owner can flip it to accepted/declined

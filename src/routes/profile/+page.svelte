@@ -19,6 +19,7 @@
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import Toggle from "$lib/components/Toggle.svelte";
   import {
     ChevronDown,
     CircleQuestionMark,
@@ -44,6 +45,7 @@
   let expandedActivityId = $state<string | null>(null);
   let adminSheetOpen = $state(false);
   let orderInfoOpen = $state(false);
+  let trainerInfoOpen = $state(false);
 
   let formatOptions = $derived(
     ACTIVITY_FORMAT_OPTIONS.map((option) => ({
@@ -64,11 +66,11 @@
   let remainingSportSlots = $derived(
     Math.max(0, maxSports - activities.length),
   );
-
-  let photos = $derived(
-    $userProfile?.photos ??
-      ($userProfile?.photoURL ? [$userProfile.photoURL] : []),
+  let trainerActivities = $derived(
+    activities.filter((activity) => activity.level === "expert"),
   );
+
+  let photos = $derived($userProfile?.photos ?? []);
 
   $effect(() => {
     activities = $userProfile?.activities ?? [];
@@ -79,6 +81,12 @@
     if (!uid) return;
     activities = next;
     await userProfile.save(uid, { activities: next });
+  }
+
+  function setTrainer(value: boolean) {
+    const uid = $authUser?.uid;
+    if (!uid || !$userProfile?.isPremium) return;
+    void userProfile.save(uid, { isTrainer: value });
   }
 
   function toggleExpandActivity(id: string) {
@@ -330,6 +338,34 @@
     </div>
   </BottomSheet>
 
+  <BottomSheet
+    bind:open={trainerInfoOpen}
+    onClose={() => (trainerInfoOpen = false)}
+    closeLabel={t.t("common.close")}
+    bgClass="bg-surface"
+  >
+    <div class="px-6 pb-6 pt-2">
+      <h2 class="mb-4 text-lg font-black text-text">
+        {t.t("profile.trainerInfoTitle")}
+      </h2>
+      <div class="flex items-start gap-4">
+        <div
+          class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+        >
+          <SlidersHorizontal class="size-5" />
+        </div>
+        <div>
+          <p class="text-base font-bold text-text">
+            {t.t("profile.trainerSports")}
+          </p>
+          <p class="mt-0.5 text-sm text-muted">
+            {t.t("profile.trainerInfoBody")}
+          </p>
+        </div>
+      </div>
+    </div>
+  </BottomSheet>
+
   <!-- Activities -->
   <div id="activities" class="scroll-mt-20 px-5 {$isAdmin ? '' : 'pt-6'}">
     <div class="mb-3 flex items-center gap-2">
@@ -460,6 +496,70 @@
         {t.t("profile.addSportButton")}
       </a>
     {/if}
+  </div>
+
+  <!-- Trainer status -->
+  <div class="px-5 pt-8">
+    <div class="rounded-2xl bg-surface px-4 py-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <p class="text-sm font-semibold text-text">
+            {t.t("profile.trainer")}
+          </p>
+          <button
+            type="button"
+            onclick={() => (trainerInfoOpen = true)}
+            aria-label={t.t("profile.trainerInfoTitle")}
+            class="flex size-7 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
+          >
+            <CircleQuestionMark class="size-4" />
+          </button>
+        </div>
+        {#if $userProfile?.isPremium}
+          <Toggle
+            checked={$userProfile?.isTrainer ?? false}
+            ariaLabel={t.t("profile.trainer")}
+            onchange={setTrainer}
+          />
+        {:else}
+          <span
+            class="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
+          >
+            <Crown class="size-3" />
+            {t.t("profile.premiumFeature")}
+          </span>
+        {/if}
+      </div>
+
+      {#if $userProfile?.isTrainer}
+        <div
+          class="mt-3 border-t border-border pt-3"
+          transition:slide={{ duration: 200 }}
+        >
+          <p class="mb-2 text-xs font-bold uppercase tracking-wide text-muted">
+            {t.t("profile.trainerSports")}
+          </p>
+          {#if trainerActivities.length > 0}
+            <ul class="flex flex-col gap-2">
+              {#each trainerActivities as activity (activity.id)}
+                <li
+                  class="flex items-center gap-3 text-sm font-semibold text-text"
+                >
+                  <span
+                    class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+                  >
+                    <ActivityIcon id={activity.id} class="size-4" />
+                  </span>
+                  {t.activity(activity.id)}
+                </li>
+              {/each}
+            </ul>
+          {:else}
+            <p class="text-sm text-muted">{t.t("profile.noTrainerSports")}</p>
+          {/if}
+        </div>
+      {/if}
+    </div>
   </div>
 
   <!-- Premium -->

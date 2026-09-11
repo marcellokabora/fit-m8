@@ -19,7 +19,7 @@
   } from "@lucide/svelte";
   import Loading from "$lib/components/Loading.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
-  import { getFallbackPhotoURL } from "$lib/image";
+  import { getFallbackPhoto } from "$lib/image";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
   import {
@@ -228,7 +228,7 @@
     const top = users[0];
     if (!top) return [] as string[];
     if (top.photos?.length) return top.photos;
-    return [top.photoURL || getFallbackPhotoURL(top.uid, top.gender)];
+    return [getFallbackPhoto(top.uid, top.gender)];
   });
 
   $effect(() => {
@@ -729,8 +729,8 @@
                 class="flex-1 min-h-0 w-full flex items-center justify-center"
               >
                 <img
-                  src={(users[2].photos?.[0] ?? users[2].photoURL) ||
-                    getFallbackPhotoURL(users[2].uid, users[2].gender)}
+                  src={users[2].photos?.[0] ||
+                    getFallbackPhoto(users[2].uid, users[2].gender)}
                   alt={users[2].displayName}
                   draggable="false"
                   class="h-full w-full object-cover pointer-events-none"
@@ -746,8 +746,8 @@
                 class="flex-1 min-h-0 w-full flex items-center justify-center"
               >
                 <img
-                  src={(users[1].photos?.[0] ?? users[1].photoURL) ||
-                    getFallbackPhotoURL(users[1].uid, users[1].gender)}
+                  src={users[1].photos?.[0] ||
+                    getFallbackPhoto(users[1].uid, users[1].gender)}
                   alt={users[1].displayName}
                   draggable="false"
                   class="h-full w-full object-cover pointer-events-none"

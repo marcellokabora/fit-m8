@@ -11,7 +11,13 @@
     MAX_SPORTS_PREMIUM,
   } from "$lib/types";
   import BackHeader from "$lib/components/BackHeader.svelte";
-  import { Crown, Dumbbell, Heart, MessageCircle } from "@lucide/svelte";
+  import {
+    Crown,
+    Dumbbell,
+    Heart,
+    MessageCircle,
+    UserShield,
+  } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -26,6 +32,13 @@
       title: "premium.featureMoreSportsTitle",
       hint: "premium.featureMoreSportsHint",
       params: { max: MAX_SPORTS_PREMIUM, free: MAX_SPORTS_FREE },
+      comingSoon: false,
+    },
+    {
+      icon: UserShield,
+      title: "premium.featureTrainerTitle",
+      hint: "premium.featureTrainerHint",
+      params: {},
       comingSoon: false,
     },
     {

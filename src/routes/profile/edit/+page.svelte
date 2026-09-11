@@ -21,7 +21,6 @@
   import {
     Bell,
     Check,
-    Crown,
     Loader2,
     Plus,
     RotateCcw,
@@ -85,11 +84,7 @@
   );
   let gender = $state<Gender | "">($userProfile?.gender ?? "");
   let isSingle = $state($userProfile?.isSingle ?? false);
-  let isTrainer = $state($userProfile?.isTrainer ?? false);
-  let photos = $state<string[]>(
-    $userProfile?.photos ??
-      ($userProfile?.photoURL ? [$userProfile.photoURL] : []),
-  );
+  let photos = $state<string[]>($userProfile?.photos ?? []);
   let socialLinks = $state<string[]>($userProfile?.socialLinks ?? []);
   let newSocialLink = $state("");
   let socialLinkError = $state(false);
@@ -130,17 +125,14 @@
       sexualOrientation = $userProfile.orientation ?? "hetero";
       gender = $userProfile.gender ?? "";
       isSingle = $userProfile.isSingle ?? false;
-      isTrainer = $userProfile.isTrainer ?? false;
-      photos =
-        $userProfile.photos ??
-        ($userProfile.photoURL ? [$userProfile.photoURL] : []);
+      photos = $userProfile.photos ?? [];
       socialLinks = $userProfile.socialLinks ?? [];
     }
   });
 
   function handlePhotosChange(next: string[]) {
     if (!uid) return;
-    userProfile.save(uid, { photos: next, photoURL: next[0] ?? "" });
+    userProfile.save(uid, { photos: next });
   }
 
   function addSocialLink() {
@@ -176,8 +168,6 @@
         gender,
         orientation: sexualOrientation,
         isSingle,
-        // Trainer status requires an active Premium subscription, even if the toggle was left on from before
-        isTrainer: $userProfile?.isPremium ? isTrainer : false,
         socialLinks,
       });
     }
@@ -330,35 +320,6 @@
         ariaLabel={t.t("profile.single")}
         onchange={(value) => (isSingle = value)}
       />
-    </div>
-    <div
-      class="mt-3 flex items-center justify-between rounded-2xl bg-surface px-4 py-3"
-    >
-      <div class="flex items-center gap-2">
-        <p class="text-sm font-semibold text-text">{t.t("profile.trainer")}</p>
-        {#if !$userProfile?.isPremium}
-          <span
-            class="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
-          >
-            <Crown class="size-3" />
-            {t.t("profile.premiumFeature")}
-          </span>
-        {/if}
-      </div>
-      {#if $userProfile?.isPremium}
-        <Toggle
-          checked={isTrainer}
-          ariaLabel={t.t("profile.trainer")}
-          onchange={(value) => (isTrainer = value)}
-        />
-      {:else}
-        <button
-          onclick={() => goto("/premium")}
-          class="rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary active:scale-95"
-        >
-          {t.t("profile.goPremium")}
-        </button>
-      {/if}
     </div>
   </div>
 

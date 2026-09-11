@@ -5,7 +5,7 @@ export type DiscoverPresetKind = 'default' | 'dating' | 'friends' | 'trainer';
 export interface DiscoverPresetContext {
     myGender: Gender | '';
     oppositeGender: Gender | '';
-    myOrientation: SexualOrientation;
+    myOrientation: SexualOrientation | '';
 }
 
 export interface DiscoverPresetValues {

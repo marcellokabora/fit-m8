@@ -14,7 +14,6 @@
     type UserActivity,
     type SkillLevel,
     type ActivityFormat,
-    type SexualOrientation,
     type Gender,
   } from "$lib/types";
   import { get } from "svelte/store";
@@ -39,7 +38,6 @@
     bio: string;
     birthdate: string;
     gender: Gender;
-    sexualOrientation: SexualOrientation;
     isSingle: boolean;
     city: string;
     lat?: number;
@@ -82,9 +80,6 @@
   let age = $derived(birthdate ? calculateAge(birthdate) : 0);
   let isUnderage = $derived(birthdate !== "" && age < MIN_AGE);
   let gender = $state<Gender>(draft.gender ?? "male");
-  let sexualOrientation = $state<SexualOrientation>(
-    draft.sexualOrientation ?? "hetero",
-  );
   let isSingle = $state(draft.isSingle ?? false);
   let city = $state(draft.city ?? "");
   let lat = $state<number | undefined>(draft.lat);
@@ -124,7 +119,6 @@
       bio,
       birthdate,
       gender,
-      sexualOrientation,
       isSingle,
       city,
       lat,
@@ -242,7 +236,7 @@
       ...getDiscoverPresetValues(discoverPreset ?? "default", {
         myGender: gender,
         oppositeGender,
-        myOrientation: sexualOrientation,
+        myOrientation: "",
       }),
       minAge: null,
       maxAge: null,
@@ -255,13 +249,11 @@
         bio,
         age,
         gender,
-        orientation: sexualOrientation,
         isSingle,
         city,
         lat,
         lng,
         photos,
-        photoURL: photos[0] || "",
         activities,
         emailVerified: user.emailVerified,
         discoverFilters,
@@ -316,7 +308,6 @@
             bind:bio
             bind:birthdate
             bind:gender
-            bind:sexualOrientation
             bind:isSingle
           />
         {:else if step === 2}

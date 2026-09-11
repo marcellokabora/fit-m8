@@ -10,7 +10,7 @@
     type ReportReason,
     type UserProfile,
   } from "$lib/types";
-  import { getFallbackPhotoURL } from "$lib/image";
+  import { getFallbackPhoto } from "$lib/image";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
@@ -76,7 +76,7 @@
     profile?.photos?.length
       ? profile.photos
       : profile
-        ? [profile.photoURL || getFallbackPhotoURL(profile.uid, profile.gender)]
+        ? [getFallbackPhoto(profile.uid, profile.gender)]
         : [],
   );
 

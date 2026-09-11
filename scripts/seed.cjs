@@ -2,6 +2,12 @@ const admin = require('firebase-admin');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const fs = require('fs');
 const path = require('path');
+const {
+	ACTIVITY_POOL: activityPool,
+	EXCLUDED_ACTIVITIES_BY_GENDER,
+	fillActivities,
+	shuffled
+} = require('./fake-profile-activities.cjs');
 
 // Load Firebase config from .env
 const envPath = path.resolve(process.cwd(), '.env');
@@ -35,62 +41,6 @@ admin.initializeApp({
 });
 
 const db = getFirestore();
-
-const activityPool = [
-	'jogging',
-	'padel',
-	'tennis',
-	'beachTennis',
-	'beachVolley',
-	'basketball',
-	'soccer',
-	'cycling',
-	'swimming',
-	'hiking',
-	'pingPong',
-	'pickleball',
-	'squash',
-	'gym',
-	'calisthenics',
-	'rockClimbing',
-	'golf',
-	'boxing',
-	'kickboxing',
-	'muayThai',
-	'karate',
-	'jiuJitsu',
-	'judo',
-	'frescobol',
-	'paddleboard',
-	'surf',
-	'windsurf',
-	'kitesurf',
-	'wingFoil',
-	'paraWing',
-	'yoga',
-	'rollerblade',
-	'bmx',
-	'scooter',
-	'electricScooter',
-	'unicycle',
-	'kayak',
-	'surfskate',
-	'skateboard',
-	'footVolley',
-	'bodybuilding',
-	'crossTraining',
-	'functionalFitness',
-	'bootCamp',
-	'pilates',
-	'meditation',
-	'breathwork',
-	'salsa',
-	'bachata',
-	'kizomba',
-	'barre',
-	'poleDance',
-	'trampoline'
-];
 
 // Human-readable labels for the generated profiles' bios (mirrors src/lib/types.ts ACTIVITIES)
 const activityLabels = {
@@ -129,7 +79,6 @@ const activityLabels = {
 	bmx: 'BMX',
 	scooter: 'scootering',
 	electricScooter: 'electric scootering',
-	unicycle: 'unicycling',
 	kayak: 'kayaking',
 	surfskate: 'surfskating',
 	skateboard: 'skateboarding',
@@ -169,16 +118,6 @@ const MALE_NAMES = [
 	'Vicenç', 'Albert', 'Andreu', 'Cristian', 'Emili', 'Felip', 'Gabriel',
 	'Hector', 'Ismael', 'Jaume', 'Kilian', 'Lucas', 'Mario'
 ];
-
-// Fisher-Yates shuffle.
-function shuffled(array) {
-	const copy = [...array];
-	for (let i = copy.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[copy[i], copy[j]] = [copy[j], copy[i]];
-	}
-	return copy;
-}
 
 // Cycles through a shuffled copy of `pool`, reshuffling once exhausted, so repeats are
 // spread out evenly across all callers instead of clustering within one sport's batch.
@@ -225,7 +164,6 @@ function generateSportProfiles(sportId, count = 10, { minAge = 18, maxAge = 45, 
 		const level = i % 2 === 0 ? 'basic' : 'expert';
 		profiles.push({
 			displayName,
-			photoURL: '',
 			photos: [],
 			age: randomAge(minAge, maxAge),
 			city: 'Barcelona',
@@ -254,26 +192,14 @@ function locationAtDistance(index, distanceKm) {
 }
 
 function prepareProfile(profile, profileIndex) {
-	const activities = [...profile.activities];
-	const existingIds = new Set(activities.map(activity => activity.id));
 	const fillerPool = requestedActivities ? TARGET_FILLER_POOL : activityPool;
-	const eligibleActivityPool = shuffled(profile.gender === 'male'
-		? fillerPool.filter(id => id !== 'poleDance')
-		: fillerPool);
+	return { ...profile, activities: fillActivities(profile.activities, profile.gender, fillerPool) };
+}
 
-	// 10 = MAX_SPORTS_FREE (src/lib/types.ts) — fills every seeded profile up to the free-tier limit.
-	for (let offset = 0; activities.length < 10; offset++) {
-		const id = eligibleActivityPool[(profileIndex * 3 + offset) % eligibleActivityPool.length];
-		if (existingIds.has(id)) continue;
-		existingIds.add(id);
-		activities.push({
-			id,
-			format: offset % 3 === 2 ? 'all' : offset % 2 === 0 ? '1v1' : '2v2',
-			level: (profileIndex + offset) % 2 === 0 ? 'basic' : 'expert'
-		});
-	}
-
-	return { ...profile, activities };
+function requiredGenderForActivity(activityId) {
+	if (EXCLUDED_ACTIVITIES_BY_GENDER.male.includes(activityId)) return 'female';
+	if (EXCLUDED_ACTIVITIES_BY_GENDER.female.includes(activityId)) return 'male';
+	return undefined;
 }
 
 // Activities that had 0 fake profiles across the fitness/mindBody/danceArts groups (see
@@ -301,7 +227,6 @@ const LOW_COUNT_ACTIVITIES = [
 	'bmx',
 	'scooter',
 	'electricScooter',
-	'unicycle',
 	'surfskate'
 ];
 
@@ -346,7 +271,7 @@ async function seedDatabase() {
 		)),
 		// 15 photo-less mixed-gender profiles per previously-0-count activity (default age range).
 		...activitiesToSeed.flatMap(activityId =>
-			generateSportProfiles(activityId, 15, activityId === 'poleDance' ? { gender: 'female' } : {}).map((profile, i) => ({
+			generateSportProfiles(activityId, 15, { gender: requiredGenderForActivity(activityId) }).map((profile, i) => ({
 				profile,
 				userId: `fake_${activityId}_${i + 1}`
 			}))
@@ -372,8 +297,7 @@ async function seedDatabase() {
 			};
 
 			// Photos are managed by hand via /admin/fake-profiles, so never write them here —
-			// merge without these keys leaves whatever is already set (or unset) untouched.
-			delete userData.photoURL;
+			// merge without this key leaves whatever is already set (or unset) untouched.
 			delete userData.photos;
 			await db.collection('users').doc(userId).set(userData, { merge: true });
 			console.log(`✅ Created: ${profile.displayName} (${profile.age}y, ~${distanceKm}km away) - ${profile.activities.map(a => a.id).join(', ')}`);

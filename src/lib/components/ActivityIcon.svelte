@@ -46,7 +46,6 @@
   import Bmx from "~icons/mdi/bike-fast";
   import Scooter from "~icons/material-symbols/scooter";
   import ElectricScooter from "~icons/material-symbols/electric-scooter";
-  import Unicycle from "~icons/mdi/unicycle";
   import Skateboard from "~icons/material-symbols/skateboarding";
   import Generic from "~icons/material-symbols/sports-outline";
   import type { ActivityId } from "$lib/types";
@@ -108,7 +107,6 @@
     bmx: Bmx,
     scooter: Scooter,
     electricScooter: ElectricScooter,
-    unicycle: Unicycle,
     surfskate: Skateboard,
     skateboard: Skateboard,
   };

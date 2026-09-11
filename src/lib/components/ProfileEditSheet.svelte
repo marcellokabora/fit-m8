@@ -23,7 +23,7 @@
   } = $props();
 
   interface ProfileDraft {
-    photoURL: string;
+    photo: string;
     displayName: string;
     bio: string;
     age: string;
@@ -37,7 +37,7 @@
 
   function draftOf(p: UserProfile): ProfileDraft {
     return {
-      photoURL: p.photoURL ?? "",
+      photo: p.photos?.[0] ?? "",
       displayName: p.displayName ?? "",
       bio: p.bio ?? "",
       age: p.age ? String(p.age) : "",
@@ -62,7 +62,7 @@
   }
 
   async function save() {
-    const url = draft.photoURL.trim();
+    const url = draft.photo.trim();
     if (url && !/^https?:\/\//.test(url)) return;
     const name = draft.displayName.trim();
     if (!name) return;
@@ -70,7 +70,6 @@
 
     saving = true;
     const update: Partial<UserProfile> = {
-      photoURL: url,
       photos: url ? [url] : [],
       displayName: name,
       bio: draft.bio.trim(),
@@ -124,9 +123,9 @@
         </button>
       </div>
 
-      {#if draft.photoURL}
+      {#if draft.photo}
         <img
-          src={draft.photoURL}
+          src={draft.photo}
           alt={profile.displayName}
           class="mb-4 aspect-square w-full rounded-2xl object-cover"
         />
@@ -141,13 +140,13 @@
       <div class="mb-4 flex flex-col gap-2">
         <label
           class="text-xs font-semibold uppercase text-muted"
-          for="photoURL-{profile.uid}">Photo URL</label
+          for="photo-{profile.uid}">Photo URL</label
         >
         <input
-          id="photoURL-{profile.uid}"
+          id="photo-{profile.uid}"
           type="url"
           placeholder="https://images.unsplash.com/..."
-          bind:value={draft.photoURL}
+          bind:value={draft.photo}
           class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text placeholder:text-muted"
         />
 

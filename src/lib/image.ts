@@ -4,7 +4,7 @@ import type { Gender } from './types';
 import { FEMALE_FALLBACK_PHOTOS, MALE_FALLBACK_PHOTOS } from './fallbackPhotos.generated';
 
 // Same uid always maps to the same fallback photo, so a given profile doesn't visually change between renders.
-export function getFallbackPhotoURL(uid: string, gender: Gender | ''): string {
+export function getFallbackPhoto(uid: string, gender: Gender | ''): string {
     const pool = gender === 'male' ? MALE_FALLBACK_PHOTOS : FEMALE_FALLBACK_PHOTOS;
     let hash = 0;
     for (let i = 0; i < uid.length; i++) hash = (hash * 31 + uid.charCodeAt(i)) >>> 0;
