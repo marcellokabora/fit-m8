@@ -61,7 +61,7 @@ const MESSAGES = {
         'common.biography': 'Biography',
         'common.location': 'Location',
         'common.sports': 'Activities',
-        'common.mySports': 'My Activities',
+        'common.mySports': 'My Sports',
         'common.noActivities': 'No activities set',
         'common.profilePhoto': 'Profile photo',
         'common.profilePhotoNumber': 'Profile photo {count}',

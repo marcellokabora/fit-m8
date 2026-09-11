@@ -59,7 +59,7 @@
   let sportQuery = $state("");
   let sportPickerOpen = $state(false);
   let genderFilter = $state<Gender | "">("");
-  let sortBy = $state<"name" | "age">("name");
+  let sortBy = $state<"withoutPhoto" | "name" | "age">("withoutPhoto");
   let selectedProfile = $state<UserProfile | null>(null);
   // keeps the sheet's content visible while it plays its close transition, since
   // selectedProfile is nulled out immediately
@@ -126,11 +126,17 @@
         )
       : profiles;
     if (genderFilter) list = list.filter((p) => p.gender === genderFilter);
-    return [...list].sort((a, b) =>
-      sortBy === "age"
+    return [...list].sort((a, b) => {
+      if (sortBy === "withoutPhoto") {
+        return (
+          Number(Boolean(a.photoURL)) - Number(Boolean(b.photoURL)) ||
+          a.displayName.localeCompare(b.displayName)
+        );
+      }
+      return sortBy === "age"
         ? (a.age ?? 0) - (b.age ?? 0)
-        : a.displayName.localeCompare(b.displayName),
-    );
+        : a.displayName.localeCompare(b.displayName);
+    });
   });
 
   // Infinite scroll renders filteredProfiles incrementally instead of all at once (sportCounts
@@ -312,6 +318,7 @@
           bind:value={sortBy}
           class="flex-1 rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text"
         >
+          <option value="withoutPhoto">Without photo first</option>
           <option value="name">Sort by name</option>
           <option value="age">Sort by age</option>
         </select>

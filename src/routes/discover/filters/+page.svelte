@@ -373,7 +373,7 @@
         </button>
         <button
           onclick={applyTrainerPreset}
-          class="hidden size-9 items-center justify-center rounded-full shadow-sm min-[380px]:flex {isTrainerPreset
+          class="size-9 items-center justify-center rounded-full shadow-sm flex {isTrainerPreset
             ? 'bg-primary text-white'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.trainerPreset")}

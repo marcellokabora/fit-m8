@@ -17,6 +17,8 @@
 		"migrate-activity-ids": "node scripts/migrate-activity-ids.cjs",
 		"migrate-martial-arts": "node scripts/migrate-martial-arts-group.cjs",
 		"migrate-remove-badminton": "node scripts/migrate-remove-badminton.cjs",
+		"migrate-male-pole-dance": "node scripts/migrate-male-pole-dance.cjs",
+		"generate-fallback-photos": "node scripts/generate-fallback-photos.cjs",
 		"deploy:functions": "firebase deploy --only functions"
 	},
 	"devDependencies": {

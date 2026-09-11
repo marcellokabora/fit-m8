@@ -268,8 +268,8 @@
       });
       if (pushToken) await savePushToken(user.uid, pushToken);
       localStorage.removeItem(DRAFT_KEY);
-      // The chosen preset drives the initial Discover feed, so land there directly
-      goto("/discover");
+      // Let users review their completed profile before entering the rest of the app.
+      goto("/profile");
     } catch (e: any) {
       error = e.message;
     } finally {

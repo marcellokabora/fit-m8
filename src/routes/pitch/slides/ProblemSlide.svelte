@@ -53,9 +53,9 @@
       class="absolute inset-x-[4%] top-[3.5%] bottom-[3.5%] flex items-center justify-center"
     >
       <img
-        src="/logo/fit-m8-logo-green.png"
+        src="/logo/fit-m8-logo-black.png"
         alt="FIT-M8"
-        class="size-12 rounded-full object-cover md:size-40"
+        class="size-12 rounded-full object-cover md:size-50"
       />
     </div>
   </div>

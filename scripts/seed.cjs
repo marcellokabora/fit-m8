@@ -40,6 +40,7 @@ const activityPool = [
 	'jogging',
 	'padel',
 	'tennis',
+	'beachTennis',
 	'beachVolley',
 	'basketball',
 	'soccer',
@@ -62,8 +63,18 @@ const activityPool = [
 	'frescobol',
 	'paddleboard',
 	'surf',
+	'windsurf',
+	'kitesurf',
+	'wingFoil',
+	'paraWing',
 	'yoga',
 	'rollerblade',
+	'bmx',
+	'scooter',
+	'electricScooter',
+	'unicycle',
+	'kayak',
+	'surfskate',
 	'skateboard',
 	'footVolley',
 	'bodybuilding',
@@ -86,6 +97,7 @@ const activityLabels = {
 	jogging: 'jogging',
 	padel: 'padel',
 	tennis: 'tennis',
+	beachTennis: 'beach tennis',
 	beachVolley: 'beach volleyball',
 	basketball: 'basketball',
 	soccer: 'football',
@@ -108,8 +120,18 @@ const activityLabels = {
 	frescobol: 'frescobol',
 	paddleboard: 'paddleboarding',
 	surf: 'surfing',
+	windsurf: 'windsurfing',
+	kitesurf: 'kitesurfing',
+	wingFoil: 'wing foiling',
+	paraWing: 'parawing',
 	yoga: 'yoga',
 	rollerblade: 'rollerblading',
+	bmx: 'BMX',
+	scooter: 'scootering',
+	electricScooter: 'electric scootering',
+	unicycle: 'unicycling',
+	kayak: 'kayaking',
+	surfskate: 'surfskating',
 	skateboard: 'skateboarding',
 	footVolley: 'foot volley',
 	bodybuilding: 'bodybuilding',
@@ -171,7 +193,21 @@ function createCycler(pool) {
 const nextFemaleName = createCycler(FEMALE_NAMES);
 const nextMaleName = createCycler(MALE_NAMES);
 
-function randomAge(min = 18, max = 55) {
+const TARGET_FILLER_POOL = [
+	'beachTennis',
+	'bmx',
+	'scooter',
+	'electricScooter',
+	'surfskate',
+	'skateboard',
+	'windsurf',
+	'kitesurf',
+	'wingFoil',
+	'paraWing',
+	'kayak'
+];
+
+function randomAge(min = 18, max = 45) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -179,7 +215,7 @@ function randomAge(min = 18, max = 55) {
 // admin fake-profiles page has at least 10 candidates to attach a real photo to for every sport.
 // Names and ages are randomized so every sport's batch looks distinct. Pass `gender` to force
 // every profile in the batch to the same gender instead of alternating.
-function generateSportProfiles(sportId, count = 10, { minAge = 18, maxAge = 55, gender: forcedGender } = {}) {
+function generateSportProfiles(sportId, count = 10, { minAge = 18, maxAge = 45, gender: forcedGender } = {}) {
 	const label = activityLabels[sportId] ?? sportId;
 	const profiles = [];
 	for (let i = 0; i < count; i++) {
@@ -220,10 +256,14 @@ function locationAtDistance(index, distanceKm) {
 function prepareProfile(profile, profileIndex) {
 	const activities = [...profile.activities];
 	const existingIds = new Set(activities.map(activity => activity.id));
+	const fillerPool = requestedActivities ? TARGET_FILLER_POOL : activityPool;
+	const eligibleActivityPool = shuffled(profile.gender === 'male'
+		? fillerPool.filter(id => id !== 'poleDance')
+		: fillerPool);
 
 	// 10 = MAX_SPORTS_FREE (src/lib/types.ts) — fills every seeded profile up to the free-tier limit.
 	for (let offset = 0; activities.length < 10; offset++) {
-		const id = activityPool[(profileIndex * 3 + offset) % activityPool.length];
+		const id = eligibleActivityPool[(profileIndex * 3 + offset) % eligibleActivityPool.length];
 		if (existingIds.has(id)) continue;
 		existingIds.add(id);
 		activities.push({
@@ -239,6 +279,7 @@ function prepareProfile(profile, profileIndex) {
 // Activities that had 0 fake profiles across the fitness/mindBody/danceArts groups (see
 // /admin/fake-profiles) — topped up separately below, 15 mixed-gender profiles each.
 const LOW_COUNT_ACTIVITIES = [
+	'beachTennis',
 	'bodybuilding',
 	'crossTraining',
 	'functionalFitness',
@@ -251,36 +292,61 @@ const LOW_COUNT_ACTIVITIES = [
 	'kizomba',
 	'barre',
 	'poleDance',
-	'trampoline'
+	'trampoline',
+	'windsurf',
+	'kitesurf',
+	'wingFoil',
+	'paraWing',
+	'kayak',
+	'bmx',
+	'scooter',
+	'electricScooter',
+	'unicycle',
+	'surfskate'
 ];
+
+const activityFilterArg = process.argv.find(arg => arg.startsWith('--activities='));
+const requestedActivities = activityFilterArg
+	? activityFilterArg.slice('--activities='.length).split(',').filter(Boolean)
+	: null;
+
+if (requestedActivities) {
+	const unknownActivities = requestedActivities.filter(id => !activityLabels[id]);
+	if (unknownActivities.length > 0) {
+		console.error(`Unknown activities: ${unknownActivities.join(', ')}`);
+		process.exit(1);
+	}
+}
 
 async function seedDatabase() {
 	console.log('🌱 Seeding fake profiles...\n');
+	const targetedRun = requestedActivities !== null;
+	const activitiesToSeed = shuffled(requestedActivities ?? LOW_COUNT_ACTIVITIES);
 
 	// 20 photo-less female + 10 male surf profiles (real photos pending manual upload via /admin/fake-profiles).
 	const entries = [
-		...generateSportProfiles('surf', 20, { minAge: 18, maxAge: 35, gender: 'female' }).map(
+		...(targetedRun ? [] : generateSportProfiles('surf', 20, { minAge: 18, maxAge: 35, gender: 'female' }).map(
 			(profile, i) => ({
 				profile,
 				userId: `fake_surf_${i + 1}`
 			})
-		),
-		...generateSportProfiles('surf', 10, { minAge: 18, maxAge: 35, gender: 'male' }).map(
+		)),
+		...(targetedRun ? [] : generateSportProfiles('surf', 10, { minAge: 18, maxAge: 35, gender: 'male' }).map(
 			(profile, i) => ({
 				profile,
 				userId: `fake_surf_${21 + i}`
 			})
-		),
+		)),
 		// 20 photo-less mixed-gender yoga profiles (alternates female/male via default gender).
-		...generateSportProfiles('yoga', 20, { minAge: 18, maxAge: 35 }).map(
+		...(targetedRun ? [] : generateSportProfiles('yoga', 20, { minAge: 18, maxAge: 35 }).map(
 			(profile, i) => ({
 				profile,
 				userId: `fake_yoga_${i + 1}`
 			})
-		),
+		)),
 		// 15 photo-less mixed-gender profiles per previously-0-count activity (default age range).
-		...LOW_COUNT_ACTIVITIES.flatMap(activityId =>
-			generateSportProfiles(activityId, 15).map((profile, i) => ({
+		...activitiesToSeed.flatMap(activityId =>
+			generateSportProfiles(activityId, 15, activityId === 'poleDance' ? { gender: 'female' } : {}).map((profile, i) => ({
 				profile,
 				userId: `fake_${activityId}_${i + 1}`
 			}))

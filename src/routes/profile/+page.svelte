@@ -332,7 +332,7 @@
 
   <!-- Activities -->
   <div id="activities" class="scroll-mt-20 px-5 {$isAdmin ? '' : 'pt-6'}">
-    <div class="mb-3 flex items-center justify-between">
+    <div class="mb-3 flex items-center gap-2">
       <h3 class="text-sm font-bold uppercase tracking-wide text-muted">
         {t.t("common.mySports")}
       </h3>
