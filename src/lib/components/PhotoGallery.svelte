@@ -28,7 +28,7 @@
 </script>
 
 <div
-  class="relative aspect-4/5 w-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary-dark/20"
+  class="relative aspect-4/5 w-full overflow-hidden bg-linear-to-br from-primary/20 to-primary-dark/20"
 >
   {#if photos.length > 1}
     <div class="absolute left-1/2 top-6 z-0 flex w-1/3 -translate-x-1/2 gap-1">
@@ -63,7 +63,7 @@
   {/if}
   {#if children}
     <div
-      class="pointer-events-none absolute inset-x-0 bottom-0 z-1 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-5 pb-4 pt-16"
+      class="pointer-events-none absolute inset-x-0 bottom-0 z-1 bg-linear-to-t from-black/80 via-black/40 to-transparent px-5 pb-4 pt-16"
     >
       {@render children()}
     </div>

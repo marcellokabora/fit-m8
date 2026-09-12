@@ -5,7 +5,6 @@
   import { db } from "$lib/firebase/client";
   import { doc, getDoc } from "firebase/firestore";
   import {
-    ACTIVITIES,
     getRemainingLikes,
     type ReportReason,
     type UserProfile,
@@ -14,6 +13,7 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
+  import BottomSheet from "$lib/components/BottomSheet.svelte";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import ProfileEditSheet from "$lib/components/ProfileEditSheet.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
@@ -57,6 +57,7 @@
   let showMessageModal = $state(false);
   let showLikeLimitModal = $state(false);
   let showEditSheet = $state(false);
+  let badgeInfo = $state<"premium" | "orientation" | "fake" | null>(null);
   let distanceAway = $derived.by(() => {
     if (
       !$userProfile ||
@@ -88,6 +89,16 @@
     [...(profile?.activities ?? [])].sort(
       (a, b) => Number(!mySportIds.has(a.id)) - Number(!mySportIds.has(b.id)),
     ),
+  );
+  let trainerActivities = $derived(
+    profile?.isTrainer
+      ? sortedActivities.filter((activity) => activity.level === "expert")
+      : [],
+  );
+  let otherActivities = $derived(
+    profile?.isTrainer
+      ? sortedActivities.filter((activity) => activity.level !== "expert")
+      : sortedActivities,
   );
 
   // Buttons only make sense for someone else's profile you haven't already matched with
@@ -297,28 +308,37 @@
           {profile.displayName}{#if profile.age}, {profile.age}{/if}
         </h1>
         {#if profile.isPremium}
-          <Crown
-            class="size-4 shrink-0 text-primary"
+          <button
+            type="button"
+            onclick={() => (badgeInfo = "premium")}
             aria-label={t.t("profile.premiumMember")}
-          />
+            title={t.t("profile.premiumMember")}
+            class="flex size-8 shrink-0 items-center justify-center rounded-full text-primary hover:bg-primary/10 active:scale-95"
+          >
+            <Crown class="size-6" aria-hidden="true" />
+          </button>
         {/if}
         {#if profile.orientation === "gay"}
-          <Rainbow
-            class="size-4 shrink-0 text-primary"
+          <button
+            type="button"
+            onclick={() => (badgeInfo = "orientation")}
             aria-label={t.orientation("gay")}
-          />
-        {/if}
-        {#if profile.isTrainer}
-          <UserShield
-            class="size-4 shrink-0 text-primary"
-            aria-label={t.t("profile.trainer")}
-          />
+            title={t.orientation("gay")}
+            class="flex size-8 shrink-0 items-center justify-center rounded-full text-primary hover:bg-primary/10 active:scale-95"
+          >
+            <Rainbow class="size-6" aria-hidden="true" />
+          </button>
         {/if}
         {#if $isAdmin && profile.uid.startsWith("fake_")}
-          <Bot
-            class="size-4 shrink-0 text-primary"
+          <button
+            type="button"
+            onclick={() => (badgeInfo = "fake")}
             aria-label={t.t("profile.fakeProfile")}
-          />
+            title={t.t("profile.fakeProfile")}
+            class="flex size-8 shrink-0 items-center justify-center rounded-full text-primary hover:bg-primary/10 active:scale-95"
+          >
+            <Bot class="size-6" aria-hidden="true" />
+          </button>
         {/if}
       {:else}
         <h1 class="text-lg font-black text-text">{t.t("nav.profile")}</h1>
@@ -423,8 +443,44 @@
         <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
       {:else}
         <div class="flex flex-col gap-3">
-          {#each sortedActivities as act}
-            {@const info = ACTIVITIES.find((a) => a.id === act.id)}
+          {#if trainerActivities.length > 0}
+            <div class="rounded-2xl bg-surface p-4 shadow-sm">
+              <div class="mb-3 flex items-center gap-2 text-primary">
+                <UserShield class="size-5 shrink-0" />
+                <p class="text-sm font-bold uppercase tracking-wide">
+                  {t.t("profile.trainer")}
+                </p>
+              </div>
+              <div class="flex flex-col gap-3">
+                {#each trainerActivities as act (act.id)}
+                  <div class="flex items-center gap-4">
+                    <span
+                      class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+                    >
+                      <ActivityIcon id={act.id} class="size-5" />
+                    </span>
+                    <div class="flex-1">
+                      <p class="flex items-center gap-2 font-bold text-text">
+                        {t.activity(act.id)}
+                        {#if mySportIds.has(act.id)}
+                          <span
+                            class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
+                          >
+                            {t.t("profile.inCommon")}
+                          </span>
+                        {/if}
+                      </p>
+                      <p class="text-sm text-muted">
+                        {#if act.format !== "all"}{t.format(act.format)}·
+                        {/if}{t.skill(act.level)}
+                      </p>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+          {#each otherActivities as act (act.id)}
             <div
               class="flex items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm"
             >
@@ -456,6 +512,50 @@
     </div>
   {/if}
 </div>
+
+<BottomSheet
+  open={badgeInfo !== null}
+  onClose={() => (badgeInfo = null)}
+  closeLabel={t.t("common.close")}
+  bgClass="bg-surface"
+>
+  <div class="flex flex-col items-center px-6 pb-8 pt-3 text-center">
+    <span
+      class="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary"
+    >
+      {#if badgeInfo === "premium"}
+        <Crown class="size-7" />
+      {:else if badgeInfo === "orientation"}
+        <Rainbow class="size-7" />
+      {:else if badgeInfo === "fake"}
+        <Bot class="size-7" />
+      {/if}
+    </span>
+    {#if badgeInfo === "premium"}
+      <h2 class="text-lg font-black text-text">
+        {t.t("profile.premiumMember")}
+      </h2>
+      <p class="mt-2 text-sm text-muted">
+        {t.t("profile.premiumMemberInfo")}
+      </p>
+    {:else if badgeInfo === "orientation"}
+      <h2 class="text-lg font-black text-text">{t.orientation("gay")}</h2>
+      <p class="mt-2 text-sm text-muted">
+        {t.t("profile.orientationInfo", {
+          name: profile?.displayName ?? "",
+          orientation: t.orientation("gay"),
+        })}
+      </p>
+    {:else if badgeInfo === "fake"}
+      <h2 class="text-lg font-black text-text">
+        {t.t("profile.fakeProfile")}
+      </h2>
+      <p class="mt-2 text-sm text-muted">
+        {t.t("profile.fakeProfileInfo")}
+      </p>
+    {/if}
+  </div>
+</BottomSheet>
 
 {#if showEditSheet && profile}
   <ProfileEditSheet
