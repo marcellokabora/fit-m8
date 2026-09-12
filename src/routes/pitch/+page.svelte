@@ -10,6 +10,7 @@
     Download,
     UserRoundPlus,
     SlidersHorizontal,
+    Dumbbell,
     Compass,
     MessagesSquare,
     MapPin,
@@ -22,6 +23,7 @@
   import MarketSlide from "./slides/MarketSlide.svelte";
   import activitiesScreen from "$lib/assets/screens/activities.png?enhanced";
   import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
+  import trainerScreen from "$lib/assets/screens/trainer.png?enhanced";
   import discoverScreen from "$lib/assets/screens/discover.png?enhanced";
   import matchesScreen from "$lib/assets/screens/matchs.png?enhanced";
   import exploreScreen from "$lib/assets/screens/explore.png?enhanced";
@@ -39,7 +41,7 @@
   );
   let colors = $derived(theme.dark);
 
-  // The 5-step product walkthrough, each rendered as its own slide via HowItWorksSlide.
+  // The 6-step product walkthrough, each rendered as its own slide via HowItWorksSlide.
   const HOW_IT_WORKS = [
     {
       icon: UserRoundPlus,
@@ -54,22 +56,28 @@
       screen: filtersScreen,
     },
     {
+      icon: Dumbbell,
+      title: "Find your trainer",
+      desc: "Connect with trainers who specialize in the activities you want to improve.",
+      screen: trainerScreen,
+    },
+    {
       icon: Compass,
       title: "Discover nearby players",
       desc: "Swipe through people who share your sports, close to you.",
       screen: discoverScreen,
     },
     {
-      icon: MessagesSquare,
-      title: "Match & play",
-      desc: "Chat with your matches and plan your next session.",
-      screen: matchesScreen,
-    },
-    {
       icon: MapPin,
       title: "Explore & check in",
       desc: "See who's playing nearby on the map and check in to your spot.",
       screen: exploreScreen,
+    },
+    {
+      icon: MessagesSquare,
+      title: "Match & play",
+      desc: "Chat with your matches and plan your next session.",
+      screen: matchesScreen,
     },
   ] as const;
 

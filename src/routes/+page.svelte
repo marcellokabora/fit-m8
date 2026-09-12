@@ -16,6 +16,7 @@
   import {
     UserRoundPlus,
     SlidersHorizontal,
+    Dumbbell,
     Compass,
     MessagesSquare,
     MapPin,
@@ -28,6 +29,7 @@
   import cyclingImg from "$lib/assets/homepage/cycling.jpg?enhanced";
   import activitiesScreen from "$lib/assets/screens/activities.png?enhanced";
   import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
+  import trainerScreen from "$lib/assets/screens/trainer.png?enhanced";
   import discoverScreen from "$lib/assets/screens/discover.png?enhanced";
   import matchesScreen from "$lib/assets/screens/matchs.png?enhanced";
   import exploreScreen from "$lib/assets/screens/explore.png?enhanced";
@@ -68,22 +70,28 @@
       screen: filtersScreen,
     },
     {
+      icon: Dumbbell,
+      titleKey: "stepTrainerTitle",
+      descKey: "stepTrainerDesc",
+      screen: trainerScreen,
+    },
+    {
       icon: Compass,
       titleKey: "step2Title",
       descKey: "step2Desc",
       screen: discoverScreen,
     },
     {
-      icon: MessagesSquare,
-      titleKey: "step3Title",
-      descKey: "step3Desc",
-      screen: matchesScreen,
-    },
-    {
       icon: MapPin,
       titleKey: "stepExploreTitle",
       descKey: "stepExploreDesc",
       screen: exploreScreen,
+    },
+    {
+      icon: MessagesSquare,
+      titleKey: "step3Title",
+      descKey: "step3Desc",
+      screen: matchesScreen,
     },
   ] as const;
 

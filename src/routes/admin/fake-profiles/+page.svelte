@@ -50,12 +50,15 @@
     isTrainer: boolean;
   }
 
+  type ActivityGroupFilter = ActivityGroupId | "other";
+
   let loading = $state(true);
   let profiles = $state<UserProfile[]>([]);
   let drafts = $state<Record<string, ProfileDraft>>({});
   let saving = $state<Record<string, boolean>>({});
   let savedFlash = $state<Record<string, boolean>>({});
   let selectedSport = $state<string | null>(null);
+  let selectedGroup = $state<ActivityGroupFilter | null>(null);
   let sportQuery = $state("");
   let sportPickerOpen = $state(false);
   let genderFilter = $state<Gender | "">("");
@@ -107,6 +110,15 @@
     combat: "Combat & Martial Arts",
   };
 
+  function groupLabel(group: ActivityGroupFilter) {
+    return group === "other" ? "Other" : GROUP_LABELS[group];
+  }
+
+  function activityGroup(id: string): ActivityGroupFilter {
+    const activity = ACTIVITIES.find((item) => item.id === id);
+    return activity && "group" in activity ? activity.group : "other";
+  }
+
   // Count by any of a profile's sports for every known activity, so missing sports show 0
   let sportCounts = $derived.by(() => {
     const counts = new Map<string, number>(ACTIVITIES.map((a) => [a.id, 0]));
@@ -119,12 +131,34 @@
     return counts;
   });
 
+  let groupCounts = $derived.by(() => {
+    const counts = new Map<ActivityGroupFilter, number>();
+    for (const section of groupActivities(ACTIVITIES)) {
+      const group = section.group ?? "other";
+      counts.set(
+        group,
+        profiles.filter((profile) =>
+          profile.activities?.some(
+            (activity) => activityGroup(activity.id) === group,
+          ),
+        ).length,
+      );
+    }
+    return counts;
+  });
+
   let filteredProfiles = $derived.by(() => {
     let list = selectedSport
       ? profiles.filter((p) =>
           p.activities?.some((act) => act.id === selectedSport),
         )
-      : profiles;
+      : selectedGroup
+        ? profiles.filter((p) =>
+            p.activities?.some(
+              (act) => activityGroup(act.id) === selectedGroup,
+            ),
+          )
+        : profiles;
     if (genderFilter) list = list.filter((p) => p.gender === genderFilter);
     return [...list].sort((a, b) => {
       if (sortBy === "withoutPhoto") {
@@ -146,6 +180,7 @@
 
   $effect(() => {
     selectedSport;
+    selectedGroup;
     genderFilter;
     sortBy;
     visibleCount = PROFILES_PAGE_SIZE;
@@ -172,12 +207,22 @@
   let groupedSportOptions = $derived.by(() => {
     const q = sportQuery.trim().toLowerCase();
     return groupActivities(ACTIVITIES)
-      .map((section) => ({
-        group: section.group,
-        items: section.items
-          .map((a) => [a.id, sportCounts.get(a.id) ?? 0] as [string, number])
-          .filter(([id]) => !q || activityLabel(id).toLowerCase().includes(q)),
-      }))
+      .map((section) => {
+        const group: ActivityGroupFilter = section.group ?? "other";
+        const groupMatches = groupLabel(group).toLowerCase().includes(q);
+        return {
+          group,
+          count: groupCounts.get(group) ?? 0,
+          items: section.items
+            .map((a) => [a.id, sportCounts.get(a.id) ?? 0] as [string, number])
+            .filter(
+              ([id]) =>
+                !q ||
+                groupMatches ||
+                activityLabel(id).toLowerCase().includes(q),
+            ),
+        };
+      })
       .filter((section) => section.items.length > 0);
   });
 
@@ -196,6 +241,13 @@
 
   function pickSport(id: string | null) {
     selectedSport = id;
+    selectedGroup = null;
+    closeSportPicker();
+  }
+
+  function pickGroup(group: ActivityGroupFilter) {
+    selectedGroup = group;
+    selectedSport = null;
     closeSportPicker();
   }
 
@@ -289,15 +341,18 @@
       <button
         type="button"
         onclick={openSportPicker}
-        class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-left text-sm {selectedSport
+        class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-left text-sm {selectedSport ||
+        selectedGroup
           ? 'text-text'
           : 'text-muted'}"
       >
         {selectedSport
           ? activityLabel(selectedSport)
-          : `All activities (${profiles.length})`}
+          : selectedGroup
+            ? `All ${groupLabel(selectedGroup)} (${filteredProfiles.length})`
+            : `All activities (${profiles.length})`}
       </button>
-      {#if selectedSport}
+      {#if selectedSport || selectedGroup}
         <p class="mt-2 text-xs text-muted">
           Showing {filteredProfiles.length} of {profiles.length} profiles
         </p>
@@ -419,11 +474,17 @@
         All activities ({profiles.length})
       </button>
       {#each groupedSportOptions as section}
-        <p
-          class="px-3 pt-3 text-xs font-bold uppercase tracking-wide text-muted"
+        <button
+          type="button"
+          onclick={() => pickGroup(section.group)}
+          class="mt-3 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-bold uppercase tracking-wide hover:bg-surface {selectedGroup ===
+          section.group
+            ? 'bg-primary/10 text-primary'
+            : 'text-muted'}"
         >
-          {section.group ? GROUP_LABELS[section.group] : "Other"}
-        </p>
+          <span>All {groupLabel(section.group)}</span>
+          <span>{section.count}</span>
+        </button>
         {#each section.items as [id, count]}
           <button
             type="button"
@@ -455,7 +516,11 @@
     {@const d = drafts[p.uid]}
     <div class="flex-1 overflow-y-auto p-5">
       <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-lg font-black text-text">{p.displayName}</h2>
+        <h2 class="min-w-0 text-lg font-black text-text">
+          <a href={`/profile/${p.uid}`} class="block truncate hover:underline">
+            {p.displayName}
+          </a>
+        </h2>
         <button
           onclick={closeProfileSheet}
           aria-label="Close"
