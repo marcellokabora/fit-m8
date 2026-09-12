@@ -1,16 +1,29 @@
 <script lang="ts">
-  import { fade, fly } from "svelte/transition";
+  import { fade, fly, slide } from "svelte/transition";
   import { doc, setDoc, serverTimestamp } from "firebase/firestore";
   import { db } from "$lib/firebase/client";
   import {
     ACTIVITIES,
+    ACTIVITY_FORMAT_OPTIONS,
     GENDER_OPTIONS,
     ORIENTATIONS,
+    SKILL_LEVEL_OPTIONS,
+    type ActivityFormat,
     type Gender,
     type SexualOrientation,
+    type SkillLevel,
+    type UserActivity,
     type UserProfile,
   } from "$lib/types";
-  import { LoaderCircle, ImageOff, Check, X } from "@lucide/svelte";
+  import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import {
+    Check,
+    ChevronDown,
+    ImageOff,
+    LoaderCircle,
+    Trash2,
+    X,
+  } from "@lucide/svelte";
 
   let {
     profile,
@@ -33,6 +46,7 @@
     isSingle: boolean;
     isTrainer: boolean;
     isPremium: boolean;
+    activities: UserActivity[];
   }
 
   function draftOf(p: UserProfile): ProfileDraft {
@@ -47,6 +61,7 @@
       isSingle: !!p.isSingle,
       isTrainer: !!p.isTrainer,
       isPremium: !!p.isPremium,
+      activities: (p.activities ?? []).map((activity) => ({ ...activity })),
     };
   }
 
@@ -55,10 +70,31 @@
   let draft = $state(draftOf(profile));
   let saving = $state(false);
   let saved = $state(false);
+  let expandedActivityIndex = $state<number | null>(null);
 
   function activityLabel(id?: string) {
     const info = ACTIVITIES.find((a) => a.id === id);
     return info ? `${info.emoji} ${info.label}` : (id ?? "—");
+  }
+
+  function updateActivity(
+    index: number,
+    changes: Partial<Pick<UserActivity, "id" | "format" | "level">>,
+  ) {
+    draft.activities[index] = { ...draft.activities[index], ...changes };
+  }
+
+  function changeActivityType(index: number, id: string) {
+    if (
+      draft.activities.some((activity, i) => i !== index && activity.id === id)
+    )
+      return;
+    updateActivity(index, { id });
+  }
+
+  function removeActivity(index: number) {
+    draft.activities.splice(index, 1);
+    expandedActivityIndex = null;
   }
 
   async function save() {
@@ -80,6 +116,7 @@
       isSingle: draft.isSingle,
       isTrainer: draft.isTrainer,
       isPremium: draft.isPremium,
+      activities: draft.activities,
     };
     await setDoc(
       doc(db, "users", profile.uid),
@@ -252,16 +289,102 @@
         <p class="mb-2 text-xs font-semibold uppercase text-muted">
           Activities
         </p>
-        <div class="flex flex-col gap-1.5">
-          {#each profile.activities ?? [] as act}
-            <div
-              class="flex items-center justify-between rounded-lg bg-bg py-1.5 text-sm"
-            >
-              <span class="text-text">{activityLabel(act.id)}</span>
-              <span class="text-muted">{act.format} · {act.level}</span>
-            </div>
-          {/each}
-        </div>
+        {#if draft.activities.length === 0}
+          <p class="text-sm text-muted">No activities</p>
+        {:else}
+          <div class="flex flex-col gap-2">
+            {#each draft.activities as act, index (act.id)}
+              {@const expanded = expandedActivityIndex === index}
+              <div class="rounded-lg border border-border bg-bg">
+                <div
+                  role="button"
+                  tabindex="0"
+                  onclick={() =>
+                    (expandedActivityIndex = expanded ? null : index)}
+                  onkeydown={(event) =>
+                    (event.key === "Enter" || event.key === " ") &&
+                    (expandedActivityIndex = expanded ? null : index)}
+                  class="flex items-center gap-2 px-3 py-2 text-sm"
+                >
+                  <span class="min-w-0 flex-1 truncate text-text">
+                    {activityLabel(act.id)}
+                  </span>
+                  <span class="shrink-0 text-xs text-muted">
+                    {act.format} · {act.level}
+                  </span>
+                  {#if expanded}
+                    <button
+                      type="button"
+                      onclick={(event) => {
+                        event.stopPropagation();
+                        removeActivity(index);
+                      }}
+                      aria-label={`Remove ${activityLabel(act.id)}`}
+                      class="flex size-8 shrink-0 items-center justify-center rounded-full bg-error/10 text-error active:scale-95"
+                    >
+                      <Trash2 class="size-4" />
+                    </button>
+                  {:else}
+                    <ChevronDown class="size-4 shrink-0 text-muted" />
+                  {/if}
+                </div>
+
+                {#if expanded}
+                  <div
+                    class="border-t border-border px-3 pt-3 pb-3"
+                    transition:slide={{ duration: 200 }}
+                  >
+                    <label
+                      class="mb-1 block text-xs font-semibold uppercase text-muted"
+                      for="activity-{profile.uid}-{index}">Sport</label
+                    >
+                    <select
+                      id="activity-{profile.uid}-{index}"
+                      value={act.id}
+                      onchange={(event) =>
+                        changeActivityType(index, event.currentTarget.value)}
+                      class="mb-3 w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
+                    >
+                      {#each ACTIVITIES as activity}
+                        <option
+                          value={activity.id}
+                          disabled={draft.activities.some(
+                            (item, itemIndex) =>
+                              itemIndex !== index && item.id === activity.id,
+                          )}>{activity.emoji} {activity.label}</option
+                        >
+                      {/each}
+                    </select>
+
+                    <p class="mb-1 text-xs font-semibold uppercase text-muted">
+                      Format
+                    </p>
+                    <div class="mb-3">
+                      <SegmentedControl
+                        options={ACTIVITY_FORMAT_OPTIONS}
+                        value={act.format}
+                        ariaLabel="Format"
+                        onchange={(format: ActivityFormat) =>
+                          updateActivity(index, { format })}
+                      />
+                    </div>
+
+                    <p class="mb-1 text-xs font-semibold uppercase text-muted">
+                      Level
+                    </p>
+                    <SegmentedControl
+                      options={SKILL_LEVEL_OPTIONS}
+                      value={act.level}
+                      ariaLabel="Level"
+                      onchange={(level: SkillLevel) =>
+                        updateActivity(index, { level })}
+                    />
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
     </div>
 
