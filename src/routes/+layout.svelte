@@ -8,6 +8,7 @@
   import { activeTheme } from "$lib/stores/theme";
   import { onMount } from "svelte";
   import { registerSW } from "virtual:pwa-register";
+  import { initAnalytics } from "$lib/firebase/analytics";
   import { initForegroundMessaging } from "$lib/firebase/notifications";
   import { startPresenceHeartbeat } from "$lib/firebase/presence";
   import { createTranslator } from "$lib/stores/language";
@@ -25,6 +26,7 @@
 
     if (import.meta.env.PROD) {
       registerSW({ immediate: true });
+      void initAnalytics();
     }
 
     let stopPresence: (() => void) | null = null;
