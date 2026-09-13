@@ -8,9 +8,33 @@ const sharp = require("sharp");
 const ROOT = path.join(__dirname, "..");
 const SOURCE_IMAGE = path.join(ROOT, "static", "logo", "fit-m8-logo-green-white.png");
 
+// Maskable icons get circle/rounded-square masked by the OS launcher, which clips anything
+// outside a centered ~80%-diameter "safe zone". Shrink the whole (already full-bleed) source
+// image and pad with its own background color so the logo mark sits safely inside that zone.
+const MASKABLE_SAFE_ZONE_SCALE = 0.8;
+const MASKABLE_BACKGROUND = { r: 22, g: 163, b: 74 }; // matches source canvas bg / --color-primary
+
 async function render(size, outPath) {
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
     await sharp(SOURCE_IMAGE).resize(size, size).png().toFile(outPath);
+    console.log("wrote", path.relative(ROOT, outPath));
+}
+
+async function renderMaskable(size, outPath) {
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    const inner = Math.round(size * MASKABLE_SAFE_ZONE_SCALE);
+    const pad = Math.round((size - inner) / 2);
+    await sharp(SOURCE_IMAGE)
+        .resize(inner, inner)
+        .extend({
+            top: pad,
+            bottom: size - inner - pad,
+            left: pad,
+            right: size - inner - pad,
+            background: MASKABLE_BACKGROUND
+        })
+        .png()
+        .toFile(outPath);
     console.log("wrote", path.relative(ROOT, outPath));
 }
 
@@ -19,8 +43,8 @@ async function main() {
 
     await render(192, path.join(iconsDir, "icon-192.png"));
     await render(512, path.join(iconsDir, "icon-512.png"));
-    await render(192, path.join(iconsDir, "icon-192-maskable.png"));
-    await render(512, path.join(iconsDir, "icon-512-maskable.png"));
+    await renderMaskable(192, path.join(iconsDir, "icon-192-maskable.png"));
+    await renderMaskable(512, path.join(iconsDir, "icon-512-maskable.png"));
 
     // Favicon (rendered larger than displayed size for crisp downscaling by the browser).
     await render(96, path.join(ROOT, "static", "favicon.png"));
@@ -42,7 +66,7 @@ async function main() {
         await render(sizes.notification, path.join(drawableDir, "ic_notification_icon.png"));
         await render(sizes.splash, path.join(drawableDir, "splash.png"));
         await render(sizes.launcher, path.join(mipmapDir, "ic_launcher.png"));
-        await render(sizes.maskable, path.join(mipmapDir, "ic_maskable.png"));
+        await renderMaskable(sizes.maskable, path.join(mipmapDir, "ic_maskable.png"));
     }
 }
 
