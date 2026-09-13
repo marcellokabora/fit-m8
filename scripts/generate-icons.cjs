@@ -6,7 +6,7 @@ const path = require("path");
 const sharp = require("sharp");
 
 const ROOT = path.join(__dirname, "..");
-const SOURCE_IMAGE = path.join(ROOT, "static", "logo", "fit-m8-logo-black.png");
+const SOURCE_IMAGE = path.join(ROOT, "static", "logo", "fit-m8-logo-green-white.png");
 
 async function render(size, outPath) {
     fs.mkdirSync(path.dirname(outPath), { recursive: true });

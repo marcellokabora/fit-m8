@@ -23,6 +23,7 @@
 		"migrate-remove-unicycle": "node scripts/migrate-remove-unicycle.cjs",
 		"migrate-remove-photo-url": "node scripts/migrate-remove-photo-url.cjs",
 		"generate-fallback-photos": "node scripts/generate-fallback-photos.cjs",
+		"generate-icons": "node scripts/generate-icons.cjs",
 		"deploy:functions": "firebase deploy --only functions"
 	},
 	"devDependencies": {
