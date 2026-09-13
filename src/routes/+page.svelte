@@ -6,7 +6,7 @@
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Loading from "$lib/components/Loading.svelte";
-  import Logo from "$lib/components/LogoIcon.svelte";
+  import Logo from "$lib/components/LogoText.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import { activeTheme, THEMES } from "$lib/stores/theme";
