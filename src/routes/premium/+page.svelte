@@ -12,11 +12,13 @@
   } from "$lib/types";
   import BackHeader from "$lib/components/BackHeader.svelte";
   import {
+    BadgeCheck,
     Crown,
     Dumbbell,
     Heart,
     MessageCircle,
     UserShield,
+    Zap,
   } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -53,6 +55,20 @@
       title: "premium.featureUnlimitedLikesTitle",
       hint: "premium.featureUnlimitedLikesHint",
       params: { free: MAX_LIKES_FREE_PER_DAY },
+      comingSoon: false,
+    },
+    {
+      icon: BadgeCheck,
+      title: "premium.featureBadgeTitle",
+      hint: "premium.featureBadgeHint",
+      params: {},
+      comingSoon: false,
+    },
+    {
+      icon: Zap,
+      title: "premium.featurePriorityBoostTitle",
+      hint: "premium.featurePriorityBoostHint",
+      params: {},
       comingSoon: false,
     },
   ] as const;
@@ -92,7 +108,7 @@
   });
 </script>
 
-<BackHeader title={t.t("premium.title")} />
+<BackHeader title={t.t("premium.title")} class="bg-bg" />
 
 <div class="flex flex-col gap-6 px-5 pb-10">
   <div class="flex flex-col items-center gap-2 pt-2 text-center">
@@ -101,7 +117,6 @@
     >
       <Crown class="size-8" />
     </span>
-    <h2 class="text-2xl font-black text-text">{t.t("premium.title")}</h2>
     <p class="text-sm text-muted">{t.t("premium.subtitle")}</p>
     <!-- <p class="mt-2 text-3xl font-black text-primary">
       {t.t("premium.priceLine")}

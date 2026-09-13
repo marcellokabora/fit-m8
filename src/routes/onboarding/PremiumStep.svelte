@@ -9,11 +9,13 @@
     MAX_SPORTS_PREMIUM,
   } from "$lib/types";
   import {
+    BadgeCheck,
     Crown,
     Dumbbell,
     Heart,
     MessageCircle,
     UserShield,
+    Zap,
   } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
@@ -44,6 +46,18 @@
       title: "premium.featureUnlimitedLikesTitle",
       hint: "premium.featureUnlimitedLikesHint",
       params: { free: MAX_LIKES_FREE_PER_DAY },
+    },
+    {
+      icon: BadgeCheck,
+      title: "premium.featureBadgeTitle",
+      hint: "premium.featureBadgeHint",
+      params: {},
+    },
+    {
+      icon: Zap,
+      title: "premium.featurePriorityBoostTitle",
+      hint: "premium.featurePriorityBoostHint",
+      params: {},
     },
   ] as const;
 
