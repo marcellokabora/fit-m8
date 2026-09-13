@@ -319,6 +319,7 @@
 <CheckinSheet
   bind:open={showCheckinSheet}
   {myActivityIds}
+  fallbackLocation={myLocation}
   onCheckin={handleCheckin}
 />
 

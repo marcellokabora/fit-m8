@@ -9,11 +9,16 @@
   let {
     open = $bindable(false),
     myActivityIds = [],
+    fallbackLocation = null,
     onCheckin,
   }: {
     open?: boolean;
     // only the user's own registered sports can be checked in on
     myActivityIds?: string[];
+    // last known fix (e.g. the one used to center the map) — used if a fresh
+    // geolocation request fails, since iOS can deny a repeat request even
+    // moments after an earlier one succeeded
+    fallbackLocation?: { lat: number; lng: number } | null;
     onCheckin: (
       activityId: string,
       lat: number,
@@ -30,6 +35,7 @@
   let durationHours = $state(2);
   let locating = $state(false);
   let error = $state("");
+  let errorDenied = $state(false);
 
   let orderedActivities = $derived(
     ACTIVITIES.filter((activity) => myActivityIds.includes(activity.id)),
@@ -41,6 +47,7 @@
       selectedId = null;
       durationHours = 2;
       error = "";
+      errorDenied = false;
     }
   });
 
@@ -52,14 +59,24 @@
   async function confirm() {
     if (!selectedId || locating) return;
     error = "";
+    errorDenied = false;
     locating = true;
     try {
-      const { lat, lng } = await getCurrentCoords();
-      await onCheckin(selectedId, lat, lng, durationHours);
+      let coords: { lat: number; lng: number };
+      try {
+        coords = await getCurrentCoords();
+      } catch (err) {
+        // fall back to the last known fix instead of blocking the check-in
+        if (!fallbackLocation) throw err;
+        coords = fallbackLocation;
+      }
+      await onCheckin(selectedId, coords.lat, coords.lng, durationHours);
       open = false;
     } catch (err: any) {
-      error =
-        err?.code === 1 ? t.t("location.denied") : t.t("location.detectFailed");
+      errorDenied = err?.code === 1;
+      error = errorDenied
+        ? t.t("location.denied")
+        : t.t("location.detectFailed");
     } finally {
       locating = false;
     }
@@ -119,6 +136,9 @@
     </select>
     {#if error}
       <p class="text-xs font-medium text-red-500">{error}</p>
+      {#if errorDenied}
+        <p class="text-xs text-muted">{t.t("location.deniedHint")}</p>
+      {/if}
     {/if}
   </div>
 

@@ -9,6 +9,8 @@ import {
 	getDocs,
 	serverTimestamp,
 	limit,
+	where,
+	documentId,
 	writeBatch,
 	runTransaction
 } from 'firebase/firestore';
@@ -162,10 +164,17 @@ export async function getDiscoverFeed(
 	const alreadySwiped = new Set(sentSnap.docs.map((d) => d.id));
 	alreadySwiped.add(currentUid);
 
-	// High cap rather than unbounded: keeps the read cost predictable while comfortably
-	// covering the current user base for filtering below.
-	let q = query(collection(db, 'users'), limit(500));
-	const snap = await getDocs(q);
+	// Fake seed accounts ("fake_<name>", see scripts/seed.cjs) now outnumber real users and sort
+	// alphabetically before/after them unpredictably. A single `limit(500)` query with no
+	// orderBy silently dropped real users whose doc id sorted past the cutoff (e.g. once fake
+	// docs alone exceeded 500) - they'd never appear in anyone's Discover feed. Real users are
+	// fetched unbounded (their count stays small), fake ones stay capped for read-cost control.
+	const [beforeFakeSnap, fakeSnap, afterFakeSnap] = await Promise.all([
+		getDocs(query(collection(db, 'users'), where(documentId(), '<', 'fake_'))),
+		getDocs(query(collection(db, 'users'), where(documentId(), '>=', 'fake_'), where(documentId(), '<', 'fake_\uf8ff'), limit(150))),
+		getDocs(query(collection(db, 'users'), where(documentId(), '>=', 'fake_\uf8ff')))
+	]);
+	const snap = { docs: [...beforeFakeSnap.docs, ...fakeSnap.docs, ...afterFakeSnap.docs] };
 
 	const hasOrigin = currentCoords.lat !== undefined && currentCoords.lng !== undefined;
 	// "All sports" means any sport we ourselves practice, not literally any sport on the platform
