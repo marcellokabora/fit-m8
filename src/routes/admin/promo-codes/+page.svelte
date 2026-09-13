@@ -14,7 +14,7 @@
   import { authUser } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import BackHeader from "$lib/components/BackHeader.svelte";
-  import Logo from "$lib/components/Logo.svelte";
+  import Logo from "$lib/components/LogoIcon.svelte";
   import {
     Check,
     Copy,

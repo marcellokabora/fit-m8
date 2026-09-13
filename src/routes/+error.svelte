@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { Compass } from "@lucide/svelte";
-  import Logo from "$lib/components/Logo.svelte";
+  import Logo from "$lib/components/LogoIcon.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
