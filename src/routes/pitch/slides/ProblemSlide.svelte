@@ -3,12 +3,12 @@
 
   const PROBLEM_POINTS = [
     {
-      title: "Tinder / dating apps are misaligned",
+      title: "Tinder dating apps are misaligned",
       desc: "Romance-first focus creates awkward dynamics when users strictly want a tennis partner or workout buddy.",
     },
     {
-      title: "Bumble (BFF / Date) lacks sports intent",
-      desc: "Generic social profiles don't filter by sport, skill level, position, or schedule availability.",
+      title: "Strava lacks real matchmaking",
+      desc: "Great for logging solo activity, but it doesn't connect you with nearby people to actually play or train with.",
     },
     {
       title: "Meetup is group-heavy & rigid",

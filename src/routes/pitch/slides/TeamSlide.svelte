@@ -20,8 +20,8 @@
   const FOUNDER = {
     photo: marcelloPhoto,
     name: "Marcello Annicchairico",
-    role: "Founder / CEO & Engineer",
-    desc: "Solo-founded and built the entire product end-to-end: product design, full-stack development, and infrastructure - shipped a mobile app already live with real users.",
+    role: "Founder, CEO & Software/Product Engineer",
+    desc: "A rare CEO who is also the engineer: designed, built, and shipped the entire product solo - product, full-stack development, and infrastructure - with a mobile app already live with real users. No dev team, no agency, no delays - pure execution speed.",
   };
 </script>
 
@@ -37,18 +37,24 @@
     A solo technical founder who has already built and shipped the product.
   </h2>
   <div
-    class="flex flex-col items-center gap-3 rounded-2xl bg-surface p-6 text-center shadow-sm"
+    class="flex w-full flex-col items-center gap-5 rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-surface to-surface p-6 text-center shadow-sm md:flex-row md:gap-8 md:p-8 md:text-left"
   >
     <img
       src={FOUNDER.photo}
       alt={FOUNDER.name}
-      class="size-24 rounded-full object-cover md:size-32"
+      class="size-28 shrink-0 rounded-full object-cover ring-4 ring-primary/30 md:size-36"
     />
-    <p class="font-bold text-text md:text-lg">{FOUNDER.name}</p>
-    <p class="text-xs font-semibold uppercase tracking-widest text-primary">
-      {FOUNDER.role}
-    </p>
-    <p class="text-sm text-muted md:text-base text-balance">{FOUNDER.desc}</p>
+    <div class="flex flex-col items-center gap-2 md:items-start">
+      <p class="font-bold text-text md:text-xl">{FOUNDER.name}</p>
+      <p
+        class="text-xs font-semibold uppercase tracking-widest text-primary md:text-sm"
+      >
+        {FOUNDER.role}
+      </p>
+      <p class="text-sm text-muted md:text-base text-balance">
+        {FOUNDER.desc}
+      </p>
+    </div>
   </div>
   <div class="flex w-full flex-col gap-2">
     <p class="text-xs font-semibold uppercase tracking-widest text-primary">
