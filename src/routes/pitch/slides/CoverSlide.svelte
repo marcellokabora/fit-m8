@@ -10,7 +10,7 @@
     <Logo class="h-auto w-56 text-primary drop-shadow-md md:w-72" />
     <p class="text-lg font-medium text-muted text-balance md:text-2xl">
       <!-- Find Your Sports Match -->
-      The swipe-and-map matchmaking app for peer-to-peer sports, friends, and trainers
+      The swipe-and-meet matchmaking app for peer-to-peer sports, friends, and trainers
     </p>
   </div>
   <div class="relative flex w-full justify-center print:hidden">

@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { TrendingUp, Users } from "@lucide/svelte";
+  import { TrendingUp, Users, Globe } from "@lucide/svelte";
+  import LinkedinIcon from "~icons/simple-icons/linkedin";
+  import GithubIcon from "~icons/simple-icons/github";
   import marcelloPhoto from "$lib/assets/marcello.jpg";
 
   // Key hires planned with this raise - not existing team members, framed honestly as a
@@ -22,6 +24,23 @@
     name: "Marcello Annicchairico",
     role: "Founder, CEO & Software/Product Engineer",
     desc: "A rare CEO who is also the engineer: designed, built, and shipped the entire product solo - product, full-stack development, and infrastructure - with a mobile app already live with real users. No dev team, no agency, no delays - pure execution speed.",
+    links: [
+      {
+        url: "https://www.linkedin.com/in/marcellokabora",
+        label: "LinkedIn",
+        icon: LinkedinIcon,
+      },
+      {
+        url: "https://github.com/marcellokabora",
+        label: "GitHub",
+        icon: GithubIcon,
+      },
+      {
+        url: "https://marcellokabora.com",
+        label: "Portfolio",
+        icon: Globe,
+      },
+    ],
   };
 </script>
 
@@ -37,7 +56,7 @@
     A solo technical founder who has already built and shipped the product.
   </h2>
   <div
-    class="flex w-full flex-col items-center gap-5 rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-surface to-surface p-6 text-center shadow-sm md:flex-row md:gap-8 md:p-8 md:text-left"
+    class="flex w-full flex-col items-center gap-5 rounded-3xl border border-primary/20 bg-linear-to-br from-primary/10 via-surface to-surface p-6 text-center shadow-sm md:flex-row md:gap-8 md:p-8 md:text-left"
   >
     <img
       src={FOUNDER.photo}
@@ -54,6 +73,19 @@
       <p class="text-sm text-muted md:text-base text-balance">
         {FOUNDER.desc}
       </p>
+      <div class="flex gap-4 pt-1">
+        {#each FOUNDER.links as link (link.url)}
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={link.label}
+            class="text-muted transition-colors hover:text-primary"
+          >
+            <link.icon class="size-5" />
+          </a>
+        {/each}
+      </div>
     </div>
   </div>
   <div class="flex w-full flex-col gap-2">
