@@ -353,9 +353,7 @@
     <nav class="flex flex-wrap justify-center gap-4 text-xs">
       <a href="/terms" class="font-semibold text-primary">Terms of Service</a>
       <a href="/privacy" class="font-semibold text-primary">Privacy Policy</a>
-      <a href="mailto:info@fit-m8.app" class="font-semibold text-primary"
-        >info@fit-m8.app</a
-      >
+      <a href="/pitch" class="font-semibold text-primary">Pitch Deck</a>
     </nav>
 
     <p class="text-xs text-muted">

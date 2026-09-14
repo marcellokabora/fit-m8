@@ -62,6 +62,24 @@
         { label: "Yes", support: "yes" },
       ],
     },
+    {
+      dimension: "Trainer marketplace",
+      cells: [
+        { label: "No", support: "no" },
+        { label: "No", support: "no" },
+        { label: "No", support: "no" },
+        { label: "Built-in Trainer Discovery", support: "yes" },
+      ],
+    },
+    {
+      dimension: "Dating, friends & training",
+      cells: [
+        { label: "Dating Only", support: "no" },
+        { label: "Tracking Only", support: "no" },
+        { label: "Events Only", support: "no" },
+        { label: "All Three Intents", support: "yes" },
+      ],
+    },
   ];
 </script>
 
@@ -154,7 +172,7 @@
             >
               <span class="inline-flex items-center gap-1.5">
                 {#if cell.support === "yes"}
-                  <CircleCheck class="size-4 shrink-0 text-primary" />
+                  <CircleCheck class="size-4 shrink-0 text-muted" />
                 {:else if cell.support === "no"}
                   <CircleX class="size-4 shrink-0 text-muted" />
                 {:else if cell.support === "partial"}
