@@ -57,7 +57,9 @@
   let showMessageModal = $state(false);
   let showLikeLimitModal = $state(false);
   let showEditSheet = $state(false);
-  let badgeInfo = $state<"premium" | "orientation" | "fake" | null>(null);
+  let badgeInfo = $state<"premium" | "orientation" | "trainer" | "fake" | null>(
+    null,
+  );
   let distanceAway = $derived.by(() => {
     if (
       !$userProfile ||
@@ -84,21 +86,17 @@
   let mySportIds = $derived(
     new Set(($userProfile?.activities ?? []).map((a) => a.id)),
   );
-  // Stable sort keeps each group in its original order, shared sports just move to the front
+  // Stable sort keeps common sports first, trainer sports second, and the rest last.
   let sortedActivities = $derived(
-    [...(profile?.activities ?? [])].sort(
-      (a, b) => Number(!mySportIds.has(a.id)) - Number(!mySportIds.has(b.id)),
-    ),
-  );
-  let trainerActivities = $derived(
-    profile?.isTrainer
-      ? sortedActivities.filter((activity) => activity.level === "expert")
-      : [],
-  );
-  let otherActivities = $derived(
-    profile?.isTrainer
-      ? sortedActivities.filter((activity) => activity.level !== "expert")
-      : sortedActivities,
+    [...(profile?.activities ?? [])].sort((activityA, activityB) => {
+      const group = (activity: typeof activityA) =>
+        mySportIds.has(activity.id)
+          ? 0
+          : profile?.isTrainer && activity.level === "expert"
+            ? 1
+            : 2;
+      return group(activityA) - group(activityB);
+    }),
   );
 
   // Buttons only make sense for someone else's profile you haven't already matched with
@@ -329,6 +327,17 @@
             <Rainbow class="size-6" aria-hidden="true" />
           </button>
         {/if}
+        {#if profile.isTrainer}
+          <button
+            type="button"
+            onclick={() => (badgeInfo = "trainer")}
+            aria-label={t.t("profile.trainerInfoTitle")}
+            title={t.t("profile.trainerInfoTitle")}
+            class="flex size-8 shrink-0 items-center justify-center rounded-full text-primary hover:bg-primary/10 active:scale-95"
+          >
+            <UserShield class="size-6" aria-hidden="true" />
+          </button>
+        {/if}
         {#if $isAdmin && profile.uid.startsWith("fake_")}
           <button
             type="button"
@@ -443,49 +452,18 @@
         <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
       {:else}
         <div class="flex flex-col gap-3">
-          {#if trainerActivities.length > 0}
-            <div class="rounded-2xl bg-surface p-4 shadow-sm">
-              <div class="mb-3 flex items-center gap-2 text-primary">
-                <UserShield class="size-5 shrink-0" />
-                <p class="text-sm font-bold uppercase tracking-wide">
-                  {t.t("profile.trainer")}
-                </p>
-              </div>
-              <div class="flex flex-col gap-3">
-                {#each trainerActivities as act (act.id)}
-                  <div class="flex items-center gap-4">
-                    <span
-                      class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
-                    >
-                      <ActivityIcon id={act.id} class="size-5" />
-                    </span>
-                    <div class="flex-1">
-                      <p class="flex items-center gap-2 font-bold text-text">
-                        {t.activity(act.id)}
-                        {#if mySportIds.has(act.id)}
-                          <span
-                            class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
-                          >
-                            {t.t("profile.inCommon")}
-                          </span>
-                        {/if}
-                      </p>
-                      <p class="text-sm text-muted">
-                        {#if act.format !== "all"}{t.format(act.format)}·
-                        {/if}{t.skill(act.level)}
-                      </p>
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            </div>
-          {/if}
-          {#each otherActivities as act (act.id)}
+          {#each sortedActivities as act (act.id)}
             <div
-              class="flex items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm"
+              class="flex items-center gap-4 rounded-2xl border p-4 shadow-sm {profile.isTrainer &&
+              act.level === 'expert'
+                ? 'border-primary/40 bg-primary/5'
+                : 'border-transparent bg-surface'}"
             >
               <span
-                class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+                class="flex size-10 items-center justify-center rounded-full {profile.isTrainer &&
+                act.level === 'expert'
+                  ? 'bg-primary/20'
+                  : 'bg-primary/10'} text-primary"
               >
                 <ActivityIcon id={act.id} class="size-5" />
               </span>
@@ -502,7 +480,9 @@
                 </p>
                 <p class="text-sm text-muted">
                   {#if act.format !== "all"}{t.format(act.format)}·
-                  {/if}{t.skill(act.level)}
+                  {/if}{#if profile.isTrainer && act.level === "expert"}{t.t(
+                      "profile.trainer",
+                    )}{:else}{t.skill(act.level)}{/if}
                 </p>
               </div>
             </div>
@@ -527,6 +507,8 @@
         <Crown class="size-7" />
       {:else if badgeInfo === "orientation"}
         <Rainbow class="size-7" />
+      {:else if badgeInfo === "trainer"}
+        <UserShield class="size-7" />
       {:else if badgeInfo === "fake"}
         <Bot class="size-7" />
       {/if}
@@ -546,6 +528,11 @@
           orientation: t.orientation("gay"),
         })}
       </p>
+    {:else if badgeInfo === "trainer"}
+      <h2 class="text-lg font-black text-text">
+        {t.t("profile.trainerInfoTitle")}
+      </h2>
+      <p class="mt-2 text-sm text-muted">{t.t("profile.trainerInfoBody")}</p>
     {:else if badgeInfo === "fake"}
       <h2 class="text-lg font-black text-text">
         {t.t("profile.fakeProfile")}

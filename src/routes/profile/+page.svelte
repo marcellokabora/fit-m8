@@ -536,9 +536,6 @@
           class="mt-3 border-t border-border pt-3"
           transition:slide={{ duration: 200 }}
         >
-          <p class="mb-2 text-xs font-bold uppercase tracking-wide text-muted">
-            {t.t("profile.trainerSports")}
-          </p>
           {#if trainerActivities.length > 0}
             <ul class="flex flex-col gap-2">
               {#each trainerActivities as activity (activity.id)}
