@@ -6,6 +6,7 @@
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Loading from "$lib/components/Loading.svelte";
+  import LogoIcon from "$lib/components/LogoIcon.svelte";
   import Logo from "$lib/components/LogoText.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
@@ -161,7 +162,7 @@
   let authModalOpen = $state(false);
   let authMode = $state<"login" | "register">("register");
 
-  // gates just the carousel slot: true while the persisted session is still resolving,
+  // shows a full-screen overlay while the persisted session is still resolving,
   // and stays true for logged-in visitors since they're about to be redirected away anyway
   let checkingAuth = $state(true);
 
@@ -207,20 +208,11 @@
       transition:fade
       class="relative flex h-38 w-full items-center justify-center -mt-4"
     >
-      {#if checkingAuth}
-        <Loading fullscreen={false} />
-      {:else}
-        <ActivityCarousel />
-      {/if}
+      <ActivityCarousel />
     </div>
 
     <!-- CTA -->
-    <div
-      transition:fade
-      class="relative z-10 flex w-full flex-col gap-3 opacity-{checkingAuth
-        ? 0
-        : 1}"
-    >
+    <div transition:fade class="relative z-10 flex w-full flex-col gap-3">
       <button
         type="button"
         onclick={() => {
@@ -372,4 +364,14 @@
   </footer>
 
   <AuthModal bind:open={authModalOpen} bind:mode={authMode} />
+
+  {#if checkingAuth}
+    <div
+      transition:fade={{ duration: 300 }}
+      class="fixed inset-0 z-50 mx-auto flex w-full flex-col items-center justify-center gap-4 bg-bg md:max-w-md"
+    >
+      <LogoIcon class="size-26 text-primary" />
+      <!-- <Loading fullscreen={false} /> -->
+    </div>
+  {/if}
 </div>

@@ -2,6 +2,7 @@
   import { onMount, untrack, type Component } from "svelte";
   import { fly } from "svelte/transition";
   import { quintOut } from "svelte/easing";
+  import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import {
@@ -128,7 +129,9 @@
   let slideCount = $derived(visibleSlides.length);
 
   // 1-based in the URL (?slide=1..N) for readability, 0-based internally
-  const urlSlideParam = Number(page.url.searchParams.get("slide"));
+  const urlSlideParam = browser
+    ? Number(page.url.searchParams.get("slide"))
+    : 1;
   let current = $state(
     urlSlideParam >= 1 && urlSlideParam <= SLIDE_DEFS.length
       ? urlSlideParam - 1

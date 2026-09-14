@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Logo from "$lib/components/LogoIcon.svelte";
+  import Logo from "$lib/components/LogoText.svelte";
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
 </script>
 
