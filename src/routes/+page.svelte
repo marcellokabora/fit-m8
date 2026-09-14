@@ -49,11 +49,12 @@
   // real profile links only - keep in sync with the JSON-LD sameAs list in src/app.html
   const SOCIAL_LINKS = [
     {
-      url: "https://www.facebook.com/",
+      url: "https://www.facebook.com/fitm8apps/",
       label: "Facebook",
     },
-    { url: "https://www.instagram.com/", label: "Instagram" },
-    { url: "https://www.youtube.com/", label: "YouTube" },
+    // { url: "https://www.instagram.com/", label: "Instagram" },
+    // { url: "https://www.youtube.com/", label: "YouTube" },
+    { url: "https://www.linkedin.com/company/fit-m8-app", label: "LinkedIn" },
   ];
 
   // icon + in-app screenshot per step, so each step shows a peek of the real screen it describes
@@ -368,8 +369,8 @@
       transition:fade={{ duration: 300 }}
       class="fixed inset-0 z-50 mx-auto flex w-full flex-col items-center justify-center gap-4 bg-bg md:max-w-md"
     >
-      <LogoIcon class="size-26 text-primary" />
-      <!-- <Loading fullscreen={false} /> -->
+      <!-- <LogoIcon class="size-26 text-primary" /> -->
+      <Loading fullscreen={false} />
     </div>
   {/if}
 </div>

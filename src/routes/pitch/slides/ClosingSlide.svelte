@@ -3,9 +3,10 @@
   import SocialIcon from "$lib/components/SocialIcon.svelte";
 
   const SOCIAL_LINKS = [
-    { url: "https://www.facebook.com/", label: "Facebook" },
-    { url: "https://www.instagram.com/", label: "Instagram" },
-    { url: "https://www.youtube.com/", label: "YouTube" },
+    { url: "https://www.facebook.com/fitm8apps/", label: "Facebook" },
+    // { url: "https://www.instagram.com/", label: "Instagram" },
+    // { url: "https://www.youtube.com/", label: "YouTube" },
+    { url: "https://www.linkedin.com/company/fit-m8-app", label: "LinkedIn" },
   ];
 </script>
 
