@@ -28,6 +28,12 @@ full-screen (no browser chrome), backed by Chrome. No app logic gets rewritten.
       backed up.
 - [x] A4. `bubblewrap build` completed — `app-release-bundle.aab` and
       `app-release-signed.apk` are in the repo root (gitignored, not committed).
+- [x] A5. 2026-09-14: site rebranded (green theme) after the last signed build (Aug 28,
+      versionCode 3). Ran `bubblewrap update` twice (picked up new icon; also corrected
+      `twa-manifest.json` theme/background colors that `update` didn't auto-refresh) — now at
+      versionCode 5, Android project regenerated with the new green branding. 2026-09-15: ran
+      `bubblewrap build` — fresh signed `app-release-bundle.aab` / `app-release-signed.apk`
+      (versionCode 5, green branding) now in the repo root, ready to upload to Play Console.
 
 (Alternative if you'd rather avoid the CLI/Android SDK locally: https://www.pwabuilder.com/ →
 enter the site URL → "Package for Stores" → Android → download a ready-made TWA project/AAB.)
@@ -47,9 +53,8 @@ placeholder + `firebase.json` hosting `ignore` exception for the dotfile-prefixe
 
 ## Phase C — Google Play Developer account (can start any time, in parallel with A/B)
 
-- [ ] C1. Create account at https://play.google.com/console/ ($25 one-time fee).
-- [ ] C2. Complete identity verification (can take days — start early; likely the real
-      critical-path bottleneck, not the technical packaging).
+- [x] C1. Create account at https://play.google.com/console/ ($25 one-time fee).
+- [x] C2. Complete identity verification.
 
 ## Phase D — Store listing content (needs C1; can prep in parallel with A/B)
 
@@ -80,7 +85,7 @@ placeholder + `firebase.json` hosting `ignore` exception for the dotfile-prefixe
     - Location-based matching so you meet people who can actually train with you.
     - Skill level and format filters (solo, group, casual, competitive).
     - Real-time chat with your matches.
-    - Multiple languages supported (English, Spanish, Portuguese).
+    - Multiple languages supported (English, Spanish, Italian).
     - Report and block tools to keep the community safe.
 
     PREMIUM
@@ -94,9 +99,13 @@ placeholder + `firebase.json` hosting `ignore` exception for the dotfile-prefixe
     Read our Privacy Policy: https://fit-m8.app/privacy
     ```
 
-- [ ] D2. Graphics: - App icon 512×512 → reuse `static/icons/icon-512.png`. - Feature graphic 1024×500 → **new asset needed**, not covered by
-      `scripts/generate-icons.cjs`. - Phone screenshots (2–8, real captures, portrait, min 320px side) → capture from a
-      live/staging build (discover, matches, chat, profile screens).
+- [x] D2. Graphics (2026-09-14, in `store-assets/`):
+  - App icon 512×512 → reuse `static/icons/icon-512.png`.
+  - Feature graphic 1024×500 → `store-assets/feature-graphic.png` (green brand gradient +
+    `static/logo/fit-m8-logo-green-white.png` mark/wordmark, chroma-keyed onto the gradient).
+  - Phone screenshots → `store-assets/screenshots/` (8 images from `src/lib/assets/screens/`,
+    reprocessed to strip alpha and pad width so height:width ratio is ≤2:1, per Play's
+    screenshot spec).
 - [ ] D3. Questionnaires: Content rating, Data Safety, Target audience, Ads declaration,
       Dating/social declarations if prompted.
 
