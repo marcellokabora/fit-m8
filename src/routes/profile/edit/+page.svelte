@@ -247,6 +247,9 @@
         bind:value={birthdate}
         label={t.t("onboarding.birthdate")}
         underageMessage={t.t("onboarding.underageError")}
+        dayLabel={t.t("onboarding.day")}
+        monthLabel={t.t("onboarding.month")}
+        yearLabel={t.t("onboarding.year")}
       />
     </div>
     {#if $authUser?.email}

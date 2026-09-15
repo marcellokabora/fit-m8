@@ -75,6 +75,9 @@
     bind:value={birthdate}
     label={t.t("onboarding.birthdate")}
     underageMessage={t.t("onboarding.underageError")}
+    dayLabel={t.t("onboarding.day")}
+    monthLabel={t.t("onboarding.month")}
+    yearLabel={t.t("onboarding.year")}
   />
   <div
     class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"

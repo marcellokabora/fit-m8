@@ -129,6 +129,9 @@
       <p class="font-bold text-text">
         {t.t("appearance.title")}
       </p>
+      <p class="text-sm text-muted">
+        {t.t("appearance.hint")}
+      </p>
     </div>
   </div>
   <AppearancePicker />

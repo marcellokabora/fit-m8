@@ -153,6 +153,9 @@ const MESSAGES = {
         'onboarding.bioOptional': 'Short bio (optional)',
         'onboarding.age': 'Age',
         'onboarding.birthdate': 'Date of birth',
+        'onboarding.day': 'Day',
+        'onboarding.month': 'Month',
+        'onboarding.year': 'Year',
         'onboarding.underageError': 'You must be at least 18 years old to use FIT-M8',
         'onboarding.yourSports': 'Your activities',
         'onboarding.sportsHint': 'Pick at least one activity you enjoy',
@@ -289,6 +292,7 @@ const MESSAGES = {
         'profile.noTrainerSports': 'Set a sport to Expert level to show it here.',
         'profile.fakeProfile': 'Fake / seed profile',
         'appearance.title': 'Appearance',
+        'appearance.hint': 'Pick a theme and light/dark mode',
         'appearance.light': 'Light',
         'appearance.dark': 'Dark',
         'appearance.appTheme': 'App Theme',
@@ -712,7 +716,11 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.checkinNoSports': 'Añade actividades a tu perfil para hacer check-in',
         'onboarding.premiumTitle': 'Premium',
         'onboarding.premiumHint': 'Un vistazo a lo que podrás desbloquear más adelante',
-        'common.learnMore': 'Saber más'
+        'common.learnMore': 'Saber más',
+        'onboarding.day': 'Día',
+        'onboarding.month': 'Mes',
+        'onboarding.year': 'Año',
+        'appearance.hint': 'Elige un tema y el modo claro/oscuro'
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
@@ -945,7 +953,11 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.checkinNoSports': 'Aggiungi attività al tuo profilo per fare check-in',
         'onboarding.premiumTitle': 'Premium',
         'onboarding.premiumHint': "Un'anteprima di ciò che potrai sbloccare in seguito",
-        'common.learnMore': 'Scopri di più'
+        'common.learnMore': 'Scopri di più',
+        'onboarding.day': 'Giorno',
+        'onboarding.month': 'Mese',
+        'onboarding.year': 'Anno',
+        'appearance.hint': 'Scegli un tema e la modalità chiara/scura'
     }
 };
 
