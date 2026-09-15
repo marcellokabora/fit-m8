@@ -43,6 +43,7 @@
     if (!uid) return;
 
     uploadingIndex = index;
+    const previousUrl = photos[index];
     try {
       const compressed = await compressImage(file);
       // Unique path per upload — slot index shifts when photos are removed, so
@@ -55,6 +56,13 @@
       next[index] = url;
       photos = next;
       onchange?.(next);
+      if (previousUrl) {
+        try {
+          await deleteObject(ref(storage, previousUrl));
+        } catch {
+          // file may already be gone, ignore
+        }
+      }
     } catch (err: any) {
       error = err.message ?? t.t("photo.uploadFailed");
     } finally {
@@ -80,15 +88,34 @@
 </script>
 
 <div class="flex w-full flex-col gap-2">
-  <div class="grid w-full grid-cols-3 gap-3 pt-2">
+  <div class="grid w-full grid-cols-3 gap-3">
     {#each Array(MAX_PHOTOS) as _, index}
       <div class="relative aspect-3/4 w-full">
         {#if photos[index]}
-          <img
-            src={photos[index]}
-            alt={t.t("common.profilePhotoNumber", { count: index + 1 })}
-            class="h-full w-full rounded-2xl object-cover"
-          />
+          <label
+            class="relative block h-full w-full cursor-pointer rounded-2xl active:scale-95"
+            aria-label={t.t("common.profilePhotoNumber", { count: index + 1 })}
+          >
+            <img
+              src={photos[index]}
+              alt={t.t("common.profilePhotoNumber", { count: index + 1 })}
+              class="h-full w-full rounded-2xl object-cover"
+            />
+            {#if uploadingIndex === index}
+              <span
+                class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/40 text-white"
+              >
+                <Loader2 class="size-6 animate-spin" />
+              </span>
+            {/if}
+            <input
+              type="file"
+              accept="image/*"
+              onchange={(e) => handleFileChange(e, index)}
+              disabled={uploadingIndex !== null}
+              class="hidden"
+            />
+          </label>
           {#if index === 0}
             <span
               class="absolute bottom-1 left-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white"
@@ -99,7 +126,7 @@
           <button
             onclick={() => removePhoto(index)}
             aria-label={t.t("common.removePhoto")}
-            class="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-primary text-white shadow-sm active:scale-95"
+            class="absolute -right-2 -top-2 z-10 flex size-6 items-center justify-center rounded-full bg-primary text-white shadow-sm active:scale-95"
           >
             <X class="size-3.5" />
           </button>

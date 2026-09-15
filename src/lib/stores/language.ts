@@ -34,6 +34,7 @@ const MESSAGES = {
         'common.close': 'Close',
         'common.cancel': 'Cancel',
         'common.clear': 'Clear',
+        'common.done': 'Done',
         'common.keepSwiping': 'Keep swiping',
         'common.information': 'Information',
         'common.removeSport': 'Remove',
@@ -720,7 +721,8 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'onboarding.day': 'Día',
         'onboarding.month': 'Mes',
         'onboarding.year': 'Año',
-        'appearance.hint': 'Elige un tema y el modo claro/oscuro'
+        'appearance.hint': 'Elige un tema y el modo claro/oscuro',
+        'common.done': 'Listo'
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
@@ -957,7 +959,8 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'onboarding.day': 'Giorno',
         'onboarding.month': 'Mese',
         'onboarding.year': 'Anno',
-        'appearance.hint': 'Scegli un tema e la modalità chiara/scura'
+        'appearance.hint': 'Scegli un tema e la modalità chiara/scura',
+        'common.done': 'Fatto'
     }
 };
 

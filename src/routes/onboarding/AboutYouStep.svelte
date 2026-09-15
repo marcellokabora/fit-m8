@@ -4,6 +4,7 @@
   import BirthdateField from "$lib/components/BirthdateField.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import { Heart, VenusAndMars } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let {
@@ -82,7 +83,8 @@
   <div
     class="flex items-center justify-between rounded-2xl border-2 border-border bg-surface px-4 py-4"
   >
-    <p class="text-sm font-semibold text-text">
+    <p class="flex items-center gap-4 text-sm font-semibold text-text">
+      <Heart class="size-5 shrink-0 text-muted" aria-hidden="true" />
       {t.t("profile.single")}
     </p>
     <Toggle
@@ -91,11 +93,21 @@
       onchange={(value) => (isSingle = value)}
     />
   </div>
-  <SegmentedControl
-    options={genderOptions}
-    value={gender}
-    ariaLabel={t.t("common.gender")}
-    onchange={(value) => (gender = value)}
-    size="lg"
-  />
+  <div
+    class="flex flex-row justify-between items-center gap-3 rounded-2xl border-2 border-border bg-surface px-4 py-4"
+  >
+    <p class="text-sm font-semibold text-text flex gap-4">
+      <VenusAndMars class="size-5 shrink-0 text-muted" aria-hidden="true" />
+      {t.t("common.gender")}
+    </p>
+    <div class="flex-1 ml-4">
+      <SegmentedControl
+        options={genderOptions}
+        value={gender}
+        ariaLabel={t.t("common.gender")}
+        onchange={(value) => (gender = value)}
+        size="sm"
+      />
+    </div>
+  </div>
 </div>

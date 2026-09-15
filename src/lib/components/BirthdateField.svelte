@@ -1,8 +1,9 @@
 <script lang="ts">
   import { untrack } from "svelte";
-  import { ChevronDown } from "@lucide/svelte";
+  import { Calendar } from "@lucide/svelte";
+  import BottomSheet from "$lib/components/BottomSheet.svelte";
   import { MIN_AGE, calculateAge } from "$lib/types";
-  import { activeLanguage } from "$lib/stores/language";
+  import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let {
     value = $bindable(""),
@@ -19,6 +20,8 @@
     monthLabel?: string;
     yearLabel?: string;
   } = $props();
+
+  let t = $derived(createTranslator($activeLanguage));
 
   const currentYear = new Date().getFullYear();
   const maxYear = currentYear - MIN_AGE;
@@ -39,9 +42,8 @@
   let month = $state<number | null>(initial.month);
   let year = $state<number | null>(initial.year);
 
-  // Keeps the selects in sync if `value` is reset/loaded from outside (e.g. draft reload).
-  // day/month/year reads are untracked so this only reacts to `value` changing, not to the
-  // user's own select changes (which would otherwise immediately reset the just-picked value).
+  // Keeps the committed fields in sync if `value` is reset/loaded from outside (e.g. draft
+  // reload). day/month/year reads are untracked so this only reacts to `value` changing.
   $effect(() => {
     const parsed = parseValue(value);
     untrack(() => {
@@ -57,10 +59,28 @@
     });
   });
 
-  let dayCount = $derived(
-    year && month ? new Date(year, month, 0).getDate() : 31,
+  let age = $derived(value ? calculateAge(value) : 0);
+  let isUnderage = $derived(value !== "" && age < MIN_AGE);
+  let formattedValue = $derived(
+    value
+      ? new Intl.DateTimeFormat($activeLanguage, {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }).format(new Date(`${value}T00:00:00`))
+      : "",
   );
-  let days = $derived(Array.from({ length: dayCount }, (_, i) => i + 1));
+
+  // --- Bottom sheet picker (draft values, only committed to `value` on confirm) ---
+  let open = $state(false);
+  let draftDay = $state<number | null>(null);
+  let draftMonth = $state<number | null>(null);
+  let draftYear = $state<number | null>(null);
+
+  let draftDayCount = $derived(
+    draftYear && draftMonth ? new Date(draftYear, draftMonth, 0).getDate() : 31,
+  );
+  let days = $derived(Array.from({ length: draftDayCount }, (_, i) => i + 1));
   let years = $derived(
     Array.from({ length: maxYear - minYear + 1 }, (_, i) => maxYear - i),
   );
@@ -78,69 +98,162 @@
 
   $effect(() => {
     // Clamp e.g. day 30 when switching from a 31-day month to a 30/28-day one
-    if (day !== null && day > dayCount) day = dayCount;
+    if (draftDay !== null && draftDay > draftDayCount) draftDay = draftDayCount;
   });
 
+  let dayColumn = $state<HTMLDivElement>();
+  let monthColumn = $state<HTMLDivElement>();
+  let yearColumn = $state<HTMLDivElement>();
+
+  // Scroll each column to the current selection when the sheet opens
   $effect(() => {
-    if (day !== null && month !== null && year !== null) {
-      const next = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-      untrack(() => {
-        if (next !== value) value = next;
-      });
-    } else {
-      untrack(() => {
-        if (value !== "") value = "";
-      });
-    }
+    if (!open) return;
+    requestAnimationFrame(() => {
+      for (const column of [dayColumn, monthColumn, yearColumn]) {
+        column
+          ?.querySelector('[data-selected="true"]')
+          ?.scrollIntoView({ block: "center" });
+      }
+    });
   });
 
-  let age = $derived(value ? calculateAge(value) : 0);
-  let isUnderage = $derived(value !== "" && age < MIN_AGE);
+  function openSheet() {
+    draftDay = day;
+    draftMonth = month;
+    draftYear = year;
+    open = true;
+  }
 
-  const selectClass =
-    "w-full appearance-none rounded-2xl border-2 border-border bg-surface px-3 py-4 text-center text-base text-text outline-none focus:border-primary";
+  function closeSheet() {
+    open = false;
+  }
+
+  function confirm() {
+    if (draftDay === null || draftMonth === null || draftYear === null) return;
+    day = draftDay;
+    month = draftMonth;
+    year = draftYear;
+    value = `${draftYear}-${String(draftMonth).padStart(2, "0")}-${String(draftDay).padStart(2, "0")}`;
+    open = false;
+  }
+
+  const optionClass =
+    "block w-full shrink-0 rounded-xl px-3 py-3 text-center text-base";
 </script>
 
 <div>
-  <!-- <p class="mb-2 text-sm font-semibold text-text">{label}</p> -->
-  <div class="grid grid-cols-3 gap-2">
-    <div class="relative">
-      <select bind:value={day} class={selectClass}>
-        <option value={null} disabled>{dayLabel}</option>
-        {#each days as d (d)}
-          <option value={d}>{d}</option>
-        {/each}
-      </select>
-      <ChevronDown
-        class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-      />
-    </div>
-    <div class="relative">
-      <select bind:value={month} class={selectClass}>
-        <option value={null} disabled>{monthLabel}</option>
-        {#each months as m (m.value)}
-          <option value={m.value}>{m.label}</option>
-        {/each}
-      </select>
-      <ChevronDown
-        class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-      />
-    </div>
-    <div class="relative">
-      <select bind:value={year} class={selectClass}>
-        <option value={null} disabled>{yearLabel}</option>
-        {#each years as y (y)}
-          <option value={y}>{y}</option>
-        {/each}
-      </select>
-      <ChevronDown
-        class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-      />
-    </div>
-  </div>
+  <button
+    type="button"
+    onclick={openSheet}
+    class="flex w-full items-center gap-3 rounded-2xl border-2 bg-surface px-4 py-4 text-left {isUnderage
+      ? 'border-error'
+      : 'border-border'}"
+  >
+    <Calendar class="size-5 shrink-0 text-muted" />
+    <span class="text-base {value ? 'text-text' : 'text-muted'}">
+      {value ? formattedValue : label}
+    </span>
+  </button>
   {#if isUnderage}
     <p class="mt-2 text-xs font-semibold text-error">
       {underageMessage}
     </p>
   {/if}
 </div>
+
+<BottomSheet
+  bind:open
+  onClose={closeSheet}
+  closeLabel={t.t("common.close")}
+  bgClass="bg-surface"
+  maxHeightClass="max-h-[70dvh]"
+>
+  <div class="flex flex-col gap-1 px-7 pb-2 pt-2">
+    <h2 class="text-xl font-black text-text">{label}</h2>
+  </div>
+  <div class="grid h-64 grid-cols-3 gap-2 px-5 pb-4">
+    <div
+      bind:this={dayColumn}
+      class="hide-scrollbar overflow-y-auto rounded-2xl border-2 border-border relative"
+    >
+      <p
+        class="px-3 py-2 text-xs font-semibold uppercase text-muted text-center sticky top-0 bg-surface"
+      >
+        {dayLabel}
+      </p>
+      {#each days as d (d)}
+        <button
+          type="button"
+          data-selected={draftDay === d}
+          onclick={() => (draftDay = d)}
+          class="{optionClass} {draftDay === d
+            ? 'font-bold text-primary'
+            : 'text-text'}"
+        >
+          {d}
+        </button>
+      {/each}
+    </div>
+    <div
+      bind:this={monthColumn}
+      class="hide-scrollbar overflow-y-auto rounded-2xl border-2 border-border"
+    >
+      <p
+        class="px-3 py-2 text-xs font-semibold uppercase text-muted text-center sticky top-0 bg-surface"
+      >
+        {monthLabel}
+      </p>
+      {#each months as m (m.value)}
+        <button
+          type="button"
+          data-selected={draftMonth === m.value}
+          onclick={() => (draftMonth = m.value)}
+          class="{optionClass} {draftMonth === m.value
+            ? 'font-bold text-primary'
+            : 'text-text'}"
+        >
+          {m.label}
+        </button>
+      {/each}
+    </div>
+    <div
+      bind:this={yearColumn}
+      class="hide-scrollbar overflow-y-auto rounded-2xl border-2 border-border"
+    >
+      <p
+        class="px-3 py-2 text-xs font-semibold uppercase text-muted text-center sticky top-0 bg-surface"
+      >
+        {yearLabel}
+      </p>
+      {#each years as y (y)}
+        <button
+          type="button"
+          data-selected={draftYear === y}
+          onclick={() => (draftYear = y)}
+          class="{optionClass} {draftYear === y
+            ? 'font-bold text-primary'
+            : 'text-text'}"
+        >
+          {y}
+        </button>
+      {/each}
+    </div>
+  </div>
+  <div class="flex gap-3 border-t border-border px-7 py-4">
+    <button
+      type="button"
+      onclick={closeSheet}
+      class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text active:scale-95"
+    >
+      {t.t("common.cancel")}
+    </button>
+    <button
+      type="button"
+      onclick={confirm}
+      disabled={draftDay === null || draftMonth === null || draftYear === null}
+      class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+    >
+      {t.t("common.done")}
+    </button>
+  </div>
+</BottomSheet>

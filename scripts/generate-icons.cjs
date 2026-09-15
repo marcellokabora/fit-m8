@@ -6,7 +6,7 @@ const path = require("path");
 const sharp = require("sharp");
 
 const ROOT = path.join(__dirname, "..");
-const SOURCE_IMAGE = path.join(ROOT, "static", "logo", "fit-m8-logo-green-white.png");
+const SOURCE_IMAGE = path.join(ROOT, "static", "logo", "logo-zoom.png");
 
 // Maskable icons get circle/rounded-square masked by the OS launcher, which clips anything
 // outside a centered ~80%-diameter "safe zone". Shrink the whole (already full-bleed) source
