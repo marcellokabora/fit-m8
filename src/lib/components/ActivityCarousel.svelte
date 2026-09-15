@@ -20,19 +20,19 @@
   import { page } from "$app/state";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
-  // lower quality is fine here - these render blurred at 50% opacity as fixed full-screen backgrounds
+  // lower quality is fine here - these render blurred at 30% opacity as fixed full-screen backgrounds
   // ("enhanced" must be last in the query string to match the "*?enhanced" ambient module type)
-  import padelImg from "$lib/assets/homepage/padel.jpg?quality=45&enhanced";
-  import footvolleyImg from "$lib/assets/homepage/footvolley.jpg?quality=45&enhanced";
-  import joggingImg from "$lib/assets/homepage/jogging.jpg?quality=45&enhanced";
-  import tennisImg from "$lib/assets/homepage/tennis.jpg?quality=45&enhanced";
-  import basketballImg from "$lib/assets/homepage/bascketball.jpg?quality=45&enhanced";
-  import cyclingImg from "$lib/assets/homepage/cycling.jpg?quality=45&enhanced";
-  import beachVolleyImg from "$lib/assets/homepage/beachvolley.jpg?quality=45&enhanced";
-  import boxingImg from "$lib/assets/homepage/boxing.jpg?quality=45&enhanced";
-  import surfImg from "$lib/assets/homepage/surf.jpg?quality=45&enhanced";
-  import soccerImg from "$lib/assets/homepage/football.jpg?quality=45&enhanced";
-  import skateImg from "$lib/assets/homepage/skate.jpg?quality=45&enhanced";
+  import padelImg from "$lib/assets/homepage/padel.jpg?quality=35&enhanced";
+  import footvolleyImg from "$lib/assets/homepage/footvolley.jpg?quality=35&enhanced";
+  import joggingImg from "$lib/assets/homepage/jogging.jpg?quality=35&enhanced";
+  import tennisImg from "$lib/assets/homepage/tennis.jpg?quality=35&enhanced";
+  import basketballImg from "$lib/assets/homepage/bascketball.jpg?quality=35&enhanced";
+  import cyclingImg from "$lib/assets/homepage/cycling.jpg?quality=35&enhanced";
+  import beachVolleyImg from "$lib/assets/homepage/beachvolley.jpg?quality=35&enhanced";
+  import boxingImg from "$lib/assets/homepage/boxing.jpg?quality=35&enhanced";
+  import surfImg from "$lib/assets/homepage/surf.jpg?quality=35&enhanced";
+  import soccerImg from "$lib/assets/homepage/football.jpg?quality=35&enhanced";
+  import skateImg from "$lib/assets/homepage/skate.jpg?quality=35&enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
 

@@ -28,7 +28,11 @@ function createAuthStore() {
 	const { subscribe, set } = writable<User | null | undefined>(undefined);
 
 	if (typeof window !== 'undefined') {
-		onAuthStateChanged(auth, (user) => set(user));
+		// Deferred to idle: attaching this listener is what makes the Auth SDK fetch its
+		// persistence-check iframe, which otherwise competes with the initial paint on every route
+		(window.requestIdleCallback ?? setTimeout)(() => {
+			onAuthStateChanged(auth, (user) => set(user));
+		});
 	}
 
 	return {

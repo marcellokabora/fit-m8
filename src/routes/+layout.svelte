@@ -9,9 +9,10 @@
   import { onMount } from "svelte";
   import { registerSW } from "virtual:pwa-register";
   import { initAnalytics } from "$lib/firebase/analytics";
-  import { initForegroundMessaging } from "$lib/firebase/notifications";
-  import { startPresenceHeartbeat } from "$lib/firebase/presence";
   import { createTranslator } from "$lib/stores/language";
+  // notifications/presence are only needed once a signed-in profile exists, so they're
+  // dynamically imported below instead of statically here - keeps firebase/messaging out
+  // of the shared chunk every anonymous landing-page visitor has to download
 
   let { children } = $props();
   let t = $derived(createTranslator($activeLanguage));
@@ -26,7 +27,8 @@
 
     if (import.meta.env.PROD) {
       registerSW({ immediate: true });
-      void initAnalytics();
+      // deferred to idle so the GTM/analytics payload doesn't compete with the initial paint
+      (window.requestIdleCallback ?? setTimeout)(() => void initAnalytics());
     }
 
     let stopPresence: (() => void) | null = null;
@@ -52,6 +54,11 @@
             await userProfile.save(user.uid, { emailVerified: true });
           }
           // Re-attach the foreground push listener; no-op if permission was never granted
+          const [{ initForegroundMessaging }, { startPresenceHeartbeat }] =
+            await Promise.all([
+              import("$lib/firebase/notifications"),
+              import("$lib/firebase/presence"),
+            ]);
           initForegroundMessaging();
           if (!stopPresence) stopPresence = startPresenceHeartbeat(user.uid);
         }
