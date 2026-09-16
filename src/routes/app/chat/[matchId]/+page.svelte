@@ -80,7 +80,7 @@
     await unmatch(matchId);
     unmatching = false;
     confirmUnmatch = false;
-    goto("/matches");
+    goto("/app/matches");
   }
 
   function openReportModal() {
@@ -192,11 +192,11 @@
 
 <div class="flex h-dvh flex-col bg-bg">
   <!-- Header -->
-  <BackHeader href="/matches" class="border-b border-border bg-surface">
+  <BackHeader href="/app/matches" class="border-b border-border bg-surface">
     {#snippet children()}
       {#if otherUser}
         <a
-          href="/profile/{otherUser.uid}"
+          href="/app/profile/{otherUser.uid}"
           class="flex min-w-0 flex-1 items-center gap-3"
         >
           <img

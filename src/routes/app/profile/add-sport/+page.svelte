@@ -58,12 +58,12 @@
         })),
       ],
     });
-    goto("/profile#activities");
+    goto("/app/profile#activities");
   }
 </script>
 
 <div class="flex h-dvh flex-col overflow-hidden bg-bg">
-  <BackHeader href="/profile">
+  <BackHeader href="/app/profile">
     <h1 class="text-lg font-black text-text">{t.t("profile.addSport")}</h1>
   </BackHeader>
 

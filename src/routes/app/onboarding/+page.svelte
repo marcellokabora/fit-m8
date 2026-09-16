@@ -261,7 +261,7 @@
       if (pushToken) await savePushToken(user.uid, pushToken);
       localStorage.removeItem(DRAFT_KEY);
       // Let users review their completed profile before entering the rest of the app.
-      goto("/profile");
+      goto("/app/profile");
     } catch (e: any) {
       error = e.message;
     } finally {

@@ -344,12 +344,12 @@
         },
       });
     }
-    goto("/discover");
+    goto("/app/discover");
   }
 </script>
 
 <div class="flex h-dvh flex-col overflow-hidden bg-bg">
-  <BackHeader href="/discover">
+  <BackHeader href="/app/discover">
     <div class="flex flex-1 items-center justify-between">
       <h1 class="text-lg font-black text-text">{t.t("discover.filters")}</h1>
       <div class="flex items-center gap-2">
@@ -603,7 +603,7 @@
 
     <div class="mt-5 flex flex-col gap-3 bg-bg">
       <a
-        href="/profile#activities"
+        href="/app/profile#activities"
         class="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
         <Plus class="size-4" />

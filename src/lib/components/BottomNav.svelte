@@ -12,15 +12,15 @@
   // block navigation elsewhere until they confirm their inbox link.
   let needsVerification = $derived($authUser?.emailVerified === false);
   const tabs = [
-    { id: "discover", href: "/discover", icon: Zap, key: "nav.discover" },
-    { id: "explore", href: "/explore", icon: Compass, key: "nav.explore" },
+    { id: "discover", href: "/app/discover", icon: Zap, key: "nav.discover" },
+    { id: "explore", href: "/app/explore", icon: Compass, key: "nav.explore" },
     {
       id: "matches",
-      href: "/matches",
+      href: "/app/matches",
       icon: MessageCircle,
       key: "nav.matches",
     },
-    { id: "profile", href: "/profile", icon: User, key: "nav.profile" },
+    { id: "profile", href: "/app/profile", icon: User, key: "nav.profile" },
   ] as const;
 </script>
 

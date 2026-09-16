@@ -71,15 +71,15 @@ Fit-M8 connects you with nearby sports partners tailored to your exact profile. 
 
 ## App Routes
 
-| Route             | Description                           |
-| ----------------- | ------------------------------------- |
-| `/`               | Landing / splash                      |
-| `/auth`           | Login & register (social + email)     |
-| `/onboarding`     | Profile wizard (4 steps)              |
-| `/discover`       | Swipe cards + activity/format filters |
-| `/matches`        | Real-time matches list                |
-| `/chat/[matchId]` | Real-time chat per match              |
-| `/profile`        | View & edit profile1                  |
+| Route                 | Description                           |
+| --------------------- | ------------------------------------- |
+| `/`                   | Landing / splash                      |
+| `/auth`               | Login & register (social + email)     |
+| `/app/onboarding`     | Profile wizard (4 steps)              |
+| `/app/discover`       | Swipe cards + activity/format filters |
+| `/app/matches`        | Real-time matches list                |
+| `/app/chat/[matchId]` | Real-time chat per match              |
+| `/app/profile`        | View & edit profile1                  |
 
 ## Deploy
 

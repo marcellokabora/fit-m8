@@ -43,12 +43,16 @@
 
   $effect(() => {
     if ($isAdmin === undefined) return; // still resolving auth state / the claim check
-    if (!$isAdmin) goto("/discover");
+    if (!$isAdmin) goto("/app/discover");
   });
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
-  <BackHeader title={t.t("home.allActivities")} href="/profile" class="bg-bg" />
+  <BackHeader
+    title={t.t("home.allActivities")}
+    href="/app/profile"
+    class="bg-bg"
+  />
 
   {#if $isAdmin === undefined}
     <div class="flex flex-1 items-center justify-center text-muted">

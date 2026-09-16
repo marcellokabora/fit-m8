@@ -185,7 +185,7 @@
     if (page.url.searchParams.get("verified") === "1") {
       justVerified = true;
       setTimeout(() => (justVerified = false), 5000);
-      goto("/discover", {
+      goto("/app/discover", {
         replaceState: true,
         noScroll: true,
         keepFocus: true,
@@ -578,7 +578,7 @@
     );
     messaging = false;
     showComposeSheet = false;
-    goto(`/chat/${matchId}`);
+    goto(`/app/chat/${matchId}`);
   }
 
   let rotation = $derived(
@@ -684,7 +684,7 @@
           onSelectPreset={selectDiscoverPreset}
         />
         <button
-          onclick={() => goto("/discover/filters")}
+          onclick={() => goto("/app/discover/filters")}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
             ? 'bg-primary text-white'
             : 'bg-surface text-text'}"
@@ -879,7 +879,7 @@
               {t.t("common.keepSwiping")}
             </button>
             <a
-              href="/matches"
+              href="/app/matches"
               class="flex-1 rounded-2xl bg-primary py-3 text-center text-sm font-bold text-white"
             >
               {t.t("matches.viewMatches")}
@@ -919,7 +919,7 @@
         {t.t("premium.messageUpsellHint")}
       </p>
       <a
-        href="/premium"
+        href="/app/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
         {t.t("profile.goPremium")}
@@ -960,7 +960,7 @@
         {t.t("premium.likeLimitHint")}
       </p>
       <a
-        href="/premium"
+        href="/app/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
         {t.t("profile.goPremium")}

@@ -271,7 +271,7 @@
   $effect(() => {
     if ($isAdmin === undefined) return; // still resolving auth state / the claim check
     if ($isAdmin) loadProfiles();
-    else goto("/discover");
+    else goto("/app/discover");
   });
 
   async function saveProfile(uid: string) {
@@ -323,7 +323,7 @@
 <svelte:window onscroll={handleWindowScroll} />
 
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
-  <BackHeader title="Fake profiles" href="/discover" class="bg-bg" />
+  <BackHeader title="Fake profiles" href="/app/discover" class="bg-bg" />
 
   {#if $isAdmin === undefined}
     <div class="flex flex-1 items-center justify-center text-muted">
@@ -517,7 +517,10 @@
     <div class="flex-1 overflow-y-auto p-5">
       <div class="mb-4 flex items-center justify-between">
         <h2 class="min-w-0 text-lg font-black text-text">
-          <a href={`/profile/${p.uid}`} class="block truncate hover:underline">
+          <a
+            href={`/app/profile/${p.uid}`}
+            class="block truncate hover:underline"
+          >
             {p.displayName}
           </a>
         </h2>

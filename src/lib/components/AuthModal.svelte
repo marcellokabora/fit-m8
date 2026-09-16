@@ -52,7 +52,7 @@
     loading = true;
     try {
       await authUser.signInGoogle();
-      goto("/discover");
+      goto("/app/discover");
     } catch (e: any) {
       error = authErrorMessage(e);
     } finally {
@@ -65,7 +65,7 @@
     loading = true;
     try {
       await authUser.signInFacebook();
-      goto("/discover");
+      goto("/app/discover");
     } catch (e: any) {
       error = authErrorMessage(e);
     } finally {
@@ -83,7 +83,7 @@
       } else {
         await authUser.registerEmail(email, password);
       }
-      goto("/discover");
+      goto("/app/discover");
     } catch (e: any) {
       error = authErrorMessage(e);
     } finally {

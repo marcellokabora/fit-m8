@@ -1,25 +1,16 @@
 <script lang="ts">
   import "../app.css";
-  import { goto } from "$app/navigation";
-  import { page } from "$app/state";
-  import { get } from "svelte/store";
-  import { authUser, userProfile } from "$lib/stores/auth";
   import { activeLanguage } from "$lib/stores/language";
   import { activeTheme } from "$lib/stores/theme";
   import { onMount } from "svelte";
   import { registerSW } from "virtual:pwa-register";
   import { initAnalytics } from "$lib/firebase/analytics";
   import { createTranslator } from "$lib/stores/language";
-  // notifications/presence are only needed once a signed-in profile exists, so they're
-  // dynamically imported below instead of statically here - keeps firebase/messaging out
-  // of the shared chunk every anonymous landing-page visitor has to download
+  // the auth-gated app shell (redirect/onboarding/presence/push) now lives in
+  // src/routes/app/+layout.svelte - this root layout only covers public marketing pages
 
   let { children } = $props();
   let t = $derived(createTranslator($activeLanguage));
-
-  const PUBLIC_ROUTES = ["/", "/pitch"];
-  // The pitch deck is presented full-screen on a laptop, not inside the phone-width app shell
-  let isFullBleedRoute = $derived(page.url.pathname === "/pitch");
 
   onMount(() => {
     activeLanguage.init();
@@ -30,40 +21,6 @@
       // deferred to idle so the GTM/analytics payload doesn't compete with the initial paint
       (window.requestIdleCallback ?? setTimeout)(() => void initAnalytics());
     }
-
-    let stopPresence: (() => void) | null = null;
-
-    return authUser.subscribe(async (user) => {
-      if (user === undefined) return; // still resolving persisted session
-      const path = page.url.pathname;
-      if (!user) {
-        stopPresence?.();
-        stopPresence = null;
-        userProfile.set(null);
-        if (!PUBLIC_ROUTES.includes(path)) {
-          goto("/");
-        }
-      } else if (user) {
-        const hasProfile = await userProfile.load(user.uid);
-        if (!hasProfile && path !== "/onboarding") {
-          goto("/onboarding");
-        } else if (hasProfile) {
-          // Catches users who verified their email link after their profile was already created
-          const profile = get(userProfile);
-          if (user.emailVerified && profile?.emailVerified !== true) {
-            await userProfile.save(user.uid, { emailVerified: true });
-          }
-          // Re-attach the foreground push listener; no-op if permission was never granted
-          const [{ initForegroundMessaging }, { startPresenceHeartbeat }] =
-            await Promise.all([
-              import("$lib/firebase/notifications"),
-              import("$lib/firebase/presence"),
-            ]);
-          initForegroundMessaging();
-          if (!stopPresence) stopPresence = startPresenceHeartbeat(user.uid);
-        }
-      }
-    });
   });
 </script>
 
@@ -83,16 +40,6 @@
   {/if}
 </svelte:head>
 
-<div
-  class="min-h-dvh bg-black font-sans {isFullBleedRoute
-    ? ''
-    : 'md:flex md:justify-center'}"
->
-  <div
-    class="relative flex min-h-dvh w-full flex-col bg-bg {isFullBleedRoute
-      ? ''
-      : 'md:max-w-md md:border-x md:border-border md:shadow-2xl'}"
-  >
-    {@render children()}
-  </div>
+<div class="min-h-dvh bg-bg font-sans">
+  {@render children()}
 </div>

@@ -175,7 +175,7 @@
         {t.t("matches.emptyHint")}
       </p>
       <a
-        href="/discover"
+        href="/app/discover"
         class="rounded-2xl bg-primary px-6 py-3 font-bold text-white active:scale-95"
       >
         {t.t("matches.goDiscover")}
@@ -196,7 +196,7 @@
               {@const other = otherUid ? otherUsers[otherUid] : undefined}
               <div class="flex w-20 shrink-0 flex-col items-center gap-2">
                 <a
-                  href="/chat/{match.id}"
+                  href="/app/chat/{match.id}"
                   class="relative block size-20 shrink-0 overflow-hidden rounded-2xl bg-primary/10 active:scale-95 transition-transform"
                 >
                   {#if other}
@@ -258,7 +258,7 @@
             {@const other = otherUid ? otherUsers[otherUid] : undefined}
             {@const unread = $unreadMatches.has(match.id)}
             <a
-              href="/chat/{match.id}"
+              href="/app/chat/{match.id}"
               class="flex items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm active:scale-[0.98] transition-transform"
             >
               <div

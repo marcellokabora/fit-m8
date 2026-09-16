@@ -56,7 +56,7 @@
   $effect(() => {
     if ($isAdmin === undefined) return; // still resolving auth state / the claim check
     if ($isAdmin) loadUsers();
-    else goto("/discover");
+    else goto("/app/discover");
   });
 
   async function handleDelete() {
@@ -76,7 +76,7 @@
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
-  <BackHeader title="Manage users" href="/profile" class="bg-bg" />
+  <BackHeader title="Manage users" href="/app/profile" class="bg-bg" />
 
   {#if $isAdmin === undefined || loading}
     <div class="flex flex-1 items-center justify-center text-muted">
@@ -105,7 +105,7 @@
           class="flex items-center gap-3 rounded-2xl bg-surface p-3 shadow-sm"
         >
           <a
-            href={`/profile/${u.uid}`}
+            href={`/app/profile/${u.uid}`}
             class="flex min-w-0 flex-1 items-center gap-3"
           >
             <img

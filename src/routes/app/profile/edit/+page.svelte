@@ -172,7 +172,7 @@
       });
     }
     saving = false;
-    goto("/profile");
+    goto("/app/profile");
   }
 
   async function handleResetSwipes() {
@@ -202,7 +202,7 @@
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg">
-  <BackHeader href="/profile" class="bg-bg">
+  <BackHeader href="/app/profile" class="bg-bg">
     <div class="flex flex-1 items-center justify-between">
       <h1 class="text-lg font-black text-text">{t.t("profile.editTitle")}</h1>
       <button

@@ -19,7 +19,7 @@ import { DEFAULT_DISTANCE_KM, type ActivityFormat, type Gender, type SexualOrien
 // Sends the verification link back to our own app instead of Firebase's generic confirmation page
 function verificationActionSettings() {
 	return {
-		url: typeof window !== 'undefined' ? `${window.location.origin}/discover?verified=1` : ''
+		url: typeof window !== 'undefined' ? `${window.location.origin}/app/discover?verified=1` : ''
 	};
 }
 

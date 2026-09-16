@@ -5,8 +5,6 @@
   import { fade } from "svelte/transition";
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import Loading from "$lib/components/Loading.svelte";
-  import LogoIcon from "$lib/components/LogoIcon.svelte";
   import Logo from "$lib/components/LogoText.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
@@ -163,22 +161,21 @@
   let authModalOpen = $state(false);
   let authMode = $state<"login" | "register">("register");
 
-  // shows a full-screen overlay while the persisted session is still resolving,
-  // and stays true for logged-in visitors since they're about to be redirected away anyway
-  let checkingAuth = $state(true);
+  // drives the CTA button: spinner while the persisted session resolves, then either
+  // the normal sign-in action or an "open app" action - no automatic redirect
+  let authState = $state<"checking" | "guest" | "loggedIn">("checking");
+  let appDestination = $state("/app/discover");
 
-  // content renders immediately (prerendered for crawlers/first paint); this only
-  // redirects away once auth resolves, if the visitor turns out to already be logged in
-  // (and, if so, on to onboarding rather than discover when their profile isn't finished)
   onMount(() => {
     return authUser.subscribe(async (user) => {
       if (user === undefined) return; // still resolving persisted session
       if (!user) {
-        checkingAuth = false;
+        authState = "guest";
         return;
       }
       const hasProfile = await userProfile.load(user.uid);
-      goto(hasProfile ? "/discover" : "/onboarding");
+      appDestination = hasProfile ? "/app/discover" : "/app/onboarding";
+      authState = "loggedIn";
     });
   });
 </script>
@@ -213,17 +210,31 @@
     </div>
 
     <!-- CTA -->
-    <div transition:fade class="relative z-10 flex w-full flex-col gap-3">
+    <div
+      transition:fade
+      class="relative z-10 mx-auto flex w-full max-w-md flex-col gap-3"
+    >
       <button
         type="button"
+        disabled={authState === "checking"}
         onclick={() => {
+          if (authState === "loggedIn") {
+            goto(appDestination);
+            return;
+          }
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95"
+        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
       >
-        <LogIn class="size-5" />
-        {t.t("auth.signIn")}
+        {#if authState === "checking"}
+          <span
+            class="size-5 shrink-0 animate-spin rounded-full border-2 border-primary/30 border-t-primary"
+          ></span>
+        {:else}
+          <LogIn class="size-5" />
+        {/if}
+        {authState === "loggedIn" ? t.t("home.openApp") : t.t("auth.signIn")}
       </button>
     </div>
 
@@ -260,13 +271,14 @@
               </div>
             </div>
 
-            <!-- tilted and bled off the page edge on purpose - just a glimpse of the screen, not the full UI -->
+            <!-- tilted on purpose - just a glimpse of the screen, not the full UI - but kept
+                 centered on the same vertical line as every other step, only alternating tilt direction -->
             <div
-              class="w-102 overflow-hidden shadow-xl mt-4 max-h-full mb-8 {i %
+              class="mx-auto w-102 overflow-hidden shadow-xl mt-4 max-h-full mb-8 {i %
                 2 ===
               0
-                ? '-ml-6 rotate-6'
-                : '-mr-12 ml-auto -rotate-6'}"
+                ? 'rotate-6'
+                : '-rotate-6'}"
             >
               <enhanced:img
                 src={step.screen}
@@ -294,7 +306,7 @@
         <!-- natural order, but chip size scales with the interest count to highlight the popular ones -->
         <!-- one big tilted "card" that bleeds off both page edges, matching the step screenshots above -->
         <div
-          class="-mx-34 flex flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10 rotate-0"
+          class="-mx-34 md:mx-auto flex max-w-[600px] flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10 rotate-0"
         >
           {#each DISPLAYED_ACTIVITIES as activity}
             {@const count = interestCount(activity.id)}
@@ -363,14 +375,4 @@
   </footer>
 
   <AuthModal bind:open={authModalOpen} bind:mode={authMode} />
-
-  {#if checkingAuth}
-    <div
-      transition:fade={{ duration: 300 }}
-      class="fixed inset-0 z-50 mx-auto flex w-full flex-col items-center justify-center gap-4 bg-bg md:max-w-md"
-    >
-      <!-- <LogoIcon class="size-26 text-primary" /> -->
-      <Loading fullscreen={false} />
-    </div>
-  {/if}
 </div>

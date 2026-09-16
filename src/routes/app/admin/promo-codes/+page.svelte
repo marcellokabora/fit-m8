@@ -72,7 +72,7 @@
   $effect(() => {
     if ($isAdmin === undefined) return; // still resolving auth state / the claim check
     if ($isAdmin) loadCode();
-    else goto("/discover");
+    else goto("/app/discover");
   });
 
   // Avoids visually-ambiguous characters (0/O, 1/I) since codes may be typed in by hand
@@ -118,7 +118,7 @@
 </script>
 
 <div class="flex min-h-dvh flex-col bg-bg pb-12">
-  <BackHeader title="Promo code" href="/profile" class="bg-bg" />
+  <BackHeader title="Promo code" href="/app/profile" class="bg-bg" />
 
   {#if $isAdmin === undefined || loading}
     <div class="flex flex-1 items-center justify-center text-muted">

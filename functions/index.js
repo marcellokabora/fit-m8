@@ -48,7 +48,7 @@ exports.onMessageCreated = onDocumentCreated(
 async function push(userRef, tokens, title, body) {
     const response = await getMessaging().sendEachForMulticast({
         tokens,
-        data: { title, body, url: '/matches' }
+        data: { title, body, url: '/app/matches' }
     });
     console.log(
         `push(${userRef.id}): "${title}" to ${tokens.length} token(s), ${response.successCount} succeeded, ${response.failureCount} failed`

@@ -187,7 +187,7 @@
       {$userProfile?.displayName ?? t.t("nav.profile")}{#if $userProfile?.age}, {$userProfile.age}{/if}
     </h1>
     <a
-      href="/profile/edit"
+      href="/app/profile/edit"
       class="flex items-center gap-1.5 rounded-xl bg-primary/10 px-4 py-2 text-sm font-bold text-primary active:scale-95"
     >
       <Pencil class="size-4" />
@@ -247,28 +247,28 @@
       <h2 class="mb-4 text-lg font-black text-text">Admin</h2>
       <div class="flex flex-col gap-2">
         <a
-          href="/admin/users"
+          href="/app/admin/users"
           class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary active:scale-95"
         >
           <Users class="size-4" />
           Users profiles
         </a>
         <a
-          href="/admin/fake-profiles"
+          href="/app/admin/fake-profiles"
           class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary active:scale-95"
         >
           <ShieldUser class="size-4" />
           Fake profiles
         </a>
         <a
-          href="/admin/promo-codes"
+          href="/app/admin/promo-codes"
           class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-bold text-primary active:scale-95"
         >
           <QrCode class="size-4" />
           Promo codes
         </a>
         <!-- <a
-          href="/admin/activities"
+          href="/app/admin/activities"
           class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-left text-sm font-bold text-primary active:scale-95"
         >
           <List class="size-4" />
@@ -489,7 +489,7 @@
       </p>
     {:else}
       <a
-        href="/profile/add-sport"
+        href="/app/profile/add-sport"
         class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
         <Plus class="size-4" />
@@ -562,7 +562,7 @@
   <!-- Premium -->
   <div class="mt-auto px-5 pt-8">
     <a
-      href="/premium"
+      href="/app/premium"
       class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95"
     >
       <Crown class="size-5" />

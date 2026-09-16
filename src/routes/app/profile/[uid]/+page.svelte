@@ -240,9 +240,9 @@
     }
     if (isMatch) {
       matchBanner = true;
-      setTimeout(() => goto("/matches"), 1800);
+      setTimeout(() => goto("/app/matches"), 1800);
     } else {
-      goto("/discover");
+      goto("/app/discover");
     }
   }
 
@@ -292,7 +292,7 @@
     );
     messaging = false;
     showComposeSheet = false;
-    goto(`/chat/${matchId}`);
+    goto(`/app/chat/${matchId}`);
   }
 </script>
 
@@ -597,7 +597,7 @@
       </h2>
       <p class="text-sm text-muted">{t.t("premium.messageUpsellHint")}</p>
       <a
-        href="/premium"
+        href="/app/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
         {t.t("profile.goPremium")}
@@ -636,7 +636,7 @@
       </h2>
       <p class="text-sm text-muted">{t.t("premium.likeLimitHint")}</p>
       <a
-        href="/premium"
+        href="/app/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
         {t.t("profile.goPremium")}

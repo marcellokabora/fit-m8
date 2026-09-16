@@ -124,7 +124,7 @@
     messaging = false;
     showComposeSheet = false;
     open = false;
-    goto(`/chat/${matchId}`);
+    goto(`/app/chat/${matchId}`);
   }
 </script>
 
@@ -138,7 +138,7 @@
   {#if checkin}
     <div class="flex flex-col items-center gap-3 px-7 pb-8 pt-2 text-center">
       <a
-        href={`/profile/${checkin.uid}`}
+        href={`/app/profile/${checkin.uid}`}
         aria-label={checkin.displayName}
         class="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
@@ -295,7 +295,7 @@
       </h2>
       <p class="text-sm text-muted">{t.t("premium.messageUpsellHint")}</p>
       <a
-        href="/premium"
+        href="/app/premium"
         class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
       >
         {t.t("profile.goPremium")}

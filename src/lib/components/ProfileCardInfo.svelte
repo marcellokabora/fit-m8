@@ -41,7 +41,7 @@
         onpointerdown={(e) => e.stopPropagation()}
         onclick={(e) => {
           e.stopPropagation();
-          goto(`/profile/${user.uid}`);
+          goto(`/app/profile/${user.uid}`);
         }}
         class="underline-offset-2 active:underline"
       >
