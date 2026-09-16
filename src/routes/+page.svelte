@@ -185,7 +185,7 @@
   style="--color-bg: {darkColors.bg}; --color-surface: {darkColors.surface}; --color-text: {darkColors.text}; --color-muted: {darkColors.muted}; --color-border: {darkColors.border};"
 >
   <div
-    class="relative flex min-h-dvh shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)]"
+    class="relative flex min-h-dvh shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)] md:justify-center md:gap-20"
   >
     <!-- Logo / Hero -->
     <div class="relative z-10 flex flex-col items-center gap-4 text-text">
@@ -247,15 +247,26 @@
 
   <!-- SEO content: real, crawlable copy below the hero fold -->
   <main class="relative z-10 flex w-full flex-col gap-10 px-6 py-12 text-text">
-    <section class="flex flex-col gap-6">
-      <h2 class="font-heading text-center text-xl font-bold text-primary">
+    <section class="flex flex-col gap-6 md:-mb-40">
+      <h2
+        class="font-heading text-center text-xl font-bold text-primary md:mb-10"
+      >
         {t.t("home.howItWorksTitle")}
       </h2>
-      <ol class="flex flex-col gap-8">
+      <ol class="mx-auto flex w-full max-w-3xl flex-col gap-8 md:gap-16">
         {#each STEPS as step, i}
-          <li class="flex flex-col gap-8">
-            <!-- info sits above the screenshot, plain like the original rows -->
-            <div class="mx-auto flex w-full max-w-60 items-start gap-4">
+          <li
+            class="flex flex-col gap-8 md:flex-row md:items-center md:justify-center md:gap-10 {i %
+              2 ===
+            1
+              ? 'md:flex-row-reverse'
+              : ''}"
+          >
+            <!-- stacked above the screenshot on mobile, side-by-side (so the row's height is just
+                 the image's, not text+image added together) on desktop -->
+            <div
+              class="mx-auto flex w-full max-w-60 items-start gap-4 md:mx-0 md:w-auto md:max-w-72"
+            >
               <span
                 class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
               >
@@ -271,10 +282,10 @@
               </div>
             </div>
 
-            <!-- tilted on purpose - just a glimpse of the screen, not the full UI - but kept
-                 centered on the same vertical line as every other step, only alternating tilt direction -->
+            <!-- tilted on purpose - just a glimpse of the screen, not the full UI - only alternating
+                 tilt direction, kept smaller on desktop since it now sits beside its text, not above it -->
             <div
-              class="mx-auto w-102 overflow-hidden shadow-xl mt-4 max-h-full mb-8 {i %
+              class="mx-auto w-102 shrink-0 overflow-hidden shadow-xl mt-4 max-h-full mb-8 md:mx-0 md:mt-0 md:mb-0 md:w-80 {i %
                 2 ===
               0
                 ? 'rotate-6'
@@ -284,7 +295,7 @@
                 src={step.screen}
                 alt=""
                 aria-hidden="true"
-                sizes="288px"
+                sizes="(min-width: 768px) 320px, 288px"
                 class="aspect-431/886 w-full object-cover object-top"
               />
             </div>
@@ -293,7 +304,7 @@
       </ol>
     </section>
 
-    <section class="flex flex-col gap-6">
+    <section class="flex flex-col gap-6 md:mt-50">
       <div class="flex flex-col gap-5">
         <h2
           class="font-heading text-center text-xl font-bold text-primary mt-4 -mb-2"
