@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import Icons from 'unplugin-icons/vite';
 import { enhancedImages } from '@sveltejs/enhanced-img';
+import { mdsvex } from 'mdsvex';
 
 export default defineConfig({
 	plugins: [
@@ -12,6 +13,11 @@ export default defineConfig({
 		Icons({ compiler: 'svelte' }),
 		enhancedImages(),
 		sveltekit({
+			// there's no svelte.config.js in this project - passing options directly here makes
+			// SvelteKit ignore one entirely (see @sveltejs/kit/vite's sveltekit() docs), so any
+			// svelte-config-shaped option (extensions/preprocess included) must live here instead
+			extensions: ['.svelte', '.md'],
+			preprocess: [mdsvex({ extensions: ['.md'] })],
 			compilerOptions: {
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true

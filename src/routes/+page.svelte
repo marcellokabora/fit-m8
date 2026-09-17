@@ -375,6 +375,7 @@
     </div>
 
     <nav class="flex flex-wrap justify-center gap-4 text-xs">
+      <a href="/blog" class="font-semibold text-primary">Blog</a>
       <a href="/terms" class="font-semibold text-primary">Terms of Service</a>
       <a href="/privacy" class="font-semibold text-primary">Privacy Policy</a>
       <a href="/pitch" class="font-semibold text-primary">Pitch Deck</a>
