@@ -30,16 +30,14 @@
   class="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8"
 >
   <span
-    class="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary md:size-16"
+    class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
   >
-    <ChartPie class="size-7 md:size-8" />
+    <ChartPie class="size-8" />
   </span>
-  <h2
-    class="text-2xl font-black text-text md:text-4xl text-balance text-center"
-  >
+  <h2 class="text-4xl font-black text-text text-balance text-center">
     A $2.1B+ addressable market built on sports enthusiast ARPU.
   </h2>
-  <div class="flex w-full flex-col gap-4 md:grid md:grid-cols-3 md:gap-6">
+  <div class="grid w-full grid-cols-3 gap-6">
     {#each MARKET_BREAKDOWN as tier}
       <div
         class="flex flex-col gap-2 rounded-2xl bg-surface p-5 text-center shadow-sm"
@@ -47,7 +45,7 @@
         <p class="text-xs font-semibold uppercase tracking-widest text-primary">
           {tier.tier}
         </p>
-        <p class="text-2xl font-black text-text md:text-3xl">{tier.value}</p>
+        <p class="text-3xl font-black text-text">{tier.value}</p>
         <p class="text-sm font-semibold text-text">{tier.label}</p>
         <p class="text-sm text-muted">{tier.detail}</p>
       </div>

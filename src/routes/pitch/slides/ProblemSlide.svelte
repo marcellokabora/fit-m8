@@ -18,31 +18,27 @@
 </script>
 
 <div
-  class="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-10 md:flex-row md:gap-16 print:max-w-2xl print:flex-col"
+  class="mx-auto flex w-full max-w-5xl flex-1 flex-row items-center justify-center gap-16 print:max-w-2xl print:flex-col"
 >
-  <div
-    class="flex flex-1 flex-col gap-6 text-center md:text-left print:text-center"
-  >
-    <h2 class="text-2xl font-black text-text md:text-4xl text-balance">
+  <div class="flex flex-1 flex-col gap-6 text-left print:text-center">
+    <h2 class="text-4xl font-black text-text text-balance">
       Existing social platforms fail active adults looking for sports partners.
     </h2>
-    <p class="text-base text-muted md:text-lg">
+    <p class="text-lg text-muted">
       Active adults (18–45) moving to new cities, picking up racket or group
       sports, or seeking gym accountability have nowhere dedicated to look for a
       partner.
     </p>
-    <div class="flex flex-col gap-3 md:gap-4">
+    <div class="flex flex-col gap-4">
       {#each PROBLEM_POINTS as point}
-        <div class="rounded-2xl bg-surface p-4 shadow-sm md:p-5">
-          <p class="font-bold text-text md:text-lg">{point.title}</p>
-          <p class="text-sm text-muted md:text-base">{point.desc}</p>
+        <div class="rounded-2xl bg-surface p-5 shadow-sm">
+          <p class="font-bold text-text text-lg">{point.title}</p>
+          <p class="text-base text-muted">{point.desc}</p>
         </div>
       {/each}
     </div>
   </div>
-  <div
-    class="relative hidden w-36 shrink-0 -rotate-3 md:block md:w-90 print:hidden"
-  >
+  <div class="relative w-90 shrink-0 -rotate-3 print:hidden">
     <img
       src={phoneImg}
       alt=""
@@ -53,9 +49,9 @@
       class="absolute inset-x-[4%] top-[3.5%] bottom-[3.5%] flex items-center justify-center"
     >
       <img
-        src="/logo/fit-m8-logo-green-white.png"
+        src="/logo/logo-zoom.png"
         alt="FIT-M8"
-        class="size-12 rounded-full object-cover md:size-50"
+        class="size-50 rounded-full object-cover"
       />
     </div>
   </div>

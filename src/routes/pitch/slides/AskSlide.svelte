@@ -23,7 +23,7 @@
   const MILESTONES = [
     "10,000 Active Monthly Users (MAU).",
     `8% conversion to the $${PREMIUM_PRICE_USD} Premium tier (~$8k/mo MRR).`,
-    "Validate the initial pilot city before expanding to the next metro.",
+    "Validate Barcelona as the pilot city before expanding to the next metro.",
   ] as const;
 </script>
 
@@ -31,13 +31,11 @@
   class="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-8"
 >
   <span
-    class="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary md:size-16"
+    class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
   >
-    <PiggyBank class="size-7 md:size-8" />
+    <PiggyBank class="size-8" />
   </span>
-  <h2
-    class="text-2xl font-black text-text md:text-4xl text-balance text-center"
-  >
+  <h2 class="text-4xl font-black text-text text-balance text-center">
     Raising €100K Pre-Seed to hit 10,000 MAU and validate core conversion
     mechanics.
   </h2>
@@ -59,15 +57,13 @@
     {/each}
   </div>
   <div
-    class="flex w-full flex-col gap-2 rounded-2xl bg-primary/10 p-4 text-center md:p-5"
+    class="flex w-full flex-col gap-2 rounded-2xl bg-primary/10 p-5 text-center"
   >
     <p class="text-xs font-semibold uppercase tracking-widest text-primary">
       18-month target milestones
     </p>
     {#each MILESTONES as milestone}
-      <p
-        class="flex items-center justify-center gap-2 text-sm text-text md:text-base"
-      >
+      <p class="flex items-center justify-center gap-2 text-base text-text">
         <Target class="size-4 shrink-0 text-primary" />
         {milestone}
       </p>

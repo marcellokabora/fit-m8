@@ -20,24 +20,22 @@
 </script>
 
 <div
-  class="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8 text-center md:flex-row md:gap-24 md:text-left"
+  class="mx-auto flex w-full max-w-4xl flex-1 flex-row items-center justify-center gap-24 text-left"
 >
-  <div class="flex flex-col items-center gap-4 md:items-start">
+  <div class="flex flex-col items-start gap-4">
     <p class="text-xs font-semibold uppercase tracking-widest text-primary">
       How FIT-M8 works
     </p>
     <span
-      class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary md:size-20"
+      class="flex size-20 items-center justify-center rounded-full bg-primary/10 text-primary"
     >
-      <Icon class="size-8 md:size-10" />
+      <Icon class="size-10" />
     </span>
-    <h2 class="text-2xl font-black text-text md:text-4xl">{title}</h2>
-    <p class="text-base text-muted md:text-lg">{desc}</p>
+    <h2 class="text-4xl font-black text-text">{title}</h2>
+    <p class="text-lg text-muted">{desc}</p>
   </div>
   <div
-    class="w-64 shrink-0 overflow-hidden rounded-2xl shadow-2xl md:w-96 {index %
-      2 ===
-    0
+    class="w-96 shrink-0 overflow-hidden rounded-2xl shadow-2xl {index % 2 === 0
       ? 'rotate-3'
       : '-rotate-3'}"
   >
@@ -45,7 +43,7 @@
       src={screen}
       alt=""
       aria-hidden="true"
-      sizes="(min-width: 768px) 384px, 256px"
+      sizes="384px"
       class="aspect-431/886 w-full object-cover object-top"
     />
   </div>

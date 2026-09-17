@@ -10,7 +10,7 @@
     {
       icon: TrendingUp,
       role: "Head of Growth",
-      desc: "Hyper-local consumer acquisition and community building for the pilot city launch.",
+      desc: "Hyper-local consumer acquisition and community building for the Barcelona launch.",
     },
     {
       icon: Users,
@@ -50,27 +50,23 @@
   <p class="text-xs font-semibold uppercase tracking-widest text-primary">
     Team & execution
   </p>
-  <h2
-    class="text-2xl font-black text-text md:text-4xl text-balance text-center"
-  >
+  <h2 class="text-4xl font-black text-text text-balance text-center">
     A solo technical founder who has already built and shipped the product.
   </h2>
   <div
-    class="flex w-full flex-col items-center gap-5 rounded-3xl border border-primary/20 bg-linear-to-br from-primary/10 via-surface to-surface p-6 text-center shadow-sm md:flex-row md:gap-8 md:p-8 md:text-left"
+    class="flex w-full flex-row items-center gap-8 rounded-3xl border border-primary/20 bg-linear-to-br from-primary/10 via-surface to-surface p-8 text-left shadow-sm"
   >
     <img
       src={FOUNDER.photo}
       alt={FOUNDER.name}
-      class="size-28 shrink-0 rounded-full object-cover ring-4 ring-primary/30 md:size-36"
+      class="size-36 shrink-0 rounded-full object-cover ring-4 ring-primary/30"
     />
-    <div class="flex flex-col items-center gap-2 md:items-start">
-      <p class="font-bold text-text md:text-xl">{FOUNDER.name}</p>
-      <p
-        class="text-xs font-semibold uppercase tracking-widest text-primary md:text-sm"
-      >
+    <div class="flex flex-col items-start gap-2">
+      <p class="font-bold text-text text-xl">{FOUNDER.name}</p>
+      <p class="text-sm font-semibold uppercase tracking-widest text-primary">
         {FOUNDER.role}
       </p>
-      <p class="text-sm text-muted md:text-base text-balance">
+      <p class="text-base text-muted text-balance">
         {FOUNDER.desc}
       </p>
       <div class="flex gap-4 pt-1">
@@ -92,7 +88,7 @@
     <p class="text-xs font-semibold uppercase tracking-widest text-primary">
       Key hires planned with this raise
     </p>
-    <div class="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="grid w-full grid-cols-2 gap-4">
       {#each NEXT_HIRES as hire}
         <div
           class="flex items-start gap-3 rounded-2xl bg-surface p-4 text-left shadow-sm"

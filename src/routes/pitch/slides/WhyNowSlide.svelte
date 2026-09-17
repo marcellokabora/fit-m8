@@ -26,24 +26,24 @@
   <p class="text-xs font-semibold uppercase tracking-widest text-primary">
     Why now?
   </p>
-  <h2 class="text-2xl font-black text-text md:text-4xl text-balance">
+  <h2 class="text-4xl font-black text-text text-balance">
     A confluence of social fitness trends and sports booms creates an immediate
     market window.
   </h2>
-  <div class="grid w-full grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
+  <div class="grid w-full grid-cols-3 gap-6">
     {#each WHY_NOW as driver}
       <div
         class="flex flex-col items-center gap-3 rounded-2xl bg-surface p-6 text-center shadow-sm"
       >
         <span
-          class="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary md:size-16"
+          class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
         >
-          <driver.icon class="size-7 md:size-8" />
+          <driver.icon class="size-8" />
         </span>
-        <p class="font-bold text-text md:text-lg text-balance">
+        <p class="font-bold text-text text-lg text-balance">
           {driver.title}
         </p>
-        <p class="text-sm text-muted md:text-base">{driver.desc}</p>
+        <p class="text-base text-muted">{driver.desc}</p>
       </div>
     {/each}
   </div>

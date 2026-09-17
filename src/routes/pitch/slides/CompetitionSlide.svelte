@@ -89,56 +89,14 @@
   <p class="text-xs font-semibold uppercase tracking-widest text-primary">
     Competitive landscape
   </p>
-  <h2
-    class="text-2xl font-black text-text md:text-4xl text-balance text-center"
-  >
-    FIT-M8 captures the unserved space between romantic dating apps, passive
-    fitness trackers, and rigid group organizers.
+  <h2 class="text-4xl font-black text-text text-balance text-center">
+    FIT-M8 fills the gap between dating apps, fitness trackers, and group
+    organizers.
   </h2>
-
-  <!-- Mobile: stacked cards, one per dimension -->
-  <div class="flex w-full flex-col gap-3 md:hidden print:hidden">
-    {#each COMPETITION_ROWS as row}
-      <div class="rounded-2xl bg-surface p-4 shadow-sm">
-        <p
-          class="mb-2 text-xs font-semibold uppercase tracking-widest text-primary"
-        >
-          {row.dimension}
-        </p>
-        <div class="flex flex-col gap-1.5 text-sm">
-          {#each row.cells as cell, i}
-            <div class="flex items-center justify-between gap-3">
-              <span class="flex items-center gap-1.5 text-muted">
-                {#if COMPETITOR_ICONS[i]}
-                  {@const Icon = COMPETITOR_ICONS[i]}
-                  <Icon class="size-3.5 shrink-0" />
-                {/if}
-                {COMPETITORS[i]}
-              </span>
-              <span
-                class="flex items-center gap-1 font-semibold {i === 3
-                  ? 'text-primary'
-                  : 'text-text'}"
-              >
-                {#if cell.support === "yes"}
-                  <CircleCheck class="size-4 text-primary" />
-                {:else if cell.support === "no"}
-                  <CircleX class="size-4 text-muted" />
-                {:else if cell.support === "partial"}
-                  <CircleAlert class="size-4 text-muted" />
-                {/if}
-                {cell.label}
-              </span>
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/each}
-  </div>
 
   <!-- Desktop/print: full table -->
   <table
-    class="hidden w-full border-collapse overflow-hidden rounded-2xl bg-surface text-sm shadow-sm md:table print:table"
+    class="w-full border-collapse overflow-hidden rounded-2xl bg-surface text-sm shadow-sm"
   >
     <thead>
       <tr class="border-b border-border">

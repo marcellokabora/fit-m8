@@ -225,7 +225,7 @@
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
+        class="flex w-full max-w-xs mx-auto items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
       >
         {#if authState === "checking"}
           <span
@@ -265,7 +265,7 @@
             <!-- stacked above the screenshot on mobile, side-by-side (so the row's height is just
                  the image's, not text+image added together) on desktop -->
             <div
-              class="mx-auto flex w-full max-w-60 items-start gap-4 md:mx-0 md:w-auto md:max-w-72"
+              class="mx-auto flex w-full max-w-65 items-start gap-4 md:mx-0 md:w-auto md:scale-120"
             >
               <span
                 class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"

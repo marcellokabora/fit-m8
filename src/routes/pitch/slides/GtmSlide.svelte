@@ -5,7 +5,7 @@
     {
       icon: Handshake,
       title: "Anchor partnerships",
-      desc: "Partner directly with local Padel clubs, beach volleyball hubs, and gym chains for exclusive member perks.",
+      desc: "Partner directly with Barcelona's Padel clubs, beach volleyball hubs, and gym chains for exclusive member perks.",
     },
     {
       icon: Sparkles,
@@ -15,7 +15,7 @@
     {
       icon: Rocket,
       title: "Grassroots organic acquisition",
-      desc: "Geo-targeted campaigns around major sport hotspots — beach volley hubs, municipal tennis courts.",
+      desc: "Geo-targeted campaigns around Barcelona's sport hotspots — Barceloneta beach volley courts, municipal tennis clubs.",
     },
   ] as const;
 
@@ -32,30 +32,29 @@
   <p class="text-xs font-semibold uppercase tracking-widest text-primary">
     Go-to-market
   </p>
-  <h2
-    class="text-2xl font-black text-text md:text-4xl text-balance text-center"
-  >
-    Hyper-local city rollout playbook targeting high-density sports hubs.
+  <h2 class="text-4xl font-black text-text text-balance text-center">
+    Hyper-local rollout playbook starting in Barcelona's high-density sports
+    hubs.
   </h2>
-  <div class="grid w-full grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
+  <div class="grid w-full grid-cols-3 gap-6">
     {#each GTM_PILLARS as pillar}
       <div
         class="flex flex-col items-center gap-3 rounded-2xl bg-surface p-6 text-center shadow-sm"
       >
         <span
-          class="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary md:size-16"
+          class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
         >
-          <pillar.icon class="size-7 md:size-8" />
+          <pillar.icon class="size-8" />
         </span>
-        <p class="font-bold text-text md:text-lg">{pillar.title}</p>
-        <p class="text-sm text-muted md:text-base">{pillar.desc}</p>
+        <p class="font-bold text-text text-lg">{pillar.title}</p>
+        <p class="text-base text-muted">{pillar.desc}</p>
       </div>
     {/each}
   </div>
-  <div class="flex w-full flex-col gap-3 sm:flex-row sm:gap-6">
+  <div class="flex w-full flex-row gap-6">
     {#each GTM_METRICS as metric}
       <div class="flex-1 rounded-2xl bg-primary/10 p-4 text-center">
-        <p class="text-xl font-black text-primary md:text-2xl">
+        <p class="text-2xl font-black text-primary">
           {metric.value}
         </p>
         <p class="text-xs font-semibold uppercase tracking-widest text-muted">

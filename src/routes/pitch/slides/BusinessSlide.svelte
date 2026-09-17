@@ -55,18 +55,18 @@
 <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8">
   <div class="flex flex-col items-center gap-2 text-center">
     <span
-      class="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary md:size-16"
+      class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary"
     >
-      <Crown class="size-7 md:size-8" />
+      <Crown class="size-8" />
     </span>
-    <h2 class="text-2xl font-black text-text md:text-4xl text-balance">
+    <h2 class="text-4xl font-black text-text text-balance">
       Freemium core driving high-margin subscription and transactional upside.
     </h2>
-    <p class="text-3xl font-black text-primary md:text-5xl">
+    <p class="text-5xl font-black text-primary">
       ${PREMIUM_PRICE_USD} / month
     </p>
   </div>
-  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4">
+  <div class="grid grid-cols-2 gap-4">
     {#each PREMIUM_FEATURES as feature}
       <div class="flex items-start gap-4 rounded-2xl bg-surface p-4 shadow-sm">
         <span
@@ -81,11 +81,11 @@
       </div>
     {/each}
   </div>
-  <div class="flex flex-col gap-3 rounded-2xl bg-surface p-5 md:p-6">
+  <div class="flex flex-col gap-3 rounded-2xl bg-surface p-6">
     <p class="text-xs font-semibold uppercase tracking-widest text-primary">
       Future platform upsides — Phase 2
     </p>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="grid grid-cols-2 gap-4">
       {#each PHASE2_UPSIDES as upside}
         <div class="flex items-start gap-3">
           <span
@@ -94,7 +94,7 @@
             <upside.icon class="size-4" />
           </span>
           <div>
-            <p class="text-sm font-bold text-text md:text-base">
+            <p class="text-base font-bold text-text">
               {upside.title}
             </p>
             <p class="text-sm text-muted">{upside.desc}</p>

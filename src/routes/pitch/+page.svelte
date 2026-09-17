@@ -219,7 +219,7 @@
     {#if slide}
       {#key current}
         <div
-          class="hide-scrollbar absolute inset-0 flex flex-col overflow-y-auto px-6 py-10 md:px-20 md:py-16"
+          class="hide-scrollbar absolute inset-0 flex flex-col overflow-y-auto px-20 py-16"
           in:fly|local={{ x: direction * 48, duration: 220, easing: quintOut }}
           out:fly|local={{
             x: direction * -48,
@@ -237,7 +237,7 @@
   <div class="hidden print:block">
     {#each visibleSlides as printSlide, i (printSlide.key)}
       <div
-        class="print-slide flex flex-col overflow-hidden px-6 py-10 md:px-20 md:py-16 {i <
+        class="print-slide flex flex-col overflow-hidden px-20 py-16 {i <
         slideCount - 1
           ? 'break-after-page'
           : ''}"
@@ -249,14 +249,14 @@
 
   <!-- Bottom pagination -->
   <div
-    class="relative z-10 flex shrink-0 items-center justify-center gap-4 px-6 pb-8 pt-4 md:gap-6 md:pb-10 md:pt-6 print:hidden"
+    class="relative z-10 flex shrink-0 items-center justify-center gap-6 px-6 pb-10 pt-6 print:hidden"
   >
     <button
       type="button"
       onclick={prev}
       disabled={current === 0}
       aria-label="Previous slide"
-      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 md:size-10"
+      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30"
     >
       <ChevronLeft class="size-5" />
     </button>
@@ -278,7 +278,7 @@
       onclick={next}
       disabled={current === slideCount - 1}
       aria-label="Next slide"
-      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 md:size-10"
+      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30"
     >
       <ChevronRight class="size-5" />
     </button>
@@ -294,11 +294,15 @@
   }
 
   .print-slide {
+    width: 100vw;
     height: 100vh;
+    box-sizing: border-box;
   }
 
+  /* Real 16:9 widescreen slide dimensions (same as PowerPoint's widescreen size) instead of
+     a rotated A4/Letter page, so the export reads as slides, not printed document pages. */
   @page {
-    size: landscape;
+    size: 13.333in 7.5in;
     margin: 0;
   }
 </style>
