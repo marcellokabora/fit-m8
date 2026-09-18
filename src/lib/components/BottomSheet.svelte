@@ -83,7 +83,7 @@
 
 {#if open}
   <div
-    class="fixed inset-0 z-50 mx-auto flex w-full items-end bg-black/60 backdrop-blur-sm md:max-w-md"
+    class="fixed inset-0 z-50 mx-auto flex w-full items-end max-sm:bg-black/60 backdrop-blur-sm md:max-w-md"
     transition:fade={{ duration: 150 }}
     role="button"
     tabindex="0"

@@ -251,7 +251,7 @@
   <div
     class="relative z-10 flex shrink-0 items-center justify-center gap-6 px-6 pb-10 pt-6 print:hidden"
   >
-    <button
+    <!-- <button
       type="button"
       onclick={prev}
       disabled={current === 0}
@@ -259,7 +259,7 @@
       class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30"
     >
       <ChevronLeft class="size-5" />
-    </button>
+    </button> -->
     <div class="flex items-center gap-2">
       {#each Array(slideCount) as _, i}
         <button
@@ -273,7 +273,7 @@
         ></button>
       {/each}
     </div>
-    <button
+    <!-- <button
       type="button"
       onclick={next}
       disabled={current === slideCount - 1}
@@ -281,7 +281,7 @@
       class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30"
     >
       <ChevronRight class="size-5" />
-    </button>
+    </button> -->
   </div>
 </div>
 
