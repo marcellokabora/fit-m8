@@ -17,7 +17,7 @@
   "maskableIconUrl": "https://fit-m8.app/icons/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
-    "path": "C:\\Users\\marce\\Documents\\GitHub\\fit-m8\\android.keystore",
+    "path": "C:\\Users\\marce\\Documents\\GitHub\\fit-m8\\android\\android.keystore",
     "alias": "android"
   },
   "appVersionName": "5",

@@ -49,7 +49,7 @@ async function main() {
     // Favicon (rendered larger than displayed size for crisp downscaling by the browser).
     await render(96, path.join(ROOT, "static", "favicon.png"));
 
-    const androidResDir = path.join(ROOT, "app", "src", "main", "res");
+    const androidResDir = path.join(ROOT, "android", "app", "src", "main", "res");
     if (!fs.existsSync(androidResDir)) return;
 
     const androidSizes = [

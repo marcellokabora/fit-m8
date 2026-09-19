@@ -14,8 +14,10 @@ open decisions are called out where they block a step.
   (`~/.bubblewrap/jdk`) was 32-bit and couldn't build — replaced with a 64-bit Temurin 17
   install copied to `C:\jdk-17-temurin` (no spaces in path — Bubblewrap doesn't quote the
   java.exe path when shelling out to apksigner) and pointed at via `~/.bubblewrap/config.json`
-  `jdkPath`. Keystore lives at `android.keystore` in the repo root (gitignored) with a backup
-  in `~/keystores/fit-m8/` and Google Drive.
+  `jdkPath`. Keystore lives at `android/android.keystore` (gitignored) with a backup
+  in `~/keystores/fit-m8/` and Google Drive. All Bubblewrap/Gradle files (twa-manifest.json,
+  keystore, app/, gradlew, build outputs) live under `android/` - run `bubblewrap`/`gradlew`
+  commands from inside that folder, not the repo root.
 
 ## Phase A — Android project via Bubblewrap
 
@@ -27,13 +29,13 @@ full-screen (no browser chrome), backed by Chrome. No app logic gets rewritten.
 - [x] A3. `bubblewrap init` completed — package `app.fit_m8.twa`, keystore created and
       backed up.
 - [x] A4. `bubblewrap build` completed — `app-release-bundle.aab` and
-      `app-release-signed.apk` are in the repo root (gitignored, not committed).
+      `app-release-signed.apk` are in `android/` (gitignored, not committed).
 - [x] A5. 2026-09-14: site rebranded (green theme) after the last signed build (Aug 28,
       versionCode 3). Ran `bubblewrap update` twice (picked up new icon; also corrected
       `twa-manifest.json` theme/background colors that `update` didn't auto-refresh) — now at
       versionCode 5, Android project regenerated with the new green branding. 2026-09-15: ran
       `bubblewrap build` — fresh signed `app-release-bundle.aab` / `app-release-signed.apk`
-      (versionCode 5, green branding) now in the repo root, ready to upload to Play Console.
+      (versionCode 5, green branding) now in `android/`, ready to upload to Play Console.
 
 (Alternative if you'd rather avoid the CLI/Android SDK locally: https://www.pwabuilder.com/ →
 enter the site URL → "Package for Stores" → Android → download a ready-made TWA project/AAB.)
@@ -99,11 +101,11 @@ placeholder + `firebase.json` hosting `ignore` exception for the dotfile-prefixe
     Read our Privacy Policy: https://fit-m8.app/privacy
     ```
 
-- [x] D2. Graphics (2026-09-14, in `store-assets/`):
+- [x] D2. Graphics (2026-09-14, in `android/store-assets/`):
   - App icon 512×512 → reuse `static/icons/icon-512.png`.
-  - Feature graphic 1024×500 → `store-assets/feature-graphic.png` (green brand gradient +
+  - Feature graphic 1024×500 → `android/store-assets/feature-graphic.png` (green brand gradient +
     `static/logo/fit-m8-logo-green-white.png` mark/wordmark, chroma-keyed onto the gradient).
-  - Phone screenshots → `store-assets/screenshots/` (8 images from `src/lib/assets/screens/`,
+  - Phone screenshots → `android/store-assets/screenshots/` (8 images from `src/lib/assets/screens/`,
     reprocessed to strip alpha and pad width so height:width ratio is ≤2:1, per Play's
     screenshot spec).
 - [ ] D3. Questionnaires: Content rating, Data Safety, Target audience, Ads declaration,
