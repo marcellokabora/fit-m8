@@ -4,9 +4,7 @@
     Users,
     UserShield,
     RotateCcw,
-    CircleQuestionMark,
     Dumbbell,
-    Zap,
     Check,
     SlidersHorizontal,
   } from "@lucide/svelte";

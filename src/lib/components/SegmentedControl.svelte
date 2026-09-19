@@ -46,7 +46,7 @@
       aria-pressed={value === option.value}
       class="relative z-10 flex-1 font-bold transition-colors {size === 'lg'
         ? 'rounded-full py-4 text-base'
-        : 'rounded-full px-2 py-1.5 text-sm'} {value === option.value
+        : 'rounded-full px-6 pl-4 py-1.5 text-sm'} {value === option.value
         ? 'text-white'
         : 'text-muted'}"
     >

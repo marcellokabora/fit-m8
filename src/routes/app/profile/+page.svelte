@@ -17,16 +17,13 @@
   import BottomSheet from "$lib/components/BottomSheet.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import PhotoGallery from "$lib/components/PhotoGallery.svelte";
-  import LanguagePicker from "$lib/components/LanguagePicker.svelte";
   import SegmentedControl from "$lib/components/SegmentedControl.svelte";
   import Toggle from "$lib/components/Toggle.svelte";
   import {
     ChevronDown,
     CircleQuestionMark,
     Crown,
-    FlaskConical,
     GripVertical,
-    List,
     ListOrdered,
     Pencil,
     Plus,
@@ -39,6 +36,7 @@
   import { slide } from "svelte/transition";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import { detectSocialPlatform } from "$lib/social";
+  import { generateFakeEvents } from "$lib/fakeEvents";
 
   let t = $derived(createTranslator($activeLanguage));
   let activities = $state<UserActivity[]>($userProfile?.activities ?? []);
@@ -71,6 +69,24 @@
   );
 
   let photos = $derived($userProfile?.photos ?? []);
+
+  // only seeded demo accounts get fabricated history - real users see a genuine empty state
+  let fakeEvents = $derived(
+    $userProfile?.uid.startsWith("fake_")
+      ? generateFakeEvents($userProfile)
+      : [],
+  );
+
+  function formatEventDate(date: Date): string {
+    return new Intl.DateTimeFormat($activeLanguage, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  }
+
+  // Sports/Events tab switching, click-only (segmented control)
+  let activeTab = $state<"sports" | "events">("sports");
 
   $effect(() => {
     activities = $userProfile?.activities ?? [];
@@ -224,19 +240,6 @@
     {/snippet}
   </PhotoGallery>
 
-  {#if $isAdmin}
-    <div class="mx-5 mb-6 mt-6">
-      <button
-        type="button"
-        onclick={() => (adminSheetOpen = true)}
-        class="flex w-full items-center justify-center gap-2 rounded-2xl bg-surface py-3 text-sm font-bold text-primary shadow-sm active:scale-95"
-      >
-        <ShieldUser class="size-4" />
-        Admin
-      </button>
-    </div>
-  {/if}
-
   <BottomSheet
     bind:open={adminSheetOpen}
     onClose={() => (adminSheetOpen = false)}
@@ -367,134 +370,195 @@
   </BottomSheet>
 
   <!-- Activities -->
-  <div id="activities" class="scroll-mt-20 px-5 {$isAdmin ? '' : 'pt-6'}">
-    <div class="mb-3 flex items-center gap-2">
-      <h3 class="text-sm font-bold uppercase tracking-wide text-muted">
-        {t.t("common.mySports")}
-      </h3>
-      <button
-        type="button"
-        onclick={() => (orderInfoOpen = true)}
-        aria-label={t.t("sports.orderInfoLabel")}
-        class="flex size-7 items-center justify-center rounded-full bg-surface text-muted shadow-sm active:scale-95"
-      >
-        <CircleQuestionMark class="size-4" />
-      </button>
-    </div>
-    {#if activities.length === 0}
-      <p class="mb-3 text-sm text-muted">
-        {t.t("common.noActivities")}
-      </p>
-    {:else}
-      <div class="mb-3 flex flex-col gap-3">
-        {#each activities as act, i (act.id)}
-          {@const expanded = expandedActivityId === act.id}
-          {@const dragging = dragIndex === i}
-          <div
-            bind:this={rowEls[i]}
-            class="rounded-2xl bg-surface shadow-sm {dragging
-              ? 'relative z-20 shadow-lg'
-              : ''}"
-            style={dragging
-              ? `transform: translateY(${dragOffsetY}px)`
-              : undefined}
+  <div id="activities" class="scroll-mt-20 mt-4 px-5 {$isAdmin ? '' : 'pt-6'}">
+    <div class="mb-3 flex items-center justify-between gap-2">
+      <SegmentedControl
+        options={[
+          { value: "sports", label: t.t("profile.tabActivities") },
+          { value: "events", label: t.t("profile.tabEvents") },
+        ]}
+        value={activeTab}
+        ariaLabel={t.t("profile.tabActivities")}
+        onchange={(v) => (activeTab = v)}
+      />
+      <div class="flex items-center justify-between gap-4">
+        {#if $isAdmin}
+          <button
+            type="button"
+            onclick={() => (adminSheetOpen = true)}
+            class="flex w-full px-4 items-center justify-center gap-2 rounded-full bg-surface py-3 text-sm font-bold text-primary shadow-sm active:scale-95"
           >
+            <ShieldUser class="size-4" />
+            Admin
+          </button>
+        {/if}
+        <button
+          type="button"
+          onclick={() => (orderInfoOpen = true)}
+          aria-label={t.t("sports.orderInfoLabel")}
+          class="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface text-muted shadow-sm active:scale-95"
+        >
+          <CircleQuestionMark class="size-4" />
+        </button>
+      </div>
+    </div>
+
+    {#if activeTab === "sports"}
+      {#if activities.length === 0}
+        <p class="mb-3 text-sm text-muted">
+          {t.t("common.noActivities")}
+        </p>
+      {:else}
+        <div class="mb-3 flex flex-col gap-3">
+          {#each activities as act, i (act.id)}
+            {@const expanded = expandedActivityId === act.id}
+            {@const dragging = dragIndex === i}
             <div
-              role="button"
-              tabindex="0"
-              onclick={() => toggleExpandActivity(act.id)}
-              onkeydown={(e) =>
-                (e.key === "Enter" || e.key === " ") &&
-                toggleExpandActivity(act.id)}
-              class="flex items-center gap-4 p-4"
+              bind:this={rowEls[i]}
+              class="rounded-2xl bg-surface shadow-sm {dragging
+                ? 'relative z-20 shadow-lg'
+                : ''}"
+              style={dragging
+                ? `transform: translateY(${dragOffsetY}px)`
+                : undefined}
             >
-              <button
-                type="button"
-                aria-label={t.t("common.dragToReorder")}
-                onpointerdown={(e) => startDrag(e, i)}
-                onpointermove={onDragMove}
-                onpointerup={endDrag}
-                onpointercancel={endDrag}
-                onclick={(e) => e.stopPropagation()}
-                class="touch-none text-muted active:cursor-grabbing"
+              <div
+                role="button"
+                tabindex="0"
+                onclick={() => toggleExpandActivity(act.id)}
+                onkeydown={(e) =>
+                  (e.key === "Enter" || e.key === " ") &&
+                  toggleExpandActivity(act.id)}
+                class="flex items-center gap-4 p-4"
               >
-                <GripVertical class="size-5" />
-              </button>
-              <span
-                class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
-              >
-                <ActivityIcon id={act.id} class="size-5" />
-              </span>
-              <div class="flex-1">
-                <p class="font-bold text-text">{t.activity(act.id)}</p>
-                <p class="text-sm text-muted">
-                  {#if act.format !== "all"}{t.format(act.format)}
-                    <span class="px-1">·</span>
-                  {/if}{t.skill(act.level)}
-                </p>
+                <button
+                  type="button"
+                  aria-label={t.t("common.dragToReorder")}
+                  onpointerdown={(e) => startDrag(e, i)}
+                  onpointermove={onDragMove}
+                  onpointerup={endDrag}
+                  onpointercancel={endDrag}
+                  onclick={(e) => e.stopPropagation()}
+                  class="touch-none text-muted active:cursor-grabbing"
+                >
+                  <GripVertical class="size-5" />
+                </button>
+                <span
+                  class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+                >
+                  <ActivityIcon id={act.id} class="size-5" />
+                </span>
+                <div class="flex-1">
+                  <p class="font-bold text-text">{t.activity(act.id)}</p>
+                  <p class="text-sm text-muted">
+                    {#if act.format !== "all"}{t.format(act.format)}
+                      <span class="px-1">·</span>
+                    {/if}{t.skill(act.level)}
+                  </p>
+                </div>
+                {#if expanded}
+                  <button
+                    onclick={(e) => {
+                      e.stopPropagation();
+                      removeSport(act.id);
+                    }}
+                    aria-label={`${t.t("common.removeSport")} ${t.activity(act.id)}`}
+                    class="flex size-8 items-center justify-center rounded-full bg-error/10 text-error active:scale-95"
+                  >
+                    <Trash2 class="size-4" />
+                  </button>
+                {:else}
+                  <ChevronDown class="size-5 text-muted" />
+                {/if}
               </div>
               {#if expanded}
-                <button
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    removeSport(act.id);
-                  }}
-                  aria-label={`${t.t("common.removeSport")} ${t.activity(act.id)}`}
-                  class="flex size-8 items-center justify-center rounded-full bg-error/10 text-error active:scale-95"
-                >
-                  <Trash2 class="size-4" />
-                </button>
-              {:else}
-                <ChevronDown class="size-5 text-muted" />
-              {/if}
-            </div>
-            {#if expanded}
-              <div class="px-4 pb-4" transition:slide={{ duration: 200 }}>
-                <p
-                  class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-                >
-                  {t.t("common.format")}
-                </p>
-                <div class="mb-3">
+                <div class="px-4 pb-4" transition:slide={{ duration: 200 }}>
+                  <p
+                    class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
+                  >
+                    {t.t("common.format")}
+                  </p>
+                  <div class="mb-3">
+                    <SegmentedControl
+                      options={formatOptions}
+                      value={act.format}
+                      ariaLabel={t.t("common.format")}
+                      onchange={(value) => updateActivityFormat(act.id, value)}
+                    />
+                  </div>
+                  <p
+                    class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
+                  >
+                    {t.t("common.level")}
+                  </p>
                   <SegmentedControl
-                    options={formatOptions}
-                    value={act.format}
-                    ariaLabel={t.t("common.format")}
-                    onchange={(value) => updateActivityFormat(act.id, value)}
+                    options={skillOptions}
+                    value={act.level}
+                    ariaLabel={t.t("common.level")}
+                    onchange={(value) => updateActivityLevel(act.id, value)}
                   />
                 </div>
-                <p
-                  class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted"
-                >
-                  {t.t("common.level")}
-                </p>
-                <SegmentedControl
-                  options={skillOptions}
-                  value={act.level}
-                  ariaLabel={t.t("common.level")}
-                  onchange={(value) => updateActivityLevel(act.id, value)}
-                />
-              </div>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {/if}
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {/if}
 
-    {#if availableActivities.length === 0}
-      <p class="text-sm text-muted">{t.t("profile.allSports")}</p>
-    {:else if remainingSportSlots === 0}
-      <p class="text-sm text-muted">
-        {t.t("sports.maxReached", { max: maxSports })}
+      {#if availableActivities.length === 0}
+        <p class="text-sm text-muted">{t.t("profile.allSports")}</p>
+      {:else if remainingSportSlots === 0}
+        <p class="text-sm text-muted">
+          {t.t("sports.maxReached", { max: maxSports })}
+        </p>
+      {:else}
+        <a
+          href="/app/profile/add-sport"
+          class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
+        >
+          <Plus class="size-4" />
+          {t.t("profile.addSportButton")}
+        </a>
+      {/if}
+    {:else if fakeEvents.length === 0}
+      <p class="mb-3 text-sm text-muted text-center">
+        {t.t("profile.noEvents")}
       </p>
-    {:else}
       <a
-        href="/app/profile/add-sport"
+        href="/app/explore"
         class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
         <Plus class="size-4" />
-        {t.t("profile.addSportButton")}
+        {t.t("profile.createEventCta")}
       </a>
+    {:else}
+      <div class="flex flex-col gap-3">
+        {#each fakeEvents as event (event.id)}
+          <div
+            class="flex items-center gap-4 rounded-2xl border bg-surface p-4 shadow-sm {event.role ===
+            'hosted'
+              ? 'border-2 border-primary/40'
+              : 'border-transparent'}"
+          >
+            <span
+              class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+            >
+              <ActivityIcon id={event.activityId} class="size-5" />
+            </span>
+            <div class="flex-1">
+              <p class="font-bold text-text">
+                {t.activity(event.activityId)}
+              </p>
+              <p class="text-sm text-muted">
+                {event.role === "hosted"
+                  ? t.t("profile.eventHosted")
+                  : t.t("profile.eventJoined")}
+                <span class="px-1">·</span>
+                {formatEventDate(event.date)}
+              </p>
+            </div>
+          </div>
+        {/each}
+      </div>
     {/if}
   </div>
 

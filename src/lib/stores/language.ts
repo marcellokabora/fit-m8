@@ -469,7 +469,8 @@ const MESSAGES = {
         'profile.tabEvents': 'Events',
         'profile.noEvents': 'No events yet',
         'profile.eventHosted': 'Hosted',
-        'profile.eventJoined': 'Joined'
+        'profile.eventJoined': 'Joined',
+        'profile.createEventCta': 'Create an event'
     },
     es: {
         'meta.description': 'Conecta con personas para hacer actividades cerca de ti', 'language.en': 'Inglés', 'language.es': 'Español', 'language.it': 'Italiano',
@@ -733,7 +734,8 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'profile.tabEvents': 'Eventos',
         'profile.noEvents': 'Aún no hay eventos',
         'profile.eventHosted': 'Organizado',
-        'profile.eventJoined': 'Unido'
+        'profile.eventJoined': 'Unido',
+        'profile.createEventCta': 'Crear un evento'
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
@@ -976,7 +978,8 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'profile.tabEvents': 'Eventi',
         'profile.noEvents': 'Ancora nessun evento',
         'profile.eventHosted': 'Organizzato',
-        'profile.eventJoined': 'Partecipato'
+        'profile.eventJoined': 'Partecipato',
+        'profile.createEventCta': 'Crea un evento'
     }
 };
 

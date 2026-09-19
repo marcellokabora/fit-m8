@@ -39,6 +39,7 @@
     Flag,
     Bot,
     X,
+    CircleQuestionMark,
   } from "@lucide/svelte";
   import {
     activeLanguage,
@@ -113,38 +114,8 @@
     }).format(date);
   }
 
-  // Sports/Events tab switching, driven by the segmented control or a horizontal swipe
+  // Sports/Events tab switching, click-only (segmented control)
   let activeTab = $state<"sports" | "events">("sports");
-  let tabDragX = $state(0);
-  let tabDragging = $state(false);
-  let tabStartX = $state(0);
-  const TAB_SWIPE_THRESHOLD = 60;
-
-  function onTabsPointerDown(e: PointerEvent) {
-    tabDragging = true;
-    tabStartX = e.clientX;
-    tabDragX = 0;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  }
-
-  function onTabsPointerMove(e: PointerEvent) {
-    if (!tabDragging) return;
-    const delta = e.clientX - tabStartX;
-    // Rubber-band past the edges instead of revealing an empty third panel
-    if (activeTab === "sports" && delta > 0) tabDragX = delta / 3;
-    else if (activeTab === "events" && delta < 0) tabDragX = delta / 3;
-    else tabDragX = delta;
-  }
-
-  function onTabsPointerUp() {
-    if (!tabDragging) return;
-    tabDragging = false;
-    if (tabDragX <= -TAB_SWIPE_THRESHOLD && activeTab === "sports")
-      activeTab = "events";
-    else if (tabDragX >= TAB_SWIPE_THRESHOLD && activeTab === "events")
-      activeTab = "sports";
-    tabDragX = 0;
-  }
 
   // Buttons only make sense for someone else's profile you haven't already matched with
   let showActions = $derived(
@@ -491,7 +462,7 @@
       </div>
     {/if}
 
-    <div class="px-5 {profile.socialLinks?.length ? '' : 'pt-4'} pb-3">
+    <div class="px-5 pb-3 flex item-center item-center mt-4 justify-between">
       <SegmentedControl
         options={[
           { value: "sports", label: t.t("profile.tabActivities") },
@@ -501,104 +472,97 @@
         ariaLabel={t.t("profile.tabActivities")}
         onchange={(v) => (activeTab = v)}
       />
-    </div>
-
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
-      class="overflow-hidden"
-      style="touch-action: pan-y;"
-      onpointerdown={onTabsPointerDown}
-      onpointermove={onTabsPointerMove}
-      onpointerup={onTabsPointerUp}
-      onpointercancel={onTabsPointerUp}
-    >
-      <div
-        class="flex w-[200%]"
-        style="transform: translateX(calc({activeTab === 'sports'
-          ? '0%'
-          : '-50%'} + {tabDragX}px)); transition: {tabDragging
-          ? 'none'
-          : 'transform 0.3s ease-out'};"
+      <button
+        type="button"
+        aria-label={t.t("sports.orderInfoLabel")}
+        class="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface text-muted shadow-sm active:scale-95"
       >
-        <div class="w-1/2 shrink-0 px-5">
-          {#if (profile.activities?.length ?? 0) === 0}
-            <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
-          {:else}
-            <div class="flex flex-col gap-3">
-              {#each sortedActivities as act (act.id)}
-                <div
-                  class="flex items-center gap-4 rounded-2xl border p-4 shadow-sm {profile.isTrainer &&
-                  act.level === 'expert'
-                    ? 'border-primary/40 bg-primary/5'
-                    : 'border-transparent bg-surface'}"
-                >
-                  <span
-                    class="flex size-10 items-center justify-center rounded-full {profile.isTrainer &&
-                    act.level === 'expert'
-                      ? 'bg-primary/20'
-                      : 'bg-primary/10'} text-primary"
-                  >
-                    <ActivityIcon id={act.id} class="size-5" />
-                  </span>
-                  <div class="flex-1">
-                    <p class="flex items-center gap-2 font-bold text-text">
-                      {t.activity(act.id)}
-                      {#if mySportIds.has(act.id)}
-                        <span
-                          class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
-                        >
-                          {t.t("profile.inCommon")}
-                        </span>
-                      {/if}
-                    </p>
-                    <p class="text-sm text-muted">
-                      {#if act.format !== "all"}{t.format(act.format)}·
-                      {/if}{#if profile.isTrainer && act.level === "expert"}{t.t(
-                          "profile.trainer",
-                        )}{:else}{t.skill(act.level)}{/if}
-                    </p>
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {/if}
-        </div>
-
-        <div class="w-1/2 shrink-0 px-5">
-          {#if fakeEvents.length === 0}
-            <p class="text-sm text-muted text-center pt-6">
-              {t.t("profile.noEvents")}
-            </p>
-          {:else}
-            <div class="flex flex-col gap-3">
-              {#each fakeEvents as event (event.id)}
-                <div
-                  class="flex items-center gap-4 rounded-2xl border border-transparent bg-surface p-4 shadow-sm"
-                >
-                  <span
-                    class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
-                  >
-                    <ActivityIcon id={event.activityId} class="size-5" />
-                  </span>
-                  <div class="flex-1">
-                    <p class="font-bold text-text">
-                      {t.activity(event.activityId)}
-                    </p>
-                    <p class="text-sm text-muted">
-                      {event.role === "hosted"
-                        ? t.t("profile.eventHosted")
-                        : t.t("profile.eventJoined")}
-                      <span class="px-1">·</span>
-                      {formatEventDate(event.date)}
-                    </p>
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {/if}
-        </div>
-      </div>
+        <CircleQuestionMark class="size-4" />
+      </button>
     </div>
+
+    {#if activeTab === "sports"}
+      <div class="px-5">
+        {#if (profile.activities?.length ?? 0) === 0}
+          <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
+        {:else}
+          <div class="flex flex-col gap-3">
+            {#each sortedActivities as act (act.id)}
+              <div
+                class="flex items-center gap-4 rounded-2xl border p-4 shadow-sm bg-surface {profile.isTrainer &&
+                act.level === 'expert'
+                  ? 'border-primary/40 border-2'
+                  : 'border-transparent '}"
+              >
+                <span
+                  class="flex size-10 items-center justify-center rounded-full {profile.isTrainer &&
+                  act.level === 'expert'
+                    ? 'bg-primary/20'
+                    : 'bg-primary/10'} text-primary"
+                >
+                  <ActivityIcon id={act.id} class="size-5" />
+                </span>
+                <div class="flex-1">
+                  <p class="flex items-center gap-2 font-bold text-text">
+                    {t.activity(act.id)}
+                    {#if mySportIds.has(act.id)}
+                      <span
+                        class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
+                      >
+                        {t.t("profile.inCommon")}
+                      </span>
+                    {/if}
+                  </p>
+                  <p class="text-sm text-muted">
+                    {#if act.format !== "all"}{t.format(act.format)}·
+                    {/if}{#if profile.isTrainer && act.level === "expert"}{t.t(
+                        "profile.trainer",
+                      )}{:else}{t.skill(act.level)}{/if}
+                  </p>
+                </div>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {:else}
+      <div class="px-5">
+        {#if fakeEvents.length === 0}
+          <p class="text-sm text-muted text-center pt-6">
+            {t.t("profile.noEvents")}
+          </p>
+        {:else}
+          <div class="flex flex-col gap-3">
+            {#each fakeEvents as event (event.id)}
+              <div
+                class="flex items-center gap-4 rounded-2xl border bg-surface p-4 shadow-sm {event.role ===
+                'hosted'
+                  ? 'border-2 border-primary/40'
+                  : 'border-transparent'}"
+              >
+                <span
+                  class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+                >
+                  <ActivityIcon id={event.activityId} class="size-5" />
+                </span>
+                <div class="flex-1">
+                  <p class="font-bold text-text">
+                    {t.activity(event.activityId)}
+                  </p>
+                  <p class="text-sm text-muted">
+                    {event.role === "hosted"
+                      ? t.t("profile.eventHosted")
+                      : t.t("profile.eventJoined")}
+                    <span class="px-1">·</span>
+                    {formatEventDate(event.date)}
+                  </p>
+                </div>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {/if}
   {/if}
 </div>
 
