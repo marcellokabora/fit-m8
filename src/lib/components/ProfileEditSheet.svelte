@@ -29,10 +29,13 @@
     profile,
     onClose,
     onSaved,
+    onDelete,
   }: {
     profile: UserProfile;
     onClose: () => void;
     onSaved: (updated: UserProfile) => void;
+    // shown as a delete button in the footer only when provided (e.g. fake-profile admin tools)
+    onDelete?: () => Promise<void> | void;
   } = $props();
 
   interface ProfileDraft {
@@ -71,6 +74,8 @@
   let saving = $state(false);
   let saved = $state(false);
   let expandedActivityIndex = $state<number | null>(null);
+  let confirmDelete = $state(false);
+  let deleting = $state(false);
 
   function activityLabel(id?: string) {
     const info = ACTIVITIES.find((a) => a.id === id);
@@ -127,6 +132,13 @@
     saved = true;
     onSaved({ ...profile, ...update });
     setTimeout(() => (saved = false), 1500);
+  }
+
+  async function handleDelete() {
+    if (!onDelete || deleting) return;
+    deleting = true;
+    await onDelete();
+    deleting = false;
   }
 </script>
 
@@ -391,19 +403,49 @@
     <div
       class="flex gap-2 border-t border-border bg-bg px-5 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]"
     >
-      <button
-        onclick={save}
-        disabled={saving}
-        class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
-      >
-        {#if saving}
-          <LoaderCircle class="size-4 animate-spin" />
-        {:else if saved}
-          <Check class="size-4" />
-        {:else}
-          Save
+      {#if onDelete && confirmDelete}
+        <button
+          onclick={() => (confirmDelete = false)}
+          disabled={deleting}
+          class="flex-1 rounded-lg border-2 border-border py-2 text-sm font-bold text-text active:scale-95 disabled:opacity-50"
+        >
+          Cancel
+        </button>
+        <button
+          onclick={handleDelete}
+          disabled={deleting}
+          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-error px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        >
+          {#if deleting}
+            <LoaderCircle class="size-4 animate-spin" />
+          {:else}
+            Confirm delete
+          {/if}
+        </button>
+      {:else}
+        <button
+          onclick={save}
+          disabled={saving}
+          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        >
+          {#if saving}
+            <LoaderCircle class="size-4 animate-spin" />
+          {:else if saved}
+            <Check class="size-4" />
+          {:else}
+            Save
+          {/if}
+        </button>
+        {#if onDelete}
+          <button
+            onclick={() => (confirmDelete = true)}
+            aria-label="Delete profile"
+            class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-error/10 text-error active:scale-95"
+          >
+            <Trash2 class="size-4" />
+          </button>
         {/if}
-      </button>
+      {/if}
     </div>
   </div>
 </div>

@@ -8,55 +8,34 @@
     documentId,
     getDocs,
     doc,
-    setDoc,
     deleteDoc,
-    serverTimestamp,
   } from "firebase/firestore";
   import { db } from "$lib/firebase/client";
   import { isAdmin } from "$lib/stores/admin";
   import {
     ACTIVITIES,
     GENDER_OPTIONS,
-    ORIENTATIONS,
     groupActivities,
     type ActivityGroupId,
     type Gender,
-    type SexualOrientation,
     type UserProfile,
   } from "$lib/types";
   import BackHeader from "$lib/components/BackHeader.svelte";
-  import BottomSheet from "$lib/components/BottomSheet.svelte";
+  import ProfileEditSheet from "$lib/components/ProfileEditSheet.svelte";
   import {
     LoaderCircle,
     ImageOff,
-    Check,
     ShieldAlert,
     X,
     Heart,
     Dumbbell,
     Rainbow,
-    Trash2,
   } from "@lucide/svelte";
-
-  interface ProfileDraft {
-    photo: string;
-    displayName: string;
-    bio: string;
-    age: string;
-    gender: Gender | "";
-    orientation: SexualOrientation | "";
-    city: string;
-    isSingle: boolean;
-    isTrainer: boolean;
-  }
 
   type ActivityGroupFilter = ActivityGroupId | "other";
 
   let loading = $state(true);
   let profiles = $state<UserProfile[]>([]);
-  let drafts = $state<Record<string, ProfileDraft>>({});
-  let saving = $state<Record<string, boolean>>({});
-  let savedFlash = $state<Record<string, boolean>>({});
   let selectedSport = $state<string | null>(null);
   let selectedGroup = $state<ActivityGroupFilter | null>(null);
   let sportQuery = $state("");
@@ -64,33 +43,9 @@
   let genderFilter = $state<Gender | "">("");
   let sortBy = $state<"withoutPhoto" | "name" | "age">("withoutPhoto");
   let selectedProfile = $state<UserProfile | null>(null);
-  // keeps the sheet's content visible while it plays its close transition, since
-  // selectedProfile is nulled out immediately
-  let displayedProfile = $state<UserProfile | null>(null);
-  let confirmDelete = $state(false);
-  let deleting = $state(false);
-
-  $effect(() => {
-    if (selectedProfile) displayedProfile = selectedProfile;
-  });
 
   function closeProfileSheet() {
     selectedProfile = null;
-    confirmDelete = false;
-  }
-
-  function draftOf(p: UserProfile): ProfileDraft {
-    return {
-      photo: p.photos?.[0] ?? "",
-      displayName: p.displayName ?? "",
-      bio: p.bio ?? "",
-      age: p.age ? String(p.age) : "",
-      gender: p.gender ?? "",
-      orientation: p.orientation ?? "",
-      city: p.city ?? "",
-      isSingle: !!p.isSingle,
-      isTrainer: !!p.isTrainer,
-    };
   }
 
   function activityLabel(id?: string) {
@@ -264,7 +219,6 @@
     profiles = snap.docs
       .map((d) => ({ uid: d.id, ...(d.data() as Omit<UserProfile, "uid">) }))
       .sort((a, b) => a.displayName.localeCompare(b.displayName));
-    for (const p of profiles) drafts[p.uid] = draftOf(p);
     loading = false;
   }
 
@@ -274,48 +228,9 @@
     else goto("/app/discover");
   });
 
-  async function saveProfile(uid: string) {
-    const d = drafts[uid];
-    if (!d) return;
-    const url = d.photo.trim();
-    if (url && !/^https?:\/\//.test(url)) return;
-    const name = d.displayName.trim();
-    if (!name) return;
-    const age = Number(d.age);
-
-    saving = { ...saving, [uid]: true };
-    const update: Partial<UserProfile> = {
-      photos: url ? [url] : [],
-      displayName: name,
-      bio: d.bio.trim(),
-      age,
-      gender: d.gender,
-      orientation: d.orientation || null,
-      city: d.city.trim(),
-      isSingle: d.isSingle,
-      isTrainer: d.isTrainer,
-    };
-    await setDoc(
-      doc(db, "users", uid),
-      { ...update, updatedAt: serverTimestamp() },
-      { merge: true },
-    );
-    profiles = profiles.map((p) => (p.uid === uid ? { ...p, ...update } : p));
-    saving = { ...saving, [uid]: false };
-    savedFlash = { ...savedFlash, [uid]: true };
-    setTimeout(() => (savedFlash = { ...savedFlash, [uid]: false }), 1500);
-    if (selectedProfile?.uid === uid) {
-      selectedProfile = null;
-    }
-  }
-
   async function deleteProfile(uid: string) {
-    deleting = true;
     await deleteDoc(doc(db, "users", uid));
     profiles = profiles.filter((p) => p.uid !== uid);
-    delete drafts[uid];
-    deleting = false;
-    confirmDelete = false;
     selectedProfile = null;
   }
 </script>
@@ -387,10 +302,7 @@
       <div class="flex flex-col gap-3 px-5">
         {#each visibleProfiles as p (p.uid)}
           <button
-            onclick={() => {
-              selectedProfile = p;
-              confirmDelete = false;
-            }}
+            onclick={() => (selectedProfile = p)}
             class="flex items-center gap-3 rounded-2xl bg-surface p-3 text-left shadow-sm active:scale-[0.99]"
           >
             {#if p.photos?.[0]}
@@ -505,216 +417,15 @@
   </div>
 {/if}
 
-<BottomSheet
-  open={selectedProfile !== null}
-  onClose={closeProfileSheet}
-  bgClass="bg-bg"
-  maxHeightClass="max-h-[90dvh]"
->
-  {#if displayedProfile}
-    {@const p = displayedProfile}
-    {@const d = drafts[p.uid]}
-    <div class="flex-1 overflow-y-auto p-5">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="min-w-0 text-lg font-black text-text">
-          <a
-            href={`/app/profile/${p.uid}`}
-            class="block truncate hover:underline"
-          >
-            {p.displayName}
-          </a>
-        </h2>
-        <button
-          onclick={closeProfileSheet}
-          aria-label="Close"
-          class="flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
-        >
-          <X class="size-4" />
-        </button>
-      </div>
-
-      {#if d.photo}
-        <img
-          src={d.photo}
-          alt={p.displayName}
-          class="mb-4 aspect-square w-full rounded-2xl object-cover"
-        />
-      {:else}
-        <div
-          class="mb-4 flex aspect-square w-full items-center justify-center rounded-2xl bg-bg text-muted"
-        >
-          <ImageOff class="size-10" />
-        </div>
-      {/if}
-
-      <div class="mb-4 flex flex-col gap-2">
-        <label
-          class="text-xs font-semibold uppercase text-muted"
-          for="photo-{p.uid}">Photo URL</label
-        >
-        <input
-          id="photo-{p.uid}"
-          type="url"
-          placeholder="https://images.unsplash.com/..."
-          bind:value={d.photo}
-          class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text placeholder:text-muted"
-        />
-
-        <label
-          class="text-xs font-semibold uppercase text-muted"
-          for="name-{p.uid}">Name</label
-        >
-        <input
-          id="name-{p.uid}"
-          type="text"
-          bind:value={d.displayName}
-          class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-        />
-
-        <div class="grid grid-cols-2 gap-2">
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-xs font-semibold uppercase text-muted"
-              for="age-{p.uid}">Age</label
-            >
-            <input
-              id="age-{p.uid}"
-              type="number"
-              min="18"
-              bind:value={d.age}
-              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-            />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-xs font-semibold uppercase text-muted"
-              for="city-{p.uid}">City</label
-            >
-            <input
-              id="city-{p.uid}"
-              type="text"
-              bind:value={d.city}
-              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-            />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-xs font-semibold uppercase text-muted"
-              for="gender-{p.uid}">Gender</label
-            >
-            <select
-              id="gender-{p.uid}"
-              bind:value={d.gender}
-              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-            >
-              <option value="">—</option>
-              {#each GENDER_OPTIONS as opt}
-                <option value={opt.value}>{opt.label}</option>
-              {/each}
-            </select>
-          </div>
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-xs font-semibold uppercase text-muted"
-              for="orientation-{p.uid}">Orientation</label
-            >
-            <select
-              id="orientation-{p.uid}"
-              bind:value={d.orientation}
-              class="w-full min-w-0 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-            >
-              <option value="">—</option>
-              {#each ORIENTATIONS as opt}
-                <option value={opt.value}>{opt.label}</option>
-              {/each}
-            </select>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <label class="flex items-center gap-1.5 text-sm text-text">
-            <input type="checkbox" bind:checked={d.isSingle} />
-            Single
-          </label>
-          <label class="flex items-center gap-1.5 text-sm text-text">
-            <input type="checkbox" bind:checked={d.isTrainer} />
-            Trainer
-          </label>
-        </div>
-
-        <label
-          class="text-xs font-semibold uppercase text-muted"
-          for="bio-{p.uid}">Bio</label
-        >
-        <textarea
-          id="bio-{p.uid}"
-          rows="3"
-          bind:value={d.bio}
-          class="w-full min-w-0 resize-none rounded-lg border border-border bg-bg px-2.5 py-1.5 text-sm text-text"
-        ></textarea>
-      </div>
-
-      <div class="mb-4">
-        <p class="mb-2 text-xs font-semibold uppercase text-muted">
-          Activities
-        </p>
-        <div class="flex flex-col gap-1.5">
-          {#each p.activities ?? [] as act}
-            <div
-              class="flex items-center justify-between rounded-lg bg-bg py-1.5 text-sm"
-            >
-              <span class="text-text">{activityLabel(act.id)}</span>
-              <span class="text-muted">{act.format} · {act.level}</span>
-            </div>
-          {/each}
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="flex gap-2 border-t border-border bg-bg px-5 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]"
-    >
-      {#if confirmDelete}
-        <button
-          onclick={() => (confirmDelete = false)}
-          disabled={deleting}
-          class="flex-1 rounded-lg border-2 border-border py-2 text-sm font-bold text-text active:scale-95 disabled:opacity-50"
-        >
-          Cancel
-        </button>
-        <button
-          onclick={() => deleteProfile(p.uid)}
-          disabled={deleting}
-          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-error px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
-        >
-          {#if deleting}
-            <LoaderCircle class="size-4 animate-spin" />
-          {:else}
-            Confirm delete
-          {/if}
-        </button>
-      {:else}
-        <button
-          onclick={() => saveProfile(p.uid)}
-          disabled={saving[p.uid]}
-          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
-        >
-          {#if saving[p.uid]}
-            <LoaderCircle class="size-4 animate-spin" />
-          {:else if savedFlash[p.uid]}
-            <Check class="size-4" />
-          {:else}
-            Save
-          {/if}
-        </button>
-        <button
-          onclick={() => (confirmDelete = true)}
-          aria-label="Delete profile"
-          class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-error/10 text-error active:scale-95"
-        >
-          <Trash2 class="size-4" />
-        </button>
-      {/if}
-    </div>
-  {/if}
-</BottomSheet>
+{#if selectedProfile}
+  {@const p = selectedProfile}
+  <ProfileEditSheet
+    profile={p}
+    onClose={closeProfileSheet}
+    onSaved={(updated) => {
+      profiles = profiles.map((pr) => (pr.uid === updated.uid ? updated : pr));
+      selectedProfile = null;
+    }}
+    onDelete={() => deleteProfile(p.uid)}
+  />
+{/if}

@@ -101,7 +101,9 @@
     }),
   );
 
-  let fakeEvents = $derived(profile ? generateFakeEvents(profile) : []);
+  let fakeEvents = $derived(
+    profile?.uid.startsWith("fake_") ? generateFakeEvents(profile) : [],
+  );
 
   function formatEventDate(date: Date): string {
     return new Intl.DateTimeFormat($activeLanguage, {
@@ -564,7 +566,9 @@
 
         <div class="w-1/2 shrink-0 px-5">
           {#if fakeEvents.length === 0}
-            <p class="text-sm text-muted">{t.t("profile.noEvents")}</p>
+            <p class="text-sm text-muted text-center pt-6">
+              {t.t("profile.noEvents")}
+            </p>
           {:else}
             <div class="flex flex-col gap-3">
               {#each fakeEvents as event (event.id)}
