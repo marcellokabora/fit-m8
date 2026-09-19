@@ -50,7 +50,7 @@
       url: "https://www.facebook.com/fitm8apps/",
       label: "Facebook",
     },
-    // { url: "https://www.instagram.com/", label: "Instagram" },
+    { url: "https://www.instagram.com/fitm8.app", label: "Instagram" },
     // { url: "https://www.youtube.com/", label: "YouTube" },
     { url: "https://www.linkedin.com/company/fit-m8-app", label: "LinkedIn" },
   ];
@@ -185,7 +185,7 @@
   style="--color-bg: {darkColors.bg}; --color-surface: {darkColors.surface}; --color-text: {darkColors.text}; --color-muted: {darkColors.muted}; --color-border: {darkColors.border};"
 >
   <div
-    class="relative flex min-h-dvh shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)] md:justify-center md:gap-20"
+    class="relative flex min-h-dvh shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)] md:justify-center md:gap-30"
   >
     <!-- Logo / Hero -->
     <div class="relative z-10 flex flex-col items-center gap-4 text-text">

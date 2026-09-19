@@ -1,14 +1,14 @@
 <script module lang="ts">
   export const CAROUSEL_ACTIVITIES = [
-    { id: "beachVolley" },
     { id: "padel" },
-    { id: "skateboard" },
-    { id: "boxing" },
-    { id: "footVolley" },
+    { id: "beachVolley" },
     { id: "jogging" },
+    { id: "boxing" },
+    { id: "tennis" },
+    { id: "footVolley" },
+    { id: "skateboard" },
     { id: "basketball" },
     { id: "surf" },
-    { id: "tennis" },
     { id: "soccer" },
     { id: "cycling" },
   ];
@@ -215,7 +215,7 @@
       >
         <span
           class={i === pos
-            ? "flex scale-120 items-center gap-2 rounded-full bg-surface/20 px-5 py-3 text-base font-semibold text-primary transition-transform duration-350 box-shadow-md"
+            ? "flex scale-100 items-center gap-2 rounded-full bg-surface/20 px-5 py-3 text-base font-semibold text-primary transition-transform duration-350 box-shadow-md"
             : "flex scale-75 items-center gap-2 px-5 py-3 text-base font-semibold text-muted transition-transform duration-350 text-shadow-2xs"}
         >
           <ActivityIcon
