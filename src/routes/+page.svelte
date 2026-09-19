@@ -7,7 +7,9 @@
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Logo from "$lib/components/LogoText.svelte";
   import AuthModal from "$lib/components/AuthModal.svelte";
+  import SideMenu from "$lib/components/SideMenu.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
+  import { SOCIAL_LINKS } from "$lib/social";
   import { activeTheme, THEMES } from "$lib/stores/theme";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
   import LanguagePicker from "$lib/components/LanguagePicker.svelte";
@@ -42,17 +44,6 @@
     { id: "boxing", src: boxingImg, span: false },
     { id: "surf", src: surfImg, span: false },
     { id: "cycling", src: cyclingImg, span: false },
-  ];
-
-  // real profile links only - keep in sync with the JSON-LD sameAs list in src/app.html
-  const SOCIAL_LINKS = [
-    {
-      url: "https://www.facebook.com/fitm8apps/",
-      label: "Facebook",
-    },
-    { url: "https://www.instagram.com/fitm8.app", label: "Instagram" },
-    // { url: "https://www.youtube.com/", label: "YouTube" },
-    { url: "https://www.linkedin.com/company/fit-m8-app", label: "LinkedIn" },
   ];
 
   // icon + in-app screenshot per step, so each step shows a peek of the real screen it describes
@@ -184,6 +175,15 @@
   class="relative flex min-h-dvh w-full flex-col overflow-x-hidden bg-bg"
   style="--color-bg: {darkColors.bg}; --color-surface: {darkColors.surface}; --color-text: {darkColors.text}; --color-muted: {darkColors.muted}; --color-border: {darkColors.border};"
 >
+  <SideMenu
+    {authState}
+    {appDestination}
+    onSignIn={() => {
+      authMode = "login";
+      authModalOpen = true;
+    }}
+  />
+
   <div
     class="relative flex min-h-dvh shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)] md:justify-center md:gap-30"
   >
@@ -225,7 +225,7 @@
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex w-full max-w-xs mx-auto items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
+        class="flex w-full capitalize max-w-xs mx-auto items-center justify-center gap-3 rounded-full border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
       >
         {#if authState === "checking"}
           <span
@@ -373,13 +373,6 @@
         </a>
       {/each}
     </div>
-
-    <nav class="flex flex-wrap justify-center gap-4 text-xs">
-      <a href="/blog" class="font-semibold text-primary">Blog</a>
-      <a href="/terms" class="font-semibold text-primary">Terms of Service</a>
-      <a href="/privacy" class="font-semibold text-primary">Privacy Policy</a>
-      <a href="/pitch" class="font-semibold text-primary">Pitch Deck</a>
-    </nav>
 
     <p class="text-xs text-muted">
       &copy; {new Date().getFullYear()} FIT-M8. {t.t("home.rights")}

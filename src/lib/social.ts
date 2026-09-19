@@ -49,3 +49,17 @@ export function normalizeSocialLink(input: string): string {
     if (!trimmed) return '';
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
+
+export interface SocialLink {
+    url: string;
+    label: string;
+}
+
+// FIT-M8's own official profile links, shared by the homepage footer and the contact page -
+// keep in sync with the JSON-LD sameAs list in src/app.html
+export const SOCIAL_LINKS: SocialLink[] = [
+    { url: 'https://www.facebook.com/fitm8apps/', label: 'Facebook' },
+    { url: 'https://www.instagram.com/fitm8.app', label: 'Instagram' },
+    { url: 'https://www.linkedin.com/company/fit-m8-app', label: 'LinkedIn' },
+];
+

@@ -26,6 +26,11 @@
 		<priority>0.4</priority>
 	</url>
 	<url>
+		<loc>https://fit-m8.app/contact</loc>
+		<changefreq>yearly</changefreq>
+		<priority>0.4</priority>
+	</url>
+	<url>
 		<loc>https://fit-m8.app/terms</loc>
 		<changefreq>yearly</changefreq>
 		<priority>0.3</priority>

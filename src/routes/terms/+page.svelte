@@ -58,8 +58,9 @@
       We may remove content or suspend or terminate accounts that violate these
       Terms. If you encounter content or behavior that violates these Terms,
       please report it to
-      <a href="mailto:info@fit-m8.app" class="font-semibold text-primary"
-        >info@fit-m8.app</a
+      <a
+        href="mailto:marcellokabora+fit-m8@gmail.com"
+        class="font-semibold text-primary">info@fit-m8.app</a
       >.
     </p>
   </section>
@@ -103,8 +104,9 @@
       You may delete your account at any time from Profile → Delete account.
       This permanently deletes your profile, photos, swipes, matches, and
       messages. You may also request deletion by emailing
-      <a href="mailto:info@fit-m8.app" class="font-semibold text-primary"
-        >info@fit-m8.app</a
+      <a
+        href="mailto:marcellokabora+fit-m8@gmail.com"
+        class="font-semibold text-primary">info@fit-m8.app</a
       >.
     </p>
   </section>
@@ -150,8 +152,9 @@
     <h2 class="text-base font-bold text-text">12. Contact us</h2>
     <p>
       If you have any questions about these Terms, contact us at
-      <a href="mailto:info@fit-m8.app" class="font-semibold text-primary"
-        >info@fit-m8.app</a
+      <a
+        href="mailto:marcellokabora+fit-m8@gmail.com"
+        class="font-semibold text-primary">info@fit-m8.app</a
       >.
     </p>
   </section>

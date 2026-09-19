@@ -109,8 +109,9 @@
       export, or delete your personal data, and to object to or restrict certain
       processing. You can delete your account and data at any time from within
       the App, or by contacting us at
-      <a href="mailto:info@fit-m8.app" class="font-semibold text-primary"
-        >info@fit-m8.app</a
+      <a
+        href="mailto:marcellokabora+fit-m8@gmail.com"
+        class="font-semibold text-primary">info@fit-m8.app</a
       >. You also have the right to lodge a complaint with your local data
       protection authority.
     </p>
@@ -148,8 +149,9 @@
     <h2 class="text-base font-bold text-text">10. Contact us</h2>
     <p>
       If you have any questions about this Privacy Policy, contact us at
-      <a href="mailto:info@fit-m8.app" class="font-semibold text-primary"
-        >info@fit-m8.app</a
+      <a
+        href="mailto:marcellokabora+fit-m8@gmail.com"
+        class="font-semibold text-primary">info@fit-m8.app</a
       >.
     </p>
   </section>
