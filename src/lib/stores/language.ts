@@ -448,7 +448,7 @@ const MESSAGES = {
         'explore.noActiveCheckins': 'No one has checked in nearby yet',
         'explore.messageButton': 'Message',
         'explore.askToJoin': 'Ask to join',
-        'explore.joinRequested': 'Requested to join',
+        'explore.cancelJoinRequest': 'Cancel request',
         'explore.joinRequestsTitle': 'Wants to join',
         'explore.joinedCount': 'Joined {count}',
         'explore.pendingCount': 'Requests {count}',
@@ -464,7 +464,12 @@ const MESSAGES = {
         'explore.filterNoSports': 'Add sports to your profile to filter the map',
         'explore.filterShowAll': 'Show all',
         'explore.filterApply': 'Apply',
-        'explore.checkinNoSports': 'Add sports to your profile to check in'
+        'explore.checkinNoSports': 'Add sports to your profile to check in',
+        'profile.tabActivities': 'Activities',
+        'profile.tabEvents': 'Events',
+        'profile.noEvents': 'No events yet',
+        'profile.eventHosted': 'Hosted',
+        'profile.eventJoined': 'Joined'
     },
     es: {
         'meta.description': 'Conecta con personas para hacer actividades cerca de ti', 'language.en': 'Inglés', 'language.es': 'Español', 'language.it': 'Italiano',
@@ -699,7 +704,7 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.noActiveCheckins': 'Todavía nadie ha hecho check-in cerca',
         'explore.messageButton': 'Mensaje',
         'explore.askToJoin': 'Pedir unirme',
-        'explore.joinRequested': 'Solicitud enviada',
+        'explore.cancelJoinRequest': 'Cancelar solicitud',
         'explore.joinRequestsTitle': 'Quiere unirse',
         'explore.joinedCount': 'Participantes {count}',
         'explore.pendingCount': 'Solicitudes {count}',
@@ -723,7 +728,12 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'onboarding.month': 'Mes',
         'onboarding.year': 'Año',
         'appearance.hint': 'Elige un tema y el modo claro/oscuro',
-        'common.done': 'Listo'
+        'common.done': 'Listo',
+        'profile.tabActivities': 'Actividades',
+        'profile.tabEvents': 'Eventos',
+        'profile.noEvents': 'Aún no hay eventos',
+        'profile.eventHosted': 'Organizado',
+        'profile.eventJoined': 'Unido'
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
@@ -937,7 +947,7 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'explore.noActiveCheckins': 'Nessuno ha ancora fatto check-in nelle vicinanze',
         'explore.messageButton': 'Messaggio',
         'explore.askToJoin': 'Chiedi di unirti',
-        'explore.joinRequested': 'Richiesta inviata',
+        'explore.cancelJoinRequest': 'Annulla richiesta',
         'explore.joinRequestsTitle': 'Vuole unirsi',
         'explore.joinedCount': 'Partecipanti {count}',
         'explore.pendingCount': 'Richieste {count}',
@@ -961,7 +971,12 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
         'onboarding.month': 'Mese',
         'onboarding.year': 'Anno',
         'appearance.hint': 'Scegli un tema e la modalità chiara/scura',
-        'common.done': 'Fatto'
+        'common.done': 'Fatto',
+        'profile.tabActivities': 'Attività',
+        'profile.tabEvents': 'Eventi',
+        'profile.noEvents': 'Ancora nessun evento',
+        'profile.eventHosted': 'Organizzato',
+        'profile.eventJoined': 'Partecipato'
     }
 };
 

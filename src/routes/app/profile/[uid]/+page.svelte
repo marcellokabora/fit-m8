@@ -17,6 +17,8 @@
   import ActionButtons from "$lib/components/ActionButtons.svelte";
   import ProfileEditSheet from "$lib/components/ProfileEditSheet.svelte";
   import MessageComposeSheet from "$lib/components/MessageComposeSheet.svelte";
+  import SegmentedControl from "$lib/components/SegmentedControl.svelte";
+  import { generateFakeEvents } from "$lib/fakeEvents";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import {
@@ -98,6 +100,49 @@
       return group(activityA) - group(activityB);
     }),
   );
+
+  let fakeEvents = $derived(profile ? generateFakeEvents(profile) : []);
+
+  function formatEventDate(date: Date): string {
+    return new Intl.DateTimeFormat($activeLanguage, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  }
+
+  // Sports/Events tab switching, driven by the segmented control or a horizontal swipe
+  let activeTab = $state<"sports" | "events">("sports");
+  let tabDragX = $state(0);
+  let tabDragging = $state(false);
+  let tabStartX = $state(0);
+  const TAB_SWIPE_THRESHOLD = 60;
+
+  function onTabsPointerDown(e: PointerEvent) {
+    tabDragging = true;
+    tabStartX = e.clientX;
+    tabDragX = 0;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onTabsPointerMove(e: PointerEvent) {
+    if (!tabDragging) return;
+    const delta = e.clientX - tabStartX;
+    // Rubber-band past the edges instead of revealing an empty third panel
+    if (activeTab === "sports" && delta > 0) tabDragX = delta / 3;
+    else if (activeTab === "events" && delta < 0) tabDragX = delta / 3;
+    else tabDragX = delta;
+  }
+
+  function onTabsPointerUp() {
+    if (!tabDragging) return;
+    tabDragging = false;
+    if (tabDragX <= -TAB_SWIPE_THRESHOLD && activeTab === "sports")
+      activeTab = "events";
+    else if (tabDragX >= TAB_SWIPE_THRESHOLD && activeTab === "events")
+      activeTab = "sports";
+    tabDragX = 0;
+  }
 
   // Buttons only make sense for someone else's profile you haven't already matched with
   let showActions = $derived(
@@ -444,51 +489,111 @@
       </div>
     {/if}
 
-    <div class="px-5 {profile.socialLinks?.length ? '' : 'pt-4'}">
-      <!-- <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-        {t.t("common.sports")}
-      </h3> -->
-      {#if (profile.activities?.length ?? 0) === 0}
-        <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
-      {:else}
-        <div class="flex flex-col gap-3">
-          {#each sortedActivities as act (act.id)}
-            <div
-              class="flex items-center gap-4 rounded-2xl border p-4 shadow-sm {profile.isTrainer &&
-              act.level === 'expert'
-                ? 'border-primary/40 bg-primary/5'
-                : 'border-transparent bg-surface'}"
-            >
-              <span
-                class="flex size-10 items-center justify-center rounded-full {profile.isTrainer &&
-                act.level === 'expert'
-                  ? 'bg-primary/20'
-                  : 'bg-primary/10'} text-primary"
-              >
-                <ActivityIcon id={act.id} class="size-5" />
-              </span>
-              <div class="flex-1">
-                <p class="flex items-center gap-2 font-bold text-text">
-                  {t.activity(act.id)}
-                  {#if mySportIds.has(act.id)}
-                    <span
-                      class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
-                    >
-                      {t.t("profile.inCommon")}
-                    </span>
-                  {/if}
-                </p>
-                <p class="text-sm text-muted">
-                  {#if act.format !== "all"}{t.format(act.format)}·
-                  {/if}{#if profile.isTrainer && act.level === "expert"}{t.t(
-                      "profile.trainer",
-                    )}{:else}{t.skill(act.level)}{/if}
-                </p>
-              </div>
+    <div class="px-5 {profile.socialLinks?.length ? '' : 'pt-4'} pb-3">
+      <SegmentedControl
+        options={[
+          { value: "sports", label: t.t("profile.tabActivities") },
+          { value: "events", label: t.t("profile.tabEvents") },
+        ]}
+        value={activeTab}
+        ariaLabel={t.t("profile.tabActivities")}
+        onchange={(v) => (activeTab = v)}
+      />
+    </div>
+
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="overflow-hidden"
+      style="touch-action: pan-y;"
+      onpointerdown={onTabsPointerDown}
+      onpointermove={onTabsPointerMove}
+      onpointerup={onTabsPointerUp}
+      onpointercancel={onTabsPointerUp}
+    >
+      <div
+        class="flex w-[200%]"
+        style="transform: translateX(calc({activeTab === 'sports'
+          ? '0%'
+          : '-50%'} + {tabDragX}px)); transition: {tabDragging
+          ? 'none'
+          : 'transform 0.3s ease-out'};"
+      >
+        <div class="w-1/2 shrink-0 px-5">
+          {#if (profile.activities?.length ?? 0) === 0}
+            <p class="text-sm text-muted">{t.t("common.noActivities")}</p>
+          {:else}
+            <div class="flex flex-col gap-3">
+              {#each sortedActivities as act (act.id)}
+                <div
+                  class="flex items-center gap-4 rounded-2xl border p-4 shadow-sm {profile.isTrainer &&
+                  act.level === 'expert'
+                    ? 'border-primary/40 bg-primary/5'
+                    : 'border-transparent bg-surface'}"
+                >
+                  <span
+                    class="flex size-10 items-center justify-center rounded-full {profile.isTrainer &&
+                    act.level === 'expert'
+                      ? 'bg-primary/20'
+                      : 'bg-primary/10'} text-primary"
+                  >
+                    <ActivityIcon id={act.id} class="size-5" />
+                  </span>
+                  <div class="flex-1">
+                    <p class="flex items-center gap-2 font-bold text-text">
+                      {t.activity(act.id)}
+                      {#if mySportIds.has(act.id)}
+                        <span
+                          class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
+                        >
+                          {t.t("profile.inCommon")}
+                        </span>
+                      {/if}
+                    </p>
+                    <p class="text-sm text-muted">
+                      {#if act.format !== "all"}{t.format(act.format)}·
+                      {/if}{#if profile.isTrainer && act.level === "expert"}{t.t(
+                          "profile.trainer",
+                        )}{:else}{t.skill(act.level)}{/if}
+                    </p>
+                  </div>
+                </div>
+              {/each}
             </div>
-          {/each}
+          {/if}
         </div>
-      {/if}
+
+        <div class="w-1/2 shrink-0 px-5">
+          {#if fakeEvents.length === 0}
+            <p class="text-sm text-muted">{t.t("profile.noEvents")}</p>
+          {:else}
+            <div class="flex flex-col gap-3">
+              {#each fakeEvents as event (event.id)}
+                <div
+                  class="flex items-center gap-4 rounded-2xl border border-transparent bg-surface p-4 shadow-sm"
+                >
+                  <span
+                    class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+                  >
+                    <ActivityIcon id={event.activityId} class="size-5" />
+                  </span>
+                  <div class="flex-1">
+                    <p class="font-bold text-text">
+                      {t.activity(event.activityId)}
+                    </p>
+                    <p class="text-sm text-muted">
+                      {event.role === "hosted"
+                        ? t.t("profile.eventHosted")
+                        : t.t("profile.eventJoined")}
+                      <span class="px-1">·</span>
+                      {formatEventDate(event.date)}
+                    </p>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      </div>
     </div>
   {/if}
 </div>

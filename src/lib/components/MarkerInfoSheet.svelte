@@ -176,7 +176,7 @@
             <UserPlus class="size-5" />
           {/if}
           {hasRequestedToJoin
-            ? t.t("explore.joinRequested")
+            ? t.t("explore.cancelJoinRequest")
             : t.t("explore.askToJoin")}
         </button>
         <button

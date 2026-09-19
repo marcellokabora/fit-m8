@@ -253,10 +253,10 @@
       >
         {t.t("home.howItWorksTitle")}
       </h2>
-      <ol class="mx-auto flex w-full max-w-3xl flex-col gap-8 md:gap-16">
+      <ol class="mx-auto flex w-full flex-col gap-8 md:gap-16">
         {#each STEPS as step, i}
           <li
-            class="flex flex-col gap-8 md:flex-row md:items-center md:justify-center md:gap-10 {i %
+            class="flex flex-col gap-8 md:flex-row md:items-center md:justify-center md:gap-20 {i %
               2 ===
             1
               ? 'md:flex-row-reverse'
@@ -317,7 +317,7 @@
         <!-- natural order, but chip size scales with the interest count to highlight the popular ones -->
         <!-- one big tilted "card" that bleeds off both page edges, matching the step screenshots above -->
         <div
-          class="-mx-34 md:mx-auto flex max-w-[600px] flex-wrap justify-center gap-2 rounded-3xl bg-surface/40 p-5 ring-1 ring-white/10 rotate-0"
+          class="-mx-34 md:mx-auto flex max-w-[800px] flex-wrap justify-center gap-2 rounded-3xl max-sm:bg-surface/40 p-5 max-sm:ring-1 ring-white/10 rotate-0"
         >
           {#each DISPLAYED_ACTIVITIES as activity}
             {@const count = interestCount(activity.id)}
