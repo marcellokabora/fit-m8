@@ -381,7 +381,7 @@
         ariaLabel={t.t("profile.tabActivities")}
         onchange={(v) => (activeTab = v)}
       />
-      <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center justify-between gap-2">
         {#if $isAdmin}
           <button
             type="button"
@@ -389,7 +389,7 @@
             class="flex w-full px-4 items-center justify-center gap-2 rounded-full bg-surface py-3 text-sm font-bold text-primary shadow-sm active:scale-95"
           >
             <ShieldUser class="size-4" />
-            Admin
+            <!-- Admin -->
           </button>
         {/if}
         <button

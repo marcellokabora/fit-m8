@@ -71,8 +71,7 @@
   let displayName = $state($userProfile?.displayName ?? "");
   let nameHasSurname = $derived(/\s/.test(displayName.trim()));
   let bio = $state($userProfile?.bio ?? "");
-  // Only `age` is persisted, not the exact date, so this starts blank rather than guessing a birthdate
-  let birthdate = $state("");
+  let birthdate = $state($userProfile?.birthdate ?? "");
   let isUnderage = $derived(
     birthdate !== "" && calculateAge(birthdate) < MIN_AGE,
   );
@@ -119,6 +118,7 @@
     if ($userProfile) {
       displayName = $userProfile.displayName;
       bio = $userProfile.bio ?? "";
+      birthdate = $userProfile.birthdate ?? "";
       city = $userProfile.city ?? "";
       lat = $userProfile.lat;
       lng = $userProfile.lng;
@@ -160,8 +160,8 @@
       await userProfile.save(uid, {
         displayName,
         bio,
-        // Only overwrite the stored age if a new birthdate was actually entered
-        ...(birthdate ? { age: calculateAge(birthdate) } : {}),
+        // Only overwrite the stored birthdate/age if a new birthdate was actually entered
+        ...(birthdate ? { birthdate, age: calculateAge(birthdate) } : {}),
         city,
         lat,
         lng,
@@ -243,6 +243,9 @@
       {/if}
     </div>
     <div class="w-full">
+      <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+        {t.t("onboarding.birthdate")}
+      </h3>
       <BirthdateField
         bind:value={birthdate}
         label={t.t("onboarding.birthdate")}
@@ -400,6 +403,9 @@
 
   <!-- Theme -->
   <div class="px-5 pt-8 pb-8">
+    <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+      {t.t("appearance.appTheme")}
+    </h3>
     <AppearancePicker />
   </div>
 

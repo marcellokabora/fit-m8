@@ -201,6 +201,9 @@ export interface UserProfile {
 	photos?: string[];
 	bio: string;
 	age: number;
+	// 'YYYY-MM-DD' date of birth, used to keep `age` accurate on future logins; optional since
+	// older accounts only ever had `age` stored
+	birthdate?: string;
 	gender: Gender | '';
 	orientation?: SexualOrientation | null;
 	city: string;

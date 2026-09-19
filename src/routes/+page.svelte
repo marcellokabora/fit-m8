@@ -185,7 +185,7 @@
   />
 
   <div
-    class="relative flex min-h-dvh shrink-0 flex-col items-center justify-between overflow-hidden px-6 py-8 transform-[translateZ(0)] md:justify-center md:gap-30"
+    class="relative flex min-h-dvh shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center gap-30"
   >
     <!-- Logo / Hero -->
     <div class="relative z-10 flex flex-col items-center gap-4 text-text">
@@ -225,7 +225,7 @@
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex w-full capitalize max-w-xs mx-auto items-center justify-center gap-3 rounded-full border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
+        class="flex w-full capitalize max-w-75 mx-auto items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
       >
         {#if authState === "checking"}
           <span

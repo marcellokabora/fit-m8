@@ -247,6 +247,7 @@
       await userProfile.save(user.uid, {
         displayName,
         bio,
+        birthdate,
         age,
         gender,
         isSingle,

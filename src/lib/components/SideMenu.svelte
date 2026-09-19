@@ -40,7 +40,7 @@
   const LINKS: SideMenuLink[] = [
     { href: "/", label: "Home", icon: Home },
     { href: "/blog", label: "Blog", icon: Newspaper },
-    { href: "/pitch", label: "Pitch Deck", icon: Presentation },
+    { href: "/pitch", label: "Pitch", icon: Presentation },
     { href: "/contact", label: "Contact", icon: Mail },
   ];
 
@@ -96,7 +96,7 @@
   <nav
     transition:fly={{ x: -280, duration: 200 }}
     aria-label="Side menu"
-    class="fixed inset-y-0 left-0 z-50 flex w-70 max-w-[80vw] flex-col gap-1 bg-surface p-5 pt-[calc(1.25rem+env(safe-area-inset-top))] shadow-2xl"
+    class="fixed inset-y-0 left-0 z-50 flex w-120 max-w-[80vw] flex-col gap-1 bg-surface p-5 pt-[calc(1.25rem+env(safe-area-inset-top))] shadow-2xl"
   >
     <button
       type="button"
@@ -112,7 +112,7 @@
       type="button"
       disabled={authState === "checking"}
       onclick={handleAuthCta}
-      class="mb-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-60"
+      class="mb-3 flex w-50 items-center justify-center gap-2 rounded-2xl border-2 border-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-60"
     >
       {#if authState === "checking"}
         <span
