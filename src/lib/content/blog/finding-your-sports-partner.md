@@ -14,7 +14,7 @@ sport as you can feel harder than the workout itself. Here's what actually works
 can actually do — how long you've played, what format you prefer, and what a good session
 looks like to you. The more specific you are, the fewer awkward first sessions you'll have.
 
-![Two people playing tennis on an outdoor court](/blog/finding-your-sports-partner/tennis.jpg)
+![Two people playing tennis on an outdoor court](/blog/finding-your-sports-partner/beachtennis.jpg)
 
 ## 2. Set your format, not just your sport
 

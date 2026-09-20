@@ -5,6 +5,8 @@
   import AuthModal from "$lib/components/AuthModal.svelte";
   import { authUser, userProfile } from "$lib/stores/auth";
 
+  let { logoHref = "/" }: { logoHref?: string } = $props();
+
   let authModalOpen = $state(false);
   let authMode = $state<"login" | "register">("register");
 
@@ -39,7 +41,7 @@
 <div
   class="sticky top-0 z-10 flex items-center justify-center bg-bg px-4 pb-3 pt-5"
 >
-  <a href="/" aria-label="FIT-M8 home">
+  <a href={logoHref} aria-label="FIT-M8 home">
     <LogoText class="h-8 w-auto text-primary" />
   </a>
 </div>

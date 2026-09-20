@@ -18,7 +18,7 @@ with one obvious catch: **you need three other people**.
 - **Short, intense sessions.** A match rarely runs much past an hour, which fits into a normal
   week far more easily than a half-day tournament.
 
-![Two pairs playing padel on an indoor court](/blog/why-padel-is-taking-over/footvolley.jpg)
+![Two pairs playing padel on an indoor court](/blog/why-padel-is-taking-over/padel1.jpg)
 
 ## The real bottleneck: finding a fourth
 

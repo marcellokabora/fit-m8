@@ -19,7 +19,7 @@
 
 <div class="flex min-h-dvh flex-col bg-bg pb-16">
   <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col">
-    <BlogHeader />
+    <BlogHeader logoHref="/blog" />
 
     <img
       src={metadata.cover}

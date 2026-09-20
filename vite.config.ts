@@ -7,6 +7,15 @@ import Icons from 'unplugin-icons/vite';
 import { enhancedImages } from '@sveltejs/enhanced-img';
 import { mdsvex } from 'mdsvex';
 
+// mdsvex 0.12.8 still emits `<script context="module">` for frontmatter exports, which Svelte 5
+// deprecated in favor of `<script module>` - patch its output until mdsvex updates upstream.
+const fixMdsvexModuleContext = {
+	markup: ({ content, filename }: { content: string; filename?: string }) => {
+		if (!filename?.endsWith('.md')) return;
+		return { code: content.replace('<script context="module">', '<script module>') };
+	}
+};
+
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
@@ -17,7 +26,7 @@ export default defineConfig({
 			// SvelteKit ignore one entirely (see @sveltejs/kit/vite's sveltekit() docs), so any
 			// svelte-config-shaped option (extensions/preprocess included) must live here instead
 			extensions: ['.svelte', '.md'],
-			preprocess: [mdsvex({ extensions: ['.md'] })],
+			preprocess: [mdsvex({ extensions: ['.md'] }), fixMdsvexModuleContext],
 			compilerOptions: {
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
