@@ -270,13 +270,6 @@
           <QrCode class="size-4" />
           Promo codes
         </a>
-        <!-- <a
-          href="/app/admin/activities"
-          class="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-left text-sm font-bold text-primary active:scale-95"
-        >
-          <List class="size-4" />
-          All activities
-        </a> -->
       </div>
     </div>
   </BottomSheet>

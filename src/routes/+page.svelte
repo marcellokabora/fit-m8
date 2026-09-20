@@ -155,7 +155,7 @@
   // drives the CTA button: spinner while the persisted session resolves, then either
   // the normal sign-in action or an "open app" action - no automatic redirect
   let authState = $state<"checking" | "guest" | "loggedIn">("checking");
-  let appDestination = $state("/app/discover");
+  let appDestination = $state("/app/profile");
 
   onMount(() => {
     return authUser.subscribe(async (user) => {
@@ -165,7 +165,7 @@
         return;
       }
       const hasProfile = await userProfile.load(user.uid);
-      appDestination = hasProfile ? "/app/discover" : "/app/onboarding";
+      appDestination = hasProfile ? "/app/profile" : "/app/onboarding";
       authState = "loggedIn";
     });
   });
@@ -240,7 +240,7 @@
 
     <!-- fades the hero photo into the solid page bg instead of cutting off hard at the fold -->
     <div
-      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-bg"
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-b from-transparent to-bg"
       aria-hidden="true"
     ></div>
   </div>
@@ -285,7 +285,7 @@
             <!-- tilted on purpose - just a glimpse of the screen, not the full UI - only alternating
                  tilt direction, kept smaller on desktop since it now sits beside its text, not above it -->
             <div
-              class="mx-auto w-102 shrink-0 overflow-hidden shadow-xl mt-4 max-h-full mb-8 md:mx-0 md:mt-0 md:mb-0 md:w-80 {i %
+              class="mx-auto w-102 shrink-0 overflow-hidden shadow-xl mt-4 max-h-full mb-8 md:mx-0 md:mt-0 md:mb-0 md:w-80 relative {i %
                 2 ===
               0
                 ? 'rotate-6'
@@ -295,9 +295,14 @@
                 src={step.screen}
                 alt=""
                 aria-hidden="true"
-                sizes="(min-width: 768px) 320px, 288px"
-                class="aspect-431/886 w-full object-cover object-top"
+                // sizes="(min-width: 768px) 320px, 288px"
+                class="aspect-431/886 w-full object-cover object-top max-h-150 md:max-h-110"
               />
+
+              <div
+                class="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-b from-transparent to-bg"
+                aria-hidden="true"
+              ></div>
             </div>
           </li>
         {/each}

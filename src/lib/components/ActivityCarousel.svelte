@@ -166,7 +166,7 @@
 </script>
 
 <div
-  class="pointer-events-none fixed inset-0 z-0 bg-surface"
+  class="pointer-events-none fixed inset-0 z-0 bg-black/35"
   aria-hidden="true"
 ></div>
 {#each backgrounds as src, i}

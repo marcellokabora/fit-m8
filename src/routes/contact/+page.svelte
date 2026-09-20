@@ -2,29 +2,33 @@
   import BlogHeader from "$lib/components/blog/BlogHeader.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import { SOCIAL_LINKS } from "$lib/social";
+  import { submitContactMessage } from "$lib/firebase/contact";
   import { Mail, Send } from "@lucide/svelte";
 
-  const CONTACT_EMAIL = "marcellokabora+fit-m8@gmail.com";
   const CONTACT_EMAIL_DISPLAY = "info@fit-m8.app";
 
   let name = $state("");
   let email = $state("");
   let message = $state("");
   let sent = $state(false);
+  let sending = $state(false);
+  let error = $state("");
 
-  // No backend to send mail from (static site) - hand off to the visitor's own mail client instead.
-  function handleSubmit(e: SubmitEvent) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const subject = encodeURIComponent(
-      name ? `FIT-M8 contact form — ${name}` : "FIT-M8 contact form",
-    );
-    const body = encodeURIComponent(
-      [message, "", email ? `Reply to: ${email}` : ""]
-        .filter(Boolean)
-        .join("\n"),
-    );
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-    sent = true;
+    sending = true;
+    error = "";
+    try {
+      await submitContactMessage(name, email, message);
+      sent = true;
+      name = "";
+      email = "";
+      message = "";
+    } catch {
+      error = "Something went wrong sending your message. Please try again.";
+    } finally {
+      sending = false;
+    }
   }
 </script>
 
@@ -41,41 +45,7 @@
   <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col">
     <BlogHeader />
 
-    <div class="flex flex-col gap-6 px-5 pt-6 text-text">
-      <div class="flex flex-col gap-1">
-        <a href="/" class="text-xs font-semibold text-primary"
-          >&larr; Back to home</a
-        >
-        <h1 class="text-2xl font-black text-text">Contact</h1>
-      </div>
-
-      <p class="text-sm leading-relaxed text-muted">
-        Questions, feedback, or need a hand with your account? We'd love to hear
-        from you.
-      </p>
-
-      <a
-        href="mailto:{CONTACT_EMAIL}"
-        class="flex items-center gap-3 rounded-2xl border-2 border-border px-4 py-3 font-semibold text-primary active:scale-95"
-      >
-        <Mail class="size-5 shrink-0" />
-        {CONTACT_EMAIL_DISPLAY}
-      </a>
-
-      <div class="flex justify-center gap-5">
-        {#each SOCIAL_LINKS as link (link.url)}
-          <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Follow us: {link.label}"
-            class="text-muted transition-colors active:scale-95"
-          >
-            <SocialIcon url={link.url} class="size-6" />
-          </a>
-        {/each}
-      </div>
-
+    <div class="flex flex-col gap-8 px-5 pt-6 text-text">
       <form
         onsubmit={handleSubmit}
         class="flex flex-col gap-4 rounded-3xl bg-surface p-5 shadow-sm"
@@ -115,18 +85,36 @@
 
         <button
           type="submit"
-          class="flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 font-bold text-white active:scale-95"
+          disabled={sending}
+          class="flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 font-bold text-white active:scale-95 disabled:opacity-60"
         >
           <Send class="size-4.5" />
-          Send message
+          {sending ? "Sending..." : "Send message"}
         </button>
 
         {#if sent}
           <p class="text-center text-xs text-muted">
-            Opening your email app to finish sending...
+            Thanks! Your message has been sent.
           </p>
         {/if}
+        {#if error}
+          <p class="text-center text-xs text-red-500">{error}</p>
+        {/if}
       </form>
+
+      <div class="flex justify-center gap-5">
+        {#each SOCIAL_LINKS as link (link.url)}
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Follow us: {link.label}"
+            class="text-muted transition-colors active:scale-95"
+          >
+            <SocialIcon url={link.url} class="size-6" />
+          </a>
+        {/each}
+      </div>
     </div>
   </div>
 </div>
