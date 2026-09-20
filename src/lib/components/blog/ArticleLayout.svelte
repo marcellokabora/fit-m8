@@ -28,11 +28,10 @@
     />
 
     <div class="flex flex-col gap-1 px-5 pt-6">
-      <a href="/blog" class="text-xs font-semibold text-primary"
-        >&larr; Back to blog</a
-      >
       <p class="text-xs font-semibold text-muted">{formattedDate}</p>
-      <h1 class="text-2xl font-black text-text">{metadata.title}</h1>
+      <h1 class="text-2xl font-black text-text text-balance">
+        {metadata.title}
+      </h1>
     </div>
 
     <div

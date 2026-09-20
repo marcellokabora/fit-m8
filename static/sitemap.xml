@@ -21,6 +21,11 @@
 		<priority>0.5</priority>
 	</url>
 	<url>
+		<loc>https://fit-m8.app/blog/footvolley-in-barcelona</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
 		<loc>https://fit-m8.app/pitch</loc>
 		<changefreq>monthly</changefreq>
 		<priority>0.4</priority>
