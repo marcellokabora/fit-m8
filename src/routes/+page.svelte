@@ -297,13 +297,13 @@
                 alt=""
                 aria-hidden="true"
                 // sizes="(min-width: 768px) 320px, 288px"
-                class="aspect-431/886 w-full object-cover object-top max-h-150 md:max-h-110"
+                class="aspect-431/886 w-full object-cover object-top"
               />
 
-              <div
+              <!-- <div
                 class="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-b from-transparent to-bg"
                 aria-hidden="true"
-              ></div>
+              ></div> -->
             </div>
           </li>
         {/each}
