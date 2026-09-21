@@ -2,7 +2,7 @@
 title: "5 Tips to Find Your Perfect Sports Partner"
 date: "2026-08-10"
 excerpt: "Struggling to find someone at your level to train with? Here's how to actually find a sports partner who sticks around."
-cover: "/blog/finding-your-sports-partner/cover.jpg"
+cover: "/blog/finding-your-sports-partner/cover.png"
 ---
 
 Finding someone who actually shows up, matches your skill level, and wants to play the same
