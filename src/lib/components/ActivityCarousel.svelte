@@ -16,10 +16,7 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import { browser } from "$app/environment";
   import { page } from "$app/state";
-  import ActivityIcon from "$lib/components/ActivityIcon.svelte";
-  import { activeLanguage, createTranslator } from "$lib/stores/language";
   import padelImg from "$lib/assets/homepage/padel.jpg?quality=35&enhanced";
   import footvolleyImg from "$lib/assets/homepage/footvolley.jpg?quality=35&enhanced";
   import joggingImg from "$lib/assets/homepage/jogging.png?quality=35&enhanced";
@@ -32,20 +29,11 @@
   import soccerImg from "$lib/assets/homepage/football.jpg?quality=35&enhanced";
   import skateImg from "$lib/assets/homepage/skate.jpg?quality=35&enhanced";
 
-  let t = $derived(createTranslator($activeLanguage));
-
   const ITEM_HEIGHT = 64;
   const PEEK_HEIGHT = 44; // how much of each neighbor is revealed above/below
   const INTERVAL = 5000;
 
-  const shuffled = CAROUSEL_ACTIVITIES;
-
-  // ?activity=tennis picks the starting slide and, when matched, pauses autoplay
-  // (reading searchParams is forbidden during prerendering, so skip it there)
-  const activityParam = browser ? page.url.searchParams.get("activity") : null;
-  const initialIndex = activityParam
-    ? CAROUSEL_ACTIVITIES.findIndex((activity) => activity.id === activityParam)
-    : -1;
+  const shuffled = [...CAROUSEL_ACTIVITIES].sort(() => Math.random() - 0.5);
 
   // pad with the last/first item so a peek is always visible on both sides, even at the loop seam
   let track = $derived([
@@ -54,7 +42,7 @@
     shuffled[0],
   ]);
 
-  let pos = $state(initialIndex >= 0 ? initialIndex + 1 : 1);
+  let pos = $state(1);
   let animate = $state(true);
   // center the current item, leaving PEEK_HEIGHT of room above/below for the neighbors
   let offset = $derived(PEEK_HEIGHT - pos * ITEM_HEIGHT);
@@ -146,7 +134,7 @@
   }
 
   onMount(() => {
-    if (initialIndex < 0) startAutoplay();
+    startAutoplay();
     return () => {
       if (timer) clearInterval(timer);
     };
@@ -180,58 +168,3 @@
     style={`opacity: ${i === activeIndex && loaded[i] ? 0.3 : 0}`}
   />
 {/each}
-
-<div
-  class="activity-carousel relative mx-auto w-full max-w-xs overflow-hidden"
-  style={`height: ${ITEM_HEIGHT + PEEK_HEIGHT * 2}px`}
-  role="group"
-  aria-label={t.activity(shuffled[activeIndex].id)}
->
-  <div
-    class={animate
-      ? "flex flex-col transition-transform duration-350 ease-in-out"
-      : "flex flex-col"}
-    style={`transform: translateY(${offset}px)`}
-  >
-    {#each track as activity, i}
-      <div
-        class={i < pos
-          ? "flex cursor-pointer items-end justify-center transition-opacity duration-350"
-          : i > pos
-            ? "flex cursor-pointer items-start justify-center transition-opacity duration-350"
-            : "flex cursor-pointer items-center justify-center transition-opacity duration-350"}
-        style={`height: ${ITEM_HEIGHT}px; opacity: ${i === pos ? 1 : 0.76}`}
-        role="button"
-        tabindex="0"
-        onclick={() => userGoTo(i)}
-        onkeydown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            userGoTo(i);
-          }
-        }}
-      >
-        <span
-          class={i === pos
-            ? "flex scale-100 items-center gap-2 rounded-full bg-surface/20 px-5 py-3 text-base font-semibold text-primary transition-transform duration-350 box-shadow-md"
-            : "flex scale-75 items-center gap-2 px-5 py-3 text-base font-semibold text-muted transition-transform duration-350 text-shadow-2xs"}
-        >
-          <ActivityIcon
-            id={activity.id}
-            class={i === pos ? "size-5" : "size-4"}
-          />
-          {t.activity(activity.id)}
-        </span>
-      </div>
-    {/each}
-  </div>
-</div>
-
-<style>
-  /* hide on short viewports where the carousel would push other content off-screen */
-  @media (max-height: 500px) {
-    .activity-carousel {
-      display: none;
-    }
-  }
-</style>

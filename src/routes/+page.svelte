@@ -185,13 +185,13 @@
   />
 
   <div
-    class="relative flex min-h-dvh shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center gap-30"
+    class="relative flex min-h-[75vh] shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center"
   >
     <!-- Logo / Hero -->
     <div class="relative z-10 flex flex-col items-center gap-4 text-text">
       <h1 class="sr-only">FIT-M8</h1>
       <Logo
-        class="w-75 mt-8 h-auto text-primary my-6 drop-shadow-md max-w-[260px]"
+        class="w-75 mt-8 h-auto text-primary my-6 drop-shadow-md max-w-65"
       />
       <p
         class="text-center text-lg font-medium text-muted -mt-6 text-balance text-shadow-2xs"
@@ -204,7 +204,7 @@
     <!-- no z-index here: it must not trap the carousel's fixed background image in a stacking context above the logo/CTA -->
     <div
       transition:fade
-      class="relative flex h-38 w-full items-center justify-center -mt-4"
+      class="relative flex w-full items-center justify-center mt-20"
     >
       <ActivityCarousel />
     </div>
@@ -225,7 +225,7 @@
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex w-full capitalize max-w-75 mx-auto items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
+        class="flex capitalize mx-auto px-12 items-center justify-center cursor-pointer gap-3 rounded-full border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
       >
         {#if authState === "checking"}
           <span
@@ -240,7 +240,7 @@
 
     <!-- fades the hero photo into the solid page bg instead of cutting off hard at the fold -->
     <div
-      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-b from-transparent to-bg"
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-b from-transparent to-bg"
       aria-hidden="true"
     ></div>
   </div>
@@ -248,11 +248,12 @@
   <!-- SEO content: real, crawlable copy below the hero fold -->
   <main class="relative z-10 flex w-full flex-col gap-10 px-6 py-12 text-text">
     <section class="flex flex-col gap-6 md:-mb-40">
-      <h2
-        class="font-heading text-center text-xl font-bold text-primary md:mb-10"
-      >
+      <h2 class="font-heading text-center text-xl font-bold text-primary">
         {t.t("home.howItWorksTitle")}
       </h2>
+      <p class="-mt-4 text-center text-sm text-muted text-balance mb-8">
+        {t.t("home.howItWorksSubtitle")}
+      </p>
       <ol class="mx-auto flex w-full flex-col gap-8 md:gap-16">
         {#each STEPS as step, i}
           <li
@@ -322,7 +323,7 @@
         <!-- natural order, but chip size scales with the interest count to highlight the popular ones -->
         <!-- one big tilted "card" that bleeds off both page edges, matching the step screenshots above -->
         <div
-          class="-mx-34 md:mx-auto flex max-w-[800px] flex-wrap justify-center gap-2 rounded-3xl max-sm:bg-surface/40 p-5 max-sm:ring-1 ring-white/10 rotate-0"
+          class="-mx-34 md:mx-auto flex max-w-200 flex-wrap justify-center gap-2 rounded-3xl max-sm:bg-surface/40 p-5 max-sm:ring-1 ring-white/10 rotate-0"
         >
           {#each DISPLAYED_ACTIVITIES as activity}
             {@const count = interestCount(activity.id)}

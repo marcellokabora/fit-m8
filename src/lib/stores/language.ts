@@ -80,6 +80,7 @@ const MESSAGES = {
         'home.signingIn': 'Signing in...',
         'home.openApp': 'Open app',
         'home.howItWorksTitle': 'How FIT-M8 works',
+        'home.howItWorksSubtitle': 'From building your profile to meeting up to play.',
         'home.step1Title': 'Create your profile',
         'home.step1Desc': 'Pick the sports and activities you love and set your location.',
         'home.stepFiltersTitle': 'Fine-tune your matches',
@@ -489,6 +490,7 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
     en: {},
     es: {
         'home.howItWorksTitle': 'Cómo funciona FIT-M8',
+        'home.howItWorksSubtitle': 'Desde crear tu perfil hasta quedar para jugar.',
         'home.step1Title': 'Crea tu perfil',
         'home.step1Desc': 'Elige los deportes y actividades que te gustan y configura tu ubicación.',
         'home.stepFiltersTitle': 'Afina tus coincidencias',
@@ -739,6 +741,7 @@ const EXTRA_MESSAGES: Record<LanguageCode, Partial<Record<TranslationKey, string
     },
     it: {
         'home.howItWorksTitle': 'Come funziona FIT-M8',
+        'home.howItWorksSubtitle': 'Dalla creazione del tuo profilo fino a giocare insieme.',
         'home.step1Title': 'Crea il tuo profilo',
         'home.step1Desc': 'Scegli gli sport e le attività che ami e imposta la tua posizione.',
         'home.stepFiltersTitle': 'Perfeziona i tuoi match',

@@ -78,7 +78,7 @@
   type="button"
   onclick={() => (open = true)}
   aria-label="Open menu"
-  class="fixed left-4 top-[calc(1rem+env(safe-area-inset-top))] z-40 flex size-10 items-center justify-center rounded-full bg-surface/90 text-text shadow-md backdrop-blur-sm active:scale-95"
+  class="fixed left-4 cursor-pointer top-[calc(1rem+env(safe-area-inset-top))] z-40 flex size-10 items-center justify-center rounded-full bg-surface/90 text-text shadow-md backdrop-blur-sm active:scale-95"
 >
   <Menu class="size-5" />
 </button>
@@ -112,7 +112,7 @@
       type="button"
       disabled={authState === "checking"}
       onclick={handleAuthCta}
-      class="mb-3 flex w-50 items-center justify-center gap-2 rounded-2xl border-2 border-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-60"
+      class="mb-3 flex w-50 items-center justify-center gap-2 rounded-full border-2 border-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-60"
     >
       {#if authState === "checking"}
         <span
