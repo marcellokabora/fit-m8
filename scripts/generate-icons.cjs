@@ -12,7 +12,7 @@ const SOURCE_IMAGE = path.join(ROOT, "static", "logo", "logo-text-dark.png");
 // outside a centered ~80%-diameter "safe zone". Shrink the whole (already full-bleed) source
 // image and pad with its own background color so the logo mark sits safely inside that zone.
 const MASKABLE_SAFE_ZONE_SCALE = 0.8;
-const MASKABLE_BACKGROUND = { r: 22, g: 163, b: 74 }; // matches source canvas bg / --color-primary
+const MASKABLE_BACKGROUND = { r: 13, g: 40, b: 20 }; // matches source canvas bg / --color-surface
 
 async function render(size, outPath) {
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
