@@ -15,8 +15,11 @@
     Compass,
     MessagesSquare,
     MapPin,
+    Globe,
   } from "@lucide/svelte";
   import { activeTheme, THEMES } from "$lib/stores/theme";
+  import { SOCIAL_LINKS } from "$lib/social";
+  import SocialIcon from "$lib/components/SocialIcon.svelte";
   import CoverSlide from "./slides/CoverSlide.svelte";
   import ProblemSlide from "./slides/ProblemSlide.svelte";
   import WhyNowSlide from "./slides/WhyNowSlide.svelte";
@@ -200,6 +203,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>FIT-M8 - Pitch Deck</title>
+</svelte:head>
+
 <svelte:window onkeydown={onKeydown} />
 
 <div
@@ -212,7 +219,7 @@
     class="absolute right-4 top-4 z-20 flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-semibold text-text shadow-md transition-transform active:scale-95 print:hidden"
   >
     <Download class="size-4" />
-    Export PDF
+    Export
   </button>
 
   <div class="relative min-h-0 flex-1 overflow-hidden print:hidden">
@@ -237,12 +244,23 @@
   <div class="hidden print:block">
     {#each visibleSlides as printSlide, i (printSlide.key)}
       <div
-        class="print-slide flex flex-col overflow-hidden px-20 py-16 {i <
+        class="print-slide relative flex flex-col overflow-hidden px-20 py-16 {i <
         slideCount - 1
           ? 'break-after-page'
           : ''}"
       >
         <printSlide.component {...printSlide.props} />
+        <div class="fixed bottom-6 left-6 flex items-center gap-3">
+          <a
+            href="https://fit-m8.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-1 text-xs font-semibold text-muted"
+          >
+            <Globe class="size-3.5" />
+            fit-m8.app
+          </a>
+        </div>
       </div>
     {/each}
   </div>
@@ -251,37 +269,49 @@
   <div
     class="relative z-10 flex shrink-0 items-center justify-center gap-6 px-6 pb-10 pt-6 print:hidden"
   >
-    <!-- <button
+    <button
       type="button"
       onclick={prev}
       disabled={current === 0}
       aria-label="Previous slide"
-      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30"
+      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 cursor-pointer"
     >
       <ChevronLeft class="size-5" />
-    </button> -->
+    </button>
     <div class="flex items-center gap-2">
+      <div class="absolute left-7 flex items-center gap-3">
+        <a
+          href="https://fit-m8.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1 text-xs font-semibold text-muted"
+        >
+          <Globe class="size-3.5" />
+          fit-m8.app
+        </a>
+      </div>
+
       {#each Array(slideCount) as _, i}
         <button
           type="button"
           onclick={() => goTo(i)}
           aria-label={`Go to slide ${i + 1}`}
           aria-current={i === current ? "step" : undefined}
-          class="h-2 rounded-full transition-all {i === current
+          class="h-2 rounded-full transition-all cursor-pointer {i === current
             ? 'w-6 bg-primary'
             : 'w-2 bg-border'}"
         ></button>
       {/each}
     </div>
-    <!-- <button
+    <button
       type="button"
       onclick={next}
       disabled={current === slideCount - 1}
       aria-label="Next slide"
-      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30"
+      class="flex size-10 items-center justify-center rounded-full bg-surface text-text shadow-md transition-transform active:scale-90 disabled:opacity-30 cursor-pointer"
     >
       <ChevronRight class="size-5" />
-    </button> -->
+    </button>
   </div>
 </div>
 

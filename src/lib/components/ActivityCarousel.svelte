@@ -20,11 +20,9 @@
   import { page } from "$app/state";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
-  // lower quality is fine here - these render blurred at 30% opacity as fixed full-screen backgrounds
-  // ("enhanced" must be last in the query string to match the "*?enhanced" ambient module type)
   import padelImg from "$lib/assets/homepage/padel.jpg?quality=35&enhanced";
   import footvolleyImg from "$lib/assets/homepage/footvolley.jpg?quality=35&enhanced";
-  import joggingImg from "$lib/assets/homepage/jogging.jpg?quality=35&enhanced";
+  import joggingImg from "$lib/assets/homepage/jogging.png?quality=35&enhanced";
   import tennisImg from "$lib/assets/homepage/tennis.jpg?quality=35&enhanced";
   import basketballImg from "$lib/assets/homepage/bascketball.jpg?quality=35&enhanced";
   import cyclingImg from "$lib/assets/homepage/cycling.jpg?quality=35&enhanced";

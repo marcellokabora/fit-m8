@@ -1,19 +1,15 @@
 <script lang="ts">
   import Logo from "$lib/components/LogoText.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
-
-  const SOCIAL_LINKS = [
-    { url: "https://www.facebook.com/fitm8apps/", label: "Facebook" },
-    // { url: "https://www.instagram.com/", label: "Instagram" },
-    // { url: "https://www.youtube.com/", label: "YouTube" },
-    { url: "https://www.linkedin.com/company/fit-m8-app", label: "LinkedIn" },
-  ];
+  import { SOCIAL_LINKS } from "$lib/social";
 </script>
 
 <div
   class="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6 text-center"
 >
-  <Logo class="h-auto w-52 text-primary opacity-90" />
+  <a href="https://fit-m8.app" target="_blank" rel="noopener noreferrer">
+    <Logo class="h-auto w-52 text-primary opacity-90" />
+  </a>
   <h2 class="text-3xl font-bold text-text text-balance">
     Let's build the home for sports partners together.
   </h2>
@@ -31,7 +27,7 @@
     {/each}
   </div>
   <a
-    href="mailto:marcellokabora@gmail.com"
+    href="mailto:marcellokabora+fit-m8@gmail.com"
     class="font-semibold text-primary text-lg"
   >
     marcellokabora@gmail.com

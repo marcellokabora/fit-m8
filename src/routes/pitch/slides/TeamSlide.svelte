@@ -22,7 +22,7 @@
   const FOUNDER = {
     photo: marcelloPhoto,
     name: "Marcello Annicchairico",
-    role: "Founder, CEO & Software/Product Engineer",
+    role: "Founder & Engineer",
     desc: "A rare CEO who is also the engineer: designed, built, and shipped the entire product solo - product, full-stack development, and infrastructure - with a mobile app already live with real users. No dev team, no agency, no delays - pure execution speed.",
     links: [
       {
