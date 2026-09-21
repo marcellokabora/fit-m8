@@ -1,5 +1,7 @@
 <script lang="ts">
   import Logo from "$lib/components/LogoText.svelte";
+
+  import { Globe } from "@lucide/svelte";
 </script>
 
 <div
@@ -17,5 +19,15 @@
       Pre-Seed Pitch
     </p>
     <p class="text-sm text-muted">Marcello Annicchairico, Founder & Engineer</p>
+
+    <a
+      href="https://fit-m8.app"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mt-4 flex items-center gap-2 rounded-full bg-surface px-5 py-2.5 text-base font-semibold text-muted shadow-sm transition-transform active:scale-95"
+    >
+      <Globe class="size-4" />
+      fit-m8.app
+    </a>
   </div>
 </div>

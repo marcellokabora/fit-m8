@@ -15,7 +15,6 @@
     Compass,
     MessagesSquare,
     MapPin,
-    Globe,
   } from "@lucide/svelte";
   import { activeTheme, THEMES } from "$lib/stores/theme";
   import { SOCIAL_LINKS } from "$lib/social";
@@ -250,17 +249,6 @@
           : ''}"
       >
         <printSlide.component {...printSlide.props} />
-        <div class="fixed bottom-6 left-6 flex items-center gap-3">
-          <a
-            href="https://fit-m8.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-1 text-xs font-semibold text-muted"
-          >
-            <Globe class="size-3.5" />
-            fit-m8.app
-          </a>
-        </div>
       </div>
     {/each}
   </div>
@@ -279,18 +267,6 @@
       <ChevronLeft class="size-5" />
     </button>
     <div class="flex items-center gap-2">
-      <div class="absolute left-7 flex items-center gap-3">
-        <a
-          href="https://fit-m8.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex items-center gap-1 text-xs font-semibold text-muted"
-        >
-          <Globe class="size-3.5" />
-          fit-m8.app
-        </a>
-      </div>
-
       {#each Array(slideCount) as _, i}
         <button
           type="button"
