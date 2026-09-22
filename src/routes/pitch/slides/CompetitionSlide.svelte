@@ -8,7 +8,7 @@
   import TinderIcon from "~icons/simple-icons/tinder";
   import StravaIcon from "~icons/simple-icons/strava";
   import MeetupIcon from "~icons/simple-icons/meetup";
-  import LogoIcon from "$lib/components/LogoIcon.svelte";
+  import LogoMark from "$lib/components/LogoMark.svelte";
 
   const COMPETITORS = [
     "Tinder",
@@ -22,7 +22,7 @@
     Volleyball,
     StravaIcon,
     MeetupIcon,
-    LogoIcon,
+    LogoMark,
   ] as const;
 
   // kept short on purpose - this table is a quick scan, not a spec sheet
@@ -33,11 +33,11 @@
     {
       dimension: "Primary intent",
       cells: [
-        { label: "Romantic / Dating" },
-        { label: "Court & Club Booking" },
-        { label: "Fitness Tracking" },
-        { label: "Large Group Events" },
-        { label: "Peer-to-Peer Sports Matching" },
+        { label: "Romantic / Dating", support: "no" },
+        { label: "Court & Club Booking", support: "no" },
+        { label: "Fitness Tracking", support: "no" },
+        { label: "Large Group Events", support: "no" },
+        { label: "Peer-to-Peer Sports Matching", support: "yes" },
       ],
     },
     {
@@ -113,7 +113,7 @@
   >
     <thead>
       <tr
-        class="border-b border-border bg-gradient-to-r from-primary/25 to-primary/5"
+        class="border-b border-border bg-linear-to-r from-primary/25 to-primary/5"
       >
         <th class="p-3 text-left font-semibold text-muted">Dimension</th>
         {#each COMPETITORS as name, i}
