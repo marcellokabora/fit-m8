@@ -16,6 +16,27 @@
     content="Tips on finding sports partners, training buddies, and staying active - from the FIT-M8 team."
   />
   <link rel="canonical" href="https://fit-m8.app/blog" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Blog · FIT-M8" />
+  <meta
+    property="og:description"
+    content="Tips on finding sports partners, training buddies, and staying active - from the FIT-M8 team."
+  />
+  <meta property="og:url" content="https://fit-m8.app/blog" />
+  <meta
+    property="og:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blog · FIT-M8" />
+  <meta
+    name="twitter:description"
+    content="Tips on finding sports partners, training buddies, and staying active - from the FIT-M8 team."
+  />
+  <meta
+    name="twitter:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
 </svelte:head>
 
 <div class="flex min-h-dvh flex-col bg-bg pb-16">

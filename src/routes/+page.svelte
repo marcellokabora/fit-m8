@@ -158,6 +158,46 @@
   });
 </script>
 
+<svelte:head>
+  <!-- this is now the single source of truth for these tags: app.html used to hardcode
+       them, but that duplicated/conflicted with every other prerendered page's own
+       canonical/og:url once /pitch, /contact, /terms, /privacy also got real SEO tags. -->
+  <title>FIT-M8 - Find Your Sports Match</title>
+  <meta
+    name="description"
+    content="Rank your sports. Set your format. Meet your match"
+  />
+  <link rel="canonical" href="https://fit-m8.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="FIT-M8 - Find Your Sports Match" />
+  <meta
+    property="og:description"
+    content="Rank your sports. Set your format. Meet your match"
+  />
+  <meta property="og:url" content="https://fit-m8.app/" />
+  <meta
+    property="og:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="FIT-M8 - Find Your Sports Match" />
+  <meta
+    name="twitter:description"
+    content="Rank your sports. Set your format. Meet your match"
+  />
+  <meta
+    name="twitter:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
+  {@html `<script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "FIT-M8",
+    url: "https://fit-m8.app/",
+    description: "Rank your sports. Set your format. Meet your match",
+  })}<\/script>`}
+</svelte:head>
+
 <div
   class="relative flex min-h-dvh w-full flex-col overflow-x-hidden bg-bg"
   style="--color-bg: {darkColors.bg}; --color-surface: {darkColors.surface}; --color-text: {darkColors.text}; --color-muted: {darkColors.muted}; --color-border: {darkColors.border};"

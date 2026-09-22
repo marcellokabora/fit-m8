@@ -203,7 +203,33 @@
 </script>
 
 <svelte:head>
-  <title>FIT-M8 - Pitch Deck</title>
+  <title>Pitch Deck · FIT-M8</title>
+  <meta
+    name="description"
+    content="FIT-M8 investor pitch deck - the app that matches people by sport, not just looks."
+  />
+  <link rel="canonical" href="https://fit-m8.app/pitch" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="FIT-M8 - Pitch Deck" />
+  <meta
+    property="og:description"
+    content="FIT-M8 investor pitch deck - the app that matches people by sport, not just looks."
+  />
+  <meta property="og:url" content="https://fit-m8.app/pitch" />
+  <meta
+    property="og:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="FIT-M8 - Pitch Deck" />
+  <meta
+    name="twitter:description"
+    content="FIT-M8 investor pitch deck - the app that matches people by sport, not just looks."
+  />
+  <meta
+    name="twitter:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
 </svelte:head>
 
 <svelte:window onkeydown={onKeydown} />

@@ -6,6 +6,32 @@
 
 <svelte:head>
   <title>Privacy Policy · FIT-M8</title>
+  <meta
+    name="description"
+    content="Read the FIT-M8 Privacy Policy to learn what information we collect and how it's used."
+  />
+  <link rel="canonical" href="https://fit-m8.app/privacy" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Privacy Policy · FIT-M8" />
+  <meta
+    property="og:description"
+    content="Read the FIT-M8 Privacy Policy to learn what information we collect and how it's used."
+  />
+  <meta property="og:url" content="https://fit-m8.app/privacy" />
+  <meta
+    property="og:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Privacy Policy · FIT-M8" />
+  <meta
+    name="twitter:description"
+    content="Read the FIT-M8 Privacy Policy to learn what information we collect and how it's used."
+  />
+  <meta
+    name="twitter:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
 </svelte:head>
 
 <BackHeader title="Privacy Policy" class="bg-bg" />

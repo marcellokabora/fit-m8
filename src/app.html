@@ -15,28 +15,6 @@
 	     which otherwise start cold shortly after first paint and sit on the LCP critical path -->
 	<link rel="preconnect" href="https://apis.google.com" crossorigin />
 	<link rel="preconnect" href="https://www.googletagmanager.com" />
-	<!--
-		Static fallback SEO/OG tags: this app runs with ssr=false (SPA), so social/link-preview
-		crawlers (Facebook, Twitter, WhatsApp, etc.) never execute JS and never see the dynamic
-		<svelte:head> tags set in +layout.svelte - they only ever see this static HTML shell.
-	-->
-	<title>FIT-M8 - Find Your Sports Match</title>
-	<meta name="description" content="Rank your sports. Set your format. Meet your match" />
-	<link rel="canonical" href="https://fit-m8.app/" />
-	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="FIT-M8" />
-	<meta property="og:title" content="FIT-M8 - Find Your Sports Match" />
-	<meta property="og:description" content="Rank your sports. Set your format. Meet your match" />
-	<meta property="og:url" content="https://fit-m8.app/" />
-	<meta property="og:image" content="https://fit-m8.app/logo/social-preview.png" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="fb:app_id" content="1427668445891250" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="FIT-M8 - Find Your Sports Match" />
-	<meta name="twitter:description" content="Rank your sports. Set your format. Meet your match" />
-	<meta name="twitter:image" content="https://fit-m8.app/logo/social-preview.png" />
 	<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
@@ -51,15 +29,6 @@
 				"https://www.youtube.com/",
 				"https://www.linkedin.com/company/fit-m8-app"
 			]
-		}
-	</script>
-	<script type="application/ld+json">
-		{
-			"@context": "https://schema.org",
-			"@type": "WebSite",
-			"name": "FIT-M8",
-			"url": "https://fit-m8.app/",
-			"description": "Rank your sports. Set your format. Meet your match"
 		}
 	</script>
 	%sveltekit.head%

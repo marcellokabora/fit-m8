@@ -6,6 +6,32 @@
 
 <svelte:head>
   <title>Terms of Service · FIT-M8</title>
+  <meta
+    name="description"
+    content="Read the FIT-M8 Terms of Service governing your use of the app."
+  />
+  <link rel="canonical" href="https://fit-m8.app/terms" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Terms of Service · FIT-M8" />
+  <meta
+    property="og:description"
+    content="Read the FIT-M8 Terms of Service governing your use of the app."
+  />
+  <meta property="og:url" content="https://fit-m8.app/terms" />
+  <meta
+    property="og:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Terms of Service · FIT-M8" />
+  <meta
+    name="twitter:description"
+    content="Read the FIT-M8 Terms of Service governing your use of the app."
+  />
+  <meta
+    name="twitter:image"
+    content="https://fit-m8.app/logo/social-preview.png"
+  />
 </svelte:head>
 
 <BackHeader title="Terms of Service" class="bg-bg" />
