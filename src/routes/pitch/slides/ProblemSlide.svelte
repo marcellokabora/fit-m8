@@ -3,16 +3,16 @@
 
   const PROBLEM_POINTS = [
     {
-      title: "Tinder dating apps are misaligned",
-      desc: "Romance-first focus creates awkward dynamics when users strictly want a tennis partner or workout buddy.",
+      title: "Tinder & Bumble — Wrong Intent",
+      desc: "Romance-first focus creates awkward dynamics when users strictly want a tennis, padel, or gym partner.",
     },
     {
-      title: "Strava lacks real matchmaking",
-      desc: "Great for logging solo activity, but it doesn't connect you with nearby people to actually play or train with.",
+      title: "Strava & Playtomic — Solo & Post-Activity Focus",
+      desc: "Great for logging solo workouts after the fact, but lacks 1-on-1 discovery and real-time match coordination.",
     },
     {
-      title: "Meetup is group-heavy & rigid",
-      desc: "Designed for large group events with fixed schedules, making spontaneous 1-on-1 or 4-player match-ups difficult to organize.",
+      title: "Meetup & Facebook — High Friction & Rigid",
+      desc: "Built for broad, group-based events with fixed schedules—making spontaneous 1-on-1 or 4-player matches difficult to organize.",
     },
   ] as const;
 </script>
@@ -22,12 +22,11 @@
 >
   <div class="flex flex-1 flex-col gap-6 text-left print:text-center">
     <h2 class="text-4xl font-black text-text text-balance">
-      Existing social platforms fail active adults looking for sports partners.
+      Existing Social Platforms Fail Active Adults Seeking Sports Partners
     </h2>
     <p class="text-lg text-muted">
-      Active adults (18–45) moving to new cities, picking up racket or group
-      sports, or seeking gym accountability have nowhere dedicated to look for a
-      partner.
+      Active adults (18–45) moving to new cities, picking up racket sports, or
+      seeking workout accountability have no dedicated space to find partners.
     </p>
     <div class="flex flex-col gap-4">
       {#each PROBLEM_POINTS as point}

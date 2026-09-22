@@ -10,20 +10,25 @@
     {
       icon: TrendingUp,
       role: "Head of Growth",
-      desc: "Hyper-local consumer acquisition and community building for the Barcelona launch.",
+      desc: "Drive hyper-local CAC reduction, sports club partnerships.",
+    },
+    {
+      icon: TrendingUp,
+      role: "Community Manager",
+      desc: "Event management & organic user retention.",
     },
     {
       icon: Users,
-      role: "Advisors",
-      desc: "Fitness industry veterans and marketplace-scaling advisors, being recruited now.",
+      role: "Advisory Board",
+      desc: "Fitness industry veterans and marketplace-scaling advisors.",
     },
   ] as const;
 
   const FOUNDER = {
     photo: marcelloPhoto,
     name: "Marcello Annicchairico",
-    role: "Founder & Engineer",
-    desc: "A rare CEO who is also the engineer: designed, built, and shipped the entire product solo - product, full-stack development, and infrastructure - with a mobile app already live with real users. No dev team, no agency, no delays - pure execution speed.",
+    role: "Founder & Product Lead",
+    desc: "Engineered and launched Fit-m8 end-to-end. Focused on core product architecture, feature iteration, and tech infrastructure.",
     links: [
       {
         url: "https://www.linkedin.com/in/marcellokabora",
@@ -51,7 +56,7 @@
     Team & execution
   </p>
   <h2 class="text-4xl font-black text-text text-balance text-center">
-    A solo technical founder who has already built and shipped the product.
+    Technical Execution Complete. Raising to Scale Growth
   </h2>
   <div
     class="flex w-full flex-row items-center gap-8 rounded-3xl border border-primary/20 bg-linear-to-br from-primary/10 via-surface to-surface p-8 text-left shadow-sm"
@@ -85,10 +90,12 @@
     </div>
   </div>
   <div class="flex w-full flex-col gap-2">
-    <p class="text-xs font-semibold uppercase tracking-widest text-primary">
+    <p
+      class="text-xs font-semibold uppercase tracking-widest text-primary text-center mb-4"
+    >
       Key hires planned with this raise
     </p>
-    <div class="grid w-full grid-cols-2 gap-4">
+    <div class="grid w-full grid-cols-{NEXT_HIRES.length} gap-4">
       {#each NEXT_HIRES as hire}
         <div
           class="flex items-start gap-3 rounded-2xl bg-surface p-4 text-left shadow-sm"

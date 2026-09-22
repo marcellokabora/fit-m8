@@ -18,36 +18,36 @@
   const PREMIUM_FEATURES = [
     {
       icon: Heart,
-      title: "Unlimited daily likes",
-      desc: `Free accounts get ${MAX_LIKES_FREE_PER_DAY} likes a day.`,
+      title: "Unlimited Discovery",
+      desc: `Unlimited daily likes (free plan capped at ${MAX_LIKES_FREE_PER_DAY}/day).`,
     },
     {
       icon: MessageCircle,
-      title: "Message directly",
-      desc: "Skip the match — reach out to any profile without waiting.",
+      title: "Direct Connect",
+      desc: "Skip matching—message profiles directly without waiting.",
     },
     {
       icon: Dumbbell,
-      title: "Full activity access",
-      desc: `Up to ${MAX_SPORTS_PREMIUM} sports instead of ${MAX_SPORTS_FREE}.`,
+      title: "Multi-Sport Access",
+      desc: `Filter up to ${MAX_SPORTS_PREMIUM} sports activities instead of ${MAX_SPORTS_FREE}.`,
     },
     {
       icon: Zap,
       title: "Priority boost",
-      desc: "Get surfaced first in local discovery feeds.",
+      desc: "Featured placement in local discovery feeds.",
     },
   ] as const;
 
   const PHASE2_UPSIDES = [
     {
       icon: Building2,
-      title: "Venue booking commissions",
-      desc: "Take-rate on court bookings (Padel/Tennis) initiated inside match chats.",
+      title: "Venue Booking Commissions",
+      desc: "10–15% take-rate on court bookings (Padel/Tennis) inside match chats.",
     },
     {
       icon: Handshake,
       title: "Certified trainer marketplace",
-      desc: "15% commission on private session bookings with verified trainers.",
+      desc: "15% commission on private sessions with verified coaches.",
     },
   ] as const;
 </script>
@@ -60,10 +60,10 @@
       <Crown class="size-8" />
     </span>
     <h2 class="text-4xl font-black text-text text-balance">
-      Freemium core driving high-margin subscription and transactional upside.
+      Freemium Core Driving High-Margin Subscriptions & Transactional
     </h2>
     <p class="text-5xl font-black text-primary">
-      ${PREMIUM_PRICE_USD} / month
+      €{PREMIUM_PRICE_USD} / month
     </p>
   </div>
   <div class="grid grid-cols-2 gap-4">
@@ -81,10 +81,14 @@
       </div>
     {/each}
   </div>
+
+  <p
+    class="text-xs font-semibold uppercase tracking-widest text-primary text-center"
+  >
+    Future platform upsides — Phase 2
+  </p>
+
   <div class="flex flex-col gap-3 rounded-2xl bg-surface p-6">
-    <p class="text-xs font-semibold uppercase tracking-widest text-primary">
-      Future platform upsides — Phase 2
-    </p>
     <div class="grid grid-cols-2 gap-4">
       {#each PHASE2_UPSIDES as upside}
         <div class="flex items-start gap-3">

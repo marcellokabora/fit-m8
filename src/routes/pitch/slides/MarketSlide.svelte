@@ -4,24 +4,22 @@
   const MARKET_BREAKDOWN = [
     {
       tier: "TAM",
-      value: "$18.4B",
-      label: "Total addressable market",
-      detail:
-        "600M global adults participating in regular sports/fitness activities.",
+      value: "€18.4B",
+      label: "Total Addressable Market",
+      detail: "Global fitness & social matching market (600M active adults).",
     },
     {
       tier: "SAM",
-      value: "$2.16B",
-      label: "Serviceable addressable market",
+      value: "€2.16B",
+      label: "Serviceable Addressable Market",
       detail:
-        "180M active urban sports enthusiasts in Europe & North America who play partner/group sports (Padel, Tennis, Gym, Running), at an estimated $12.00 annual ARPU.",
+        "180M urban European athletes playing racket, team, or fitness sports.",
     },
     {
       tier: "SOM",
-      value: "$43.2M",
-      label: "Serviceable obtainable market",
-      detail:
-        "Initial 3-year capture of 3.6M active users across the top 15 European metro hubs (Barcelona, Madrid, London, Berlin, Milan).",
+      value: "€43.2M",
+      label: "Serviceable Obtainable Market",
+      detail: "3-year capture across top 15 Tier-1 European cities.",
     },
   ] as const;
 </script>
@@ -35,7 +33,7 @@
     <ChartPie class="size-8" />
   </span>
   <h2 class="text-4xl font-black text-text text-balance text-center">
-    A $2.1B+ addressable market built on sports enthusiast ARPU.
+    A €2.1B+ Addressable Market Powered by Active Sports Enthusiasts
   </h2>
   <div class="grid w-full grid-cols-3 gap-6">
     {#each MARKET_BREAKDOWN as tier}

@@ -35,6 +35,9 @@
 
   let t = $derived(createTranslator($activeLanguage));
 
+  // pages that don't wire up sign-in (e.g. the pitch deck) just omit onSignIn
+  let showAuthCta = $derived(onSignIn !== undefined);
+
   let open = $state(false);
 
   const LINKS: SideMenuLink[] = [
@@ -96,7 +99,7 @@
   <nav
     transition:fly={{ x: -280, duration: 200 }}
     aria-label="Side menu"
-    class="fixed inset-y-0 left-0 z-50 flex w-120 max-w-[80vw] flex-col gap-1 bg-surface p-5 pt-[calc(1.25rem+env(safe-area-inset-top))] shadow-2xl"
+    class="fixed inset-y-0 left-0 z-50 flex w-120 max-w-[80vw] flex-col gap-1 bg-surface p-5 pt-[calc(1.25rem+env(safe-area-inset-top))] shadow-2xl print:hidden"
   >
     <button
       type="button"
@@ -107,22 +110,25 @@
       <X class="size-5" />
     </button>
 
-    <!-- the app's primary action, so it stands out from the plain nav links below -->
-    <button
-      type="button"
-      disabled={authState === "checking"}
-      onclick={handleAuthCta}
-      class="mb-3 flex w-50 items-center justify-center gap-2 rounded-full border-2 border-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-60"
-    >
-      {#if authState === "checking"}
-        <span
-          class="size-5 shrink-0 animate-spin rounded-full border-2 border-white/30 border-t-white"
-        ></span>
-      {:else}
-        <LogIn class="size-5" />
-      {/if}
-      {authState === "loggedIn" ? t.t("home.openApp") : t.t("auth.signIn")}
-    </button>
+    {#if showAuthCta}
+      <!-- the app's primary action, so it stands out from the plain nav links below -->
+
+      <button
+        type="button"
+        disabled={authState === "checking"}
+        onclick={handleAuthCta}
+        class="mb-3 flex w-50 items-center justify-center gap-2 rounded-full border-2 border-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-60"
+      >
+        {#if authState === "checking"}
+          <span
+            class="size-5 shrink-0 animate-spin rounded-full border-2 border-white/30 border-t-white"
+          ></span>
+        {:else}
+          <LogIn class="size-5" />
+        {/if}
+        {authState === "loggedIn" ? t.t("home.openApp") : t.t("auth.signIn")}
+      </button>
+    {/if}
 
     {#each LINKS as link (link.href)}
       <a

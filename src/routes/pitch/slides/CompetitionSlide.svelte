@@ -1,18 +1,31 @@
 <script lang="ts">
-  import { CircleCheck, CircleX, CircleAlert } from "@lucide/svelte";
+  import {
+    CircleCheck,
+    CircleX,
+    CircleAlert,
+    Volleyball,
+  } from "@lucide/svelte";
   import TinderIcon from "~icons/simple-icons/tinder";
   import StravaIcon from "~icons/simple-icons/strava";
   import MeetupIcon from "~icons/simple-icons/meetup";
   import LogoIcon from "$lib/components/LogoIcon.svelte";
 
-  const COMPETITORS = ["Tinder", "Strava", "Meetup", "FIT-M8"] as const;
+  const COMPETITORS = [
+    "Tinder",
+    "Playtomic",
+    "Strava",
+    "Meetup",
+    "FIT-M8",
+  ] as const;
   const COMPETITOR_ICONS = [
     TinderIcon,
+    Volleyball,
     StravaIcon,
     MeetupIcon,
     LogoIcon,
   ] as const;
 
+  // kept short on purpose - this table is a quick scan, not a spec sheet
   type Support = "yes" | "no" | "partial";
   type Cell = { label: string; support?: Support };
   type Row = { dimension: string; cells: Cell[] };
@@ -21,7 +34,8 @@
       dimension: "Primary intent",
       cells: [
         { label: "Romantic / Dating" },
-        { label: "Fitness Tracking & Social Feed" },
+        { label: "Court & Club Booking" },
+        { label: "Fitness Tracking" },
         { label: "Large Group Events" },
         { label: "Peer-to-Peer Sports Matching" },
       ],
@@ -30,7 +44,8 @@
       dimension: "Sport & skill filtering",
       cells: [
         { label: "None", support: "no" },
-        { label: "Activity Type Tags Only", support: "partial" },
+        { label: "Racket Sports Only", support: "partial" },
+        { label: "Activity Tags Only", support: "partial" },
         { label: "Event Categories Only", support: "partial" },
         { label: "100+ Sports & Skill Levels", support: "yes" },
       ],
@@ -38,19 +53,21 @@
     {
       dimension: "Match dynamics",
       cells: [
-        { label: "1-on-1" },
-        { label: "Follow / Kudos, No Matching" },
-        { label: "Group / Event Host" },
-        { label: "1-on-1 & 4-Player Activity Loops" },
+        { label: "1-on-1 Only", support: "no" },
+        { label: "Court Lobby Rentals", support: "no" },
+        { label: "Follow / Kudos", support: "no" },
+        { label: "Group Only", support: "partial" },
+        { label: "1-on-1 & 4-Player Activity Loops", support: "yes" },
       ],
     },
     {
-      dimension: "Real-time map check-in",
+      dimension: "Real-time map discovery",
       cells: [
         { label: "No", support: "no" },
+        { label: "Venue Map Only", support: "partial" },
+        { label: "Heatmap Only", support: "partial" },
         { label: "No", support: "no" },
-        { label: "No", support: "no" },
-        { label: "Live Spot Check-Ins", support: "yes" },
+        { label: "Live Spot Check-Ins & Heatmaps", support: "yes" },
       ],
     },
     {
@@ -59,39 +76,35 @@
         { label: "Yes", support: "yes" },
         { label: "No", support: "no" },
         { label: "No", support: "no" },
-        { label: "Yes", support: "yes" },
+        { label: "No", support: "no" },
+        { label: "Yes (Swipe + Map Views)", support: "yes" },
       ],
     },
     {
-      dimension: "Trainer marketplace",
+      dimension: "Monetization engine",
       cells: [
-        { label: "No", support: "no" },
-        { label: "No", support: "no" },
-        { label: "No", support: "no" },
-        { label: "Built-in Trainer Discovery", support: "yes" },
-      ],
-    },
-    {
-      dimension: "Dating, friends & training",
-      cells: [
-        { label: "Dating Only", support: "no" },
-        { label: "Tracking Only", support: "no" },
-        { label: "Events Only", support: "no" },
-        { label: "All Three Intents", support: "yes" },
+        { label: "Dating Subscriptions" },
+        { label: "Court Commission Only" },
+        { label: "Subscription (Premium)" },
+        { label: "Ticket / Group Fees" },
+        {
+          label: "Subscriptions + Trainer & Venue Marketplace",
+          support: "yes",
+        },
       ],
     },
   ];
 </script>
 
 <div
-  class="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-6"
+  class="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center gap-6"
 >
   <p class="text-xs font-semibold uppercase tracking-widest text-primary">
     Competitive landscape
   </p>
   <h2 class="text-4xl font-black text-text text-balance text-center">
     FIT-M8 fills the gap between dating apps, fitness trackers, and group
-    organizers.
+    organizers
   </h2>
 
   <!-- Desktop/print: full table -->
@@ -99,11 +112,13 @@
     class="w-full border-collapse overflow-hidden rounded-2xl bg-surface text-sm shadow-sm"
   >
     <thead>
-      <tr class="border-b border-border">
+      <tr
+        class="border-b border-border bg-gradient-to-r from-primary/25 to-primary/5"
+      >
         <th class="p-3 text-left font-semibold text-muted">Dimension</th>
         {#each COMPETITORS as name, i}
           <th
-            class="p-3 text-left font-semibold {i === 3
+            class="p-3 text-left font-semibold {i === COMPETITORS.length - 1
               ? 'text-primary'
               : 'text-text'}"
           >
@@ -124,17 +139,17 @@
           <td class="p-3 font-semibold text-text">{row.dimension}</td>
           {#each row.cells as cell, i}
             <td
-              class="p-3 {i === 3
+              class="p-3 {i === COMPETITORS.length - 1
                 ? 'font-semibold text-primary'
                 : 'text-muted'}"
             >
               <span class="inline-flex items-center gap-1.5">
                 {#if cell.support === "yes"}
-                  <CircleCheck class="size-4 shrink-0 text-muted" />
+                  <CircleCheck class="size-4 shrink-0 text-emerald-500" />
                 {:else if cell.support === "no"}
-                  <CircleX class="size-4 shrink-0 text-muted" />
+                  <CircleX class="size-4 shrink-0 text-red-500" />
                 {:else if cell.support === "partial"}
-                  <CircleAlert class="size-4 shrink-0 text-muted" />
+                  <CircleAlert class="size-4 shrink-0 text-amber-500" />
                 {/if}
                 {cell.label}
               </span>

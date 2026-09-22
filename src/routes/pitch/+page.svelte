@@ -19,6 +19,7 @@
   import { activeTheme, THEMES } from "$lib/stores/theme";
   import { SOCIAL_LINKS } from "$lib/social";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
+  import SideMenu from "$lib/components/SideMenu.svelte";
   import CoverSlide from "./slides/CoverSlide.svelte";
   import ProblemSlide from "./slides/ProblemSlide.svelte";
   import WhyNowSlide from "./slides/WhyNowSlide.svelte";
@@ -233,6 +234,10 @@
 </svelte:head>
 
 <svelte:window onkeydown={onKeydown} />
+
+<div class="print:hidden">
+  <SideMenu />
+</div>
 
 <div
   class="relative flex h-dvh flex-col overflow-hidden bg-bg text-text print:h-auto print:overflow-visible"

@@ -4,25 +4,25 @@
   const GTM_PILLARS = [
     {
       icon: Handshake,
-      title: "Anchor partnerships",
-      desc: "Partner directly with Barcelona's Padel clubs, beach volleyball hubs, and gym chains for exclusive member perks.",
+      title: "Anchor Hotspots",
+      desc: "Direct integrations with high-volume sports hubs (Padel & Beach Volleyball) to capture existing athletic communities.",
     },
     {
       icon: Sparkles,
-      title: "Micro-influencer & ambassador loops",
-      desc: "Onboard local fitness creators and tournament organizers to host public match lobbies.",
+      title: "Creator Lobbies",
+      desc: "Micro-influencer & organizer ambassador loops driving public match creation and user retention.",
     },
     {
       icon: Rocket,
-      title: "Grassroots organic acquisition",
-      desc: "Geo-targeted campaigns around Barcelona's sport hotspots — Barceloneta beach volley courts, municipal tennis clubs.",
+      title: "Hyper-Local Acquisition",
+      desc: "Geo-targeted physical activations & localized social campaigns around active sports hubs.",
     },
   ] as const;
 
   const GTM_METRICS = [
-    { label: "Target CAC", value: "< $3.50" },
-    { label: "Target 6-month LTV", value: "$18.00" },
-    { label: "Target LTV : CAC", value: "> 5.0×" },
+    { label: "Blended CAC", value: "< $3.00" },
+    { label: "6-Month LTV", value: "$18.00" },
+    { label: "LTV : CAC", value: "> 6.0×" },
   ] as const;
 </script>
 
@@ -34,7 +34,7 @@
   </p>
   <h2 class="text-4xl font-black text-text text-balance text-center">
     Hyper-local rollout playbook starting in Barcelona's high-density sports
-    hubs.
+    hubs
   </h2>
   <div class="grid w-full grid-cols-3 gap-6">
     {#each GTM_PILLARS as pillar}

@@ -4,18 +4,18 @@
   const WHY_NOW = [
     {
       icon: TrendingUp,
-      title: "Explosion of social racket sports",
-      desc: "Padel and Pickleball are experiencing >25% YoY player growth globally, creating urgent demand for 4-player matchmaking.",
+      title: "Global Explosion of Social Racket Sports",
+      desc: "Padel and Pickleball are growing at >25% YoY. Both require exactly 4 balanced players, creating urgent daily demand for hyper-local matchmaking.",
     },
     {
       icon: HeartHandshake,
-      title: "Loneliness epidemic & social fitness",
-      desc: "Gen Z and Millennials are replacing nightlife with active social clubs and fitness communities.",
+      title: "The Shift From Nightlife to Social Fitness",
+      desc: "Gen Z and Millennials are swapping bars for active social clubs, run clubs, and fitness communities to fight urban isolation.",
     },
     {
       icon: MapPinned,
-      title: "Location-based matchmaking maturity",
-      desc: "Consumers are universally accustomed to swipe/map-based discovery, eliminating user onboarding friction.",
+      title: "Normalization of Matchmaking UI",
+      desc: "Location-based swiping and map discovery are now universal consumer habits, eliminating onboarding friction for non-dating apps.",
     },
   ] as const;
 </script>
@@ -27,8 +27,7 @@
     Why now?
   </p>
   <h2 class="text-4xl font-black text-text text-balance">
-    A confluence of social fitness trends and sports booms creates an immediate
-    market window.
+    Three Macro Tailwinds Driving Immediate Market Demand
   </h2>
   <div class="grid w-full grid-cols-3 gap-6">
     {#each WHY_NOW as driver}
