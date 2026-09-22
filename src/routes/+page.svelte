@@ -22,12 +22,8 @@
     MessagesSquare,
     MapPin,
     LogIn,
+    ChevronDown,
   } from "@lucide/svelte";
-  import footballImg from "$lib/assets/homepage/football.jpg?enhanced";
-  import tennisImg from "$lib/assets/homepage/tennis.jpg?enhanced";
-  import boxingImg from "$lib/assets/homepage/boxing.jpg?enhanced";
-  import surfImg from "$lib/assets/homepage/surf.jpg?enhanced";
-  import cyclingImg from "$lib/assets/homepage/cycling.jpg?enhanced";
   import activitiesScreen from "$lib/assets/screens/activities.png?enhanced";
   import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
   import trainerScreen from "$lib/assets/screens/trainer.png?enhanced";
@@ -36,15 +32,6 @@
   import exploreScreen from "$lib/assets/screens/explore.png?enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
-
-  // a small curated bento of homepage photos - not the full carousel set
-  const GALLERY_TILES = [
-    { id: "soccer", src: footballImg, span: true },
-    { id: "tennis", src: tennisImg, span: false },
-    { id: "boxing", src: boxingImg, span: false },
-    { id: "surf", src: surfImg, span: false },
-    { id: "cycling", src: cyclingImg, span: false },
-  ];
 
   // icon + in-app screenshot per step, so each step shows a peek of the real screen it describes
   const STEPS = [
@@ -185,28 +172,22 @@
   />
 
   <div
-    class="relative flex min-h-[75vh] shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center"
+    class="relative flex min-h-screen shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center gap-20"
   >
+    <!-- Activity carousel -->
+    <div transition:fade class="">
+      <ActivityCarousel />
+    </div>
+
     <!-- Logo / Hero -->
     <div class="relative z-10 flex flex-col items-center gap-4 text-text">
       <h1 class="sr-only">FIT-M8</h1>
-      <Logo
-        class="w-75 mt-8 h-auto text-primary my-6 drop-shadow-md max-w-65"
-      />
+      <Logo class="w-75 h-auto text-primary my-6 drop-shadow-md max-w-65" />
       <p
         class="text-center text-lg font-medium text-muted -mt-6 text-balance text-shadow-2xs"
       >
         {t.t("home.tagline")}<br />{t.t("home.taglineSecond")}
       </p>
-    </div>
-
-    <!-- Activity carousel -->
-    <!-- no z-index here: it must not trap the carousel's fixed background image in a stacking context above the logo/CTA -->
-    <div
-      transition:fade
-      class="relative flex w-full items-center justify-center mt-20"
-    >
-      <ActivityCarousel />
     </div>
 
     <!-- CTA -->
@@ -238,9 +219,17 @@
       </button>
     </div>
 
+    <!-- scroll cue: hints there's more content below the hero fold -->
+    <div
+      class="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex justify-center text-text/70"
+      aria-hidden="true"
+    >
+      <ChevronDown class="size-5 animate-bounce" />
+    </div>
+
     <!-- fades the hero photo into the solid page bg instead of cutting off hard at the fold -->
     <div
-      class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-b from-transparent to-bg"
+      class="pointer-events-none absolute inset-x-0 -bottom-2 h-1/3 bg-linear-to-b from-transparent to-bg"
       aria-hidden="true"
     ></div>
   </div>
