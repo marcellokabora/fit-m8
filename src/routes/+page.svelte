@@ -172,10 +172,10 @@
   />
 
   <div
-    class="relative flex min-h-screen shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center gap-20"
+    class="relative flex min-h-dvh shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center gap-20"
   >
     <!-- Activity carousel -->
-    <div transition:fade class="">
+    <div transition:fade class="absolute inset-0">
       <ActivityCarousel />
     </div>
 

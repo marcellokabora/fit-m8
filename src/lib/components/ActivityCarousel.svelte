@@ -151,10 +151,7 @@
   });
 </script>
 
-<div
-  class="pointer-events-none absolute inset-0 z-0 bg-black/35"
-  aria-hidden="true"
-></div>
+<div class="pointer-events-none z-0 bg-black/35" aria-hidden="true"></div>
 {#each backgrounds as src, i}
   <enhanced:img
     {src}
