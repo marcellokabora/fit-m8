@@ -1,4 +1,6 @@
 <script lang="ts">
+  import SiteHeader from "$lib/components/SiteHeader.svelte";
+
   const LAST_UPDATED = "August 21, 2026";
 </script>
 
@@ -35,6 +37,8 @@
 <div
   class="flex flex-col gap-5 px-5 pb-16 text-sm leading-relaxed text-text max-w-5xl m-auto"
 >
+  <SiteHeader />
+
   <p class="text-xs text-muted">Last updated: {LAST_UPDATED}</p>
 
   <p>
