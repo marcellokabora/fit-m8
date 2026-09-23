@@ -22,7 +22,7 @@
         onclick={() => activeTheme.selectMode("light")}
         class="flex flex-1 items-center justify-center gap-2 rounded-full py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
         'light'
-          ? 'bg-primary text-white'
+          ? 'bg-primary text-bg'
           : 'text-muted'}"
       >
         <Sun class="size-4" />
@@ -32,7 +32,7 @@
         onclick={() => activeTheme.selectMode("dark")}
         class="flex flex-1 items-center justify-center gap-2 rounded-full py-2 text-sm font-bold transition-colors {$activeTheme.mode ===
         'dark'
-          ? 'bg-primary text-white'
+          ? 'bg-primary text-bg'
           : 'text-muted'}"
       >
         <Moon class="size-4" />
@@ -40,7 +40,7 @@
       </button>
     </div>
 
-    <!-- {#if import.meta.env.DEV}
+    {#if import.meta.env.DEV}
       <div class="relative">
         <button
           type="button"
@@ -55,7 +55,7 @@
         >
           <span
             class="size-6 rounded-full shadow-sm"
-            style="background: linear-gradient(135deg, {currentTheme.primary} 50%, {currentTheme.primaryDark} 50%);"
+            style="background: linear-gradient(135deg, {currentTheme.primary} 50%, {currentTheme.secondary} 50%);"
           ></span>
         </button>
 
@@ -75,7 +75,7 @@
                 }}
                 aria-label={t.t(`appearance.${theme.id}` as any)}
                 class="relative flex size-10 items-center justify-center rounded-full shadow-sm transition-transform active:scale-95"
-                style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.primaryDark} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
+                style="background: linear-gradient(135deg, {theme.primary} 50%, {theme.secondary} 50%); box-shadow: 0 0 0 3px {$activeTheme.mode ===
                 'dark'
                   ? theme.dark.bg
                   : theme.light.bg}, 0 0 0 {$activeTheme.themeId === theme.id
@@ -92,6 +92,6 @@
           </div>
         {/if}
       </div>
-    {/if} -->
+    {/if}
   </div>
 </div>

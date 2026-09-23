@@ -191,7 +191,7 @@
       <button
         onclick={generateCode}
         disabled={generating}
-        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-bg active:scale-95 disabled:opacity-50"
       >
         {#if generating}
           <LoaderCircle class="size-4 animate-spin" />

@@ -356,7 +356,7 @@
         <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.datingPreset")}
         >
@@ -365,7 +365,7 @@
         <button
           onclick={applyFriendsPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isFriendsPreset
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.friendsPreset")}
         >
@@ -374,7 +374,7 @@
         <button
           onclick={applyTrainerPreset}
           class="size-9 items-center justify-center rounded-full shadow-sm flex {isTrainerPreset
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.trainerPreset")}
         >
@@ -580,7 +580,7 @@
       onclick={() => pickActivity("")}
       class="mb-2 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.length ===
       0
-        ? 'bg-primary text-white'
+        ? 'bg-primary text-bg'
         : 'text-text hover:bg-bg'}"
     >
       {t.t("discover.allSports")}
@@ -592,7 +592,7 @@
           class="flex min-w-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors {draftActivities.includes(
             act.id,
           )
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'text-text hover:bg-bg'}"
         >
           <ActivityIcon id={act.id} class="size-4 shrink-0" />
@@ -615,7 +615,7 @@
   <div class="border-t border-border bg-surface p-4">
     <button
       onclick={applyAndBack}
-      class="relative flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 font-bold text-white active:scale-95"
+      class="relative flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 font-bold text-bg active:scale-95"
     >
       <span class="flex items-center gap-2 {previewLoading ? 'opacity-0' : ''}">
         <Users class="size-5" />

@@ -312,7 +312,7 @@
           <div
             class="max-w-[75%] whitespace-pre-wrap wrap-break-word rounded-2xl px-4 py-3 text-sm {msg.senderId ===
             currentUid
-              ? 'rounded-br-sm bg-primary text-white'
+              ? 'rounded-br-sm bg-primary text-bg'
               : 'rounded-bl-sm bg-surface text-text shadow-sm'}"
           >
             {#each linkifyText(msg.text) as seg}
@@ -347,7 +347,7 @@
       <button
         onclick={send}
         disabled={!text.trim() || sending}
-        class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-xl text-white shadow-md active:scale-90 disabled:opacity-40 transition-transform"
+        class="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-xl text-bg shadow-md active:scale-90 disabled:opacity-40 transition-transform"
       >
         <Send class="size-5" />
       </button>
@@ -398,7 +398,7 @@
         <p class="text-sm text-muted">{t.t("chat.reportSuccess")}</p>
         <button
           onclick={() => (showReportModal = false)}
-          class="w-full rounded-2xl bg-primary py-3 text-xs font-bold text-white active:scale-95"
+          class="w-full rounded-2xl bg-primary py-3 text-xs font-bold text-bg active:scale-95"
         >
           {t.t("common.close")}
         </button>

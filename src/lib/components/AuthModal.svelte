@@ -194,7 +194,7 @@
         <button
           type="submit"
           disabled={loading}
-          class="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary py-4 text-lg font-bold text-white shadow-md active:scale-95 disabled:opacity-50"
+          class="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary py-4 text-lg font-bold text-bg shadow-md active:scale-95 disabled:opacity-50"
         >
           {#if !loading}
             {#if mode === "login"}

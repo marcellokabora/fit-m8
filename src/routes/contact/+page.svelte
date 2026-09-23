@@ -107,7 +107,7 @@
         <button
           type="submit"
           disabled={sending}
-          class="flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 font-bold text-white active:scale-95 disabled:opacity-60"
+          class="flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 font-bold text-bg active:scale-95 disabled:opacity-60"
         >
           <Send class="size-4.5" />
           {sending ? "Sending..." : "Send message"}

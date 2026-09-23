@@ -251,7 +251,7 @@
       type="button"
       onclick={confirm}
       disabled={draftDay === null || draftMonth === null || draftYear === null}
-      class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+      class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-bg active:scale-95 disabled:opacity-40"
     >
       {t.t("common.done")}
     </button>

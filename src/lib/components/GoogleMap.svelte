@@ -42,7 +42,7 @@
 
   function mapStyles(
     colors: ModeColors,
-    accent: string,
+    secondary: string,
   ): google.maps.MapTypeStyle[] {
     return [
       { elementType: "geometry", stylers: [{ color: colors.bg }] },
@@ -82,7 +82,7 @@
       {
         featureType: "road.highway",
         elementType: "geometry",
-        stylers: [{ color: accent }],
+        stylers: [{ color: secondary }],
       },
       {
         featureType: "road",
@@ -133,7 +133,7 @@
 
   function iconFor(activityId: string, isSelf?: boolean): google.maps.Icon {
     const emoji = emojiById[activityId] ?? "📍";
-    const fill = isSelf ? "#f97316" : "#16a34a";
+    const fill = isSelf ? "#f97316" : selectedTheme.primary;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="42" height="42"><circle cx="21" cy="21" r="18" fill="${fill}" stroke="white" stroke-width="3"/><text x="21" y="28" font-size="18" text-anchor="middle">${emoji}</text></svg>`;
     return {
       url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
@@ -216,7 +216,7 @@
           disableDefaultUI: true,
           clickableIcons: false,
           backgroundColor: mapColors.bg,
-          styles: mapStyles(mapColors, selectedTheme.primaryDark),
+          styles: mapStyles(mapColors, selectedTheme.secondary),
         });
         if (pendingRecenter) {
           map.panTo(pendingRecenter);
@@ -253,7 +253,7 @@
   $effect(() => {
     map?.setOptions({
       backgroundColor: mapColors.bg,
-      styles: mapStyles(mapColors, selectedTheme.primaryDark),
+      styles: mapStyles(mapColors, selectedTheme.secondary),
     });
   });
 </script>

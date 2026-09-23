@@ -87,7 +87,7 @@
                 : 'border-border'}"
             >
               {#if isSelected}
-                <Check class="size-3.5 text-white" />
+                <Check class="size-3.5 text-bg" />
               {/if}
             </span>
           </button>
@@ -104,7 +104,7 @@
         <button
           onclick={confirm}
           disabled={selected.length === 0}
-          class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+          class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-bg active:scale-95 disabled:opacity-40"
         >
           {t.t("common.continue")}
         </button>

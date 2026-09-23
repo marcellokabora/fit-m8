@@ -56,26 +56,20 @@ export default defineConfig({
 				name: 'FIT-M8',
 				short_name: 'FIT-M8',
 				description: 'Match people for sports activities',
-				theme_color: '#06170b',
-				background_color: '#06170b',
+				theme_color: '#0B3692',
+				background_color: '#0B3692',
 				display: 'standalone',
 				orientation: 'portrait',
 				start_url: '/',
+				// no maskable/512 round asset in the new icon set (static/icons) - just the two "any" sizes it ships
 				icons: [
-					{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-					{ src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
 					{
-						src: '/icons/icon-192-maskable.png',
+						src: '/icons/mipmap-xxxhdpi/ic_launcher.png',
 						sizes: '192x192',
 						type: 'image/png',
-						purpose: 'maskable'
+						purpose: 'any'
 					},
-					{
-						src: '/icons/icon-512-maskable.png',
-						sizes: '512x512',
-						type: 'image/png',
-						purpose: 'maskable'
-					}
+					{ src: '/icons/ic_launcher.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
 				]
 			}
 		})

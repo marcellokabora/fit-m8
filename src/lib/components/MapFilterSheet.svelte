@@ -112,7 +112,7 @@
       type="button"
       onclick={apply}
       disabled={draft.length === 0}
-      class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+      class="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-bg active:scale-95 disabled:opacity-40"
     >
       {t.t("explore.filterApply")}
     </button>

@@ -18,7 +18,7 @@
   </div>
   <a
     href="/"
-    class="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-white active:scale-95"
+    class="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-bg active:scale-95"
   >
     <Compass class="size-4" />
     {t.t("errors.goHome")}

@@ -472,13 +472,13 @@
         ariaLabel={t.t("profile.tabActivities")}
         onchange={(v) => (activeTab = v)}
       />
-      <button
+      <!-- <button
         type="button"
         aria-label={t.t("sports.orderInfoLabel")}
         class="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface text-muted shadow-sm active:scale-95"
       >
         <CircleQuestionMark class="size-4" />
-      </button>
+      </button> -->
     </div>
 
     {#if activeTab === "sports"}
@@ -671,7 +671,7 @@
       <p class="text-sm text-muted">{t.t("premium.messageUpsellHint")}</p>
       <a
         href="/app/premium"
-        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-bg active:scale-95"
       >
         {t.t("profile.goPremium")}
       </a>
@@ -710,7 +710,7 @@
       <p class="text-sm text-muted">{t.t("premium.likeLimitHint")}</p>
       <a
         href="/app/premium"
-        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-bg active:scale-95"
       >
         {t.t("profile.goPremium")}
       </a>
@@ -749,7 +749,7 @@
         <p class="text-sm text-muted">{t.t("chat.reportSuccess")}</p>
         <button
           onclick={() => (showReportModal = false)}
-          class="w-full rounded-2xl bg-primary py-3 text-xs font-bold text-white active:scale-95"
+          class="w-full rounded-2xl bg-primary py-3 text-xs font-bold text-bg active:scale-95"
         >
           {t.t("common.close")}
         </button>

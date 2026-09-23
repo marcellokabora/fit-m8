@@ -102,7 +102,7 @@ placeholder + `firebase.json` hosting `ignore` exception for the dotfile-prefixe
     ```
 
 - [x] D2. Graphics (2026-09-14, in `android/store-assets/`):
-  - App icon 512×512 → reuse `static/icons/icon-512.png`.
+  - App icon 512×512 → reuse `static/icons/ic_launcher.png`.
   - Feature graphic 1024×500 → `android/store-assets/feature-graphic.png` (green brand gradient +
     `static/logo/fit-m8-logo-green-white.png` mark/wordmark, chroma-keyed onto the gradient).
   - Phone screenshots → `android/store-assets/screenshots/` (8 images from `src/lib/assets/screens/`,

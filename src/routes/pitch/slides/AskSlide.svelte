@@ -40,7 +40,7 @@
   </h2>
   <div class="flex w-full flex-col gap-2">
     {#each FUNDING_ALLOCATION as bucket}
-      <div class="rounded-2xl bg-surface p-3 shadow-sm">
+      <div class="rounded-2xl bg-surface p-6 shadow-sm">
         <div class="mb-1 flex items-baseline justify-between gap-3">
           <p class="font-bold text-text">{bucket.label}</p>
           <p class="font-black text-primary">{bucket.pct}%</p>
@@ -55,11 +55,11 @@
       </div>
     {/each}
   </div>
-  <div class="mx-auto flex w-full flex-col gap-4 rounded-2xl bg-primary/10 p-3">
-    <p class="text-xs font-semibold uppercase tracking-widest text-primary">
-      18-month target milestones
-    </p>
-    <div class="flex gap-4">
+  <p class="text-xs font-semibold uppercase tracking-widest text-primary">
+    18-month target milestones
+  </p>
+  <div class="mx-auto flex w-full flex-col gap-4 rounded-2xl bg-surface p-6">
+    <div class="flex justify-center gap-4">
       {#each MILESTONES as milestone}
         <p
           class="flex items-center justify-center gap-1.5 text-sm text-text text-nowrap"

@@ -28,7 +28,7 @@
   import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
   import trainerScreen from "$lib/assets/screens/trainer.png?enhanced";
   import discoverScreen from "$lib/assets/screens/discover.png?enhanced";
-  import matchesScreen from "$lib/assets/screens/matchs.png?enhanced";
+  import matchesScreen from "$lib/assets/screens/matches.png?enhanced";
   import exploreScreen from "$lib/assets/screens/explore.png?enhanced";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -246,7 +246,7 @@
           authMode = "login";
           authModalOpen = true;
         }}
-        class="flex capitalize mx-auto px-12 items-center justify-center cursor-pointer gap-3 rounded-full border-2 border-primary bg-surface py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
+        class="flex capitalize mx-auto px-12 items-center justify-center cursor-pointer gap-3 rounded-full border-2 border-primary backdrop-blur-md py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
       >
         {#if authState === "checking"}
           <span
@@ -269,7 +269,7 @@
 
     <!-- fades the hero photo into the solid page bg instead of cutting off hard at the fold -->
     <div
-      class="pointer-events-none absolute inset-x-0 -bottom-2 h-1/3 bg-linear-to-b from-transparent to-bg"
+      class="pointer-events-none absolute inset-x-0 -bottom-0 h-1/3 bg-linear-to-b from-transparent to-bg"
       aria-hidden="true"
     ></div>
   </div>
@@ -321,13 +321,7 @@
                 ? 'rotate-6'
                 : '-rotate-6'}"
             >
-              <enhanced:img
-                src={step.screen}
-                alt=""
-                aria-hidden="true"
-                // sizes="(min-width: 768px) 320px, 288px"
-                class="aspect-431/886 w-full object-cover object-top"
-              />
+              <enhanced:img src={step.screen} alt="" aria-hidden="true" />
 
               <!-- <div
                 class="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-b from-transparent to-bg"
@@ -360,7 +354,7 @@
             {@const medium = !big && count >= 500}
             <span
               class="flex items-center gap-1.5 rounded-full font-semibold {big
-                ? 'bg-primary px-4 py-2 text-sm text-white shadow-md'
+                ? 'bg-primary px-4 py-2 text-sm text-bg shadow-md'
                 : medium
                   ? 'bg-surface px-3.5 py-1.5 text-sm text-text ring-1 ring-border'
                   : 'bg-surface px-3 py-1 text-xs text-text ring-1 ring-border'}"

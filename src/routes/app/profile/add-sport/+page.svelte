@@ -121,7 +121,7 @@
     <button
       onclick={confirm}
       disabled={selectedIds.length === 0}
-      class="w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+      class="w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-bg active:scale-95 disabled:opacity-40"
     >
       {selectedIds.length > 1
         ? t.t("profile.addSports", { count: selectedIds.length })

@@ -21,8 +21,8 @@
     : 'bg-border'}"
 >
   <span
-    class="absolute top-0.5 left-0.5 size-6 rounded-full bg-white shadow-sm transition-transform {checked
-      ? 'translate-x-5'
-      : 'translate-x-0'}"
+    class="absolute top-0.5 left-0.5 size-6 rounded-full shadow-sm transition-transform {checked
+      ? 'bg-bg translate-x-5'
+      : 'bg-white translate-x-0'}"
   ></span>
 </button>

@@ -47,11 +47,7 @@
     <div
       class="absolute inset-x-[4%] top-[3.5%] bottom-[3.5%] flex items-center justify-center"
     >
-      <img
-        src="/logo/logo-text-dark.png"
-        alt="FIT-M8"
-        class="size-50 rounded-full object-cover"
-      />
+      <img src="\icons\mipmap-xxxhdpi\ic_launcher.png" alt="FIT-M8" class="" />
     </div>
   </div>
 </div>

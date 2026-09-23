@@ -24,7 +24,7 @@ function handleForegroundMessage(registration: ServiceWorkerRegistration, messag
     onMessage(messaging, (payload) => {
         registration.showNotification(payload.data?.title ?? 'FIT-M8', {
             body: payload.data?.body,
-            icon: '/icons/icon-192.png',
+            icon: '/icons/mipmap-xxxhdpi/ic_launcher.png',
             data: { url: payload.data?.url }
         });
     });

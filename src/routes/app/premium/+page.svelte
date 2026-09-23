@@ -161,7 +161,7 @@
     <button
       onclick={() => setPremium(true)}
       disabled={saving || !canRegisterMembership}
-      class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
+      class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95 disabled:opacity-40"
     >
       {saving ? t.t("common.saving") : t.t("premium.subscribeButton")}
     </button>

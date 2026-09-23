@@ -26,10 +26,10 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
     const { title, body, url } = payload.data ?? {};
     // No "badge" here: Android renders it as a solid-color silhouette using only the
-    // icon's alpha channel, and icon-192.png is fully opaque, so it showed as a white square.
+    // icon's alpha channel, which turns this icon's transparent corners into a white square.
     self.registration.showNotification(title ?? 'FIT-M8', {
         body,
-        icon: '/icons/icon-192.png',
+        icon: '/icons/mipmap-xxxhdpi/ic_launcher.png',
         data: { url }
     });
 });

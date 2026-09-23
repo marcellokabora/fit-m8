@@ -161,7 +161,7 @@
                   : 'border-border'}"
               >
                 {#if isActive}
-                  <Check class="size-3.5 text-white" />
+                  <Check class="size-3.5 text-bg" />
                 {/if}
               </span>
             </button>

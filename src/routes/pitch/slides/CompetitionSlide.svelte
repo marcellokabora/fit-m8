@@ -22,7 +22,6 @@
     Volleyball,
     StravaIcon,
     MeetupIcon,
-    LogoMark,
   ] as const;
 
   // kept short on purpose - this table is a quick scan, not a spec sheet
@@ -112,9 +111,7 @@
     class="w-full border-collapse overflow-hidden rounded-2xl bg-surface text-sm shadow-sm"
   >
     <thead>
-      <tr
-        class="border-b border-border bg-linear-to-r from-primary/25 to-primary/5"
-      >
+      <tr class="border-b border-border bg-primary/10">
         <th class="p-3 text-left font-semibold text-muted">Dimension</th>
         {#each COMPETITORS as name, i}
           <th

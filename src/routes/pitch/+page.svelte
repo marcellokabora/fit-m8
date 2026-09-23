@@ -29,7 +29,7 @@
   import filtersScreen from "$lib/assets/screens/filters.png?enhanced";
   import trainerScreen from "$lib/assets/screens/trainer.png?enhanced";
   import discoverScreen from "$lib/assets/screens/discover.png?enhanced";
-  import matchesScreen from "$lib/assets/screens/matchs.png?enhanced";
+  import matchesScreen from "$lib/assets/screens/matches.png?enhanced";
   import exploreScreen from "$lib/assets/screens/explore.png?enhanced";
   import BusinessSlide from "./slides/BusinessSlide.svelte";
   import GtmSlide from "./slides/GtmSlide.svelte";
@@ -241,7 +241,7 @@
 
 <div
   class="relative flex h-dvh flex-col overflow-hidden bg-bg text-text print:h-auto print:overflow-visible"
-  style="--color-primary: {theme.primary}; --color-primary-dark: {theme.primaryDark}; --color-bg: {colors.bg}; --color-surface: {colors.surface}; --color-text: {colors.text}; --color-muted: {colors.muted}; --color-border: {colors.border};"
+  style="--color-primary: {theme.primary}; --color-secondary: {theme.secondary}; --color-bg: {colors.bg}; --color-surface: {colors.surface}; --color-text: {colors.text}; --color-muted: {colors.muted}; --color-border: {colors.border};"
 >
   <button
     type="button"

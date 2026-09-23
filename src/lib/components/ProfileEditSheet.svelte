@@ -426,7 +426,7 @@
         <button
           onclick={save}
           disabled={saving}
-          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-white active:scale-95 disabled:opacity-50"
+          class="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-bold text-bg active:scale-95 disabled:opacity-50"
         >
           {#if saving}
             <LoaderCircle class="size-4 animate-spin" />

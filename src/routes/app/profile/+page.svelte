@@ -620,7 +620,7 @@
   <div class="mt-auto px-5 pt-8">
     <a
       href="/app/premium"
-      class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95"
+      class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95"
     >
       <Crown class="size-5" />
       {$userProfile?.isPremium

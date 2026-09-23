@@ -24,7 +24,7 @@
       href="https://fit-m8.app"
       target="_blank"
       rel="noopener noreferrer"
-      class="mt-4 flex items-center gap-2 rounded-full bg-surface px-5 py-2.5 text-base font-semibold text-muted shadow-sm transition-transform active:scale-95"
+      class="mt-4 flex items-center gap-2 rounded-full bg-surface px-5 py-2.5 text-base font-semibold text-primary shadow-sm transition-transform active:scale-95"
     >
       <Globe class="size-4" />
       fit-m8.app

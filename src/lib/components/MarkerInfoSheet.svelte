@@ -182,7 +182,7 @@
         <button
           type="button"
           onclick={handleMessage}
-          class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+          class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-bold text-bg active:scale-95"
         >
           <MessageCircle class="size-5" />
           {t.t("explore.messageButton")}
@@ -219,7 +219,7 @@
                       type="button"
                       onclick={() => handleRespond(request.uid, "accepted")}
                       aria-label={t.t("explore.acceptJoin")}
-                      class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-white active:scale-95"
+                      class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-bg active:scale-95"
                     >
                       <Check class="size-4" />
                     </button>
@@ -296,7 +296,7 @@
       <p class="text-sm text-muted">{t.t("premium.messageUpsellHint")}</p>
       <a
         href="/app/premium"
-        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-bg active:scale-95"
       >
         {t.t("profile.goPremium")}
       </a>

@@ -153,7 +153,7 @@
     <button
       onclick={confirm}
       disabled={!selectedId || locating}
-      class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-sm font-bold text-white active:scale-95 disabled:opacity-40"
+      class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-sm font-bold text-bg active:scale-95 disabled:opacity-40"
     >
       {#if locating}
         <Loader2 class="size-4 animate-spin" />

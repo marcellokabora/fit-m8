@@ -79,7 +79,7 @@
         type="button"
         onclick={submit}
         disabled={sending || !text.trim()}
-        class="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-lg font-bold text-white shadow-md active:scale-95 disabled:opacity-50"
+        class="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-lg font-bold text-bg shadow-md active:scale-95 disabled:opacity-50"
       >
         <Send class="size-5" />
         {sending ? sendingLabel : sendLabel}

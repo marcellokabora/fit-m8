@@ -213,7 +213,7 @@
       aria-label={t.t("explore.filterButton")}
       class="absolute bottom-24 left-20 z-10 flex size-11 items-center justify-center rounded-full border-2 shadow-xl active:scale-95 {filterActivityIds.length >
       0
-        ? 'border-text/60 bg-primary text-white'
+        ? 'border-text/60 bg-primary text-bg'
         : 'border-text/40 bg-surface text-primary'}"
     >
       <SlidersHorizontal class="size-5" />
@@ -269,7 +269,7 @@
         type="button"
         onclick={() => (showCheckinSheet = true)}
         aria-label={t.t("explore.checkInCta")}
-        class="absolute bottom-24 right-4 z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg active:scale-95"
+        class="absolute bottom-24 right-4 z-10 flex size-12 items-center justify-center rounded-full bg-primary text-bg shadow-lg active:scale-95"
       >
         <Plus class="size-6" />
       </button>

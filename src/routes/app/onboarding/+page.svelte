@@ -359,7 +359,7 @@
             photos.length === 0)) ||
           (step === 2 && selectedActivities.length === 0) ||
           (step === 3 && !locationValid)}
-        class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
+        class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95 disabled:opacity-40"
       >
         {t.t("common.continue")}
         <ArrowRight class="size-5" />
@@ -368,7 +368,7 @@
       <button
         onclick={save}
         disabled={saving || !locationValid}
-        class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-40"
+        class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95 disabled:opacity-40"
       >
         {saving ? t.t("common.saving") : t.t("common.letsGo")}
         {#if saving}

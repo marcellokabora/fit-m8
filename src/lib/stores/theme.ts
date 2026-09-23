@@ -14,25 +14,25 @@ export interface Theme {
     id: string;
     label: string;
     primary: string;
-    primaryDark: string;
+    secondary: string;
     light: ModeColors;
     dark: ModeColors;
 }
 
 export const THEMES: Theme[] = [
-    {
-        id: 'barcelona',
-        label: 'Barcelona',
-        primary: '#c80000',
-        primaryDark: '#990000',
-        light: { bg: '#fff5f5', surface: '#ffffff', text: '#1f0d0d', muted: '#806666', border: '#f3d6d6' },
-        dark: { bg: '#1a0606', surface: '#2b0d0d', text: '#fdecec', muted: '#c39a9a', border: '#4a1c1c' }
-    },
+    // {
+    //     id: 'barcelona',
+    //     label: 'Barcelona',
+    //     primary: '#c80000',
+    //     secondary: '#990000',
+    //     light: { bg: '#fff5f5', surface: '#ffffff', text: '#1f0d0d', muted: '#806666', border: '#f3d6d6' },
+    //     dark: { bg: '#1a0606', surface: '#2b0d0d', text: '#fdecec', muted: '#c39a9a', border: '#4a1c1c' }
+    // },
     {
         id: 'sunset',
         label: 'Sunset',
         primary: '#f97316',
-        primaryDark: '#c2410c',
+        secondary: '#c2410c',
         light: { bg: '#fff7ed', surface: '#ffffff', text: '#1a1206', muted: '#7c6a52', border: '#fde7cf' },
         dark: { bg: '#1a1006', surface: '#291a0d', text: '#fdf3e7', muted: '#cbab84', border: '#402a16' }
     },
@@ -40,34 +40,34 @@ export const THEMES: Theme[] = [
         id: 'forest',
         label: 'Forest',
         primary: '#16a34a',
-        primaryDark: '#15803d',
+        secondary: '#15803d',
         light: { bg: '#f0fdf4', surface: '#ffffff', text: '#0d1a10', muted: '#5f7a66', border: '#d7f3df' },
         dark: { bg: '#06170b', surface: '#0d2814', text: '#eafcef', muted: '#8fbd9c', border: '#1d4029' }
     },
     {
         id: 'classic',
         label: 'Classic',
-        primary: '#0066ff',
-        primaryDark: '#0047cc',
-        light: { bg: '#f5f7fa', surface: '#ffffff', text: '#0d0d0d', muted: '#6b7280', border: '#e5e7eb' },
-        dark: { bg: '#0b0f17', surface: '#161c27', text: '#f2f4f8', muted: '#97a1b3', border: '#2b3444' }
+        primary: '#1edb63',
+        secondary: '#0e2a8c',
+        light: { bg: '#f4f6fc', surface: '#ffffff', text: '#0a0f2e', muted: '#5b6485', border: '#dde3f5' },
+        dark: { bg: '#0a1030', surface: '#101a4a', text: '#f2f4f8', muted: '#8f9cc7', border: '#22306e' }
     },
-    {
-        id: 'berry',
-        label: 'Berry',
-        primary: '#9333ea',
-        primaryDark: '#7e22ce',
-        light: { bg: '#faf5ff', surface: '#ffffff', text: '#180d1f', muted: '#7a6689', border: '#eddcfb' },
-        dark: { bg: '#150720', surface: '#241033', text: '#f6ecfd', muted: '#b79bcb', border: '#382152' }
-    },
-    {
-        id: 'slate',
-        label: 'Slate',
-        primary: '#475569',
-        primaryDark: '#334155',
-        light: { bg: '#f1f5f9', surface: '#ffffff', text: '#0f172a', muted: '#64748b', border: '#e2e8f0' },
-        dark: { bg: '#0b1220', surface: '#151d2c', text: '#eef2f8', muted: '#94a3b8', border: '#263242' }
-    }
+    // {
+    //     id: 'berry',
+    //     label: 'Berry',
+    //     primary: '#9333ea',
+    //     secondary: '#7e22ce',
+    //     light: { bg: '#faf5ff', surface: '#ffffff', text: '#180d1f', muted: '#7a6689', border: '#eddcfb' },
+    //     dark: { bg: '#150720', surface: '#241033', text: '#f6ecfd', muted: '#b79bcb', border: '#382152' }
+    // },
+    // {
+    //     id: 'slate',
+    //     label: 'Slate',
+    //     primary: '#475569',
+    //     secondary: '#334155',
+    //     light: { bg: '#f1f5f9', surface: '#ffffff', text: '#0f172a', muted: '#64748b', border: '#e2e8f0' },
+    //     dark: { bg: '#0b1220', surface: '#151d2c', text: '#eef2f8', muted: '#94a3b8', border: '#263242' }
+    // }
 ];
 
 export interface ThemeState {
@@ -77,7 +77,7 @@ export interface ThemeState {
 
 const THEME_KEY = 'fit-m8-theme';
 const MODE_KEY = 'fit-m8-theme-mode';
-const DEFAULT_STATE: ThemeState = { themeId: 'forest', mode: 'dark' };
+const DEFAULT_STATE: ThemeState = { themeId: 'classic', mode: 'dark' };
 
 function resolveThemeId(...themeIds: Array<string | null | undefined>): string {
     return themeIds.find((themeId) => themeId && THEMES.some((theme) => theme.id === themeId))
@@ -95,7 +95,7 @@ function applyState(state: ThemeState) {
     const modeColors = state.mode === 'dark' ? theme.dark : theme.light;
     const root = document.documentElement.style;
     root.setProperty('--color-primary', theme.primary);
-    root.setProperty('--color-primary-dark', theme.primaryDark);
+    root.setProperty('--color-secondary', theme.secondary);
     root.setProperty('--color-bg', modeColors.bg);
     root.setProperty('--color-surface', modeColors.surface);
     root.setProperty('--color-text', modeColors.text);

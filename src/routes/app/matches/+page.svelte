@@ -176,7 +176,7 @@
       </p>
       <a
         href="/app/discover"
-        class="rounded-2xl bg-primary px-6 py-3 font-bold text-white active:scale-95"
+        class="rounded-2xl bg-primary px-6 py-3 font-bold text-bg active:scale-95"
       >
         {t.t("matches.goDiscover")}
       </a>

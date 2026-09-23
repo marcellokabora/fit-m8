@@ -609,7 +609,7 @@
       <button
         onclick={checkVerification}
         disabled={checkingVerification}
-        class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-50"
+        class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95 disabled:opacity-50"
       >
         {checkingVerification
           ? t.t("common.loading")
@@ -647,7 +647,7 @@
         <button
           onclick={applyDatingPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.datingPreset")}
         >
@@ -656,7 +656,7 @@
         <button
           onclick={applyFriendsPreset}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isFriendsPreset
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.friendsPreset")}
         >
@@ -665,7 +665,7 @@
         <button
           onclick={applyTrainerPreset}
           class="size-9 items-center justify-center rounded-full shadow-sm flex {isTrainerPreset
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.trainerPreset")}
         >
@@ -686,7 +686,7 @@
         <button
           onclick={() => goto("/app/discover/filters")}
           class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
-            ? 'bg-primary text-white'
+            ? 'bg-primary text-bg'
             : 'bg-surface text-text'}"
           aria-label={t.t("discover.filters")}
         >
@@ -712,7 +712,7 @@
           </p>
           <button
             onclick={loadFeed}
-            class="rounded-2xl bg-primary px-6 py-3 font-bold text-white active:scale-95"
+            class="rounded-2xl bg-primary px-6 py-3 font-bold text-bg active:scale-95"
           >
             {t.t("discover.refresh")}
           </button>
@@ -880,7 +880,7 @@
             </button>
             <a
               href="/app/matches"
-              class="flex-1 rounded-2xl bg-primary py-3 text-center text-sm font-bold text-white"
+              class="flex-1 rounded-2xl bg-primary py-3 text-center text-sm font-bold text-bg"
             >
               {t.t("matches.viewMatches")}
             </a>
@@ -920,7 +920,7 @@
       </p>
       <a
         href="/app/premium"
-        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-bg active:scale-95"
       >
         {t.t("profile.goPremium")}
       </a>
@@ -961,7 +961,7 @@
       </p>
       <a
         href="/app/premium"
-        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-white active:scale-95"
+        class="mt-2 w-full rounded-2xl bg-primary py-3 font-bold text-bg active:scale-95"
       >
         {t.t("profile.goPremium")}
       </a>
