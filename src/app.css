@@ -4,13 +4,13 @@
 @import "@fontsource/poppins/latin-700.css";
 
 @theme {
-  --color-primary: #16a34a;
-  --color-secondary: #15803d;
-  --color-bg: #06170b;
-  --color-surface: #0d2814;
-  --color-text: #eafcef;
-  --color-muted: #8fbd9c;
-  --color-border: #1d4029;
+  --color-primary: #1edb63;
+  --color-secondary: #0e2a8c;
+  --color-bg: #0a1030;
+  --color-surface: #101a4a;
+  --color-text: #f2f4f8;
+  --color-muted: #8f9cc7;
+  --color-border: #22306e;
   --color-error: #ff3b30;
   --color-success: #34c759;
 

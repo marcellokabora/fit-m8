@@ -1,5 +1,6 @@
 <script module lang="ts">
   export const CAROUSEL_ACTIVITIES = [
+    { id: "surf" },
     { id: "padel" },
     { id: "beachVolley" },
     { id: "jogging" },
@@ -8,7 +9,6 @@
     { id: "footVolley" },
     { id: "skateboard" },
     { id: "basketball" },
-    { id: "surf" },
     { id: "soccer" },
     { id: "cycling" },
   ];

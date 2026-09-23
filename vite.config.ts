@@ -61,15 +61,34 @@ export default defineConfig({
 				display: 'standalone',
 				orientation: 'portrait',
 				start_url: '/',
-				// no maskable/512 round asset in the new icon set (static/icons) - just the two "any" sizes it ships
+				// ic_launcher.png's wordmark sits well within the maskable safe zone (center 80%
+				// circle) already, so the same file can serve both purposes - without a declared
+				// "maskable" icon, Android/Chrome synthesizes its own fallback that shrinks+pads the
+				// icon further (small logo floating in a white circle), which is what "not filling all
+				// the space" looked like.
 				icons: [
 					{
 						src: '/icons/ic_launcher.png',
 						sizes: '192x192',
 						type: 'image/png',
-						purpose: 'any'
+						purpose: 'any maskable'
 					},
-					{ src: '/icons/ic_launcher.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
+					{
+						src: '/icons/ic_launcher.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'any maskable'
+					},
+					// Android 13+ "themed icon" support (Material You tinting to match wallpaper) - the OS
+					// only reads this shape's alpha channel and recolors it itself, so the source fill
+					// color doesn't matter. Reuses the adaptive-icon foreground layer already generated
+					// alongside ic_launcher.png (previously unused).
+					{
+						src: '/icons/drawable-anydpi/ic_launcher.svg',
+						sizes: 'any',
+						type: 'image/svg+xml',
+						purpose: 'monochrome'
+					}
 				]
 			}
 		})
