@@ -44,10 +44,18 @@
   });
 </script>
 
-<div class="min-h-dvh bg-black md:flex md:justify-center">
+<div class="app-shell min-h-dvh bg-black md:flex md:justify-center">
   <div
     class="relative flex min-h-dvh w-full flex-col bg-bg md:max-w-md md:border-x md:border-border md:shadow-2xl"
   >
     {@render children()}
   </div>
 </div>
+
+<style>
+  /* Only the in-app shell blocks the native swipe-back/forward gesture - marketing pages
+     outside /app keep it so users can swipe between pages */
+  .app-shell {
+    overscroll-behavior: none;
+  }
+</style>

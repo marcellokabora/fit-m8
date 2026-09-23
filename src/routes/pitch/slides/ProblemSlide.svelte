@@ -47,7 +47,7 @@
     <div
       class="absolute inset-x-[4%] top-[3.5%] bottom-[3.5%] flex items-center justify-center"
     >
-      <img src="/icons/mipmap-xxxhdpi/ic_launcher.png" alt="FIT-M8" class="" />
+      <img src="/icons/ic_launcher.png" alt="FIT-M8" class="" />
     </div>
   </div>
 </div>

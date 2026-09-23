@@ -41,7 +41,6 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
-  overscroll-behavior: none;
   /* Blocks pinch-zoom and double-tap-zoom gestures */
   touch-action: pan-x pan-y;
   transition:

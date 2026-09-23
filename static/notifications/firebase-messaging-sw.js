@@ -29,7 +29,7 @@ messaging.onBackgroundMessage((payload) => {
     // icon's alpha channel, which turns this icon's transparent corners into a white square.
     self.registration.showNotification(title ?? 'FIT-M8', {
         body,
-        icon: '/icons/mipmap-xxxhdpi/ic_launcher.png',
+        icon: '/icons/ic_launcher.png',
         data: { url }
     });
 });

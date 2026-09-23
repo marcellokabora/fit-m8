@@ -64,7 +64,7 @@ export default defineConfig({
 				// no maskable/512 round asset in the new icon set (static/icons) - just the two "any" sizes it ships
 				icons: [
 					{
-						src: '/icons/mipmap-xxxhdpi/ic_launcher.png',
+						src: '/icons/ic_launcher.png',
 						sizes: '192x192',
 						type: 'image/png',
 						purpose: 'any'
