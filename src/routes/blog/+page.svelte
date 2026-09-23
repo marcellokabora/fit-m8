@@ -1,6 +1,6 @@
 <script lang="ts">
-  import BlogHeader from "$lib/components/blog/BlogHeader.svelte";
   import BlogPostCard from "$lib/components/blog/BlogPostCard.svelte";
+  import SiteHeader from "$lib/components/SiteHeader.svelte";
   import type { BlogPostMetadata } from "$lib/blog";
 
   let {
@@ -39,8 +39,8 @@
   />
 </svelte:head>
 
-<div class="mx-auto flex w-full container">
-  <BlogHeader />
+<div class="mx-auto w-full container">
+  <SiteHeader />
 
   <div class="grid grid-cols-1 gap-4 px-5 pt-2 sm:grid-cols-2 lg:grid-cols-3">
     {#each data.posts as post (post.slug)}

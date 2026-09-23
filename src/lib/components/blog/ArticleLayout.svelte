@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import BlogHeader from "$lib/components/blog/BlogHeader.svelte";
+  import SiteHeader from "$lib/components/SiteHeader.svelte";
   import type { BlogPostMetadata } from "$lib/blog";
 
   let {
@@ -19,7 +19,7 @@
 
 <div class="flex min-h-dvh flex-col bg-bg pb-16">
   <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col">
-    <BlogHeader logoHref="/blog" />
+    <SiteHeader logoHref="/blog" />
 
     <img
       src={metadata.cover}

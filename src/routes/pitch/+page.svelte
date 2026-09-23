@@ -19,7 +19,7 @@
   import { activeTheme, THEMES } from "$lib/stores/theme";
   import { SOCIAL_LINKS } from "$lib/social";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
-  import SideMenu from "$lib/components/SideMenu.svelte";
+  import SiteHeader from "$lib/components/SiteHeader.svelte";
   import CoverSlide from "./slides/CoverSlide.svelte";
   import ProblemSlide from "./slides/ProblemSlide.svelte";
   import WhyNowSlide from "./slides/WhyNowSlide.svelte";
@@ -235,14 +235,12 @@
 
 <svelte:window onkeydown={onKeydown} />
 
-<div class="print:hidden">
-  <SideMenu />
-</div>
-
 <div
   class="relative flex h-dvh flex-col overflow-hidden bg-bg text-text print:h-auto print:overflow-visible"
   style="--color-primary: {theme.primary}; --color-secondary: {theme.secondary}; --color-bg: {colors.bg}; --color-surface: {colors.surface}; --color-text: {colors.text}; --color-muted: {colors.muted}; --color-border: {colors.border};"
 >
+  <SiteHeader showLogo={false} />
+
   <button
     type="button"
     onclick={exportPdf}

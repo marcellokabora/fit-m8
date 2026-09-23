@@ -19,7 +19,7 @@
         stopPresence?.();
         stopPresence = null;
         userProfile.set(null);
-        goto("/");
+        goto(`/auth?redirect=${encodeURIComponent(page.url.pathname)}`);
       } else {
         const hasProfile = await userProfile.load(user.uid);
         if (!hasProfile && page.url.pathname !== "/app/onboarding") {

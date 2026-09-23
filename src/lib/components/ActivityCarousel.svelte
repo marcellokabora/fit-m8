@@ -1,12 +1,12 @@
 <script module lang="ts">
   export const CAROUSEL_ACTIVITIES = [
-    { id: "surf" },
     { id: "padel" },
     { id: "beachVolley" },
     { id: "jogging" },
     { id: "boxing" },
     { id: "tennis" },
     { id: "footVolley" },
+    { id: "surf" },
     { id: "skateboard" },
     { id: "basketball" },
     { id: "soccer" },
@@ -33,7 +33,7 @@
   const PEEK_HEIGHT = 44; // how much of each neighbor is revealed above/below
   const INTERVAL = 5000;
 
-  const shuffled = [...CAROUSEL_ACTIVITIES].sort(() => Math.random() - 0.5);
+  const shuffled = CAROUSEL_ACTIVITIES;
 
   // pad with the last/first item so a peek is always visible on both sides, even at the loop seam
   let track = $derived([
@@ -158,7 +158,7 @@
     alt=""
     aria-hidden="true"
     sizes="100vw"
-    loading="eager"
+    loading={i === 0 ? "eager" : "lazy"}
     fetchpriority={i === 0 ? "high" : "auto"}
     onload={() => (loaded[i] = true)}
     class="carousel-bg pointer-events-none absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out blur-xs"

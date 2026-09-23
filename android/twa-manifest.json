@@ -12,7 +12,7 @@
   "navigationDividerColorDark": "#000000",
   "backgroundColor": "#0B3692",
   "enableNotifications": true,
-  "startUrl": "/",
+  "startUrl": "/app/discover",
   "iconUrl": "https://fit-m8.app/icons/ic_launcher.png",
   "maskableIconUrl": "https://fit-m8.app/icons/ic_launcher.png",
   "splashScreenFadeOutDuration": 300,

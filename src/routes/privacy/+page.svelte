@@ -1,6 +1,4 @@
 <script lang="ts">
-  import BackHeader from "$lib/components/BackHeader.svelte";
-
   const LAST_UPDATED = "August 21, 2026";
 </script>
 
@@ -34,9 +32,9 @@
   />
 </svelte:head>
 
-<BackHeader title="Privacy Policy" class="bg-bg" />
-
-<div class="flex flex-col gap-5 px-5 pb-16 text-sm leading-relaxed text-text">
+<div
+  class="flex flex-col gap-5 px-5 pb-16 text-sm leading-relaxed text-text max-w-5xl m-auto"
+>
   <p class="text-xs text-muted">Last updated: {LAST_UPDATED}</p>
 
   <p>

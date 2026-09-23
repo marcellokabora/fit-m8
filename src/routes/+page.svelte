@@ -1,13 +1,9 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { authUser, userProfile } from "$lib/stores/auth";
-  import { onMount } from "svelte";
   import { fade } from "svelte/transition";
   import ActivityCarousel from "$lib/components/ActivityCarousel.svelte";
   import ActivityIcon from "$lib/components/ActivityIcon.svelte";
   import Logo from "$lib/components/LogoText.svelte";
-  import AuthModal from "$lib/components/AuthModal.svelte";
-  import SideMenu from "$lib/components/SideMenu.svelte";
+  import SiteHeader from "$lib/components/SiteHeader.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import { SOCIAL_LINKS } from "$lib/social";
   import { activeTheme, THEMES } from "$lib/stores/theme";
@@ -135,27 +131,6 @@
     (THEMES.find((theme) => theme.id === $activeTheme.themeId) ?? THEMES[0])
       .dark,
   );
-
-  let authModalOpen = $state(false);
-  let authMode = $state<"login" | "register">("register");
-
-  // drives the CTA button: spinner while the persisted session resolves, then either
-  // the normal sign-in action or an "open app" action - no automatic redirect
-  let authState = $state<"checking" | "guest" | "loggedIn">("checking");
-  let appDestination = $state("/app/profile");
-
-  onMount(() => {
-    return authUser.subscribe(async (user) => {
-      if (user === undefined) return; // still resolving persisted session
-      if (!user) {
-        authState = "guest";
-        return;
-      }
-      const hasProfile = await userProfile.load(user.uid);
-      appDestination = hasProfile ? "/app/profile" : "/app/onboarding";
-      authState = "loggedIn";
-    });
-  });
 </script>
 
 <svelte:head>
@@ -202,20 +177,13 @@
   class="relative flex min-h-dvh w-full flex-col overflow-x-hidden bg-bg"
   style="--color-bg: {darkColors.bg}; --color-surface: {darkColors.surface}; --color-text: {darkColors.text}; --color-muted: {darkColors.muted}; --color-border: {darkColors.border};"
 >
-  <SideMenu
-    {authState}
-    {appDestination}
-    onSignIn={() => {
-      authMode = "login";
-      authModalOpen = true;
-    }}
-  />
+  <SiteHeader showLogo={false} />
 
   <div
     class="relative flex min-h-dvh shrink-0 flex-col items-center overflow-hidden px-6 py-8 transform-[translateZ(0)] justify-center gap-20"
   >
     <!-- Activity carousel -->
-    <div transition:fade class="absolute inset-0">
+    <div class="absolute inset-0">
       <ActivityCarousel />
     </div>
 
@@ -235,28 +203,13 @@
       transition:fade
       class="relative z-10 mx-auto flex w-full max-w-md flex-col gap-3"
     >
-      <button
-        type="button"
-        disabled={authState === "checking"}
-        onclick={() => {
-          if (authState === "loggedIn") {
-            goto(appDestination);
-            return;
-          }
-          authMode = "login";
-          authModalOpen = true;
-        }}
-        class="flex capitalize mx-auto px-12 items-center justify-center cursor-pointer gap-3 rounded-full border-2 border-primary backdrop-blur-md py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95 disabled:opacity-60"
+      <a
+        href="/app/discover"
+        class="flex capitalize mx-auto px-12 items-center justify-center cursor-pointer gap-3 rounded-full border-2 border-primary backdrop-blur-md py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95"
       >
-        {#if authState === "checking"}
-          <span
-            class="size-5 shrink-0 animate-spin rounded-full border-2 border-primary/30 border-t-primary"
-          ></span>
-        {:else}
-          <LogIn class="size-5" />
-        {/if}
-        {authState === "loggedIn" ? t.t("home.openApp") : t.t("auth.signIn")}
-      </button>
+        <LogIn class="size-5" />
+        {t.t("home.openApp")}
+      </a>
     </div>
 
     <!-- scroll cue: hints there's more content below the hero fold -->
@@ -321,7 +274,12 @@
                 ? 'rotate-6'
                 : '-rotate-6'}"
             >
-              <enhanced:img src={step.screen} alt="" aria-hidden="true" />
+              <enhanced:img
+                src={step.screen}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              />
 
               <!-- <div
                 class="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-b from-transparent to-bg"
@@ -407,6 +365,4 @@
       &copy; {new Date().getFullYear()} FIT-M8. {t.t("home.rights")}
     </p>
   </footer>
-
-  <AuthModal bind:open={authModalOpen} bind:mode={authMode} />
 </div>

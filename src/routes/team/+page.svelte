@@ -2,7 +2,7 @@
   import { TrendingUp, Users, Globe } from "@lucide/svelte";
   import LinkedinIcon from "~icons/simple-icons/linkedin";
   import GithubIcon from "~icons/simple-icons/github";
-  import BlogHeader from "$lib/components/blog/BlogHeader.svelte";
+  import SiteHeader from "$lib/components/SiteHeader.svelte";
   import marcelloPhoto from "$lib/assets/marcello.jpg";
 
   const FOUNDER = {
@@ -81,7 +81,7 @@
 
 <div class="mx-auto flex w-full container flex-col pb-6">
   <div class="mx-auto flex w-full max-w-5xl flex-1 flex-col">
-    <BlogHeader />
+    <SiteHeader />
 
     <div class="flex flex-col gap-8 px-5 pt-6 text-text">
       <div class="flex flex-col gap-2 text-center">

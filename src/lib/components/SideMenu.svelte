@@ -1,7 +1,6 @@
 <script lang="ts">
   import { fade, fly } from "svelte/transition";
   import type { Component } from "svelte";
-  import { goto } from "$app/navigation";
   import {
     Menu,
     X,
@@ -24,20 +23,7 @@
     icon: Component;
   }
 
-  let {
-    authState = "checking",
-    appDestination = "/app/discover",
-    onSignIn,
-  }: {
-    authState?: "checking" | "guest" | "loggedIn";
-    appDestination?: string;
-    onSignIn?: () => void;
-  } = $props();
-
   let t = $derived(createTranslator($activeLanguage));
-
-  // pages that don't wire up sign-in (e.g. the pitch deck) just omit onSignIn
-  let showAuthCta = $derived(onSignIn !== undefined);
 
   let open = $state(false);
 
@@ -48,15 +34,6 @@
     { href: "/team", label: "Team", icon: Users },
     { href: "/contact", label: "Contact", icon: Mail },
   ];
-
-  function handleAuthCta() {
-    close();
-    if (authState === "loggedIn") {
-      goto(appDestination);
-      return;
-    }
-    onSignIn?.();
-  }
 
   // lower-priority legal links, styled smaller and pinned near the social icons at the bottom
   const SECONDARY_LINKS: SideMenuLink[] = [
@@ -112,25 +89,16 @@
       <X class="size-5" />
     </button>
 
-    {#if showAuthCta}
-      <!-- the app's primary action, so it stands out from the plain nav links below -->
-
-      <button
-        type="button"
-        disabled={authState === "checking"}
-        onclick={handleAuthCta}
-        class="mb-3 flex w-50 items-center justify-center gap-2 rounded-full border-2 border-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95 disabled:opacity-60"
-      >
-        {#if authState === "checking"}
-          <span
-            class="size-5 shrink-0 animate-spin rounded-full border-2 border-white/30 border-t-white"
-          ></span>
-        {:else}
-          <LogIn class="size-5" />
-        {/if}
-        {authState === "loggedIn" ? t.t("home.openApp") : t.t("auth.signIn")}
-      </button>
-    {/if}
+    <!-- the app's primary action, so it stands out from the plain nav links below - the
+         app layout itself redirects to /auth if the visitor isn't signed in -->
+    <a
+      href="/app/discover"
+      onclick={close}
+      class="mb-3 flex w-50 items-center justify-center gap-2 rounded-full border-2 border-primary py-3.5 text-base font-bold text-white shadow-md active:scale-95"
+    >
+      <LogIn class="size-5" />
+      {t.t("home.openApp")}
+    </a>
 
     {#each LINKS as link (link.href)}
       <a

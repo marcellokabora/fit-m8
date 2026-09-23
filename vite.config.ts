@@ -60,7 +60,14 @@ export default defineConfig({
 				background_color: '#0B3692',
 				display: 'standalone',
 				orientation: 'portrait',
-				start_url: '/',
+				// launching from the installed home-screen icon skips the marketing homepage and
+				// goes straight into the app (still gated by the /app layout's auth redirect) -
+				// browser/URL visits to "/" are unaffected, only the installed-app launch path
+				start_url: '/app/discover',
+				// without an explicit scope, it defaults to start_url's directory ("/app/") instead
+				// of the whole site - keep the full origin in scope so e.g. blog/legal links opened
+				// from within the installed app still stay inside the standalone window
+				scope: '/',
 				// ic_launcher.png's wordmark sits well within the maskable safe zone (center 80%
 				// circle) already, so the same file can serve both purposes - without a declared
 				// "maskable" icon, Android/Chrome synthesizes its own fallback that shrinks+pads the

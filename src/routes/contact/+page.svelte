@@ -1,6 +1,6 @@
 <script lang="ts">
-  import BlogHeader from "$lib/components/blog/BlogHeader.svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
+  import SiteHeader from "$lib/components/SiteHeader.svelte";
   import { SOCIAL_LINKS } from "$lib/social";
   import { submitContactMessage } from "$lib/firebase/contact";
   import { Mail, Send } from "@lucide/svelte";
@@ -64,7 +64,7 @@
 
 <div class="flex min-h-dvh flex-col bg-bg pb-16">
   <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col">
-    <BlogHeader />
+    <SiteHeader />
 
     <div class="flex flex-col gap-12 px-5 pt-6 text-text justify-center flex-1">
       <form
