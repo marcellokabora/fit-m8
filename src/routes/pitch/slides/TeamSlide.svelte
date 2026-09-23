@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TrendingUp, Users, Globe } from "@lucide/svelte";
+  import { TrendingUp, Users, Globe, Megaphone } from "@lucide/svelte";
   import LinkedinIcon from "~icons/simple-icons/linkedin";
   import GithubIcon from "~icons/simple-icons/github";
   import marcelloPhoto from "$lib/assets/marcello.jpg";
@@ -13,7 +13,7 @@
       desc: "Drive hyper-local CAC reduction, sports club partnerships.",
     },
     {
-      icon: TrendingUp,
+      icon: Megaphone,
       role: "Community Manager",
       desc: "Event management & organic user retention.",
     },

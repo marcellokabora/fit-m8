@@ -39,14 +39,12 @@
   />
 </svelte:head>
 
-<div class="flex min-h-dvh flex-col bg-bg pb-16">
-  <div class="mx-auto flex w-full max-w-5xl flex-1 flex-col">
-    <BlogHeader />
+<div class="mx-auto flex w-full container">
+  <BlogHeader />
 
-    <div class="grid grid-cols-1 gap-4 px-5 pt-2 sm:grid-cols-2 lg:grid-cols-3">
-      {#each data.posts as post (post.slug)}
-        <BlogPostCard {post} />
-      {/each}
-    </div>
+  <div class="grid grid-cols-1 gap-4 px-5 pt-2 sm:grid-cols-2 lg:grid-cols-3">
+    {#each data.posts as post (post.slug)}
+      <BlogPostCard {post} />
+    {/each}
   </div>
 </div>

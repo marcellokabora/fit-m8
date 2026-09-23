@@ -66,7 +66,7 @@
   <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col">
     <BlogHeader />
 
-    <div class="flex flex-col gap-8 px-5 pt-6 text-text">
+    <div class="flex flex-col gap-12 px-5 pt-6 text-text justify-center flex-1">
       <form
         onsubmit={handleSubmit}
         class="flex flex-col gap-4 rounded-3xl bg-surface p-5 shadow-sm"

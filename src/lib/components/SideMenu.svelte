@@ -6,12 +6,13 @@
     Menu,
     X,
     Mail,
-    Home,
+    House,
     Newspaper,
     FileText,
     ShieldCheck,
     Presentation,
     LogIn,
+    Users,
   } from "@lucide/svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import { SOCIAL_LINKS } from "$lib/social";
@@ -41,9 +42,10 @@
   let open = $state(false);
 
   const LINKS: SideMenuLink[] = [
-    { href: "/", label: "Home", icon: Home },
+    { href: "/", label: "Home", icon: House },
     { href: "/blog", label: "Blog", icon: Newspaper },
     { href: "/pitch", label: "Pitch", icon: Presentation },
+    { href: "/team", label: "Team", icon: Users },
     { href: "/contact", label: "Contact", icon: Mail },
   ];
 
