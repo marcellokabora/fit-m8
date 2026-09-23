@@ -3,6 +3,7 @@
   import { doc, getDoc } from "firebase/firestore";
   import { db } from "$lib/firebase/client";
   import { authUser, userProfile } from "$lib/stores/auth";
+  import { submitPremiumRequest } from "$lib/firebase/premiumRequests";
   import {
     MAX_LIKES_FREE_PER_DAY,
     MAX_SPORTS_FREE,
@@ -77,6 +78,21 @@
       }
     });
   });
+
+  let requesting = $state(false);
+  let requestSent = $state(false);
+
+  async function requestPremium() {
+    const uid = $authUser?.uid;
+    if (!uid || requesting) return;
+    requesting = true;
+    try {
+      await submitPremiumRequest(uid);
+      requestSent = true;
+    } finally {
+      requesting = false;
+    }
+  }
 </script>
 
 <div class="mb-6 flex flex-col items-center gap-2 text-center">
@@ -114,8 +130,16 @@
     <p class="font-bold text-primary">{t.t("premium.activeTitle")}</p>
     <p class="mt-1 text-sm text-muted">{t.t("premium.activeHint")}</p>
   </div>
-{:else}
+{:else if requestSent}
   <p class="mt-4 text-center text-xs text-muted">
-    {t.t("premium.inviteOnlyHint")}
+    {t.t("premium.requestSentHint")}
   </p>
+{:else}
+  <button
+    onclick={requestPremium}
+    disabled={requesting}
+    class="mt-4 w-full rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95 disabled:opacity-40"
+  >
+    {requesting ? t.t("common.saving") : t.t("premium.requestButton")}
+  </button>
 {/if}

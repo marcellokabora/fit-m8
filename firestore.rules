@@ -86,5 +86,12 @@ service cloud.firestore {
           && request.resource.data.message.size() > 0
           && request.resource.data.message.size() <= 5000;
       }
+
+      // Premium membership requests: signed-in user asking to be considered for invite-only
+      // access. Create-only for themselves; reviewed via the console/admin tooling.
+      match /premiumRequests/{requestId} {
+        allow create: if request.auth != null && request.auth.uid == request.resource.data.uid
+          && request.resource.data.keys().hasOnly(['uid', 'createdAt']);
+      }
     }
   }

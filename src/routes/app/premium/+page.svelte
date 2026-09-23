@@ -5,6 +5,7 @@
   import { db } from "$lib/firebase/client";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
+  import { submitPremiumRequest } from "$lib/firebase/premiumRequests";
   import {
     MAX_LIKES_FREE_PER_DAY,
     MAX_SPORTS_FREE,
@@ -27,6 +28,20 @@
   let error = $state("");
   // Self-service signup is disabled for everyone except admins; a valid ?promo= code auto-grants instead.
   let canRegisterMembership = $derived($isAdmin === true);
+  let requesting = $state(false);
+  let requestSent = $state(false);
+
+  async function requestPremium() {
+    const uid = get(authUser)?.uid;
+    if (!uid || requesting) return;
+    requesting = true;
+    try {
+      await submitPremiumRequest(uid);
+      requestSent = true;
+    } finally {
+      requesting = false;
+    }
+  }
 
   const FEATURES = [
     {
@@ -166,9 +181,19 @@
       {saving ? t.t("common.saving") : t.t("premium.subscribeButton")}
     </button>
     {#if !canRegisterMembership}
-      <p class="text-center text-xs text-muted">
-        {t.t("premium.inviteOnlyHint")}
-      </p>
+      {#if requestSent}
+        <p class="text-center text-xs text-muted">
+          {t.t("premium.requestSentHint")}
+        </p>
+      {:else}
+        <button
+          onclick={requestPremium}
+          disabled={requesting}
+          class="w-full rounded-2xl border-2 border-primary/30 py-3 text-sm font-semibold text-primary active:scale-95 disabled:opacity-40"
+        >
+          {requesting ? t.t("common.saving") : t.t("premium.requestButton")}
+        </button>
+      {/if}
     {/if}
   {/if}
 </div>
