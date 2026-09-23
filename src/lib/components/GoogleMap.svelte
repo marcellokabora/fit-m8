@@ -134,7 +134,7 @@
   function iconFor(activityId: string, isSelf?: boolean): google.maps.Icon {
     const emoji = emojiById[activityId] ?? "📍";
     const fill = isSelf ? "#f97316" : selectedTheme.primary;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="42" height="42"><circle cx="21" cy="21" r="18" fill="${fill}" stroke="white" stroke-width="3"/><text x="21" y="28" font-size="18" text-anchor="middle">${emoji}</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="42" height="42"><circle cx="21" cy="21" r="18" fill="${fill}" stroke="#1a1a1a" stroke-width="3"/><text x="21" y="28" font-size="18" text-anchor="middle">${emoji}</text></svg>`;
     return {
       url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
       scaledSize: new google.maps.Size(42, 42),
