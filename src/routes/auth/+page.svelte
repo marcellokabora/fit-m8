@@ -124,7 +124,7 @@
     <div class="w-full max-w-sm">
       <div class="mb-8 flex flex-col items-center gap-2 text-center">
         <a href="/" aria-label="FIT-M8 home">
-          <LogoText class="h-8 w-auto text-primary" />
+          <LogoText class="h-12 w-auto text-primary" />
         </a>
         <h1 class="mt-4 text-2xl font-black text-text">
           {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
