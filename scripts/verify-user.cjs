@@ -1,5 +1,6 @@
-// Dev helper: marks a test user's email as verified in Firebase Auth, bypassing the real inbox link.
+// Dev helper: marks a test user's email as verified (or unverified) in Firebase Auth, bypassing the real inbox link.
 // Usage: npm run verify-user -- someone@example.com
+//        npm run verify-user -- someone@example.com --revoke
 const admin = require('firebase-admin');
 const { getAuth } = require('firebase-admin/auth');
 const fs = require('fs');
@@ -33,16 +34,22 @@ admin.initializeApp({
 
 async function main() {
     const email = process.argv[2];
+    const revoke = process.argv.includes('--revoke');
     if (!email) {
-        console.error('Usage: npm run verify-user -- <email>');
+        console.error('Usage: npm run verify-user -- <email> [--revoke]');
         process.exit(1);
     }
 
     const auth = getAuth();
     const user = await auth.getUserByEmail(email);
-    await auth.updateUser(user.uid, { emailVerified: true });
-    console.log(`✅ ${email} (${user.uid}) is now marked as email-verified in Firebase Auth.`);
-    console.log('   Reopen /discover in the app (or click "I\'ve verified my email") to sync it.');
+    await auth.updateUser(user.uid, { emailVerified: !revoke });
+    if (revoke) {
+        console.log(`✅ ${email} (${user.uid}) is now marked as email-UNverified in Firebase Auth.`);
+        console.log('   Reopen the app to see the verification gate again.');
+    } else {
+        console.log(`✅ ${email} (${user.uid}) is now marked as email-verified in Firebase Auth.`);
+        console.log('   Reopen /discover in the app (or click "I\'ve verified my email") to sync it.');
+    }
 }
 
 main().catch((e) => {

@@ -12,6 +12,7 @@
     Presentation,
     LogIn,
     Users,
+    PlayCircle,
   } from "@lucide/svelte";
   import SocialIcon from "$lib/components/SocialIcon.svelte";
   import { SOCIAL_LINKS } from "$lib/social";
@@ -34,6 +35,8 @@
     { href: "/team", label: "Team", icon: Users },
     { href: "/contact", label: "Contact", icon: Mail },
   ];
+
+  const DEMO_VIDEO_URL = "https://www.youtube.com/watch?v=8XC1glfkSAY";
 
   // lower-priority legal links, styled smaller and pinned near the social icons at the bottom
   const SECONDARY_LINKS: SideMenuLink[] = [
@@ -110,6 +113,16 @@
         {link.label}
       </a>
     {/each}
+
+    <a
+      href={DEMO_VIDEO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex items-center gap-2 rounded-xl px-3 py-3 text-base font-semibold text-text active:scale-95"
+    >
+      <PlayCircle class="size-4.5 shrink-0" />
+      Demo
+    </a>
 
     <div class="mt-auto flex flex-col gap-1">
       {#each SECONDARY_LINKS as link (link.href)}

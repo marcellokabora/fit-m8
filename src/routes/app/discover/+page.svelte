@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import type { UserProfile } from "$lib/types";
   import { goto } from "$app/navigation";
-  import { page } from "$app/state";
   import {
     SlidersHorizontal,
     User,
@@ -13,11 +12,11 @@
     Moon,
     Check,
     PartyPopper,
-    MailCheck,
     Info,
     Crown,
   } from "@lucide/svelte";
   import Loading from "$lib/components/Loading.svelte";
+  import BottomSheet from "$lib/components/BottomSheet.svelte";
   import ProfileCardInfo from "$lib/components/ProfileCardInfo.svelte";
   import { getFallbackPhoto } from "$lib/image";
   import ActionButtons from "$lib/components/ActionButtons.svelte";
@@ -143,54 +142,9 @@
         $filterTrainer !== ""),
   );
 
-  // Email/password accounts must confirm their inbox link before they're visible in Discover;
-  // Google accounts come back already verified. Refreshed on mount in case it just happened elsewhere.
-  let needsVerification = $derived($authUser?.emailVerified === false);
-  let verificationSending = $state(false);
-  let verificationMessage = $state("");
-  let checkingVerification = $state(false);
-  let justVerified = $state(false);
-
-  async function resendVerification() {
-    verificationSending = true;
-    verificationMessage = "";
-    try {
-      await authUser.resendVerificationEmail();
-      verificationMessage = t.t("auth.verificationEmailSent");
-    } catch (e: any) {
-      verificationMessage = e.message ?? t.t("errors.generic");
-    } finally {
-      verificationSending = false;
-    }
-  }
-
-  async function checkVerification() {
-    checkingVerification = true;
-    verificationMessage = "";
-    const verified = await authUser.refreshUser();
-    if (verified) {
-      const uid = get(authUser)?.uid;
-      if (uid) await userProfile.save(uid, { emailVerified: true });
-    } else {
-      verificationMessage = t.t("auth.stillNotVerified");
-    }
-    checkingVerification = false;
-  }
-
   // Backfill coordinates for profiles saved before distance filtering existed —
   // only runs if the browser already granted geolocation, so it never prompts.
   onMount(() => {
-    authUser.refreshUser();
-    // Firebase's verification email links back here with ?verified=1 once it confirms the address
-    if (page.url.searchParams.get("verified") === "1") {
-      justVerified = true;
-      setTimeout(() => (justVerified = false), 5000);
-      goto("/app/discover", {
-        replaceState: true,
-        noScroll: true,
-        keepFocus: true,
-      });
-    }
     if (typeof navigator === "undefined") return;
     if (!("geolocation" in navigator) || !("permissions" in navigator)) return;
     navigator.permissions
@@ -526,7 +480,6 @@
 
     if (isMatch) {
       matchBanner = true;
-      setTimeout(() => (matchBanner = false), 3000);
     }
   }
 
@@ -589,306 +542,250 @@
 </script>
 
 <div class="flex h-dvh flex-col overflow-hidden bg-bg pb-18">
-  {#if needsVerification}
-    <!-- Email verification gate: keeps unverified email/password accounts out of Discover -->
-    <div
-      class="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center"
-    >
-      <MailCheck class="size-16 text-primary" />
-      <h1 class="text-xl font-black text-text">
-        {t.t("auth.verifyEmailTitle")}
-      </h1>
-      <p class="text-sm text-muted">
-        {t.t("auth.verifyEmailHint", { email: $authUser?.email ?? "" })}
-      </p>
-      {#if verificationMessage}
-        <p class="rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary">
-          {verificationMessage}
+  <!-- Header -->
+  <div class="flex items-center justify-between px-5 pb-3 pt-5">
+    <h1 class="text-2xl font-black text-text">{pageTitle}</h1>
+    <div class="flex items-center gap-2">
+      <button
+        onclick={applyDatingPreset}
+        class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
+          ? 'bg-primary text-bg'
+          : 'bg-surface text-text'}"
+        aria-label={t.t("discover.datingPreset")}
+      >
+        <Heart class="size-5" />
+      </button>
+      <button
+        onclick={applyFriendsPreset}
+        class="flex size-9 items-center justify-center rounded-full shadow-sm {isFriendsPreset
+          ? 'bg-primary text-bg'
+          : 'bg-surface text-text'}"
+        aria-label={t.t("discover.friendsPreset")}
+      >
+        <Users class="size-5" />
+      </button>
+      <button
+        onclick={applyTrainerPreset}
+        class="size-9 items-center justify-center rounded-full shadow-sm flex {isTrainerPreset
+          ? 'bg-primary text-bg'
+          : 'bg-surface text-text'}"
+        aria-label={t.t("discover.trainerPreset")}
+      >
+        <UserShield class="size-5" />
+      </button>
+      <PresetSheet
+        preset={isDefaultPreset
+          ? "default"
+          : isDatingPreset
+            ? "dating"
+            : isFriendsPreset
+              ? "friends"
+              : isTrainerPreset
+                ? "trainer"
+                : null}
+        onSelectPreset={selectDiscoverPreset}
+      />
+      <button
+        onclick={() => goto("/app/discover/filters")}
+        class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
+          ? 'bg-primary text-bg'
+          : 'bg-surface text-text'}"
+        aria-label={t.t("discover.filters")}
+      >
+        <SlidersHorizontal class="size-5" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Card stack -->
+  <div
+    class="relative flex min-h-0 flex-1 flex-col items-center justify-center"
+  >
+    {#if loading}
+      <Loading fullscreen={false} class="absolute inset-0" />
+    {:else if users.length === 0}
+      <div class="flex flex-col items-center gap-4 text-center">
+        <Moon class="size-16 text-muted" />
+        <p class="text-lg font-bold text-text">
+          {t.t("discover.noMorePlayers")}
         </p>
-      {/if}
-      <button
-        onclick={checkVerification}
-        disabled={checkingVerification}
-        class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95 disabled:opacity-50"
-      >
-        {checkingVerification
-          ? t.t("common.loading")
-          : t.t("auth.iHaveVerified")}
-      </button>
-      <button
-        onclick={resendVerification}
-        disabled={verificationSending}
-        class="w-full rounded-2xl border-2 border-border py-4 text-base font-semibold text-text active:scale-95 disabled:opacity-50"
-      >
-        {verificationSending
-          ? t.t("common.loading")
-          : t.t("auth.resendVerification")}
-      </button>
-      <button
-        onclick={() => authUser.signOut()}
-        class="mt-2 text-sm font-semibold text-muted"
-      >
-        {t.t("profile.signOut")}
-      </button>
-    </div>
-  {:else}
-    {#if justVerified}
-      <div
-        class="mx-5 mt-5 flex items-center gap-2 rounded-2xl bg-success/10 px-4 py-3 text-sm font-semibold text-success"
-      >
-        <MailCheck class="size-5 shrink-0" />
-        {t.t("auth.emailVerifiedSuccess")}
-      </div>
-    {/if}
-    <!-- Header -->
-    <div class="flex items-center justify-between px-5 pb-3 pt-5">
-      <h1 class="text-2xl font-black text-text">{pageTitle}</h1>
-      <div class="flex items-center gap-2">
+        <p class="text-sm text-muted">
+          {t.t("discover.tryFilters")}
+        </p>
         <button
-          onclick={applyDatingPreset}
-          class="flex size-9 items-center justify-center rounded-full shadow-sm {isDatingPreset
-            ? 'bg-primary text-bg'
-            : 'bg-surface text-text'}"
-          aria-label={t.t("discover.datingPreset")}
+          onclick={loadFeed}
+          class="rounded-2xl bg-primary px-6 py-3 font-bold text-bg active:scale-95"
         >
-          <Heart class="size-5" />
-        </button>
-        <button
-          onclick={applyFriendsPreset}
-          class="flex size-9 items-center justify-center rounded-full shadow-sm {isFriendsPreset
-            ? 'bg-primary text-bg'
-            : 'bg-surface text-text'}"
-          aria-label={t.t("discover.friendsPreset")}
-        >
-          <Users class="size-5" />
-        </button>
-        <button
-          onclick={applyTrainerPreset}
-          class="size-9 items-center justify-center rounded-full shadow-sm flex {isTrainerPreset
-            ? 'bg-primary text-bg'
-            : 'bg-surface text-text'}"
-          aria-label={t.t("discover.trainerPreset")}
-        >
-          <UserShield class="size-5" />
-        </button>
-        <PresetSheet
-          preset={isDefaultPreset
-            ? "default"
-            : isDatingPreset
-              ? "dating"
-              : isFriendsPreset
-                ? "friends"
-                : isTrainerPreset
-                  ? "trainer"
-                  : null}
-          onSelectPreset={selectDiscoverPreset}
-        />
-        <button
-          onclick={() => goto("/app/discover/filters")}
-          class="flex size-9 items-center justify-center rounded-full shadow-sm {isCustomFilter
-            ? 'bg-primary text-bg'
-            : 'bg-surface text-text'}"
-          aria-label={t.t("discover.filters")}
-        >
-          <SlidersHorizontal class="size-5" />
+          {t.t("discover.refresh")}
         </button>
       </div>
-    </div>
-
-    <!-- Card stack -->
-    <div
-      class="relative flex min-h-0 flex-1 flex-col items-center justify-center"
-    >
-      {#if loading}
-        <Loading fullscreen={false} class="absolute inset-0" />
-      {:else if users.length === 0}
-        <div class="flex flex-col items-center gap-4 text-center">
-          <Moon class="size-16 text-muted" />
-          <p class="text-lg font-bold text-text">
-            {t.t("discover.noMorePlayers")}
-          </p>
-          <p class="text-sm text-muted">
-            {t.t("discover.tryFilters")}
-          </p>
-          <button
-            onclick={loadFeed}
-            class="rounded-2xl bg-primary px-6 py-3 font-bold text-bg active:scale-95"
+    {:else}
+      <!-- Card stack wrapper: keeps all layers anchored to the same box -->
+      <div class="relative min-h-0 w-full flex-1">
+        <!-- Background cards (stacked look) -->
+        {#if users[2]}
+          <div
+            class="absolute inset-0 z-0 flex flex-col overflow-hidden bg-surface shadow-md"
           >
-            {t.t("discover.refresh")}
-          </button>
-        </div>
-      {:else}
-        <!-- Card stack wrapper: keeps all layers anchored to the same box -->
-        <div class="relative min-h-0 w-full flex-1">
-          <!-- Background cards (stacked look) -->
-          {#if users[2]}
-            <div
-              class="absolute inset-0 z-0 flex flex-col overflow-hidden bg-surface shadow-md"
-            >
-              <div
-                class="flex-1 min-h-0 w-full flex items-center justify-center"
-              >
-                <img
-                  src={users[2].photos?.[0] ||
-                    getFallbackPhoto(users[2].uid, users[2].gender)}
-                  alt={users[2].displayName}
-                  draggable="false"
-                  class="h-full w-full object-cover pointer-events-none"
-                />
-              </div>
+            <div class="flex-1 min-h-0 w-full flex items-center justify-center">
+              <img
+                src={users[2].photos?.[0] ||
+                  getFallbackPhoto(users[2].uid, users[2].gender)}
+                alt={users[2].displayName}
+                draggable="false"
+                class="h-full w-full object-cover pointer-events-none"
+              />
             </div>
-          {/if}
-          {#if users[1]}
-            <div
-              class="absolute inset-0 z-10 flex flex-col overflow-hidden bg-surface shadow-md"
-            >
-              <div
-                class="flex-1 min-h-0 w-full flex items-center justify-center"
-              >
-                <img
-                  src={users[1].photos?.[0] ||
-                    getFallbackPhoto(users[1].uid, users[1].gender)}
-                  alt={users[1].displayName}
-                  draggable="false"
-                  class="h-full w-full object-cover pointer-events-none"
-                />
-              </div>
-              <ProfileCardInfo user={users[1]} {t} />
-            </div>
-          {/if}
-
-          <!-- Top card -->
-          {#key users[0]?.uid}
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div
-              bind:this={cardEl}
-              onpointerdown={onPointerDown}
-              onpointermove={onPointerMove}
-              onpointerup={onPointerUp}
-              onpointercancel={onPointerUp}
-              style="transform: translateX({currentX}px) rotate({rotation}deg); transition: {dragging
-                ? 'none'
-                : exiting
-                  ? 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)'
-                  : 'transform 0.3s'}, border-radius 0.2s; touch-action: none;"
-              class="absolute inset-0 z-20 flex flex-col overflow-hidden bg-surface shadow-xl select-none cursor-grab active:cursor-grabbing {dragging ||
-              exiting
-                ? 'rounded-3xl'
-                : ''}"
-            >
-              <!-- Photo progress segments (Tinder-style tap navigation) -->
-              {#if currentPhotos.length > 1}
-                <div
-                  class="absolute left-1/2 top-6 z-10 flex w-1/3 -translate-x-1/2 gap-1"
-                >
-                  {#each currentPhotos as _, i}
-                    <div
-                      class="h-1 flex-1 overflow-hidden rounded-full bg-white/40"
-                    >
-                      <div
-                        class="h-full rounded-full bg-white"
-                        style="width: {i === photoIndex ? '100%' : '0%'}"
-                      ></div>
-                    </div>
-                  {/each}
-                </div>
-              {/if}
-
-              <!-- Profile image area (fills remaining vertical space) -->
-              <div
-                bind:this={photoEl}
-                class="relative flex-1 min-h-0 w-full flex items-center justify-center"
-              >
-                {#if currentPhotos[photoIndex]}
-                  <img
-                    src={currentPhotos[photoIndex]}
-                    alt={users[0].displayName}
-                    draggable="false"
-                    class="h-full w-full object-cover pointer-events-none"
-                  />
-                {:else}
-                  <User class="size-24 text-primary/40" />
-                {/if}
-              </div>
-
-              <!-- Like / Pass overlays -->
-              <div
-                class="absolute inset-0 flex items-start justify-start p-6 pointer-events-none"
-                style="opacity: {likeOpacity};"
-              >
-                <span
-                  class="flex items-center gap-1 rounded-xl border-4 border-success px-4 py-2 text-2xl font-black text-success rotate-[-15deg]"
-                >
-                  LIKE <Check class="size-6" />
-                </span>
-              </div>
-              <div
-                class="absolute inset-0 flex items-start justify-end p-6 pointer-events-none"
-                style="opacity: {passOpacity};"
-              >
-                <span
-                  class="flex items-center gap-1 rounded-xl border-4 border-error px-4 py-2 text-2xl font-black text-error rotate-[15deg]"
-                >
-                  PASS <X class="size-6" />
-                </span>
-              </div>
-
-              <!-- Info -->
-              <ProfileCardInfo user={users[0]} {t} />
-            </div>
-          {/key}
-
-          <!-- Action buttons: overlaid on the card's bottom shadow, not in flex flow -->
-          <ActionButtons
-            class="absolute inset-x-0 bottom-4 z-30"
-            onPass={() => swipe("pass")}
-            onLike={() => swipe("like")}
-            disabled={exiting}
-            likeProgress={likeOpacity}
-            passProgress={passOpacity}
-            passLabel={t.t("common.pass")}
-            likeLabel={t.t("common.like")}
-            onUndo={undoLastSwipe}
-            canUndo={!!lastSwipe}
-            undoLabel={t.t("common.undo")}
-            onMessage={handleMessage}
-            messageLabel={t.t("common.message")}
-          />
-        </div>
-      {/if}
-    </div>
-
-    <!-- Match banner -->
-    {#if matchBanner}
-      <div
-        class="fixed inset-0 z-50 mx-auto flex w-full items-center justify-center bg-black/60 backdrop-blur-sm md:max-w-md"
-      >
-        <div
-          class="flex flex-col items-center gap-4 rounded-3xl bg-surface p-10 shadow-2xl text-center mx-6"
-        >
-          <PartyPopper class="size-16 text-primary" />
-          <h2 class="text-3xl font-black text-primary">
-            {t.t("discover.matchTitle")}
-          </h2>
-          <p class="text-muted">{t.t("discover.matchHint")}</p>
-          <div class="flex gap-3 w-full">
-            <button
-              onclick={() => (matchBanner = false)}
-              class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text"
-            >
-              {t.t("common.keepSwiping")}
-            </button>
-            <a
-              href="/app/matches"
-              class="flex-1 rounded-2xl bg-primary py-3 text-center text-sm font-bold text-bg"
-            >
-              {t.t("matches.viewMatches")}
-            </a>
           </div>
-        </div>
+        {/if}
+        {#if users[1]}
+          <div
+            class="absolute inset-0 z-10 flex flex-col overflow-hidden bg-surface shadow-md"
+          >
+            <div class="flex-1 min-h-0 w-full flex items-center justify-center">
+              <img
+                src={users[1].photos?.[0] ||
+                  getFallbackPhoto(users[1].uid, users[1].gender)}
+                alt={users[1].displayName}
+                draggable="false"
+                class="h-full w-full object-cover pointer-events-none"
+              />
+            </div>
+            <ProfileCardInfo user={users[1]} {t} />
+          </div>
+        {/if}
+
+        <!-- Top card -->
+        {#key users[0]?.uid}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div
+            bind:this={cardEl}
+            onpointerdown={onPointerDown}
+            onpointermove={onPointerMove}
+            onpointerup={onPointerUp}
+            onpointercancel={onPointerUp}
+            style="transform: translateX({currentX}px) rotate({rotation}deg); transition: {dragging
+              ? 'none'
+              : exiting
+                ? 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)'
+                : 'transform 0.3s'}, border-radius 0.2s; touch-action: none;"
+            class="absolute inset-0 z-20 flex flex-col overflow-hidden bg-surface shadow-xl select-none cursor-grab active:cursor-grabbing {dragging ||
+            exiting
+              ? 'rounded-3xl'
+              : ''}"
+          >
+            <!-- Photo progress segments (Tinder-style tap navigation) -->
+            {#if currentPhotos.length > 1}
+              <div
+                class="absolute left-1/2 top-6 z-10 flex w-1/3 -translate-x-1/2 gap-1"
+              >
+                {#each currentPhotos as _, i}
+                  <div
+                    class="h-1 flex-1 overflow-hidden rounded-full bg-white/40"
+                  >
+                    <div
+                      class="h-full rounded-full bg-white"
+                      style="width: {i === photoIndex ? '100%' : '0%'}"
+                    ></div>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+
+            <!-- Profile image area (fills remaining vertical space) -->
+            <div
+              bind:this={photoEl}
+              class="relative flex-1 min-h-0 w-full flex items-center justify-center"
+            >
+              {#if currentPhotos[photoIndex]}
+                <img
+                  src={currentPhotos[photoIndex]}
+                  alt={users[0].displayName}
+                  draggable="false"
+                  class="h-full w-full object-cover pointer-events-none"
+                />
+              {:else}
+                <User class="size-24 text-primary/40" />
+              {/if}
+            </div>
+
+            <!-- Like / Pass overlays -->
+            <div
+              class="absolute inset-0 flex items-start justify-start p-6 pointer-events-none"
+              style="opacity: {likeOpacity};"
+            >
+              <span
+                class="flex items-center gap-1 rounded-xl border-4 border-success px-4 py-2 text-2xl font-black text-success rotate-[-15deg]"
+              >
+                LIKE <Check class="size-6" />
+              </span>
+            </div>
+            <div
+              class="absolute inset-0 flex items-start justify-end p-6 pointer-events-none"
+              style="opacity: {passOpacity};"
+            >
+              <span
+                class="flex items-center gap-1 rounded-xl border-4 border-error px-4 py-2 text-2xl font-black text-error rotate-[15deg]"
+              >
+                PASS <X class="size-6" />
+              </span>
+            </div>
+
+            <!-- Info -->
+            <ProfileCardInfo user={users[0]} {t} />
+          </div>
+        {/key}
+
+        <!-- Action buttons: overlaid on the card's bottom shadow, not in flex flow -->
+        <ActionButtons
+          class="absolute inset-x-0 bottom-4 z-30"
+          onPass={() => swipe("pass")}
+          onLike={() => swipe("like")}
+          disabled={exiting}
+          likeProgress={likeOpacity}
+          passProgress={passOpacity}
+          passLabel={t.t("common.pass")}
+          likeLabel={t.t("common.like")}
+          onUndo={undoLastSwipe}
+          canUndo={!!lastSwipe}
+          undoLabel={t.t("common.undo")}
+          onMessage={handleMessage}
+          messageLabel={t.t("common.message")}
+        />
       </div>
     {/if}
-  {/if}
+  </div>
+
+  <!-- Match banner -->
+  <BottomSheet
+    open={matchBanner}
+    onClose={() => (matchBanner = false)}
+    closeLabel={t.t("common.close")}
+  >
+    {#snippet children()}
+      <div class="flex flex-col items-center gap-4 px-6 pb-8 pt-4 text-center">
+        <PartyPopper class="size-16 text-primary" />
+        <h2 class="text-3xl font-black text-primary">
+          {t.t("discover.matchTitle")}
+        </h2>
+        <p class="text-muted">{t.t("discover.matchHint")}</p>
+        <div class="flex w-full gap-3">
+          <button
+            onclick={() => (matchBanner = false)}
+            class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text"
+          >
+            {t.t("common.keepSwiping")}
+          </button>
+          <a
+            href="/app/matches"
+            class="flex-1 rounded-2xl bg-primary py-3 text-center text-sm font-bold text-bg"
+          >
+            {t.t("matches.viewMatches")}
+          </a>
+        </div>
+      </div>
+    {/snippet}
+  </BottomSheet>
 
   <BottomNav active="discover" />
 </div>

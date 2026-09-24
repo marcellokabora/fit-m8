@@ -170,6 +170,8 @@
   ) {
     if (!$userProfile) return;
     await startCheckin($userProfile, activityId, lat, lng, durationHours);
+    filterActivityIds = [];
+    await updateMyLocation(true);
   }
 
   async function handleEndCheckin() {

@@ -68,6 +68,15 @@
     activities.filter((activity) => activity.level === "expert"),
   );
 
+  const ACTIVITIES_PREVIEW_COUNT = 6;
+  let showAllActivities = $state(false);
+  let visibleActivityCount = $derived(
+    showAllActivities
+      ? activities.length
+      : Math.min(ACTIVITIES_PREVIEW_COUNT, activities.length),
+  );
+  let visibleActivities = $derived(activities.slice(0, visibleActivityCount));
+
   let photos = $derived($userProfile?.photos ?? []);
 
   // only seeded demo accounts get fabricated history - real users see a genuine empty state
@@ -403,7 +412,7 @@
         </p>
       {:else}
         <div class="mb-3 flex flex-col gap-3">
-          {#each activities as act, i (act.id)}
+          {#each visibleActivities as act, i (act.id)}
             {@const expanded = expandedActivityId === act.id}
             {@const dragging = dragIndex === i}
             <div
@@ -495,6 +504,15 @@
             </div>
           {/each}
         </div>
+        {#if activities.length > visibleActivityCount}
+          <button
+            type="button"
+            onclick={() => (showAllActivities = true)}
+            class="mb-3 flex w-full items-center justify-center rounded-2xl bg-surface py-3 text-sm font-bold text-primary shadow-sm active:scale-95"
+          >
+            {t.t("common.showMore")}
+          </button>
+        {/if}
       {/if}
 
       {#if availableActivities.length === 0}
