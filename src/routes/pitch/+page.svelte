@@ -17,8 +17,6 @@
     MapPin,
   } from "@lucide/svelte";
   import { activeTheme, THEMES } from "$lib/stores/theme";
-  import { SOCIAL_LINKS } from "$lib/social";
-  import SocialIcon from "$lib/components/SocialIcon.svelte";
   import SiteHeader from "$lib/components/SiteHeader.svelte";
   import CoverSlide from "./slides/CoverSlide.svelte";
   import ProblemSlide from "./slides/ProblemSlide.svelte";
@@ -99,12 +97,12 @@
     { key: "cover", label: "Cover", component: CoverSlide, props: {} },
     { key: "whyNow", label: "Why Now?", component: WhyNowSlide, props: {} },
     { key: "problem", label: "Problem", component: ProblemSlide, props: {} },
-    ...HOW_IT_WORKS.map((step, index) => ({
-      key: `how-${index}`,
-      label: `How it works: ${step.title}`,
-      component: HowItWorksSlide,
-      props: { ...step, index },
-    })),
+    // ...HOW_IT_WORKS.map((step, index) => ({
+    //   key: `how-${index}`,
+    //   label: `How it works: ${step.title}`,
+    //   component: HowItWorksSlide,
+    //   props: { ...step, index },
+    // })),
     { key: "market", label: "Market Size", component: MarketSlide, props: {} },
     {
       key: "business",

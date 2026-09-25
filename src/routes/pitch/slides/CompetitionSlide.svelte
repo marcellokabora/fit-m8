@@ -43,28 +43,28 @@
       dimension: "Sport & skill filtering",
       cells: [
         { label: "None", support: "no" },
-        { label: "Racket Sports Only", support: "partial" },
-        { label: "Activity Tags Only", support: "partial" },
-        { label: "Event Categories Only", support: "partial" },
+        { label: "Racket Sports", support: "partial" },
+        { label: "Activity Tags", support: "partial" },
+        { label: "Event Categories", support: "partial" },
         { label: "100+ Sports & Skill Levels", support: "yes" },
       ],
     },
     {
       dimension: "Match dynamics",
       cells: [
-        { label: "1-on-1 Only", support: "no" },
+        { label: "1-on-1", support: "no" },
         { label: "Court Lobby Rentals", support: "no" },
         { label: "Follow / Kudos", support: "no" },
-        { label: "Group Only", support: "partial" },
+        { label: "Group", support: "partial" },
         { label: "1-on-1 & 4-Player Activity Loops", support: "yes" },
       ],
     },
     {
-      dimension: "Real-time map discovery",
+      dimension: "Discovery map",
       cells: [
         { label: "No", support: "no" },
-        { label: "Venue Map Only", support: "partial" },
-        { label: "Heatmap Only", support: "partial" },
+        { label: "Venue Map", support: "partial" },
+        { label: "Heatmap", support: "partial" },
         { label: "No", support: "no" },
         { label: "Live Spot Check-Ins & Heatmaps", support: "yes" },
       ],
@@ -82,12 +82,12 @@
     {
       dimension: "Monetization engine",
       cells: [
-        { label: "Dating Subscriptions" },
-        { label: "Court Commission Only" },
-        { label: "Subscription (Premium)" },
-        { label: "Ticket / Group Fees" },
+        { label: "Subscriptions", support: "partial" },
+        { label: "Commission", support: "partial" },
+        { label: "Subscription", support: "partial" },
+        { label: "Commission", support: "partial" },
         {
-          label: "Subscriptions + Trainer & Venue Marketplace",
+          label: "Subscriptions + Trainer + Commission",
           support: "yes",
         },
       ],
@@ -133,7 +133,7 @@
     <tbody>
       {#each COMPETITION_ROWS as row}
         <tr class="border-b border-border last:border-0">
-          <td class="p-3 font-semibold text-text">{row.dimension}</td>
+          <td class="p-4 font-semibold text-text">{row.dimension}</td>
           {#each row.cells as cell, i}
             <td
               class="p-3 {i === COMPETITORS.length - 1
