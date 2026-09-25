@@ -66,7 +66,16 @@
   <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col">
     <SiteHeader />
 
-    <div class="flex flex-col gap-12 px-5 pt-6 text-text justify-center flex-1">
+    <div class="flex flex-col gap-6 px-5 pt-6 text-text flex-1">
+      <div class="flex flex-col gap-2 text-center">
+        <p class="text-xs font-semibold uppercase tracking-widest text-primary">
+          Contact
+        </p>
+        <h1 class="text-3xl font-black text-text text-balance">
+          Get in touch with the FIT-M8 team
+        </h1>
+      </div>
+
       <form
         onsubmit={handleSubmit}
         class="flex flex-col gap-4 rounded-3xl bg-surface p-5 shadow-sm"

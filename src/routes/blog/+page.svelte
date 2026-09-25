@@ -42,6 +42,15 @@
 <div class="mx-auto w-full container">
   <SiteHeader />
 
+  <div class="flex flex-col gap-2 px-5 pt-6 pb-8 text-center">
+    <p class="text-xs font-semibold uppercase tracking-widest text-primary">
+      Blog
+    </p>
+    <h1 class="text-3xl font-black text-text text-balance">
+      Tips for finding your next sports partner
+    </h1>
+  </div>
+
   <div class="grid grid-cols-1 gap-4 px-5 pt-2 sm:grid-cols-2 lg:grid-cols-3">
     {#each data.posts as post (post.slug)}
       <BlogPostCard {post} />

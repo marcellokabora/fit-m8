@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TrendingUp, Users, Globe } from "@lucide/svelte";
+  import { TrendingUp, Users, Globe, Megaphone } from "@lucide/svelte";
   import LinkedinIcon from "~icons/simple-icons/linkedin";
   import GithubIcon from "~icons/simple-icons/github";
   import SiteHeader from "$lib/components/SiteHeader.svelte";
@@ -37,7 +37,7 @@
       desc: "Drive hyper-local CAC reduction, sports club partnerships.",
     },
     {
-      icon: TrendingUp,
+      icon: Megaphone,
       role: "Community Manager",
       desc: "Event management & organic user retention.",
     },
@@ -150,6 +150,12 @@
             </div>
           {/each}
         </div>
+        <a
+          href="/contact"
+          class="mx-auto flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-bold text-bg active:scale-95 mt-4"
+        >
+          Interested? Get in touch
+        </a>
       </div>
     </div>
   </div>
