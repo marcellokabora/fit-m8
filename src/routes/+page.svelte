@@ -204,7 +204,7 @@
       class="relative z-10 mx-auto flex w-full max-w-md flex-col gap-3"
     >
       <a
-        href="/app/discover"
+        href="/auth"
         class="flex capitalize mx-auto px-12 items-center justify-center cursor-pointer gap-3 rounded-full border-2 border-primary backdrop-blur-md py-4 text-center text-base font-semibold text-text shadow-sm active:scale-95"
       >
         <LogIn class="size-5" />

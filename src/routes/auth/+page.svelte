@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
+  import { onMount } from "svelte";
   import { authUser } from "$lib/stores/auth";
   import GoogleSignInButton from "$lib/components/GoogleSignInButton.svelte";
   import FacebookSignInButton from "$lib/components/FacebookSignInButton.svelte";
@@ -26,6 +27,19 @@
   let info = $state("");
   let loading = $state(false);
   let resetSending = $state(false);
+  // true until we know whether a session already exists, so the form doesn't flash before redirecting
+  let checkingSession = $state(true);
+
+  onMount(() =>
+    authUser.subscribe((user) => {
+      if (user === undefined) return; // still resolving persisted session
+      if (user) {
+        goto(redirectTo);
+        return;
+      }
+      checkingSession = false;
+    }),
+  );
 
   function authErrorMessage(e: any) {
     switch (e?.code) {
@@ -118,18 +132,18 @@
 </svelte:head>
 
 <div class="flex min-h-dvh flex-col items-center justify-center px-6 py-12">
-  {#if loading}
+  {#if checkingSession || loading}
     <Loading fullscreen={false} />
   {:else}
     <div class="w-full max-w-sm">
-      <div class="mb-8 flex flex-col items-center gap-2 text-center">
+      <div class="mb-8 flex flex-col items-center gap-4 text-center">
         <a href="/" aria-label="FIT-M8 home">
           <LogoText class="h-12 w-auto text-primary" />
         </a>
-        <h1 class="mt-4 text-2xl font-black text-text">
+        <!-- <h1 class="mt-4 text-2xl font-black text-text">
           {mode === "login" ? t.t("auth.welcome") : t.t("auth.join")}
-        </h1>
-        <p class="text-sm text-muted">
+        </h1> -->
+        <p class="text-md text-muted">
           {mode === "login"
             ? t.t("auth.loginSubtitle")
             : t.t("auth.registerSubtitle")}
