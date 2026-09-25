@@ -91,7 +91,7 @@ export default defineConfig({
 					// color doesn't matter. Reuses the adaptive-icon foreground layer already generated
 					// alongside ic_launcher.png (previously unused).
 					{
-						src: '/icons/drawable-anydpi/ic_launcher.svg',
+						src: '/icons/mythemedicon.svg',
 						sizes: 'any',
 						type: 'image/svg+xml',
 						purpose: 'monochrome'
