@@ -58,7 +58,7 @@
         })),
       ],
     });
-    goto("/app/profile#activities");
+    history.back();
   }
 </script>
 

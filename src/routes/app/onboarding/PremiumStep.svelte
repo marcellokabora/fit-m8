@@ -4,63 +4,11 @@
   import { db } from "$lib/firebase/client";
   import { authUser, userProfile } from "$lib/stores/auth";
   import { submitPremiumRequest } from "$lib/firebase/premiumRequests";
-  import {
-    MAX_LIKES_FREE_PER_DAY,
-    MAX_SPORTS_FREE,
-    MAX_SPORTS_PREMIUM,
-  } from "$lib/types";
-  import {
-    BadgeCheck,
-    Crown,
-    Dumbbell,
-    Heart,
-    MessageCircle,
-    UserShield,
-    Zap,
-  } from "@lucide/svelte";
+  import { PREMIUM_FEATURES } from "$lib/premiumFeatures";
+  import { Crown } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
-
-  // Preview-only — mirrors src/routes/premium/+page.svelte's feature list, no signup here.
-  const FEATURES = [
-    {
-      icon: Dumbbell,
-      title: "premium.featureMoreSportsTitle",
-      hint: "premium.featureMoreSportsHint",
-      params: { max: MAX_SPORTS_PREMIUM, free: MAX_SPORTS_FREE },
-    },
-    {
-      icon: UserShield,
-      title: "premium.featureTrainerTitle",
-      hint: "premium.featureTrainerHint",
-      params: {},
-    },
-    {
-      icon: MessageCircle,
-      title: "premium.featureDirectMessageTitle",
-      hint: "premium.featureDirectMessageHint",
-      params: {},
-    },
-    {
-      icon: Heart,
-      title: "premium.featureUnlimitedLikesTitle",
-      hint: "premium.featureUnlimitedLikesHint",
-      params: { free: MAX_LIKES_FREE_PER_DAY },
-    },
-    {
-      icon: BadgeCheck,
-      title: "premium.featureBadgeTitle",
-      hint: "premium.featureBadgeHint",
-      params: {},
-    },
-    {
-      icon: Zap,
-      title: "premium.featurePriorityBoostTitle",
-      hint: "premium.featurePriorityBoostHint",
-      params: {},
-    },
-  ] as const;
 
   // Guards against re-checking the same ?promo= link on every reactive rerun once redemption has been attempted.
   let promoChecked = $state(false);
@@ -109,7 +57,7 @@
   </p>
 </div>
 <div class="flex flex-col gap-3">
-  {#each FEATURES as feature}
+  {#each PREMIUM_FEATURES as feature}
     <div class="flex items-start gap-4 rounded-2xl bg-surface p-4 shadow-sm">
       <span
         class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"

@@ -40,7 +40,7 @@
       </button>
     </div>
 
-    {#if import.meta.env.DEV}
+    <!-- {#if import.meta.env.DEV}
       <div class="relative">
         <button
           type="button"
@@ -92,6 +92,6 @@
           </div>
         {/if}
       </div>
-    {/if}
+    {/if} -->
   </div>
 </div>

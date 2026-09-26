@@ -45,7 +45,7 @@
 </script>
 
 <h2 class="mb-1 text-2xl font-black text-text">
-  {t.t("onboarding.makeItYours")}
+  {t.t("onboarding.yourSettings")}
 </h2>
 <p class="mb-6 text-sm text-muted text-balance">
   {t.t("onboarding.appearanceHint")}

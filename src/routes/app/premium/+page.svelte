@@ -6,21 +6,9 @@
   import { authUser, userProfile } from "$lib/stores/auth";
   import { isAdmin } from "$lib/stores/admin";
   import { submitPremiumRequest } from "$lib/firebase/premiumRequests";
-  import {
-    MAX_LIKES_FREE_PER_DAY,
-    MAX_SPORTS_FREE,
-    MAX_SPORTS_PREMIUM,
-  } from "$lib/types";
+  import { PREMIUM_FEATURES } from "$lib/premiumFeatures";
   import BackHeader from "$lib/components/BackHeader.svelte";
-  import {
-    BadgeCheck,
-    Crown,
-    Dumbbell,
-    Heart,
-    MessageCircle,
-    UserShield,
-    Zap,
-  } from "@lucide/svelte";
+  import { Crown } from "@lucide/svelte";
   import { activeLanguage, createTranslator } from "$lib/stores/language";
 
   let t = $derived(createTranslator($activeLanguage));
@@ -42,51 +30,6 @@
       requesting = false;
     }
   }
-
-  const FEATURES = [
-    {
-      icon: Dumbbell,
-      title: "premium.featureMoreSportsTitle",
-      hint: "premium.featureMoreSportsHint",
-      params: { max: MAX_SPORTS_PREMIUM, free: MAX_SPORTS_FREE },
-      comingSoon: false,
-    },
-    {
-      icon: UserShield,
-      title: "premium.featureTrainerTitle",
-      hint: "premium.featureTrainerHint",
-      params: {},
-      comingSoon: false,
-    },
-    {
-      icon: MessageCircle,
-      title: "premium.featureDirectMessageTitle",
-      hint: "premium.featureDirectMessageHint",
-      params: {},
-      comingSoon: false,
-    },
-    {
-      icon: Heart,
-      title: "premium.featureUnlimitedLikesTitle",
-      hint: "premium.featureUnlimitedLikesHint",
-      params: { free: MAX_LIKES_FREE_PER_DAY },
-      comingSoon: false,
-    },
-    {
-      icon: BadgeCheck,
-      title: "premium.featureBadgeTitle",
-      hint: "premium.featureBadgeHint",
-      params: {},
-      comingSoon: false,
-    },
-    {
-      icon: Zap,
-      title: "premium.featurePriorityBoostTitle",
-      hint: "premium.featurePriorityBoostHint",
-      params: {},
-      comingSoon: false,
-    },
-  ] as const;
 
   async function setPremium(value: boolean) {
     const uid = get(authUser)?.uid;
@@ -139,7 +82,7 @@
   </div>
 
   <div class="flex flex-col gap-3">
-    {#each FEATURES as feature}
+    {#each PREMIUM_FEATURES as feature}
       <div class="flex items-start gap-4 rounded-2xl bg-surface p-4 shadow-sm">
         <span
           class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
@@ -173,13 +116,13 @@
       {saving ? t.t("common.saving") : t.t("premium.cancelButton")}
     </button>
   {:else}
-    <button
+    <!-- <button
       onclick={() => setPremium(true)}
       disabled={saving || !canRegisterMembership}
       class="w-full rounded-2xl bg-primary py-4 text-base font-bold text-bg shadow-md active:scale-95 disabled:opacity-40"
     >
       {saving ? t.t("common.saving") : t.t("premium.subscribeButton")}
-    </button>
+    </button> -->
     {#if !canRegisterMembership}
       {#if requestSent}
         <p class="text-center text-xs text-muted">

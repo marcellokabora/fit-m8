@@ -603,7 +603,7 @@
 
     <div class="mt-5 flex flex-col gap-3 bg-bg">
       <a
-        href="/app/profile#activities"
+        href="/app/profile/add-sport"
         class="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/40 py-3 text-sm font-bold text-primary active:scale-95"
       >
         <Plus class="size-4" />
