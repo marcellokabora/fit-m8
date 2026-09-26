@@ -161,17 +161,6 @@
   >
     <div class="mx-auto mt-3 h-1.5 w-10 shrink-0 rounded-full bg-border"></div>
     <div class="flex-1 overflow-y-auto p-5">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-lg font-black text-text">Edit profile</h2>
-        <button
-          onclick={onClose}
-          aria-label="Close"
-          class="flex size-8 items-center justify-center rounded-full bg-bg text-muted active:scale-95"
-        >
-          <X class="size-4" />
-        </button>
-      </div>
-
       {#if draft.photo}
         <img
           src={draft.photo}

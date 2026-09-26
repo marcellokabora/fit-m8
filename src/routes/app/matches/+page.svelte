@@ -188,7 +188,7 @@
           <h2 class="px-5 text-xs font-bold uppercase tracking-wide text-muted">
             {t.t("matches.newMatches")}
           </h2>
-          <div class="flex gap-4 overflow-x-auto px-5 pb-1">
+          <div class="hide-scrollbar flex gap-4 overflow-x-auto px-5 pb-1">
             {#each newMatches as match (match.id)}
               {@const otherUid = match.userIds.find(
                 (id) => id !== $authUser?.uid,

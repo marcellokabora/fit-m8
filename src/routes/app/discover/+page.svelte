@@ -69,6 +69,7 @@
   let lastLoadedKey = $state<string | null>(null);
 
   let matchBanner = $state(false);
+  let matchedChatId = $state<string | null>(null);
   // The most recently swiped profile (like or pass), restorable via the undo button; cleared on undo
   let lastSwipe = $state<{
     profile: UserProfile;
@@ -479,6 +480,7 @@
     exiting = false;
 
     if (isMatch) {
+      matchedChatId = [uid, top.uid].sort().join("_");
       matchBanner = true;
     }
   }
@@ -759,7 +761,10 @@
   <!-- Match banner -->
   <BottomSheet
     open={matchBanner}
-    onClose={() => (matchBanner = false)}
+    onClose={() => {
+      matchBanner = false;
+      matchedChatId = null;
+    }}
     closeLabel={t.t("common.close")}
   >
     {#snippet children()}
@@ -771,13 +776,16 @@
         <p class="text-muted">{t.t("discover.matchHint")}</p>
         <div class="flex w-full gap-3">
           <button
-            onclick={() => (matchBanner = false)}
+            onclick={() => {
+              matchBanner = false;
+              matchedChatId = null;
+            }}
             class="flex-1 rounded-2xl border-2 border-border py-3 text-sm font-semibold text-text"
           >
             {t.t("common.keepSwiping")}
           </button>
           <a
-            href="/app/matches"
+            href={matchedChatId ? `/app/chat/${matchedChatId}` : "/app/matches"}
             class="flex-1 rounded-2xl bg-primary py-3 text-center text-sm font-bold text-bg"
           >
             {t.t("matches.viewMatches")}
